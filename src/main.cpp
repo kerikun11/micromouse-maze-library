@@ -40,7 +40,7 @@ class Maze{
 		Maze(){
 			reset();
 		}
-		void reset(){
+		inline void reset(){
 			for(uint8_t y=0; y<MAZE_SIZE; y++)
 				for(uint8_t x=0; x<MAZE_SIZE; x++)
 					wall[y][x]=0x00;
@@ -59,7 +59,7 @@ class Maze{
 				}
 			return *this;
 		}
-		void loadFromArray(const char asciiData[MAZE_SIZE+1][MAZE_SIZE+1]){
+		inline void loadFromArray(const char asciiData[MAZE_SIZE+1][MAZE_SIZE+1]){
 			for(int i=0;i<MAZE_SIZE;i++){
 				for(int j=0;j<MAZE_SIZE;j++){
 					char ch = asciiData[MAZE_SIZE-1-i][j];
@@ -74,7 +74,7 @@ class Maze{
 		}
 		inline uint8_t getWall(const uint8_t x, const uint8_t y) const {return wall[y][x];}
 		inline uint8_t getStepMap(const uint8_t x, const uint8_t y) const {return stepMap[y][x];}
-		void updateWall(const uint8_t x, const uint8_t y, const uint8_t w){
+		inline void updateWall(const uint8_t x, const uint8_t y, const uint8_t w){
 			wall[y][x] |= w;
 			if(x != 0          ) wall[y][x-1] |= (w&F_WEST )>>2; //< Not Westernmost
 			if(x != MAZE_SIZE-1) wall[y][x+1] |= (w&F_EAST )<<2; //< Not Easternmost
@@ -82,14 +82,7 @@ class Maze{
 			if(y != MAZE_SIZE-1) wall[y+1][x] |= (w&F_NORTH)<<2; //< Not Northernmost
 		}
 		inline void updateWall(const IndexVec& v, const uint8_t w) { return updateWall(v.x, v.y, w);}
-		void updateWall(const uint8_t x, const uint8_t y, const uint8_t dir, const bool left, const bool front, const bool right){
-			uint8_t w=0x00;
-			w |= (left  ? F_NORTH : N_NORTH) << ((dir+3)&0x03);
-			w |= (front ? F_NORTH : N_NORTH) << ((dir+0)&0x03);
-			w |= (right ? F_NORTH : N_NORTH) << ((dir+1)&0x03);
-			updateWall(x,y,w);
-		}
-		void printWall(const IndexVec& v){
+		inline void printWall(const IndexVec& v){
 			for(int16_t y=MAZE_SIZE-1; y>=0; y--){
 				for(uint8_t x=0; x<MAZE_SIZE; x++) printf("+%s+", wall[y][x]&NORTH ? "---" : "   ");
 				printf("\n");
@@ -105,7 +98,7 @@ class Maze{
 			}
 			printf("\n");
 		}
-		void printWall(uint8_t nums[MAZE_SIZE][MAZE_SIZE] = NULL){
+		inline void printWall(uint8_t nums[MAZE_SIZE][MAZE_SIZE] = NULL){
 			for(int16_t y=MAZE_SIZE-1; y>=0; y--){
 				for(uint8_t x=0; x<MAZE_SIZE; x++) printf("+%s+", wall[y][x]&NORTH ? "---" : "   ");
 				printf("\n");
@@ -121,7 +114,7 @@ class Maze{
 			}
 			printf("\n");
 		}
-		void updateStepMap(const IndexVec& dest){
+		inline void updateStepMap(const IndexVec& dest){
 			for(uint8_t y=0; y<MAZE_SIZE; y++)
 				for(uint8_t x=0; x<MAZE_SIZE; x++)
 					stepMap[y][x] = 0xff;
