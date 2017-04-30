@@ -23,6 +23,14 @@
 #define N_WEST		0x40
 #define N_SOUTH		0x80
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 typedef int8_t dir_t;
 typedef uint16_t step_t;
 
@@ -175,19 +183,26 @@ class Maze{
 #else
 			printf("\n");
 			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
-				for(uint8_t x=0; x<MAZE_SIZE; x++) printf("+%s", wall[y][x].n ? "---" : "   ");
-				printf("\n");
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
-					printf("%s", wall[y][x].w ? "|" : " ");
+					if(wall[y][x].N) printf("+" ANSI_COLOR_CYAN "%s" ANSI_COLOR_RESET, wall[y][x].n ? "---" : "   ");
+					else printf("+" ANSI_COLOR_RED "%s" ANSI_COLOR_RESET, wall[y][x].n ? "---" : " - ");
+				}
+				printf("+\n");
+				for(uint8_t x=0; x<MAZE_SIZE; x++){
+					if(wall[y][x].W)printf(ANSI_COLOR_CYAN "%s" ANSI_COLOR_RESET, wall[y][x].w ? "|" : " ");
+					else printf(ANSI_COLOR_RED "%s" ANSI_COLOR_RESET, wall[y][x].w ? "|" : ":");
 					if(nums==NULL) printf("   ");
 					else printf("%3d", nums[y][x]);
 				}
-				printf("%s", wall[y][MAZE_SIZE-1].e ? "|" : " ");
+				if(wall[y][MAZE_SIZE-1].E)printf(ANSI_COLOR_CYAN "%s" ANSI_COLOR_RESET, wall[y][MAZE_SIZE-1].e ? "|" : " ");
+				else printf(ANSI_COLOR_RED "%s" ANSI_COLOR_RESET, wall[y][MAZE_SIZE-1].e ? "|" : ":");
 				printf("\n");
 			}
-			for(uint8_t x=0; x<MAZE_SIZE; x++) printf("+%s", wall[0][x].s ? "---" : "   ");
-			printf("\n");
-			printf("\n");
+			for(uint8_t x=0; x<MAZE_SIZE; x++){
+				if(wall[0][x].S) printf("+" ANSI_COLOR_CYAN "%s" ANSI_COLOR_RESET, wall[0][x].s ? "---" : "   ");
+				else printf("+" ANSI_COLOR_RED "%s" ANSI_COLOR_RESET, wall[0][x].s ? "---" : " - ");
+			}
+			printf("+\n\n");
 #endif
 		}
 		inline void printPath(std::vector<Vector> path){
@@ -261,10 +276,9 @@ class MazeAgent{
 				}
 				if(min_step == MAZE_STEP_MAX) state = GOT_LOST;
 				for(auto g: goal){
-					if(v.next(nextDir)==g) {
+					if(v==g) {
 						state = REACHED_GOAL;
 						list = goal;
-						list.erase(list.begin()+(&g-&goal[0]));
 					}
 				}
 			}
@@ -280,10 +294,9 @@ class MazeAgent{
 						nextDir = dir;
 					}
 				}
-				for(auto l: list){
-					if(v.next(nextDir)==l) {
-						state = REACHED_GOAL;
-						list.erase(list.begin()+(&l-&list[0]));
+				for(auto it=list.begin();it != list.end(); it++){
+					if(v.next(nextDir)==*it) {
+						list.erase(it);
 						break;
 					}
 				}
@@ -298,13 +311,28 @@ class MazeAgent{
 			}
 
 			if(state == BACKING_TO_START){
-				state = REACHED_START;
+				maze.updateStepMap({start});
+				step_t min_step = MAZE_STEP_MAX;
+				for(dir_t dir: {0+d, 1+d, 3+d, 2+d}){
+					dir &= 3;
+					if(maze.getStep(v.next(dir))<min_step && !maze.getWall(v)[dir]){
+						min_step = maze.getStep(v.next(dir));
+						nextDir = dir;
+					}
+				}
+				if(min_step == MAZE_STEP_MAX) state = GOT_LOST;
+				if(v==start) {
+					state = REACHED_START;
+				}
 			}
 			printf("State: %d, Cur: (%d, %d, %d), Next Dir: %d\n", state, curVec.x, curVec.y, curDir, nextDir);
 		}
 
 		State getState(){
 			return state;
+		}
+		Maze getMaze(){
+			return maze;
 		}
 		dir_t getNextDir(){
 			return nextDir;
@@ -319,6 +347,7 @@ class MazeAgent{
 	private:
 		State state;
 		Maze maze;
+		const Vector start = Vector(0, 0);
 		std::vector<Vector> goal;
 		Vector curVec;
 		dir_t curDir;
@@ -379,7 +408,8 @@ int main(void){
 		Vector nextVec = agent.getCurVec().next(nextDir);
 		agent.update(nextVec, nextDir, sample.getWall(nextVec));
 	}
-	maze.printStepMap();
+	maze = agent.getMaze();
+	maze.updateStepMap(goal);
 	return 0;
 }
 
