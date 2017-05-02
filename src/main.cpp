@@ -17,7 +17,6 @@
 #define C_CYAN    "\x1b[36m"
 #define C_RESET   "\x1b[0m"
 
-typedef int8_t dir_t;
 typedef uint16_t step_t;
 
 class Dir{
@@ -146,6 +145,10 @@ class Maze{
 			}
 			//* start cell
 			updateWall(0,0,0x0b);
+			//* step map
+			for(uint8_t y=0; y<MAZE_SIZE; y++)
+				for(uint8_t x=0; x<MAZE_SIZE; x++)
+					stepMap[y][x] = 0;
 		}
 		inline Wall& getWall(const Vector& v) { return getWall(v.x, v.y); }
 		inline Wall& getWall(const int x, const int y) {
@@ -173,7 +176,7 @@ class Maze{
 			getWall(v) = w;
 			for(Dir d: Dir::All()) getWall(v.next(d)).updateOne(2+d, w[d]); //< also update every next wall
 		}
-		inline void printWall(step_t nums[MAZE_SIZE][MAZE_SIZE] = NULL, const Vector v = Vector(-1,-1)){
+		inline void printWall(const step_t nums[MAZE_SIZE][MAZE_SIZE] = NULL, const Vector v = Vector(-1,-1)) const {
 #if 0
 			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
 				for(uint8_t x=0; x<MAZE_SIZE; x++) printf("+%s+", wall[y][x].n ? "---" : "   ");
@@ -207,14 +210,14 @@ class Maze{
 			printf("+\n\n");
 #endif
 		}
-		inline void printPath(std::vector<Vector> path){
+		inline void printPath(std::vector<Vector> path) const {
 			step_t steps[MAZE_SIZE][MAZE_SIZE]={0};
 			for(auto &v: path){
 				steps[v.y][v.x] = (&v-&path[0]+1);
 			}
 			printWall(steps);
 		}
-		inline void printStepMap(const Vector v=Vector(-1,-1)){
+		inline void printStepMap(const Vector v=Vector(-1,-1)) const {
 			printWall(stepMap, v);
 		}
 		inline void updateStepMap(std::vector<Vector> dest){
@@ -269,99 +272,90 @@ class MazeAgent{
 			return str[s];
 		}
 
-		void update(const Vector v, const Dir &d, const Wall& w){
+		void update(const Vector v, const Dir &dir, const Wall& w){
 			curVec = v;
-			curDir = d;
+			curDir = dir;
+			maze.updateWall(v, w);
+		}
+		bool calcNextDir(){
 			if(state == IDOLE){
 				state = SEARCHING_FOR_GOAL;
 			}
 
 			if(state == SEARCHING_FOR_GOAL){
-				maze.updateWall(v, w);
-				maze.updateStepMap(goal);
-				step_t min_step = MAZE_STEP_MAX;
-				for(Dir dir: d.ordered()){
-					if(maze.getStep(v.next(dir))<min_step && !maze.getWall(v)[dir]){
-						min_step = maze.getStep(v.next(dir));
-						nextDir = dir;
-					}
-				}
-				if(min_step == MAZE_STEP_MAX) state = GOT_LOST;
-				if(std::find(goal.begin(), goal.end(),v)!=goal.end()){
+				if(std::find(goal.begin(), goal.end(), curVec)!=goal.end()){
 					state = REACHED_GOAL;
 					candidates = goal;
-					candidates.erase(std::find(candidates.begin(), candidates.end(), v));
+				}else{
+					maze.updateStepMap(goal);
+					calcNextDirByStepMap();
 				}
 			}
 
 			if(state == REACHED_GOAL){
-				maze.updateWall(v, w);
-				maze.updateStepMap(candidates);
-				step_t min_step = MAZE_STEP_MAX;
-				for(dir_t dir: {0+d, 1+d, 3+d}){
-					dir &= 3;
-					if(maze.getStep(v.next(dir))<min_step && !maze.getWall(v)[dir]){
-						min_step = maze.getStep(v.next(dir));
-						nextDir = dir;
-					}
-				}
-				candidates.erase(std::remove(candidates.begin(),candidates.end(), v), candidates.end());
+				candidates.erase(std::find(candidates.begin(),candidates.end(), curVec));
 				if(candidates.empty()){
 					state = SEARCHING_ADDITIONALLY;
+				}else{
+					maze.updateStepMap(candidates);
+					calcNextDirByStepMap();
 				}
 			}
 
 			if(state == SEARCHING_ADDITIONALLY){
-				maze.updateWall(v, w);
 				maze.updateStepMap({start});
 				candidates.clear();
-				for(int i=maze.getStep(v); i<maze.getStep(start); i--){
-					for(dir_t dir: {0+d, 1+d, 3+d, 2+d}){
-						Vector next = v.next(dir);
-						if(maze.getStep(next) == i-1 && maze.getWall(next).nDone()!=4){
-							candidates.push_back(next);
+				std::vector<step_t> goal_steps;
+				for(auto g:goal)goal_steps.push_back(maze.getStep(g));
+				step_t goal_step = *(min_element(goal_steps.begin(), goal_steps.end()));
+				for(int i=0; i<MAZE_SIZE; i++){
+					for(int j=0; j<MAZE_SIZE; j++){
+						//if(maze.getWall(i,j).nDone()!=4 && maze.getStep(i,j) != MAZE_STEP_MAX){
+						if(maze.getWall(i,j).nDone()!=4 && maze.getStep(i,j) < goal_step){
+							candidates.push_back(Vector(i,j));
 						}
 					}
 				}
-				state = BACKING_TO_START;
+				if(candidates.empty()){
+					state = BACKING_TO_START;
+				}else{
+					maze.updateStepMap(candidates);
+					calcNextDirByStepMap();
+				}
 			}
 
 			if(state == BACKING_TO_START){
-				maze.updateStepMap({start});
-				step_t min_step = MAZE_STEP_MAX;
-				for(dir_t dir: {0+d, 1+d, 3+d, 2+d}){
-					dir &= 3;
-					if(maze.getStep(v.next(dir))<min_step && !maze.getWall(v)[dir]){
-						min_step = maze.getStep(v.next(dir));
-						nextDir = dir;
-					}
-				}
-				if(min_step == MAZE_STEP_MAX) state = GOT_LOST;
-				if(v==start) {
+				if(curVec==start) {
 					state = REACHED_START;
+				}else{
+					maze.updateStepMap({start});
+					calcNextDirByStepMap();
 				}
 			}
+
+			return true;
 		}
 
-		State getState(){
+		State getState() const {
 			return state;
 		}
-		Maze getMaze(){
+		Maze getMaze() const {
 			return maze;
 		}
-		dir_t getNextDir(){
+		Dir getNextDir() const {
 			return nextDir;
 		}
-		Vector getCurVec(){
+		Vector getCurVec() const {
 			return curVec;
 		}
-		dir_t getCurDir(){
+		Dir getCurDir() const {
 			return curDir;
 		}
-		printInfo(int step){
+		void printInfo(int step) const {
 			for(int i=0; i<MAZE_SIZE*2+4; i++) printf("\x1b[A");
 			maze.printStepMap(curVec);
-			printf("Step: %d, State: %s, Cur: (%d, %d, %d), Next Dir: %d\n", step, stateString(state), curVec.x, curVec.y, curDir, nextDir);
+			printf("Step: %d, State: %s, Cur: (%d, %d, %d), Next Dir: %d      \n",
+					step, stateString(state), curVec.x, curVec.y, uint8_t(curDir), uint8_t(nextDir));
 		}
 	private:
 		State state;
@@ -369,28 +363,20 @@ class MazeAgent{
 		const Vector start{0, 0};
 		std::vector<Vector> goal;
 		Vector curVec;
-		dir_t curDir;
-		dir_t nextDir;
+		Dir curDir;
+		Dir nextDir;
 
 		std::vector<Vector> candidates;
-		/*
-		   void calcNextDirMap(){
-		   step_t min_step = MAZE_STEP_MAX;
-		   for(dir_t dir: {0+d, 1+d, 3+d, 2+d}){
-		   dir &= 3;
-		   if(maze.getStep(v.next(dir))<min_step && !maze.getWall(v)[dir]){
-		   min_step = maze.getStep(v.next(dir));
-		   nextDir = dir;
-		   }
-		   }
-		   if(min_step == MAZE_STEP_MAX) state = GOT_LOST;
-		   if(std::any_of(goal.begin(), goal.end(), [&v](const auto &g){return g==v;})){
-		   state = REACHED_GOAL;
-		   candidates = goal;
-		   candidates.erase(std::find(candidates.begin(), candidates.end(), v));
-		   }
-		   }
-		   */
+		void calcNextDirByStepMap(){
+			step_t min_step = MAZE_STEP_MAX;
+			for(Dir d: curDir.ordered()){
+				if(maze.getStep(curVec.next(d))<min_step && !maze.getWall(curVec)[d]){
+					min_step = maze.getStep(curVec.next(d));
+					nextDir = d;
+				}
+			}
+			if(min_step == MAZE_STEP_MAX) state = GOT_LOST;
+		}
 };
 
 const char mazeData_fp2016[8+1][8+1] = {
@@ -423,30 +409,127 @@ extern const char mazeData_maze[16+1][16+1] = {
 	{"eec55456fc554556"},
 };
 
+extern const char mazeData_maze2013exp[16+1][16+1] = {
+		{"9795555555551393"},
+		{"856915555553eaaa"},
+		{"8796a95153d43c6a"},
+		{"ad056ad07a93853a"},
+		{"ad0796d07c6aad2a"},
+		{"a943c3d0793ac3aa"},
+		{"a8543ad056ac3aaa"},
+		{"ac53ac38396baaaa"},
+		{"a956a96c6c3c2aaa"},
+		{"ac53c43939696aaa"},
+		{"a95693c6c6bad2aa"},
+		{"a8556a9153c296aa"},
+		{"a8393c6c5296abaa"},
+		{"aac681793c43a86a"},
+		{"aabbec56c5546ad2"},
+		{"ec44555555555456"},
+};
+
+extern const char mazeData_maze2013fr[16+1][16+1] = {
+		{"9115151553ff9113"},
+		{"aaafafaf94556aaa"},
+		{"a8696fafa95556aa"},
+		{"82fad543aa95556a"},
+		{"aa92fffac6c55392"},
+		{"a8681516f95556aa"},
+		{"c2faafa954553faa"},
+		{"f816afa83953afaa"},
+		{"fac3856c6afaafaa"},
+		{"92fac5553c3ac56a"},
+		{"ac54539543ac5552"},
+		{"affffaa93aaf9552"},
+		{"8515542aac696952"},
+		{"af851546c3fafafa"},
+		{"afafaf9552fafafa"},
+		{"efc5456ffc545456"},
+};
+
+extern const char mazeData_maze3[16+1][16+1] = {
+		{"d5553fffffffffff"},
+		{"d5116fff93ffffff"},
+		{"ffe815556affffff"},
+		{"fffeaf93fa93ffff"},
+		{"ff95052afaaaffff"},
+		{"ffc52baa96aaffff"},
+		{"ff956c6c056c5553"},
+		{"9507fff92ffffffa"},
+		{"a96f955443fffffa"},
+		{"aafbaffff8553ffa"},
+		{"aef86ffffaffc156"},
+		{"c53afffffafffaff"},
+		{"b96a955552fffaff"},
+		{"86beefbffafffaff"},
+		{"8545156ffc5556fb"},
+		{"efffeffffffffffe"},
+};
+
+extern const char mazeData_maze4[16+1][16+1] = {
+		{"d51157f9515557d3"},
+		{"97ac5552fc55153a"},
+		{"afaff97ad153afaa"},
+		{"c5413c52fad6c3c2"},
+		{"fbfaabbc56f956fa"},
+		{"d452ac053ffaf956"},
+		{"d13aad6f8156d453"},
+		{"faac2d392c39517a"},
+		{"fc43afac47aefafa"},
+		{"93bc43af9383fa96"},
+		{"aac552c56c6a946b"},
+		{"ac553c5555568552"},
+		{"afffabffb9556fba"},
+		{"affd04154695512a"},
+		{"83938501552ffeea"},
+		{"ec6c6feeffc55556"},
+};
+
+extern const char mazeData_maze5[16+1][16+1] = {
+		{"f93f953bfd397d53"},
+		{"d46b852ed146fbbe"},
+		{"f93c4507babbd02b"},
+		{"feef97ed6a807e86"},
+		{"d17be97d546c3d6f"},
+		{"febc383b9117c57f"},
+		{"d52d2eea86c7fd13"},
+		{"ffe941502d57d506"},
+		{"d796fc3c2bd15107"},
+		{"f92b97c52ed47ec7"},
+		{"d2c4417d693fbbff"},
+		{"d4517ad392c7eabb"},
+		{"fbbc1456c6ff9406"},
+		{"9443ad13d795456f"},
+		{"af942faa914553bf"},
+		{"efed6feeec55546f"},
+};
+
 int main(void){
-	Maze sample(mazeData_maze,false);
+	setvbuf(stdout, (char *)NULL, _IONBF, 0);
+	//Maze sample(mazeData_maze, false);
+	Maze sample(mazeData_maze3, false);
 	std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 	//Maze sample(mazeData_fp2016);
 	//std::vector<Vector> goal = {Vector(7,7)};
 	MazeAgent agent(goal);
-	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	agent.update(Vector(0, 0), 1, sample.getWall(0,0));
-	agent.printInfo(0);
-	usleep(100000);
 	for(int step=1; ; step++){
-	if(agent.getState() == MazeAgent::REACHED_START){
-	printf("End\n");
-	break;
-	}
-	if(agent.getState() == MazeAgent::GOT_LOST){
-	printf("GOT LOST!\n");
-	break;
-	}
-	dir_t nextDir = agent.getNextDir();
-	Vector nextVec = agent.getCurVec().next(nextDir);
-	agent.update(nextVec, nextDir, sample.getWall(nextVec));
-	agent.printInfo(step);
-	usleep(100000);
+		agent.calcNextDir();
+		if(agent.getState() == MazeAgent::GOT_LOST){
+			printf("GOT LOST!\n");
+			break;
+		}
+		Dir nextDir = agent.getNextDir();
+		Vector nextVec = agent.getCurVec().next(nextDir);
+		// move robot here
+		agent.printInfo(step);
+		usleep(100000);
+		agent.update(nextVec, nextDir, sample.getWall(nextVec));
+		MazeAgent::State state = agent.getState();
+		if(agent.getState() == MazeAgent::REACHED_START){
+			printf("End\n");
+			break;
+		}
 	}
 	return 0;
 }
