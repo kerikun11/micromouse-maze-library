@@ -1,13 +1,13 @@
 #include <cstdio>
+#include <cstdint>
 #include <queue>
 #include <vector>
 #include <array>
-#include <cstdint>
 #include <algorithm>
 #include <unistd.h>
 
-#define MAZE_SIZE		16
-#define MAZE_STEP_MAX	999
+#define MAZE_SIZE      16
+#define MAZE_STEP_MAX  999
 
 #define C_RED     "\x1b[31m"
 #define C_GREEN   "\x1b[32m"
@@ -22,21 +22,20 @@ typedef uint16_t step_t;
 class Dir{
 	public:
 		enum AbsoluteDir: uint8_t { East, North, West, South, AbsMax };
-		Dir(const enum AbsoluteDir d = East):d(d){}
-		Dir(const uint8_t d):d(AbsoluteDir(d&3)){}
+		enum RelativeDir: uint8_t { Forward, Left, Back, Right, RelMax };
+		Dir(const enum AbsoluteDir d = East) : d(d) {}
+		Dir(const uint8_t d) : d(AbsoluteDir(d&3)) {}
 
 		operator uint8_t() const { return d; }
-		const Dir operator=(const Dir& obj) { this->d = obj.d; return *this; }
+		inline const Dir operator=(const Dir& obj) { this->d = obj.d; return *this; }
+		inline const Dir operator-(const Dir& obj) const { return Dir(uint8_t(d)-uint8_t(obj.d)); }
 
-		const std::array<Dir, 4> ordered() const {
-			std::array<Dir, 4> order{Forward(), Left(), Right(), Back()};
+		inline const std::array<Dir, 4> ordered() const {
+			std::array<Dir, 4> order{d, d+1, d+3, d+2};
 			return order;
 		}
 
-		const Dir Forward() const { return Dir(d); }
-		const Dir Left() const { return Dir(d+1); }
-		const Dir Right() const { return Dir(d+3); }
-		const Dir Back() const { return Dir(d+2); }
+		inline const Dir getRelative(const enum RelativeDir rd) const { return Dir(uint8_t(rd)-uint8_t(d)); }
 
 		static const std::array<Dir, 4>& All(){
 			static const std::array<Dir, 4> all = {East, North, West, South};
@@ -306,12 +305,12 @@ class MazeAgent{
 				maze.updateStepMap({start});
 				candidates.clear();
 				std::vector<step_t> goal_steps;
-				for(auto g:goal)goal_steps.push_back(maze.getStep(g));
-				step_t goal_step = *(min_element(goal_steps.begin(), goal_steps.end()));
+				for(auto g:goal) goal_steps.push_back(maze.getStep(g));
+				//step_t goal_step = *(std::min_element(goal_steps.begin(), goal_steps.end()));
+				step_t goal_step = maze.getStep(goal[0]);
 				for(int i=0; i<MAZE_SIZE; i++){
 					for(int j=0; j<MAZE_SIZE; j++){
-						//if(maze.getWall(i,j).nDone()!=4 && maze.getStep(i,j) != MAZE_STEP_MAX){
-						if(maze.getWall(i,j).nDone()!=4 && maze.getStep(i,j) < goal_step){
+						if(maze.getWall(i,j).nDone() !=4 && maze.getStep(i,j) < goal_step){
 							candidates.push_back(Vector(i,j));
 						}
 					}
@@ -351,11 +350,12 @@ class MazeAgent{
 		Dir getCurDir() const {
 			return curDir;
 		}
-		void printInfo(int step) const {
-			for(int i=0; i<MAZE_SIZE*2+4; i++) printf("\x1b[A");
+		void printInfo(int step, int f, int l, int r, int b) const {
+			for(int i=0; i<MAZE_SIZE*2+6; i++) printf("\x1b[A");
 			maze.printStepMap(curVec);
-			printf("Step: %d, State: %s, Cur: (%d, %d, %d), Next Dir: %d      \n",
-					step, stateString(state), curVec.x, curVec.y, uint8_t(curDir), uint8_t(nextDir));
+			printf("State: %s      \n", stateString(state));
+			printf("Cur: ( %3d, %3d, %3d), Next Dir: %d      \n", curVec.x, curVec.y, uint8_t(curDir), uint8_t(nextDir));
+			printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d\n", step, f, l, r, b);
 		}
 	private:
 		State state;
@@ -410,110 +410,147 @@ extern const char mazeData_maze[16+1][16+1] = {
 };
 
 extern const char mazeData_maze2013exp[16+1][16+1] = {
-		{"9795555555551393"},
-		{"856915555553eaaa"},
-		{"8796a95153d43c6a"},
-		{"ad056ad07a93853a"},
-		{"ad0796d07c6aad2a"},
-		{"a943c3d0793ac3aa"},
-		{"a8543ad056ac3aaa"},
-		{"ac53ac38396baaaa"},
-		{"a956a96c6c3c2aaa"},
-		{"ac53c43939696aaa"},
-		{"a95693c6c6bad2aa"},
-		{"a8556a9153c296aa"},
-		{"a8393c6c5296abaa"},
-		{"aac681793c43a86a"},
-		{"aabbec56c5546ad2"},
-		{"ec44555555555456"},
+	{"9795555555551393"},
+	{"856915555553eaaa"},
+	{"8796a95153d43c6a"},
+	{"ad056ad07a93853a"},
+	{"ad0796d07c6aad2a"},
+	{"a943c3d0793ac3aa"},
+	{"a8543ad056ac3aaa"},
+	{"ac53ac38396baaaa"},
+	{"a956a96c6c3c2aaa"},
+	{"ac53c43939696aaa"},
+	{"a95693c6c6bad2aa"},
+	{"a8556a9153c296aa"},
+	{"a8393c6c5296abaa"},
+	{"aac681793c43a86a"},
+	{"aabbec56c5546ad2"},
+	{"ec44555555555456"},
 };
 
 extern const char mazeData_maze2013fr[16+1][16+1] = {
-		{"9115151553ff9113"},
-		{"aaafafaf94556aaa"},
-		{"a8696fafa95556aa"},
-		{"82fad543aa95556a"},
-		{"aa92fffac6c55392"},
-		{"a8681516f95556aa"},
-		{"c2faafa954553faa"},
-		{"f816afa83953afaa"},
-		{"fac3856c6afaafaa"},
-		{"92fac5553c3ac56a"},
-		{"ac54539543ac5552"},
-		{"affffaa93aaf9552"},
-		{"8515542aac696952"},
-		{"af851546c3fafafa"},
-		{"afafaf9552fafafa"},
-		{"efc5456ffc545456"},
+	{"9115151553ff9113"},
+	{"aaafafaf94556aaa"},
+	{"a8696fafa95556aa"},
+	{"82fad543aa95556a"},
+	{"aa92fffac6c55392"},
+	{"a8681516f95556aa"},
+	{"c2faafa954553faa"},
+	{"f816afa83953afaa"},
+	{"fac3856c6afaafaa"},
+	{"92fac5553c3ac56a"},
+	{"ac54539543ac5552"},
+	{"affffaa93aaf9552"},
+	{"8515542aac696952"},
+	{"af851546c3fafafa"},
+	{"afafaf9552fafafa"},
+	{"efc5456ffc545456"},
 };
 
 extern const char mazeData_maze3[16+1][16+1] = {
-		{"d5553fffffffffff"},
-		{"d5116fff93ffffff"},
-		{"ffe815556affffff"},
-		{"fffeaf93fa93ffff"},
-		{"ff95052afaaaffff"},
-		{"ffc52baa96aaffff"},
-		{"ff956c6c056c5553"},
-		{"9507fff92ffffffa"},
-		{"a96f955443fffffa"},
-		{"aafbaffff8553ffa"},
-		{"aef86ffffaffc156"},
-		{"c53afffffafffaff"},
-		{"b96a955552fffaff"},
-		{"86beefbffafffaff"},
-		{"8545156ffc5556fb"},
-		{"efffeffffffffffe"},
+	{"d5553fffffffffff"},
+	{"d5116fff93ffffff"},
+	{"ffe815556affffff"},
+	{"fffeaf93fa93ffff"},
+	{"ff95052afaaaffff"},
+	{"ffc52baa96aaffff"},
+	{"ff956c6c056c5553"},
+	{"9507fff92ffffffa"},
+	{"a96f955443fffffa"},
+	{"aafbaffff8553ffa"},
+	{"aef86ffffaffc156"},
+	{"c53afffffafffaff"},
+	{"b96a955552fffaff"},
+	{"86beefbffafffaff"},
+	{"8545156ffc5556fb"},
+	{"efffeffffffffffe"},
 };
 
 extern const char mazeData_maze4[16+1][16+1] = {
-		{"d51157f9515557d3"},
-		{"97ac5552fc55153a"},
-		{"afaff97ad153afaa"},
-		{"c5413c52fad6c3c2"},
-		{"fbfaabbc56f956fa"},
-		{"d452ac053ffaf956"},
-		{"d13aad6f8156d453"},
-		{"faac2d392c39517a"},
-		{"fc43afac47aefafa"},
-		{"93bc43af9383fa96"},
-		{"aac552c56c6a946b"},
-		{"ac553c5555568552"},
-		{"afffabffb9556fba"},
-		{"affd04154695512a"},
-		{"83938501552ffeea"},
-		{"ec6c6feeffc55556"},
+	{"d51157f9515557d3"},
+	{"97ac5552fc55153a"},
+	{"afaff97ad153afaa"},
+	{"c5413c52fad6c3c2"},
+	{"fbfaabbc56f956fa"},
+	{"d452ac053ffaf956"},
+	{"d13aad6f8156d453"},
+	{"faac2d392c39517a"},
+	{"fc43afac47aefafa"},
+	{"93bc43af9383fa96"},
+	{"aac552c56c6a946b"},
+	{"ac553c5555568552"},
+	{"afffabffb9556fba"},
+	{"affd04154695512a"},
+	{"83938501552ffeea"},
+	{"ec6c6feeffc55556"},
 };
 
 extern const char mazeData_maze5[16+1][16+1] = {
-		{"f93f953bfd397d53"},
-		{"d46b852ed146fbbe"},
-		{"f93c4507babbd02b"},
-		{"feef97ed6a807e86"},
-		{"d17be97d546c3d6f"},
-		{"febc383b9117c57f"},
-		{"d52d2eea86c7fd13"},
-		{"ffe941502d57d506"},
-		{"d796fc3c2bd15107"},
-		{"f92b97c52ed47ec7"},
-		{"d2c4417d693fbbff"},
-		{"d4517ad392c7eabb"},
-		{"fbbc1456c6ff9406"},
-		{"9443ad13d795456f"},
-		{"af942faa914553bf"},
-		{"efed6feeec55546f"},
+	{"f93f953bfd397d53"},
+	{"d46b852ed146fbbe"},
+	{"f93c4507babbd02b"},
+	{"feef97ed6a807e86"},
+	{"d17be97d546c3d6f"},
+	{"febc383b9117c57f"},
+	{"d52d2eea86c7fd13"},
+	{"ffe941502d57d506"},
+	{"d796fc3c2bd15107"},
+	{"f92b97c52ed47ec7"},
+	{"d2c4417d693fbbff"},
+	{"d4517ad392c7eabb"},
+	{"fbbc1456c6ff9406"},
+	{"9443ad13d795456f"},
+	{"af942faa914553bf"},
+	{"efed6feeec55546f"},
+};
+
+const char mazeData_maze2013half[32+1][32+1] = {
+	{"95555115555555395555555395555393"},
+	{"a9153aa9515153aa9515153aa955382a"},
+	{"aa816aac16bc16aac16bc16ac417aaaa"},
+	{"a82816c16943c16c16943c3a9569442a"},
+	{"aa86c396943c3c396945456c4514396a"},
+	{"a8053c6947a96fc692fffffffd052c3a"},
+	{"82852954556c5553aafffffffd05296a"},
+	{"a8052a955539553aaafffffffd052c3a"},
+	{"86c56aa9556c53aaaafffffffd056d2a"},
+	{"c5553c6c555556aaaafffffffd0793aa"},
+	{"d55385555515556aaafffffffd07ac6a"},
+	{"913aafffffa95556aa9555555507c53a"},
+	{"aaaaafffffaa95556ac53d515507956a"},
+	{"aaaaafffffaaa9555295695055078552"},
+	{"aaaaafffffaaaa9552c538545507853a"},
+	{"aaaaafffffaaaa85545568551507afaa"},
+	{"aaaaafffffaaaac5395554554547c56a"},
+	{"aaaaafffffaaaa93aa95555555555552"},
+	{"aac6afffffac6aac6aa955555555553a"},
+	{"ac554555516d12affaaa9555555553aa"},
+	{"8155155514796ac552aaaffffff93aaa"},
+	{"a83943f9695454553aaaaffffffaaaaa"},
+	{"82841696bc539553aaaaaffffffaaaaa"},
+	{"ac4141456956a93aaaaaaffffffaaaaa"},
+	{"853c16913c53aac46aaaaffffffaaaaa"},
+	{"a94143802956ac5556aaaffffffaaaaa"},
+	{"ac1416846c53855553aaaffffffaaaaa"},
+	{"a94143839156c1553aaac5555556aaaa"},
+	{"841416ac40553c156aac555555556aaa"},
+	{"a941438554156d4152c55555555556aa"},
+	{"805452c555455554545555555555556a"},
+	{"ec555455555555555555555555555556"},
 };
 
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
-	//Maze sample(mazeData_maze, false);
-	Maze sample(mazeData_maze3, false);
+	Maze sample(mazeData_maze4, false);
 	std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 	//Maze sample(mazeData_fp2016);
 	//std::vector<Vector> goal = {Vector(7,7)};
+	//Maze sample(mazeData_maze2013half, false);
+	//std::vector<Vector> goal = {Vector(7,7)};
 	MazeAgent agent(goal);
 	agent.update(Vector(0, 0), 1, sample.getWall(0,0));
-	for(int step=1; ; step++){
+	int step=0,f=0,l=0,r=0,b=0;
+	while(1){
 		agent.calcNextDir();
 		if(agent.getState() == MazeAgent::GOT_LOST){
 			printf("GOT LOST!\n");
@@ -522,15 +559,22 @@ int main(void){
 		Dir nextDir = agent.getNextDir();
 		Vector nextVec = agent.getCurVec().next(nextDir);
 		// move robot here
-		agent.printInfo(step);
-		usleep(100000);
-		agent.update(nextVec, nextDir, sample.getWall(nextVec));
-		MazeAgent::State state = agent.getState();
+		usleep(250000);
+		agent.printInfo(step, f, l, r, b);
+		step++;
+		f += agent.getCurDir().getRelative(Dir::Forward) == nextDir;
+		l += agent.getCurDir().getRelative(Dir::Left) == nextDir;
+		r += agent.getCurDir().getRelative(Dir::Right) == nextDir;
+		b += agent.getCurDir().getRelative(Dir::Back) == nextDir;
+		Wall found_wall = sample.getWall(nextVec);
+		// end move
+		agent.update(nextVec, nextDir, found_wall);
 		if(agent.getState() == MazeAgent::REACHED_START){
-			printf("End\n");
 			break;
 		}
 	}
+	agent.printInfo(step, f, l, r, b);
+	printf("End\n");
 	return 0;
 }
 
