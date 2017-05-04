@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <unistd.h>
 
-#define MAZE_SIZE      32
+#define MAZE_SIZE      16
 #define MAZE_STEP_MAX  999
 
 #define C_RED     "\x1b[31m"
@@ -214,7 +214,23 @@ class Maze{
 			for(auto &v: path){
 				steps[v.y][v.x] = (&v-&path[0]+1);
 			}
-			printWall(steps);
+			printf("\n");
+			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
+				for(uint8_t x=0; x<MAZE_SIZE; x++)
+					printf("+%s" C_RESET, wall[y][x].N ? (wall[y][x].n?"---":"   ") : C_RED " - ");
+				printf("+\n");
+				for(uint8_t x=0; x<MAZE_SIZE; x++){
+					printf("%s" C_RESET, wall[y][x].W ? (wall[y][x].w?"|":" ") : C_RED ":");
+					auto it = std::find(path.begin(), path.end(), Vector(x,y));
+					if(it!=path.end()) printf("%s%3d" C_RESET, C_YELLOW, it-path.begin());
+					else printf("%s", "   ");
+				}
+				printf("%s" C_RESET, wall[y][MAZE_SIZE-1].E ? (wall[y][MAZE_SIZE-1].e?"|":" ") : C_RED ":");
+				printf("\n");
+			}
+			for(uint8_t x=0; x<MAZE_SIZE; x++)
+				printf("+%s" C_RESET, wall[0][x].S ? (wall[0][x].s?"---":"   ") : C_RED " - ");
+			printf("+\n");
 		}
 		inline void printStepMap(const Vector v=Vector(-1,-1)) const {
 			printWall(stepMap, v);
@@ -345,6 +361,23 @@ class MazeAgent{
 			return false;
 		}
 
+		void calcShortestPath(){
+			maze.updateStepMap(goal);
+			shortestPath.clear();
+			Vector v = start;
+			shortestPath.push_back(v);
+			while(1){
+				for(Dir d: Dir::All()){
+					if(maze.getStep(v.next(d)) == maze.getStep(v)-1){
+						v=v.next(d);
+						shortestPath.push_back(v);
+						break;
+					}
+				}
+				if(maze.getStep(v)==0) break;
+			}
+		}
+
 		State getState() const {
 			return state;
 		}
@@ -360,12 +393,21 @@ class MazeAgent{
 		Dir getCurDir() const {
 			return curDir;
 		}
+		const std::vector<Vector>& getShortestPath() const {
+			return shortestPath;
+		}
 		void printInfo() const {
 			for(int i=0; i<MAZE_SIZE*2+5; i++) printf("\x1b[A");
 			maze.printStepMap(curVec);
 			printf("State: %s      \n", stateString(state));
 			printf("Cur: ( %3d, %3d, %3d), Next Dir: %d\n", curVec.x, curVec.y, uint8_t(curDir), uint8_t(nextDir));
 			printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d\n", step, f, l, r, b);
+		}
+		void printPath() const {
+			for(int i=0; i<MAZE_SIZE*2+5; i++) printf("\x1b[A");
+			maze.printPath(shortestPath);
+			printf("\n\n\n");
+			printf("Shortest Step: %d\n", shortestPath.size()-1);
 		}
 	private:
 		State state;
@@ -376,6 +418,7 @@ class MazeAgent{
 		Dir curDir;
 		Dir nextDir;
 		int step=0,f=0,l=0,r=0,b=0;
+		std::vector<Vector> shortestPath;
 
 		std::vector<Vector> candidates;
 		void calcNextDirByStepMap(){
@@ -553,11 +596,11 @@ const char mazeData_maze2013half[32+1][32+1] = {
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 
-	std::vector<Vector> goal = {Vector(7,7)};
-	//std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
+	//std::vector<Vector> goal = {Vector(7,7)};
+	std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 	//Maze sample(mazeData_fp2016);
-	//Maze sample(mazeData_maze, false);
-	Maze sample(mazeData_maze2013half, false);
+	Maze sample(mazeData_maze, false);
+	//Maze sample(mazeData_maze2013half, false);
 
 	MazeAgent agent(goal);
 	agent.update(Vector(0, 0), 1, sample.getWall(0,0));
@@ -569,7 +612,7 @@ int main(void){
 		Dir nextDir = agent.getNextDir();
 		Vector nextVec = agent.getCurVec().next(nextDir);
 		// move robot here
-#if 0
+#if 1
 		usleep(250000);
 		agent.printInfo();
 #endif
@@ -581,6 +624,9 @@ int main(void){
 		}
 	}
 	agent.printInfo();
+	sleep(1);
+	agent.calcShortestPath();
+	agent.printPath();
 	printf("End\n");
 	return 0;
 }
