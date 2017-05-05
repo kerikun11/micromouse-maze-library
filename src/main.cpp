@@ -18,8 +18,8 @@
 #define C_RESET   "\x1b[0m"
 
 #define DEEPNESS 0
-#define SEARCHING_ADDITIALLY_AT_START true
-#define DISPLAY true
+#define SEARCHING_ADDITIALLY_AT_START 1
+#define DISPLAY 1
 
 typedef uint16_t step_t;
 
@@ -292,7 +292,6 @@ class MazeAgent{
 		void update(const Vector v, const Dir &dir, const Wall& w){
 			curVec = v;
 			curDir = dir;
-			if(state == BACKING_TO_START) return;
 			maze.updateWall(v, w);
 		}
 		bool calcNextDir(){
@@ -441,7 +440,7 @@ class MazeAgent{
 		void calcNextDirByStepMap(){
 			step_t min_step = MAZE_STEP_MAX;
 			for(Dir d: curDir.ordered()){
-				if(!maze.getWall(curVec)[d] && maze.getStep(curVec.next(d))<min_step && !maze.getWall(curVec)[d]){
+				if(!maze.getWall(curVec)[d] && maze.getWall(curVec)[4+d] && maze.getStep(curVec.next(d))<min_step){
 					min_step = maze.getStep(curVec.next(d));
 					nextDir = d;
 				}
