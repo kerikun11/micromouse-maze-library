@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <unistd.h>
 
-#define MAZE_SIZE      8
+#define MAZE_SIZE      16
 #define MAZE_STEP_MAX  999
 
 #define C_RED     "\x1b[31m"
@@ -19,7 +19,7 @@
 
 #define DEEPNESS 0
 #define SEARCHING_ADDITIALLY_AT_START 1
-#define DISPLAY 1
+#define DISPLAY 0
 
 typedef uint16_t step_t;
 
@@ -446,7 +446,7 @@ class MazeAgent{
 		void printPath() const {
 			for(int i=0; i<MAZE_SIZE*2+5; i++) printf("\x1b[A");
 			maze.printPath(shortestPath);
-			printf("\n\n\n");
+			printf("\n\n");
 			printf("Shortest Step: %d\n", shortestPath.size()-1);
 		}
 	private:
@@ -654,13 +654,11 @@ int main(void){
 			agent.updateCurDir(nextDir);
 			agent.updateCurVec(nextVec);
 		}
+		if(agent.getState() == MazeAgent::REACHED_START) break;
 		Wall found_wall = sample.getWall(agent.getCurVec());
 		agent.updateWall(agent.getCurVec(), found_wall);
-		if(agent.getState() == MazeAgent::REACHED_START){
-			break;
-		}
 #if DISPLAY
-		usleep(500000);
+		usleep(400000);
 #endif
 	}
 	agent.printInfo();
@@ -669,7 +667,6 @@ int main(void){
 		printf("Failed to find shortest path!\n");
 	}
 	agent.printPath();
-	printf("End\n");
 	return 0;
 }
 
