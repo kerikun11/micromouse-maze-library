@@ -25,22 +25,20 @@ typedef uint16_t step_t;
 
 class Dir{
 	public:
-		enum AbsoluteDir: uint8_t { East, North, West, South, AbsMax };
-		enum RelativeDir: uint8_t { Forward, Left, Back, Right, RelMax };
+		enum AbsoluteDir: int8_t { East, North, West, South, AbsMax };
+		enum RelativeDir: int8_t { Forward, Left, Back, Right, RelMax };
 		Dir(const enum AbsoluteDir d = East) : d(d) {}
-		Dir(const uint8_t d) : d(AbsoluteDir(d&3)) {}
+		Dir(const int8_t d) : d(AbsoluteDir(d&3)) {}
 
-		operator uint8_t() const { return d; }
+		operator int8_t() const { return d; }
 		inline const Dir operator=(const Dir& obj) { this->d = obj.d; return *this; }
-		inline const Dir operator-(const Dir& obj) const { return Dir(uint8_t(d)-uint8_t(obj.d)); }
+		inline const Dir operator-(const Dir& obj) const { return Dir(d-obj.d); }
 
-		inline const std::array<Dir, 4> ordered() const {
+		inline const Dir getRelative(const enum RelativeDir& rd) const { return Dir(rd-d); }
+		const std::array<Dir, 4> ordered() const {
 			std::array<Dir, 4> order{d, d+1, d+3, d+2};
 			return order;
 		}
-
-		inline const Dir getRelative(const enum RelativeDir rd) const { return Dir(uint8_t(rd)-uint8_t(d)); }
-
 		static const std::array<Dir, 4>& All(){
 			static const std::array<Dir, 4> all = {East, North, West, South};
 			return all;
@@ -65,14 +63,9 @@ union Wall{
 	inline operator uint8_t() const { return flags; }
 	inline uint8_t operator[](uint8_t index) const { return (flags>>index)&0x01; }
 	inline uint8_t operator=(const Wall& obj) { flags=obj.flags; return flags; }
-	inline uint8_t operator|=(const Wall& obj) { flags|=obj.flags; return flags; }
-	inline uint8_t operator&=(const Wall& obj) { flags&=obj.flags; return flags; }
 
-	inline void reset(){ flags=0; }
-	//inline int8_t nWall() const { return e+n+w+s; }
-	inline int8_t nWall() const { return __builtin_popcount(0x0f&flags); }
-	//inline int8_t nDone() const { return E+N+W+S; }
-	inline int8_t nDone() const { return __builtin_popcount(0xf0&flags);; }
+	inline int8_t nWall() const { return e+n+w+s; }
+	inline int8_t nKnown() const { return E+N+W+S; }
 
 	inline void updateOne(const Dir &dir, const bool b) {
 		if(b) flags |=   1<<dir;
@@ -82,6 +75,11 @@ union Wall{
 	inline void updateAll(const uint8_t wall) {
 		flags = 0xF0 | (wall&0x0F);
 	}
+
+	inline bool canGoDir(const Dir& d) const {
+		return !(flags&(1<<d)) && (flags&(1<<(4+d)));
+	}
+
 	inline uint8_t rotate(const Dir &dir) const {
 		return ((flags<<dir)|(flags>>(4-dir)))&0x0F;
 	}
@@ -89,15 +87,16 @@ union Wall{
 
 struct Vector{
 	Vector(int8_t x=0, int8_t y=0) : x(x), y(y) {}
+	Vector(const Vector& obj) : x(obj.x), y(obj.y) {}
 	int8_t x,y;
 
-	const Vector& operator=(const Vector& obj) { x=obj.x; y=obj.y; return *this; }
-	const Vector& operator+=(const Vector& obj) { x+=obj.x; y+=obj.y; return *this; }
-	const Vector& operator-=(const Vector& obj) { x-=obj.x; y-=obj.y; return *this; }
-	const Vector operator+(const Vector& obj) const { return Vector(x+obj.x, y+obj.y); }
-	const Vector operator-(const Vector& obj) const { return Vector(x-obj.x, y-obj.y); }
-	const bool operator==(const Vector& obj) const { return x==obj.x && y==obj.y; }
-	const bool operator!=(const Vector& obj) const { return x!=obj.x || y!=obj.y; }
+	inline const Vector& operator=(const Vector& obj) { x=obj.x; y=obj.y; return *this; }
+	inline const Vector& operator+=(const Vector& obj) { x+=obj.x; y+=obj.y; return *this; }
+	inline const Vector& operator-=(const Vector& obj) { x-=obj.x; y-=obj.y; return *this; }
+	inline const Vector operator+(const Vector& obj) const { return Vector(x+obj.x, y+obj.y); }
+	inline const Vector operator-(const Vector& obj) const { return Vector(x-obj.x, y-obj.y); }
+	inline const bool operator==(const Vector& obj) const { return x==obj.x && y==obj.y; }
+	inline const bool operator!=(const Vector& obj) const { return x!=obj.x || y!=obj.y; }
 
 	const Vector next(const Dir &dir) const {
 		switch(dir){
@@ -134,11 +133,23 @@ class Maze{
 					}
 				}
 		}
+		const Maze& operator=(Maze& obj){
+			for(int8_t y=0; y<MAZE_SIZE; y++)
+				for(uint8_t x=0; x<MAZE_SIZE; x++){
+					getWall(x, y) = obj.getWall(x, y);
+					getStep(x, y, 0) = obj.getStep(x, y, 0);
+					getStep(x, y, 1) = obj.getStep(x, y, 1);
+				}
+			return *this;
+		}
 		inline void reset(){
 			//* clear all wall
 			for(int8_t y=0; y<MAZE_SIZE; y++)
-				for(uint8_t x=0; x<MAZE_SIZE; x++)
-					getWall(x, y).reset();
+				for(uint8_t x=0; x<MAZE_SIZE; x++){
+					getWall(x, y) = 0;
+					getStep(x, y, 0) = 0;
+					getStep(x, y, 1) = 0;
+				}
 			//* set outline
 			for(int8_t i=0; i<MAZE_SIZE; i++){
 				getWall(i, 0).updateOne(Dir::South, true);
@@ -264,7 +275,8 @@ class Maze{
 
 class MazeAgent{
 	public:
-		MazeAgent(std::vector<Vector> goal):state(IDOLE), goal(goal){
+		MazeAgent(const std::vector<Vector>& goal){
+			reset(goal);
 		}
 
 		enum State{
@@ -288,12 +300,26 @@ class MazeAgent{
 			};
 			return str[s];
 		}
-
-		void update(const Vector v, const Dir &dir, const Wall& w){
+		void reset(const std::vector<Vector>& goal){
+			this->goal = goal;
+			maze.reset();
+			curVec = Vector(0, 0);
+			nextDir = Dir::North;
+			state = IDOLE;
+		}
+		void forceBackToStart(){
+			state = BACKING_TO_START;
+		}
+		void updateAll(const Vector& v, const Dir& dir, const Wall& w){
 			curVec = v;
 			curDir = dir;
 			maze.updateWall(v, w);
 		}
+		/*
+		   void updateCurVec(const Vector& v){ curVec = v; }
+		   void updateCurDir(const Dir& d){ curDir = d; }
+		   void updateWall(const Vector& v, const Wall& w){ maze.updateWall(v, w); }
+		   */
 		bool calcNextDir(){
 			State prev_state = getState();
 			if(state == IDOLE){
@@ -335,15 +361,15 @@ class MazeAgent{
 					for(int j=0; j<MAZE_SIZE; j++){
 						Vector v(i,j);
 #if DEEPNESS == 0
-						if(maze.getWall(i,j).nDone()!=4 && (maze.getStep(i,j)+maze.getStep(i,j,1)) <= goal_step){
+						if(maze.getWall(i,j).nKnown()!=4 && (maze.getStep(i,j)+maze.getStep(i,j,1)) <= goal_step){
 							candidates.push_back(v);
 						}
 #elif DEEPNESS == 1
-						if(maze.getWall(i,j).nDone()!=4 && (maze.getStep(i,j)) <= goal_step){
+						if(maze.getWall(i,j).nKnown()!=4 && (maze.getStep(i,j)) <= goal_step){
 							candidates.push_back(v);
 						}
 #elif DEEPNESS == 2
-						if(maze.getWall(i,j).nDone()!=4 && (maze.getStep(i,j)) != MAZE_STEP_MAX){
+						if(maze.getWall(i,j).nKnown()!=4 && (maze.getStep(i,j)) != MAZE_STEP_MAX){
 							candidates.push_back(v);
 						}
 #endif
@@ -372,6 +398,9 @@ class MazeAgent{
 			if(getState() != prev_state) return true;
 			return false;
 		}
+		bool calcNextDirInAdvance(){
+			Vector next = curVec.next(nextDir);
+		}
 
 		bool calcShortestPath(){
 			maze.updateStepMap(goal);
@@ -382,7 +411,7 @@ class MazeAgent{
 			while(1){
 				auto dirs = dir.ordered();
 				auto it = std::find_if(dirs.begin(), dirs.end(),[&](auto d){
-						if(maze.getWall(v)[d]) return false;
+						if(!maze.getWall(v).canGoDir(d)) return false;
 						return maze.getStep(v.next(d)) == maze.getStep(v)-1;
 						});
 				if(it == dirs.end()) return false;
@@ -440,7 +469,7 @@ class MazeAgent{
 		void calcNextDirByStepMap(){
 			step_t min_step = MAZE_STEP_MAX;
 			for(Dir d: curDir.ordered()){
-				if(!maze.getWall(curVec)[d] && maze.getWall(curVec)[4+d] && maze.getStep(curVec.next(d))<min_step){
+				if(maze.getWall(curVec).canGoDir(d) && maze.getStep(curVec.next(d))<min_step){
 					min_step = maze.getStep(curVec.next(d));
 					nextDir = d;
 				}
@@ -555,25 +584,6 @@ extern const char mazeData_maze4[16+1][16+1] = {
 	{"ec6c6feeffc55556"},
 };
 
-extern const char mazeData_maze5[16+1][16+1] = {
-	{"f93f953bfd397d53"},
-	{"d46b852ed146fbbe"},
-	{"f93c4507babbd02b"},
-	{"feef97ed6a807e86"},
-	{"d17be97d546c3d6f"},
-	{"febc383b9117c57f"},
-	{"d52d2eea86c7fd13"},
-	{"ffe941502d57d506"},
-	{"d796fc3c2bd15107"},
-	{"f92b97c52ed47ec7"},
-	{"d2c4417d693fbbff"},
-	{"d4517ad392c7eabb"},
-	{"fbbc1456c6ff9406"},
-	{"9443ad13d795456f"},
-	{"af942faa914553bf"},
-	{"efed6feeec55546f"},
-};
-
 const char mazeData_maze2013half[32+1][32+1] = {
 	{"95555115555555395555555395555393"},
 	{"a9153aa9515153aa9515153aa955382a"},
@@ -617,6 +627,7 @@ int main(void){
 	Maze sample(mazeData_fp2016);
 #elif MAZE_SIZE == 16
 	std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
+	//Maze sample(mazeData_maze, false);
 	Maze sample(mazeData_maze, false);
 #elif MAZE_SIZE == 32
 	std::vector<Vector> goal = {Vector(7,7)};
@@ -624,22 +635,24 @@ int main(void){
 #endif
 
 	MazeAgent agent(goal);
-	agent.update(Vector(0, 0), 1, sample.getWall(0,0));
+	agent.updateAll(Vector(0, 0), 1, sample.getWall(0,0));
 	while(1){
 		agent.calcNextDir();
 		if(agent.getState() == MazeAgent::GOT_LOST){
 			printf("GOT LOST!\n");
+			break;
 		}
 		Dir nextDir = agent.getNextDir();
 		Vector nextVec = agent.getCurVec().next(nextDir);
 		// move robot here
 #if DISPLAY
-		usleep(500000);
+		//usleep(500000);
+		usleep(100000);
 		agent.printInfo();
 #endif
 		Wall found_wall = sample.getWall(nextVec);
 		// end move
-		agent.update(nextVec, nextDir, found_wall);
+		agent.updateAll(nextVec, nextDir, found_wall);
 		if(agent.getState() == MazeAgent::REACHED_START){
 			break;
 		}
@@ -647,7 +660,7 @@ int main(void){
 	agent.printInfo();
 	sleep(1);
 	if(!agent.calcShortestPath()){
-		printf("Failed to find shortest path");
+		printf("Failed to find shortest path!\n");
 	}
 	agent.printPath();
 	printf("End\n");
