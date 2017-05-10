@@ -110,11 +110,11 @@ struct Vector{
 
 class Maze{
 	public:
-		Maze(){
-			reset();
+		Maze(const std::vector<Vector>& goal) {
+			reset(goal);
 		}
-		Maze(const char data[MAZE_SIZE+1][MAZE_SIZE+1], bool east_origin = true){
-			reset();
+		Maze(const std::vector<Vector>& goal, const char data[MAZE_SIZE+1][MAZE_SIZE+1], bool east_origin = true){
+			reset(goal);
 			for(uint8_t y=0; y<MAZE_SIZE; y++)
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
 					char c = data[MAZE_SIZE-y-1][x];
@@ -149,7 +149,8 @@ class Maze{
 				}
 			return *this;
 		}
-		inline void reset(){
+		inline void reset(const std::vector<Vector>& goal){
+			this->goal = goal;
 			//* clear all wall
 			for(int8_t y=0; y<MAZE_SIZE; y++)
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
@@ -275,15 +276,19 @@ class Maze{
 				}
 			}
 		}
+		const std::vector<Vector>& getGoal(){return goal;}
+		const Vector& getStart(){return start;}
 	private:
 		Wall wall[MAZE_SIZE][MAZE_SIZE];
 		step_t stepMap[StepMapPurposeMax][MAZE_SIZE][MAZE_SIZE];
+		const Vector start{0, 0};
+		std::vector<Vector> goal;
 };
 
 class MazeAgent{
 	public:
-		MazeAgent(const std::vector<Vector>& goal){
-			reset(goal);
+		MazeAgent(Maze& maze) : maze(maze){
+			reset();
 		}
 
 		enum State{
@@ -307,9 +312,8 @@ class MazeAgent{
 			};
 			return str[s];
 		}
-		void reset(const std::vector<Vector>& goal){
-			this->goal = goal;
-			maze.reset();
+		void reset(){
+			maze.reset(maze.getGoal());
 			curVec = Vector(0, 0);
 			state = IDOLE;
 		}
@@ -335,11 +339,11 @@ class MazeAgent{
 			}
 
 			if(state == SEARCHING_FOR_GOAL){
-				if(std::find(goal.begin(), goal.end(), curVec)!=goal.end()){
+				if(std::find(maze.getGoal().begin(), maze.getGoal().end(), curVec)!=maze.getGoal().end()){
 					state = REACHED_GOAL;
-					candidates = goal;
+					candidates = maze.getGoal();
 				}else{
-					maze.updateStepMap(goal, Maze::Goal);
+					maze.updateStepMap(maze.getGoal(), Maze::Goal);
 					calcNextDirByStepMap(Maze::Goal);
 				}
 			}
@@ -355,11 +359,11 @@ class MazeAgent{
 			}
 
 			if(state == SEARCHING_ADDITIONALLY){
-				maze.updateStepMap(goal, Maze::Goal);
-				maze.updateStepMap({start}, Maze::Start);
+				maze.updateStepMap(maze.getGoal(), Maze::Goal);
+				maze.updateStepMap({maze.getStart()}, Maze::Start);
 				candidates.clear();
 				std::vector<step_t> goal_steps;
-				for(auto g:goal) goal_steps.push_back(maze.getStep(g, Maze::Start));
+				for(auto g:maze.getGoal()) goal_steps.push_back(maze.getStep(g, Maze::Start));
 				step_t goal_step = *(std::min_element(goal_steps.begin(), goal_steps.end()));
 				for(int i=0; i<MAZE_SIZE; i++){
 					for(int j=0; j<MAZE_SIZE; j++){
@@ -388,9 +392,9 @@ class MazeAgent{
 			}
 
 			if(state == BACKING_TO_START){
-				maze.updateStepMap({start}, Maze::Start);
+				maze.updateStepMap({maze.getStart()}, Maze::Start);
 				calcNextDirByStepMap(Maze::Start);
-				if(curVec.next(nextDirs.back())==start) {
+				if(curVec.next(nextDirs.back())==maze.getStart()) {
 					state = REACHED_START;
 				}
 			}
@@ -406,9 +410,9 @@ class MazeAgent{
 		}
 
 		bool calcShortestPath(){
-			maze.updateStepMap(goal, Maze::Goal);
+			maze.updateStepMap(maze.getGoal(), Maze::Goal);
 			shortestPath.clear();
-			Vector v = start;
+			Vector v = maze.getStart();
 			Dir dir = Dir::North;
 			Dir prev_dir = Dir::North;
 			shortestPath.push_back(v);
@@ -463,9 +467,7 @@ class MazeAgent{
 		}
 	private:
 		State state;
-		Maze maze;
-		const Vector start{0, 0};
-		std::vector<Vector> goal;
+		Maze& maze;
 		Vector curVec;
 		Dir curDir;
 		std::vector<Dir> nextDirs;
@@ -677,7 +679,7 @@ int main(void){
 #elif MAZE_SIZE == 16
 	std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 	//Maze sample(mazeData_maze, false);
-	Maze sample(mazeData_maze2013exp, false);
+	Maze sample(goal, mazeData_maze2013exp, false);
 #elif MAZE_SIZE == 32
 	//std::vector<Vector> goal = {Vector(3,3)};
 	std::vector<Vector> goal = {
@@ -689,7 +691,8 @@ int main(void){
 	Maze sample(mazeData_maze2016half);
 #endif
 
-	MazeAgent agent(goal);
+	Maze maze(goal);
+	MazeAgent agent(maze);
 	agent.updateAll(Vector(0, 0), 1, sample.getWall(0,0));
 	while(1){
 		agent.calcNextDir();
