@@ -259,17 +259,18 @@ class Maze{
 				for(uint8_t x=0; x<MAZE_SIZE; x++)
 					getStep(x, y, sp) = MAZE_STEP_MAX;
 			std::queue<Vector> q;
-			for(auto d: dest) {
-				getStep(d, sp) = 0;
-				q.push(d);
+			for(auto v: dest) {
+				getStep(v, sp) = 0;
+				q.push(v);
 			}
 			while(!q.empty()){
 				Vector focus = q.front(); q.pop();
 				step_t focus_step = getStep(focus, sp);
 				Wall focus_wall = getWall(focus);
-				for(Dir dir: Dir::All()){
-					Vector next = focus.next(dir);
-					if(!focus_wall[dir] && getStep(next, sp)>focus_step+1){
+				for(Dir d: Dir::All()){
+					Vector next = focus.next(d);
+					if(focus_wall[d]) continue;
+					if(getStep(next, sp)>focus_step+1){
 						getStep(next, sp) = focus_step+1;
 						q.push(next);
 					}
@@ -417,6 +418,18 @@ class MazeAgent{
 			Dir prev_dir = Dir::North;
 			shortestPath.push_back(v);
 			while(1){
+				/*
+					for(auto d: Dir::All()) if(maze.getWall(v).canGoDir(d)) dirs.push_back(d);
+					auto it = std::min_element(dirs.begin(), dirs.end(), [&](auto &d1, auto &d2){
+						return maze.getStep(v.next(d1)) < maze.getStep(v.next(d2));
+					});
+					if(maze.getStep(v.next(*it))>=maze.getStep(v)) break;
+					prev_dir = dir;
+					dir = *it;
+					v=v.next(dir);
+					shortestPath.push_back(v);
+					if(maze.getStep(v)==0) break;
+				*/
 				std::vector<Dir> dirs;
 				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir, Dir(dir+1)};
 				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir, Dir(dir+3)};
@@ -455,7 +468,24 @@ class MazeAgent{
 		}
 		void printInfo() const {
 			for(int i=0; i<MAZE_SIZE*2+4; i++) printf("\x1b[A");
-			maze.printStepMap(curVec);
+			switch(state){
+				case IDOLE:
+				case SEARCHING_FOR_GOAL:
+					maze.printStepMap(curVec, Maze::Goal);
+					break;
+				case REACHED_GOAL:
+				case SEARCHING_ADDITIONALLY:
+					maze.printStepMap(curVec, Maze::General);
+					break;
+				case BACKING_TO_START:
+					maze.printStepMap(curVec, Maze::Start);
+					break;
+				case REACHED_START:
+				case GOT_LOST:
+				default:
+					maze.printStepMap(curVec, Maze::Goal);
+					break;
+			}
 			printf("Cur: ( %3d, %3d, %3d), State: %s       \n", curVec.x, curVec.y, uint8_t(curDir), stateString(state));
 			printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d\n", step, f, l, r, b);
 		}
@@ -473,13 +503,24 @@ class MazeAgent{
 		std::vector<Dir> nextDirs;
 		int step=0,f=0,l=0,r=0,b=0;
 		std::vector<Vector> shortestPath;
-
 		std::vector<Vector> candidates;
+
 		void calcNextDirByStepMap(const enum Maze::StepMapPurpose sp){
 			nextDirs.clear();
 			Vector focus_v = curVec;
 			Dir focus_d = curDir;
 			while(1){
+				/*
+				   std::vector<Dir> dirs;
+				   for(auto d: focus_d.ordered()) if(maze.getWall(focus_v).canGoDir(d)) dirs.push_back(d);
+				   auto it = std::min_element(dirs.begin(), dirs.end(), [&](auto &d1, auto &d2){
+				   return maze.getStep(focus_v.next(d1), sp) < maze.getStep(focus_v.next(d2), sp);
+				   });
+				   if(maze.getStep(focus_v.next(*it), sp)>=maze.getStep(focus_v, sp)) break;
+				   nextDirs.push_back(*it);
+				   focus_d = *it;
+				   focus_v = focus_v.next(*it);
+				   */
 				auto dirs = focus_d.ordered();
 				auto it = std::find_if(dirs.begin(), dirs.end(), [&](auto d){
 						if(!maze.getWall(focus_v).canGoDir(d))return false;
@@ -675,20 +716,23 @@ int main(void){
 
 #if MAZE_SIZE == 8
 	std::vector<Vector> goal = {Vector(7,7)};
-	Maze sample(mazeData_fp2016);
+	Maze sample(goal, mazeData_fp2016);
 #elif MAZE_SIZE == 16
 	std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
-	//Maze sample(mazeData_maze, false);
-	Maze sample(goal, mazeData_maze2013exp, false);
+	Maze sample(goal, mazeData_maze, false);
+	//Maze sample(goal, mazeData_maze2013exp, false);
 #elif MAZE_SIZE == 32
-	//std::vector<Vector> goal = {Vector(3,3)};
+#if 1
+	std::vector<Vector> goal = {Vector(7,6)};
+	Maze sample(goal, mazeData_maze2013half, false);
+#else
 	std::vector<Vector> goal = {
 		Vector(1,4),Vector(2,4),Vector(3,4),
 		Vector(1,3),Vector(2,3),Vector(3,3),
 		Vector(1,2),Vector(2,2),Vector(3,2),
 	};
-	//Maze sample(mazeData_maze2013half, false);
-	Maze sample(mazeData_maze2016half);
+	Maze sample(goal, mazeData_maze2016half);
+#endif
 #endif
 
 	Maze maze(goal);
