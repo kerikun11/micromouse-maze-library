@@ -393,10 +393,11 @@ class MazeAgent{
 			}
 
 			if(state == BACKING_TO_START){
-				maze.updateStepMap({maze.getStart()}, Maze::Start);
-				calcNextDirByStepMap(Maze::Start);
-				if(curVec.next(nextDirs.back())==maze.getStart()) {
+				if(curVec == maze.getStart()) {
 					state = REACHED_START;
+				}else{
+					maze.updateStepMap({maze.getStart()}, Maze::Start);
+					calcNextDirByStepMap(Maze::Start);
 				}
 			}
 			for(auto d: nextDirs){
@@ -419,17 +420,17 @@ class MazeAgent{
 			shortestPath.push_back(v);
 			while(1){
 				/*
-					for(auto d: Dir::All()) if(maze.getWall(v).canGoDir(d)) dirs.push_back(d);
-					auto it = std::min_element(dirs.begin(), dirs.end(), [&](auto &d1, auto &d2){
-						return maze.getStep(v.next(d1)) < maze.getStep(v.next(d2));
-					});
-					if(maze.getStep(v.next(*it))>=maze.getStep(v)) break;
-					prev_dir = dir;
-					dir = *it;
-					v=v.next(dir);
-					shortestPath.push_back(v);
-					if(maze.getStep(v)==0) break;
-				*/
+				   for(auto d: Dir::All()) if(maze.getWall(v).canGoDir(d)) dirs.push_back(d);
+				   auto it = std::min_element(dirs.begin(), dirs.end(), [&](auto &d1, auto &d2){
+				   return maze.getStep(v.next(d1)) < maze.getStep(v.next(d2));
+				   });
+				   if(maze.getStep(v.next(*it))>=maze.getStep(v)) break;
+				   prev_dir = dir;
+				   dir = *it;
+				   v=v.next(dir);
+				   shortestPath.push_back(v);
+				   if(maze.getStep(v)==0) break;
+				   */
 				std::vector<Dir> dirs;
 				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir, Dir(dir+1)};
 				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir, Dir(dir+3)};
@@ -740,6 +741,7 @@ int main(void){
 	agent.updateAll(Vector(0, 0), 1, sample.getWall(0,0));
 	while(1){
 		agent.calcNextDir();
+		if(agent.getState() == MazeAgent::REACHED_START) break;
 		if(agent.getState() == MazeAgent::GOT_LOST){
 			printf("GOT LOST!\n");
 			break;
@@ -754,7 +756,6 @@ int main(void){
 			agent.updateCurDir(nextDir);
 			agent.updateCurVec(nextVec);
 		}
-		if(agent.getState() == MazeAgent::REACHED_START) break;
 		Wall found_wall = sample.getWall(agent.getCurVec());
 		agent.updateWall(agent.getCurVec(), found_wall);
 #if DISPLAY
