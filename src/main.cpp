@@ -218,7 +218,7 @@ int main(void){
 			agent.updateCurDir(nextDir);
 			agent.updateCurVec(nextVec);
 		}
-		Wall found_wall = sample.getWalls(agent.getCurVec());
+		uint8_t found_wall = sample.getWalls(agent.getCurVec());
 		agent.updateWall(agent.getCurVec(), found_wall);
 #if DISPLAY
 		usleep(400000);
