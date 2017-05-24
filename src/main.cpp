@@ -189,22 +189,18 @@ int main(void){
 	Maze sample(goal, mazeData_maze, false);
 	//Maze sample(goal, mazeData_maze2013exp, false);
 #elif MAZE_SIZE == 32
-#if 1
+#if 0
 	std::vector<Vector> goal = {Vector(7,6)};
 	Maze sample(goal, mazeData_maze2013half, false);
 #else
-	std::vector<Vector> goal = {
-		Vector(1,4),Vector(2,4),Vector(3,4),
-		Vector(1,3),Vector(2,3),Vector(3,3),
-		Vector(1,2),Vector(2,2),Vector(3,2),
-	};
+	std::vector<Vector> goal = {Vector(3,3)};
 	Maze sample(goal, mazeData_maze2016half);
 #endif
 #endif
 
 	Maze maze(goal), backup(goal);
 	Agent agent(maze);
-	agent.updateAll(Vector(0, 0), 1, sample.getWall(0,0));
+	agent.updateAll(Vector(0, 0), 1, sample.getWalls(Vector(0,0)));
 	while(1){
 		agent.calcNextDir();
 		if(agent.getState() == Agent::REACHED_START) break;
@@ -222,7 +218,7 @@ int main(void){
 			agent.updateCurDir(nextDir);
 			agent.updateCurVec(nextVec);
 		}
-		Wall found_wall = sample.getWall(agent.getCurVec());
+		Wall found_wall = sample.getWalls(agent.getCurVec());
 		agent.updateWall(agent.getCurVec(), found_wall);
 #if DISPLAY
 		usleep(400000);

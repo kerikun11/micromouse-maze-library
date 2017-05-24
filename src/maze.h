@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <unistd.h>
 
-#define MAZE_SIZE      16
+#define MAZE_SIZE      32
 #define MAZE_STEP_MAX  999
 
 #define C_RED     "\x1b[31m"
@@ -109,97 +109,170 @@ class Maze{
 						h = c-'a'+10;
 					}
 					if(east_origin){
-						updateWall(x, y, h);
+						updateWall(Vector(x, y), Dir::East, h&0x01);
+						updateWall(Vector(x, y), Dir::North, h&0x02);
+						updateWall(Vector(x, y), Dir::West, h&0x04);
+						updateWall(Vector(x, y), Dir::South, h&0x08);
 					}else{
-						updateOne(Vector(x, y), Dir::East, h&0x02);
-						updateOne(Vector(x, y), Dir::North, h&0x01);
-						updateOne(Vector(x, y), Dir::West, h&0x08);
-						updateOne(Vector(x, y), Dir::South, h&0x04);
+						updateWall(Vector(x, y), Dir::East, h&0x02);
+						updateWall(Vector(x, y), Dir::North, h&0x01);
+						updateWall(Vector(x, y), Dir::West, h&0x08);
+						updateWall(Vector(x, y), Dir::South, h&0x04);
 					}
 				}
 		}
 		const Maze& operator=(Maze& obj){
 			goal = obj.goal;
-			for(int8_t y=0; y<MAZE_SIZE; ++y)
-				for(int8_t x=0; x<MAZE_SIZE; ++x)
-					getWall(x, y) = obj.getWall(x, y);
+			for(int8_t i=0; i<MAZE_SIZE-1; i++){
+				wall[0][i]=obj.wall[0][i];
+				wall[1][i]=obj.wall[1][i];
+				known[0][i]=obj.known[0][i];
+				known[1][i]=obj.known[1][i];
+			}
 			return *this;
 		}
 		void reset(const std::vector<Vector>& goal){
 			this->goal = goal;
-			//* clear all wall
-			for(int8_t y=0; y<MAZE_SIZE; ++y)
-				for(int8_t x=0; x<MAZE_SIZE; ++x)
-					getWall(x, y) = 0;
-			//* set outline
-			for(int8_t i=0; i<MAZE_SIZE; ++i){
-				updateOne(Vector(i, 0), Dir::South, true);
-				updateOne(Vector(0, i), Dir::West, true);
-				updateOne(Vector(MAZE_SIZE-1, i), Dir::East, true);
-				updateOne(Vector(i, MAZE_SIZE-1), Dir::North, true);
+			for(int8_t i=0; i<MAZE_SIZE-1; i++){
+				wall[0][i]=0;
+				wall[1][i]=0;
+				known[0][i]=0;
+				known[1][i]=0;
 			}
-			//* start cell
-			updateWall(0,0,0x0b);
+			updateWall(Vector(0,0), Dir::East, true); //< start cell
 		}
-		inline Wall& getWall(const Vector& v) { return getWall(v.x, v.y); }
-		inline Wall& getWall(const int8_t x, const int8_t y) {
-			static Wall edge;
-			edge.flags = 0xFF;
-			if(x<0 || y<0 || x>MAZE_SIZE-1 || y>MAZE_SIZE-1) return edge;
-			return wall[y][x];
+		bool isWall(const Vector& v, const Dir& d) const { return isWall(v.x, v.y, d); }
+		bool isWall(const int8_t& x, const int8_t& y, const Dir& d) const {
+			switch(d){
+				case Dir::East:
+					if(x<0 || x>MAZE_SIZE-2){ return true; }
+					if(y<0 || y>MAZE_SIZE-1){ return true; }
+					return wall[1][x] & (1<<y);
+				case Dir::North:
+					if(x<0 || x>MAZE_SIZE-1){ return true; }
+					if(y<0 || y>MAZE_SIZE-2){ return true; }
+					return wall[0][y] & (1<<x);
+				case Dir::West:
+					if(x-1<0 || x-1>MAZE_SIZE-2){ return true; }
+					if(y<0 || y>MAZE_SIZE-1){ return true; }
+					return wall[1][x-1] & (1<<y);
+				case Dir::South:
+					if(x<0 || x>MAZE_SIZE-1){ return true; }
+					if(y-1<0 || y-1>MAZE_SIZE-2){ return true; }
+					return wall[0][y-1] & (1<<x);
+			}
 		}
-		inline void updateWall(const int8_t x, const int8_t y, const Wall& w){ return updateWall(Vector(x, y), w); }
-		inline void updateWall(const Vector& v, Wall w){
-			getWall(v) = 0xF0 | w;
-			if(v.x==0) updateOne(v, Dir::West, true);
-			if(v.y==0) updateOne(v, Dir::South, true);
-			if(v.x==MAZE_SIZE-1) updateOne(v, Dir::East, true);
-			if(v.y==MAZE_SIZE-1) updateOne(v, Dir::North, true);
-			for(Dir d: Dir::All()) updateOne(v.next(d), 2+d, w[d]); //< also update every next wall
+		void setWall(const Vector& v, const Dir& d, const bool& b) { return setWall(v.x, v.y, d, b); }
+		void setWall(const int8_t& x, const int8_t& y, const Dir& d, const bool& b) {
+			switch(d){
+				case Dir::East:
+					if(x<0 || x>MAZE_SIZE-2){ printf("","Warning: Out of Field\n"); return; }
+					if(y<0 || y>MAZE_SIZE-1){ printf("","Warning: Out of Field\n"); return; }
+					if(b) wall[1][x] |= (1<<y); else wall[1][x] &= ~(1<<y); return;
+				case Dir::North:
+					if(x<0 || x>MAZE_SIZE-1){ printf("","Warning: Out of Field\n"); return; }
+					if(y<0 || y>MAZE_SIZE-2){ printf("","Warning: Out of Field\n"); return; }
+					if(b) wall[0][y] |= (1<<x); else wall[0][y] &= ~(1<<x); return;
+				case Dir::West:
+					if(x-1<0 || x-1>MAZE_SIZE-2){ printf("","Warning: Out of Field\n"); return; }
+					if(y<0 || y>MAZE_SIZE-1){ printf("","Warning: Out of Field\n"); return; }
+					if(b) wall[1][x-1] |= (1<<y); else wall[1][x-1] &= ~(1<<y); return;
+				case Dir::South:
+					if(x<0 || x>MAZE_SIZE-1){ printf("","Warning: Out of Field\n"); return; }
+					if(y-1<0 || y-1>MAZE_SIZE-2){ printf("","Warning: Out of Field\n"); return; }
+					if(b) wall[0][y-1] |= (1<<x); else wall[0][y-1] &= ~(1<<x); return;
+			}
 		}
-		inline void updateOne(const Vector& v, const Dir& d, const bool b){
-			Wall& w = getWall(v);
-			if(b) w.flags |=   1<<d;
-			else  w.flags &= ~(1<<d);
-			w.flags |= 1<<(d+4);
+		bool isKnown(const Vector& v, const Dir& d) const { return isKnown(v.x, v.y, d); }
+		bool isKnown(const int8_t& x, const int8_t& y, const Dir& d) const {
+			switch(d){
+				case Dir::East:
+					if(x<0 || x>MAZE_SIZE-2){ return true; }
+					if(y<0 || y>MAZE_SIZE-1){ return true; }
+					return known[1][x] & (1<<y);
+				case Dir::North:
+					if(x<0 || x>MAZE_SIZE-1){ return true; }
+					if(y<0 || y>MAZE_SIZE-2){ return true; }
+					return known[0][y] & (1<<x);
+				case Dir::West:
+					if(x-1<0 || x-1>MAZE_SIZE-2){ return true; }
+					if(y<0 || y>MAZE_SIZE-1){ return true; }
+					return known[1][x-1] & (1<<y);
+				case Dir::South:
+					if(x<0 || x>MAZE_SIZE-1){ return true; }
+					if(y-1<0 || y-1>MAZE_SIZE-2){ return true; }
+					return known[0][y-1] & (1<<x);
+			}
 		}
-		inline bool canGo(const Vector& v, const Dir& d) {
-			const Wall& w = getWall(v);
-			return !(w.flags&(1<<d)) && (w.flags&(1<<(4+d)));
+		void setKnown(const Vector& v, const Dir& d, const bool& b) { return setKnown(v.x, v.y, d, b); }
+		void setKnown(const int8_t& x, const int8_t& y, const Dir& d, const bool& b) {
+			switch(d){
+				case Dir::East:
+					if(x<0 || x>MAZE_SIZE-2){ printf("","Warning: Out of Field\n"); return; }
+					if(y<0 || y>MAZE_SIZE-1){ printf("","Warning: Out of Field\n"); return; }
+					if(b) known[1][x] |= (1<<y); else known[1][x] &= ~(1<<y); return;
+				case Dir::North:
+					if(x<0 || x>MAZE_SIZE-1){ printf("","Warning: Out of Field\n"); return; }
+					if(y<0 || y>MAZE_SIZE-2){ printf("","Warning: Out of Field\n"); return; }
+					if(b) known[0][y] |= (1<<x); else known[0][y] &= ~(1<<x); return;
+				case Dir::West:
+					if(x-1<0 || x-1>MAZE_SIZE-2){ printf("","Warning: Out of Field\n"); return; }
+					if(y<0 || y>MAZE_SIZE-1){ printf("","Warning: Out of Field\n"); return; }
+					if(b) known[1][x-1] |= (1<<y); else known[1][x-1] &= ~(1<<y); return;
+				case Dir::South:
+					if(x<0 || x>MAZE_SIZE-1){ printf("","Warning: Out of Field\n"); return; }
+					if(y-1<0 || y-1>MAZE_SIZE-2){ printf("","Warning: Out of Field\n"); return; }
+					if(b) known[0][y-1] |= (1<<x); else known[0][y-1] &= ~(1<<x); return;
+			}
+		}
+		bool canGo(const Vector& v, const Dir& d) const {
+			return isKnown(v, d) && !isWall(v, d);
+		}
+		int8_t nWall(const Vector& v) const {
+			int8_t n=0;
+			for(auto d: Dir::All()) if(isWall(v, d)) n++;
+			return n;
+		}
+		int8_t nKnown(const Vector& v) const {
+			int8_t n=0;
+			for(auto d: Dir::All()) if(isKnown(v, d)) n++;
+			return n;
+		}
+		uint8_t getWalls(const Vector& v) const {
+			uint8_t w=0;
+			if(isWall(v, Dir::East)) w |= 0x01;
+			if(isWall(v, Dir::North)) w |= 0x02;
+			if(isWall(v, Dir::West)) w |= 0x04;
+			if(isWall(v, Dir::South)) w |= 0x08;
+			return w;
+		}
+		void updateWall(const Vector& v, const Wall& w){
+			for(auto d: Dir::All()) {
+				setWall(v, d, w[d]);
+				setKnown(v, d, true);
+			}
+		}
+		void updateWall(const Vector& v, const Dir& d, const bool& b){
+			setWall(v, d, b);
+			setKnown(v, d, true);
 		}
 		inline void printWall(const step_t nums[MAZE_SIZE][MAZE_SIZE] = NULL, const Vector v = Vector(-1,-1)) const {
-#if 0
-			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
-				for(uint8_t x=0; x<MAZE_SIZE; x++) printf("+%s+", wall[y][x].n ? "---" : "   ");
-				printf("\n");
-				for(uint8_t x=0; x<MAZE_SIZE; x++){
-					printf("%s", wall[y][x].w ? "|" : " ");
-					if(nums==NULL) printf("   ");
-					else printf("%3d", nums[y][x]);
-					printf("%s", wall[y][x].e ? "|" : " ");
-				}
-				printf("\n");
-				for(uint8_t x=0; x<MAZE_SIZE; x++) printf("+%s+", wall[y][x].s ? "---" : "   ");
-				printf("\n");
-			}
-#else
 			printf("\n");
 			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
 				for(uint8_t x=0; x<MAZE_SIZE; x++)
-					printf("+%s" C_RESET, wall[y][x].N ? (wall[y][x].n?"---":"   ") : C_RED " - ");
+					printf("+%s" C_RESET, isKnown(x,y,Dir::North) ? (isWall(x,y,Dir::North)?"---":"   ") : C_RED " - ");
 				printf("+\n");
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
-					printf("%s" C_RESET, wall[y][x].W ? (wall[y][x].w?"|":" ") : C_RED ":");
+					printf("%s" C_RESET, isKnown(x,y,Dir::West) ? (isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
 					if(nums!=NULL) printf("%s%3d" C_RESET, v==Vector(x,y)?C_YELLOW:C_CYAN, nums[y][x]);
 					else printf("%s" C_RESET, v==Vector(x,y)?(C_YELLOW " X "):"   ");
 				}
-				printf("%s" C_RESET, wall[y][MAZE_SIZE-1].E ? (wall[y][MAZE_SIZE-1].e?"|":" ") : C_RED ":");
+				printf("%s" C_RESET, isKnown(MAZE_SIZE-1,y,Dir::East) ? (isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
 				printf("\n");
 			}
 			for(uint8_t x=0; x<MAZE_SIZE; x++)
-				printf("+%s" C_RESET, wall[0][x].S ? (wall[0][x].s?"---":"   ") : C_RED " - ");
+				printf("+%s" C_RESET, isKnown(x,0,Dir::South) ? (isWall(x,0,Dir::South)?"---":"   ") : C_RED " - ");
 			printf("+\n");
-#endif
 		}
 		inline void printPath(std::vector<Vector> path) const {
 			step_t steps[MAZE_SIZE][MAZE_SIZE]={0};
@@ -209,25 +282,26 @@ class Maze{
 			printf("\n");
 			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
 				for(uint8_t x=0; x<MAZE_SIZE; x++)
-					printf("+%s" C_RESET, wall[y][x].N ? (wall[y][x].n?"---":"   ") : C_RED " - ");
+					printf("+%s" C_RESET, isKnown(x,y,Dir::North) ? (isWall(x,y,Dir::North)?"---":"   ") : C_RED " - ");
 				printf("+\n");
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
-					printf("%s" C_RESET, wall[y][x].W ? (wall[y][x].w?"|":" ") : C_RED ":");
+					printf("%s" C_RESET, isKnown(x,y,Dir::West) ? (isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
 					auto it = std::find(path.begin(), path.end(), Vector(x,y));
 					if(it!=path.end()) printf("%s%3d" C_RESET, C_YELLOW, it-path.begin());
 					else printf("%s", "   ");
 				}
-				printf("%s" C_RESET, wall[y][MAZE_SIZE-1].E ? (wall[y][MAZE_SIZE-1].e?"|":" ") : C_RED ":");
+				printf("%s" C_RESET, isKnown(MAZE_SIZE-1,y,Dir::East) ? (isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
 				printf("\n");
 			}
 			for(uint8_t x=0; x<MAZE_SIZE; x++)
-				printf("+%s" C_RESET, wall[0][x].S ? (wall[0][x].s?"---":"   ") : C_RED " - ");
+				printf("+%s" C_RESET, isKnown(x,0,Dir::South) ? (isWall(x,0,Dir::South)?"---":"   ") : C_RED " - ");
 			printf("+\n");
 		}
 		const std::vector<Vector>& getGoal(){return goal;}
 		const Vector& getStart(){return start;}
 	private:
-		Wall wall[MAZE_SIZE][MAZE_SIZE];
+		uint32_t wall[2][MAZE_SIZE-1];
+		uint32_t known[2][MAZE_SIZE-1];
 		const Vector start{0, 0};
 		std::vector<Vector> goal;
 };
@@ -279,10 +353,9 @@ class StepMap{
 			while(!q.empty()){
 				Vector focus = q.front(); q.pop();
 				step_t focus_step = getStep(focus, sp);
-				Wall focus_wall = maze.getWall(focus);
 				for(Dir d: Dir::All()){
 					Vector next = focus.next(d);
-					if(focus_wall[d]) continue;
+					if(maze.isWall(focus, d)) continue;
 					if(getStep(next, sp)>focus_step+1){
 						getStep(next, sp) = focus_step+1;
 						q.push(next);
@@ -377,7 +450,7 @@ class Agent{
 					for(int j=0; j<MAZE_SIZE; j++){
 						Vector v(i,j);
 #if DEEPNESS == 0
-						if(maze.getWall(i,j).nKnown()!=4 && (stepMap.getStep(i,j)+stepMap.getStep(i,j,StepMap::Start)) <= goal_step){
+						if(maze.nKnown(Vector(i,j))!=4 && (stepMap.getStep(i,j)+stepMap.getStep(i,j,StepMap::Start)) <= goal_step){
 							candidates.push_back(v);
 						}
 #elif DEEPNESS == 1
@@ -426,18 +499,6 @@ class Agent{
 			Dir prev_dir = Dir::North;
 			shortestPath.push_back(v);
 			while(1){
-				/*
-				   for(auto d: Dir::All()) if(maze.getWall(v).canGoDir(d)) dirs.push_back(d);
-				   auto it = std::min_element(dirs.begin(), dirs.end(), [&](auto &d1, auto &d2){
-				   return stepMap.getStep(v.next(d1)) < stepMap.getStep(v.next(d2));
-				   });
-				   if(stepMap.getStep(v.next(*it))>=stepMap.getStep(v)) break;
-				   prev_dir = dir;
-				   dir = *it;
-				   v=v.next(dir);
-				   shortestPath.push_back(v);
-				   if(stepMap.getStep(v)==0) break;
-				   */
 				std::vector<Dir> dirs;
 				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir, Dir(dir+1)};
 				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir, Dir(dir+3)};
@@ -521,17 +582,6 @@ class Agent{
 			Vector focus_v = curVec;
 			Dir focus_d = curDir;
 			while(1){
-				/*
-				   std::vector<Dir> dirs;
-				   for(auto d: focus_d.ordered()) if(maze.getWall(focus_v).canGoDir(d)) dirs.push_back(d);
-				   auto it = std::min_element(dirs.begin(), dirs.end(), [&](auto &d1, auto &d2){
-				   return stepMap.getStep(focus_v.next(d1), sp) < stepMap.getStep(focus_v.next(d2), sp);
-				   });
-				   if(stepMap.getStep(focus_v.next(*it), sp)>=stepMap.getStep(focus_v, sp)) break;
-				   nextDirs.push_back(*it);
-				   focus_d = *it;
-				   focus_v = focus_v.next(*it);
-				   */
 				auto dirs = focus_d.ordered();
 				auto it = std::find_if(dirs.begin(), dirs.end(), [&](auto d){
 						if(!maze.canGo(focus_v, d)) return false;
