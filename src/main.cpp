@@ -2,6 +2,8 @@
 #include <cstdint>
 #include "Maze.h"
 
+#define DISPLAY 0
+
 const char mazeData_fp2016[8+1][8+1] = {
 	{"6beab6ab"},
 	{"4aaa3c37"},
@@ -200,7 +202,6 @@ int main(void){
 
 	Maze maze(goal), backup(goal);
 	Agent agent(maze);
-	agent.updateAll(Vector(0, 0), 1, sample.getWalls(Vector(0,0)));
 	while(1){
 		agent.calcNextDir();
 		if(agent.getState() == Agent::REACHED_START) break;
@@ -215,11 +216,13 @@ int main(void){
 #endif
 			Vector nextVec = agent.getCurVec().next(nextDir);
 			// move robot here
-			agent.updateCurDir(nextDir);
-			agent.updateCurVec(nextVec);
+			agent.updateCurVecDir(nextVec, nextDir);
 		}
-		uint8_t found_wall = sample.getWalls(agent.getCurVec());
-		agent.updateWall(agent.getCurVec(), found_wall);
+		const Vector& v = agent.getCurVec();
+		const Dir& d = agent.getCurDir();
+		agent.updateWall(v, d-1, sample.isWall(v, d-1));
+		agent.updateWall(v, d+0, sample.isWall(v, d+0));
+		agent.updateWall(v, d+1, sample.isWall(v, d+1));
 #if DISPLAY
 		usleep(400000);
 #endif
@@ -228,8 +231,9 @@ int main(void){
 	sleep(1);
 	if(!agent.calcShortestPath()){
 		printf("Failed to find shortest path!\n");
+	}else{
+		agent.printPath();
 	}
-	agent.printPath();
 	return 0;
 }
 

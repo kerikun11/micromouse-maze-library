@@ -18,8 +18,7 @@
 #define C_RESET   "\x1b[0m"
 
 #define DEEPNESS 0
-#define SEARCHING_ADDITIALLY_AT_START 0
-#define DISPLAY 0
+#define SEARCHING_ADDITIALLY_AT_START 1
 
 typedef uint16_t step_t;
 
@@ -112,6 +111,7 @@ class Maze{
 				known[1][i]=0;
 			}
 			updateWall(Vector(0,0), Dir::East, true); //< start cell
+			updateWall(Vector(0,0), Dir::North, false); //< start cell
 		}
 		bool isWall(const Vector& v, const Dir& d) const { return isWall(v.x, v.y, d); }
 		bool isWall(const int8_t& x, const int8_t& y, const Dir& d) const {
@@ -210,20 +210,6 @@ class Maze{
 			for(auto d: Dir::All()) if(isKnown(v, d)) n++;
 			return n;
 		}
-		uint8_t getWalls(const Vector& v) const {
-			uint8_t w=0;
-			if(isWall(v, Dir::East)) w |= 0x01;
-			if(isWall(v, Dir::North)) w |= 0x02;
-			if(isWall(v, Dir::West)) w |= 0x04;
-			if(isWall(v, Dir::South)) w |= 0x08;
-			return w;
-		}
-		void updateWalls(const Vector& v, const uint8_t& w){
-			for(auto d: Dir::All()) {
-				setWall(v, d, (w>>d)&1);
-				setKnown(v, d, true);
-			}
-		}
 		void updateWall(const Vector& v, const Dir& d, const bool& b){
 			setWall(v, d, b);
 			setKnown(v, d, true);
@@ -313,7 +299,7 @@ class StepMap{
 		void print(const Vector& v=Vector(-1,-1), const enum Purpose& sp = Goal) const {
 			maze.printWall(stepMap[sp], v);
 		}
-		void update(const std::vector<Vector>& dest, const enum Purpose& sp){
+		void update(const std::vector<Vector>& dest, const enum Purpose& sp, const bool& onlyCanGo = false){
 			for(uint8_t y=0; y<MAZE_SIZE; y++)
 				for(uint8_t x=0; x<MAZE_SIZE; x++)
 					getStep(x, y, sp) = MAZE_STEP_MAX;
@@ -328,6 +314,7 @@ class StepMap{
 				for(Dir d: Dir::All()){
 					Vector next = focus.next(d);
 					if(maze.isWall(focus, d)) continue;
+					if(onlyCanGo && !maze.isKnown(focus, d)) continue;
 					if(getStep(next, sp)>focus_step+1){
 						getStep(next, sp) = focus_step+1;
 						q.push(next);
@@ -350,6 +337,7 @@ class Agent{
 			SEARCHING_ADDITIONALLY,
 			BACKING_TO_START,
 			REACHED_START,
+			FORCE_BACKING_TO_START,
 			GOT_LOST,
 		};
 		static const char* stateString(const enum State s){
@@ -360,6 +348,7 @@ class Agent{
 				"Searching Additionally",
 				"Backing to Start",
 				"Reached Start",
+				"Force Backing to Start",
 				"Got Lost",
 			};
 			return str[s];
@@ -372,16 +361,10 @@ class Agent{
 			state = IDOLE;
 		}
 		void forceBackToStart(){
-			state = BACKING_TO_START;
+			if(state != REACHED_START) state = FORCE_BACKING_TO_START;
 		}
-		void updateAll(const Vector& v, const Dir& d, const uint8_t& w){
-			updateCurVec(v);
-			updateCurDir(d);
-			updateWall(v, w);
-		}
-		void updateCurVec(const Vector& v){ curVec = v; }
-		void updateCurDir(const Dir& d){ curDir = d; }
-		void updateWall(const Vector& v, const uint8_t& w){ maze.updateWalls(v, w); }
+		void updateCurVecDir(const Vector& v, const Dir& d){ curVec = v; curDir=d; }
+		void updateWall(const Vector& v, const Dir& d, const bool& b){ maze.updateWall(v, d, b); }
 		bool calcNextDir(){
 			State prev_state = getState();
 			if(state == IDOLE){
@@ -449,6 +432,16 @@ class Agent{
 					calcNextDirByStepMap(StepMap::Start);
 				}
 			}
+
+			if(state == FORCE_BACKING_TO_START){
+				if(curVec == maze.getStart()) {
+					state = REACHED_START;
+				}else{
+					stepMap.update({maze.getStart()}, StepMap::Start, true);
+					calcNextDirByStepMap(StepMap::Start);
+				}
+			}
+
 			for(auto d: nextDirs){
 				step++;
 				f += curDir.getRelative(Dir::Forward) == d;
@@ -461,13 +454,26 @@ class Agent{
 		}
 
 		bool calcShortestPath(){
-			stepMap.update(maze.getGoal(), StepMap::Goal);
+			stepMap.update(maze.getGoal(), StepMap::Goal, true);
 			shortestPath.clear();
 			Vector v = maze.getStart();
 			Dir dir = Dir::North;
 			Dir prev_dir = Dir::North;
 			shortestPath.push_back(v);
 			while(1){
+				/*
+				   std::vector<Dir> dirs;
+				   for(auto d: Dir::All()) if(maze.canGo(v, d)) dirs.push_back(d);
+				   auto it = std::min_element(dirs.begin(), dirs.end(), [&](auto &d1, auto &d2){
+				   return stepMap.getStep(v.next(d1)) < stepMap.getStep(v.next(d2));
+				   });
+				   if(stepMap.getStep(v.next(*it))>=stepMap.getStep(v)) break;
+				   prev_dir = dir;
+				   dir = *it;
+				   v=v.next(dir);
+				   shortestPath.push_back(v);
+				   if(stepMap.getStep(v)==0) break;
+				   */
 				std::vector<Dir> dirs;
 				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir, Dir(dir+1)};
 				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir, Dir(dir+3)};
@@ -562,8 +568,8 @@ class Agent{
 				focus_v = focus_v.next(*it);
 			}
 			if(nextDirs.empty()){
-			state = GOT_LOST;
-			return false;
+				state = GOT_LOST;
+				return false;
 			}
 			return true;
 		}
