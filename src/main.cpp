@@ -2,7 +2,8 @@
 #include <cstdint>
 #include "Maze.h"
 
-#define DISPLAY 0
+#define DISPLAY 1
+#define MAZE_BACKUP_SIZE 3
 
 const char mazeData_fp2016[8+1][8+1] = {
 	{"6beab6ab"},
@@ -185,10 +186,10 @@ std::vector<Vector> goal = {Vector(7,7)};
 Maze sample(mazeData_fp2016);
 #elif MAZE_SIZE == 16
 std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
-Maze sample(mazeData_maze, false);
-//Maze sample(goal, mazeData_maze2013exp, false);
+//Maze sample(mazeData_maze, false);
+Maze sample(mazeData_maze2013exp, false);
 #elif MAZE_SIZE == 32
-#if 1
+#if 0
 std::vector<Vector> goal = {Vector(6,5)};
 Maze sample(mazeData_maze2013half, false);
 #else
@@ -206,22 +207,34 @@ bool searchRun(){
 	agent.reset();
 	if(agent.getState()==Agent::REACHED_START) return true;
 
-	// Action::START_STEP
+	// queue Action::START_STEP
+	// conduct machine calibration
+	// move robot here
 	Agent::State prevState = agent.getState();
 	int count=0;
-	while(count++ < 10){
+	while(1){
+		if(count++>10) return false; // for debug
+		// move robot here
+		const Vector& v = agent.getCurVec();
+		const Dir& d = agent.getCurDir();
+		agent.updateWall(v, d-1, sample.isWall(v, d-1)); // right
+		agent.updateWall(v, d+0, sample.isWall(v, d+0)); // front
+		agent.updateWall(v, d+1, sample.isWall(v, d+1)); // left
+
 		agent.calcNextDir();
 		Agent::State newState = agent.getState();
 		if(newState!=prevState && newState == Agent::REACHED_START) break;
-		if(newState!=prevState && newState == Agent::GOT_LOST) break;
 		if(newState!=prevState && newState == Agent::REACHED_GOAL){ /* REACHED_GOAL */ }
 		if(newState!=prevState && newState == Agent::BACKING_TO_START){ /* BACKING_TO_START */ }
 		prevState = newState;
 		auto nextDirs = agent.getNextDirs();
+		if(nextDirs.empty()){
+			// Action::STOP
+			return false;
+		}
 		for(Dir nextDir: nextDirs){
 #if DISPLAY
-			usleep(100000);
-			agent.printInfo();
+			usleep(100000); agent.printInfo();
 #endif
 			Vector nextVec = agent.getCurVec().next(nextDir);
 			// queue action(s) here
@@ -231,17 +244,11 @@ bool searchRun(){
 		usleep(400000);
 #endif
 		maze_backup.push(maze);
-		if(maze_backup.size()>3) maze_backup.pop();
-		// move robot here
-		const Vector& v = agent.getCurVec();
-		const Dir& d = agent.getCurDir();
-		agent.updateWall(v, d-1, sample.isWall(v, d-1)); // right
-		agent.updateWall(v, d+0, sample.isWall(v, d+0)); // front
-		agent.updateWall(v, d+1, sample.isWall(v, d+1)); // left
+		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop();
 	}
-	if(agent.getState() != Agent::REACHED_START) return false;
-	agent.printInfo();
-	sleep(1);
+	// queue Action::START_INIT
+	// move robot here
+	// COMPLETE
 	return true;
 }
 
@@ -257,6 +264,8 @@ int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	maze_backup.push(maze);
 	while(!searchRun());
+	agent.printInfo();
+	sleep(1);
 	fastRun();
 	return 0;
 }

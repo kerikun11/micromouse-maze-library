@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <unistd.h>
 
-#define MAZE_SIZE      32
+#define MAZE_SIZE      16
 #define MAZE_STEP_MAX  999
 
 #define C_RED     "\x1b[31m"
