@@ -2,8 +2,8 @@
 #include <cstdint>
 #include "Maze.h"
 
-#define DISPLAY 1
-#define MAZE_BACKUP_SIZE 3
+#define DISPLAY 0
+#define MAZE_BACKUP_SIZE 5
 
 const char mazeData_fp2016[8+1][8+1] = {
 	{"6beab6ab"},
@@ -186,8 +186,11 @@ std::vector<Vector> goal = {Vector(7,7)};
 Maze sample(mazeData_fp2016);
 #elif MAZE_SIZE == 16
 std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
-//Maze sample(mazeData_maze, false);
-Maze sample(mazeData_maze2013exp, false);
+Maze sample(mazeData_maze, false);
+//Maze sample(mazeData_maze3, false);
+//Maze sample(mazeData_maze4, false);
+//Maze sample(mazeData_maze2013exp, false);
+//Maze sample(mazeData_maze2013fr, false);
 #elif MAZE_SIZE == 32
 #if 0
 std::vector<Vector> goal = {Vector(6,5)};
@@ -203,9 +206,11 @@ std::queue<Maze> maze_backup;
 Agent agent(maze, goal);
 
 bool searchRun(){
-	maze = maze_backup.front();
+	maze = maze_backup.back();
 	agent.reset();
 	if(agent.getState()==Agent::REACHED_START) return true;
+	maze = maze_backup.front();
+	agent.reset();
 
 	// queue Action::START_STEP
 	// conduct machine calibration
@@ -213,13 +218,15 @@ bool searchRun(){
 	Agent::State prevState = agent.getState();
 	int count=0;
 	while(1){
-		if(count++>10) return false; // for debug
+		//if(count++>10) return false; // for debug
 		// move robot here
 		const Vector& v = agent.getCurVec();
 		const Dir& d = agent.getCurDir();
 		agent.updateWall(v, d-1, sample.isWall(v, d-1)); // right
 		agent.updateWall(v, d+0, sample.isWall(v, d+0)); // front
 		agent.updateWall(v, d+1, sample.isWall(v, d+1)); // left
+		maze_backup.push(maze);
+		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop();
 
 		agent.calcNextDir();
 		Agent::State newState = agent.getState();
@@ -243,8 +250,6 @@ bool searchRun(){
 #if DISPLAY
 		usleep(400000);
 #endif
-		maze_backup.push(maze);
-		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop();
 	}
 	// queue Action::START_INIT
 	// move robot here

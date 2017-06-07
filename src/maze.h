@@ -9,6 +9,7 @@
 #define MAZE_SIZE      16
 #define MAZE_STEP_MAX  999
 
+#if 1
 #define C_RED     "\x1b[31m"
 #define C_GREEN   "\x1b[32m"
 #define C_YELLOW  "\x1b[33m"
@@ -16,9 +17,18 @@
 #define C_MAGENTA "\x1b[35m"
 #define C_CYAN    "\x1b[36m"
 #define C_RESET   "\x1b[0m"
+#else
+#define C_RED     ""
+#define C_GREEN   ""
+#define C_YELLOW  ""
+#define C_BLUE    ""
+#define C_MAGENTA ""
+#define C_CYAN    ""
+#define C_RESET   ""
+#endif
 
 #define DEEPNESS 0
-#define SEARCHING_ADDITIALLY_AT_START 1
+#define SEARCHING_ADDITIALLY_AT_START 0
 
 typedef uint16_t step_t;
 
@@ -517,10 +527,34 @@ class Agent{
 			}
 			return true;
 		}
+		void findShortestCandidates(){
+			stepMap.update(goal, StepMap::Goal);
+			stepMap.update({start}, StepMap::Start);
+			candidates.clear();
+			std::vector<step_t> goal_steps;
+			for(auto g:goal) goal_steps.push_back(stepMap.getStep(g, StepMap::Start));
+			step_t goal_step = *(std::min_element(goal_steps.begin(), goal_steps.end()));
+			for(int i=0; i<MAZE_SIZE; i++){
+				for(int j=0; j<MAZE_SIZE; j++){
+					Vector v(i,j);
+#if DEEPNESS == 0
+					if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= goal_step && maze.nKnown(Vector(i,j))!=4){
+						candidates.push_back(v);
+					}
+#elif DEEPNESS == 1
+					if(stepMap.getStep(i,j) != MAZE_STEP_MAX && maze.nKnown(Vector(i,j))!=4){
+						candidates.push_back(v);
+					}
+#endif
+				}
+			}
+		}
 		const enum State calcNextDir(const Vector& pv, const Dir& pd, enum State state){
 			if(state == IDOLE){
 				step=0; f=0; l=0; r=0; b=0;
-				state = SEARCHING_FOR_GOAL;
+				findShortestCandidates();
+				if(candidates.empty()) state = BACKING_TO_START;
+				else state = SEARCHING_FOR_GOAL;
 #if SEARCHING_ADDITIALLY_AT_START
 				state = SEARCHING_ADDITIONALLY;
 #endif
@@ -547,26 +581,7 @@ class Agent{
 			}
 
 			if(state == SEARCHING_ADDITIONALLY){
-				stepMap.update(goal, StepMap::Goal);
-				stepMap.update({start}, StepMap::Start);
-				candidates.clear();
-				std::vector<step_t> goal_steps;
-				for(auto g:goal) goal_steps.push_back(stepMap.getStep(g, StepMap::Start));
-				step_t goal_step = *(std::min_element(goal_steps.begin(), goal_steps.end()));
-				for(int i=0; i<MAZE_SIZE; i++){
-					for(int j=0; j<MAZE_SIZE; j++){
-						Vector v(i,j);
-#if DEEPNESS == 0
-						if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= goal_step && maze.nKnown(Vector(i,j))!=4){
-							candidates.push_back(v);
-						}
-#elif DEEPNESS == 1
-						if(stepMap.getStep(i,j) != MAZE_STEP_MAX && maze.nKnown(Vector(i,j))!=4){
-							candidates.push_back(v);
-						}
-#endif
-					}
-				}
+				findShortestCandidates();
 				if(candidates.empty()){
 					state = BACKING_TO_START;
 				}else{
