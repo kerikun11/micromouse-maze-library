@@ -364,6 +364,10 @@ class Agent{
 			};
 			return str[s];
 		}
+		void reset(const std::vector<Vector>& goal) {
+			this->goal = goal;
+			reset();
+		}
 		void reset(){
 			stepMap.reset();
 			curVec = Vector(0, 0);
