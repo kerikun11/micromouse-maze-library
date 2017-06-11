@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <cstdint>
+#include <unistd.h>
 #include "Maze.h"
+#include "Agent.h"
 
 #define DISPLAY 0
 #define MAZE_BACKUP_SIZE 5
