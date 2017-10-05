@@ -212,15 +212,16 @@ class Maze{
 		bool canGo(const Vector& v, const Dir& d) const {
 			return isKnown(v, d) && !isWall(v, d);
 		}
-		int8_t nWall(const Vector& v) const {
+		int8_t wallCount(const Vector& v) const {
 			int8_t n=0;
 			for(auto d: Dir::All()) if(isWall(v, d)) n++;
 			return n;
+			auto dirs = Dir::All();
+			return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return isWall(v, d);});
 		}
-		int8_t nKnown(const Vector& v) const {
-			int8_t n=0;
-			for(auto d: Dir::All()) if(isKnown(v, d)) n++;
-			return n;
+		int8_t knownCount(const Vector& v) const {
+			auto dirs = Dir::All();
+			return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return isKnown(v, d);});
 		}
 		void updateWall(const Vector& v, const Dir& d, const bool& b){
 			setWall(v, d, b);

@@ -4,7 +4,7 @@
 #include "Maze.h"
 #include "Agent.h"
 
-#define DISPLAY 0
+#define DISPLAY 1
 #define MAZE_BACKUP_SIZE 5
 
 const char mazeData_fp2016[8+1][8+1] = {

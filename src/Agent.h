@@ -207,7 +207,7 @@ class Agent{
 				for(int j=0; j<MAZE_SIZE; j++){
 					Vector v(i,j);
 #if DEEPNESS == 0
-					if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= goal_step && maze.nKnown(Vector(i,j))!=4){
+					if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= goal_step && maze.knownCount(Vector(i,j))!=4){
 						candidates.push_back(v);
 					}
 #elif DEEPNESS == 1
