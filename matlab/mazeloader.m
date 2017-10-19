@@ -1,6 +1,6 @@
 %% 入力
-maze_size = 32;
-file_name = 'MM2016rec_HX.jpg';
+maze_size = 16;
+file_name = '2017MC.png';
 
 %% 二値化＆色反転(壁を1にするため)
 original = imread(file_name);
@@ -17,8 +17,8 @@ rowsum = sum(bw,2);
 trim = bw(ne:(se+size(rowsum,1)/2), we:(ee+size(colsum,2)/2));
 
 %% ノイズの除去と壁の膨張
-trim = imopen(trim, ones(2,2));
-trim = imdilate(trim, ones(6,6));
+trim = imopen(trim, ones(5));
+trim = imdilate(trim, ones(3));
 imshow(trim);
 
 %% 壁の抽出
