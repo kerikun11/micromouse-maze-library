@@ -3,6 +3,9 @@
 #include "Maze.h"
 #include "StepMap.h"
 
+#define DEEPNESS 0
+#define SEARCHING_ADDITIALLY_AT_START 0
+
 class Agent{
 	public:
 		Agent(Maze& maze, const std::vector<Vector>& goal) : maze(maze), stepMap(maze), goal(goal){ reset(); }
@@ -138,19 +141,19 @@ class Agent{
 				switch(state){
 					case IDOLE:
 					case SEARCHING_FOR_GOAL:
-						stepMap.print(curVec, StepMap::Goal);
+						stepMap.print(StepMap::Goal, curVec);
 						break;
 					case REACHED_GOAL:
 					case SEARCHING_ADDITIONALLY:
-						stepMap.print(curVec, StepMap::General);
+						stepMap.print(StepMap::General, curVec);
 						break;
 					case BACKING_TO_START:
-						stepMap.print(curVec, StepMap::Start);
+						stepMap.print(StepMap::Start, curVec);
 						break;
 					case REACHED_START:
 					case GOT_LOST:
 					default:
-						stepMap.print(curVec, StepMap::Goal);
+						stepMap.print(StepMap::Goal, curVec);
 						break;
 				}
 			}
@@ -287,4 +290,3 @@ class Agent{
 			return state;
 		}
 };
-

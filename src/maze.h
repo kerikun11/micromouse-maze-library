@@ -5,8 +5,7 @@
 #include <array>
 #include <algorithm>
 
-#define MAZE_SIZE      16
-#define MAZE_STEP_MAX  999
+#define MAZE_SIZE      32
 
 #if 1
 #define C_RED     "\x1b[31m"
@@ -25,11 +24,6 @@
 #define C_CYAN    ""
 #define C_RESET   ""
 #endif
-
-#define DEEPNESS 0
-#define SEARCHING_ADDITIALLY_AT_START 0
-
-typedef uint16_t step_t;
 
 class Dir{
 	public:
@@ -83,7 +77,7 @@ class Maze{
 			for(uint8_t y=0; y<MAZE_SIZE; y++)
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
 					char c = data[MAZE_SIZE-y-1][x];
-					uint8_t h;
+					uint8_t h = 0;
 					if ('0' <= c && c <= '9') {
 						h = c-'0';
 					} else if('a'<=c && c<='f'){
@@ -227,7 +221,7 @@ class Maze{
 			setWall(v, d, b);
 			setKnown(v, d, true);
 		}
-		void printWall(const step_t nums[MAZE_SIZE][MAZE_SIZE] = NULL, const Vector v = Vector(-1,-1)) const {
+		void print(const Vector v = Vector(-1,-1)) const {
 			printf("\n");
 			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
 				for(uint8_t x=0; x<MAZE_SIZE; x++)
@@ -235,8 +229,7 @@ class Maze{
 				printf("+\n");
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
 					printf("%s" C_RESET, isKnown(x,y,Dir::West) ? (isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
-					if(nums!=NULL) printf("%s%3d" C_RESET, v==Vector(x,y)?C_YELLOW:C_CYAN, nums[y][x]);
-					else printf("%s" C_RESET, v==Vector(x,y)?(C_YELLOW " X "):"   ");
+					printf("%s" C_RESET, v==Vector(x,y)?(C_YELLOW " X "):"   ");
 				}
 				printf("%s" C_RESET, isKnown(MAZE_SIZE-1,y,Dir::East) ? (isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
 				printf("\n");
@@ -246,7 +239,7 @@ class Maze{
 			printf("+\n");
 		}
 		void printPath(const Vector start, const std::vector<Dir>& dirs) const {
-			step_t steps[MAZE_SIZE][MAZE_SIZE]={0};
+			int steps[MAZE_SIZE][MAZE_SIZE]={0};
 			Vector v = start;
 			int counter = 1;
 			for(auto d: dirs){
@@ -274,4 +267,3 @@ class Maze{
 		uint32_t wall[2][MAZE_SIZE-1];
 		uint32_t known[2][MAZE_SIZE-1];
 };
-
