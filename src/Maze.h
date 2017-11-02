@@ -11,13 +11,18 @@
 #include <array>
 #include <algorithm>
 
-/** @def
-*  @brief 迷路の1辺の区画数
+/** @def MAZE_SIZE
+*   @brief 迷路の1辺の区画数
 */
 #define MAZE_SIZE      32
+/** @typedef
+*   @brief 迷路のサイズのbit数の整数型
+*   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
+*/
+typedef uint32_t wall_size_t;
 
 /** @def
-*  @brief 迷路のカラー表示切替
+*   @brief 迷路のカラー表示切替
 */
 #if 1
 #define C_RED     "\x1b[31m"
@@ -38,20 +43,20 @@
 #endif
 
 /** @struc Dir
-*  @brief 迷路上の方向を定義
+*   @brief 迷路上の方向を定義
 */
 struct Dir{
 public:
 	/** @enum Dir::AbsoluteDir
-	*  @brief 絶対方向の列挙型
+	*   @brief 絶対方向の列挙型
 	*/
 	enum AbsoluteDir: int8_t { East, North, West, South, AbsMax };
 	/** @enum Dir::RelativeDir
-	*  @brief 相対方向の列挙型
+	*   @brief 相対方向の列挙型
 	*/
 	enum RelativeDir: int8_t { Forward, Left, Back, Right, RelMax };
 	/** @function Constructor
-	*  @param d Absolute Direction
+	*   @param d Absolute Direction
 	*/
 	Dir(const enum AbsoluteDir d = East) : d(d) {}
 	Dir(const int8_t d) : d(AbsoluteDir(d&3)) {}
@@ -64,20 +69,20 @@ public:
 	inline const Dir operator=(const Dir& obj) { this->d = obj.d; return *this; }
 
 	/** @function getRelative
-	*  @brief 自オブジェクト方向から見た引数方向を返す．
-	*  @param rd 対象方向
-	*  @return 相対方向
+	*   @brief 自オブジェクト方向から見た引数方向を返す．
+	*   @param rd 対象方向
+	*   @return 相対方向
 	*/
 	inline const Dir getRelative(const enum RelativeDir& rd) const { return Dir(rd-d); }
 	/** @function ordered
-	*  @brief 「正面，左，右，後」の順序の配列を生成する関数
+	*   @brief 「正面，左，右，後」の順序の方向配列を生成する関数
 	*/
 	inline const std::array<Dir, 4> ordered() const {
 		std::array<Dir, 4> order{d, d+1, d+3, d+2};
 		return order;
 	}
 	/** @function All
-	*  @brief 全方向の配列を生成する関数
+	*   @brief 全方向の方向配列を生成する静的関数
 	*/
 	static const std::array<Dir, 4>& All(){
 		static const std::array<Dir, 4> all = {East, North, West, South};
@@ -88,10 +93,11 @@ private:
 };
 
 /** @struct Vector
-*  @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
+*   @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
 */
 struct Vector{
-	int8_t x, y; /**< @brief 座標 */
+public:
+	int8_t x, y; /**< @brief 迷路の区画座標 */
 	Vector(int8_t x=0, int8_t y=0) : x(x), y(y) {} /**< @brief コンストラクタ */
 	Vector(const Vector& obj) : x(obj.x), y(obj.y) {} /**< @brief コンストラクタ */
 	/** @brief 演算子のオーバーロード
@@ -100,9 +106,9 @@ struct Vector{
 	inline const bool operator==(const Vector& obj) const { return x==obj.x && y==obj.y; }
 	inline const bool operator!=(const Vector& obj) const { return x!=obj.x || y!=obj.y; }
 	/** @function next
-	*  @brief 自分の引数方向に隣接した区画のVectorを返す
-	*  @param 隣接方向
-	*  @return 隣接座標
+	*   @brief 自分の引数方向に隣接した区画のVectorを返す
+	*   @param 隣接方向
+	*   @return 隣接座標
 	*/
 	inline const Vector next(const Dir &dir) const {
 		switch(dir){
@@ -117,16 +123,16 @@ struct Vector{
 };
 
 /** @class Maze
-*  @brief 迷路の壁情報を管理するクラス
+*   @brief 迷路の壁情報を管理するクラス
 */
 class Maze{
 public:
 	Maze() { reset(); } /**< @brief 空の迷路のコンストラクタ */
 	Maze(const Maze& obj){ *this = obj; } /**< @brief コピーコンストラクタ */
 	/** @brief 配列から迷路を読み込むコンストラクタ
-	*  @param data 各区画16進表記の文字列配列
+	*   @param data 各区画16進表記の文字列配列
 	*  例：{"abaf", "1234", "abab", "aaff"}
-	*  @param east_origin true: 東から反時計回り，false: 北から時計回り に0bitから格納されている
+	*   @param east_origin true: 東から反時計回り，false: 北から時計回り に0bitから格納されている
 	*/
 	Maze(const char data[MAZE_SIZE+1][MAZE_SIZE+1], bool east_origin = true){
 		for(uint8_t y=0; y<MAZE_SIZE; y++)
@@ -160,7 +166,7 @@ public:
 		return *this;
 	}
 	/** @function reset
-	*  @brief 迷路の初期化．壁を削除し，スタート区画を既知に
+	*   @brief 迷路の初期化．壁を削除し，スタート区画を既知に
 	*/
 	void reset(){
 		for(int8_t i=0; i<MAZE_SIZE-1; i++){
@@ -173,10 +179,10 @@ public:
 		updateWall(Vector(0,0), Dir::North, false); //< start cell
 	}
 	/** @function isWall
-	*  @brief 壁の有無を返す
-	*  @param v 区画の座標
-	*  @param d 壁の方向
-	*  @return true: 壁あり，false: 壁なし
+	*   @brief 壁の有無を返す
+	*   @param v 区画の座標
+	*   @param d 壁の方向
+	*   @return true: 壁あり，false: 壁なし
 	*/
 	bool isWall(const Vector& v, const Dir& d) const { return isWall(v.x, v.y, d); }
 	bool isWall(const int8_t& x, const int8_t& y, const Dir& d) const {
@@ -202,10 +208,10 @@ public:
 		return true;
 	}
 	/** @function setWall
-	*  @brief 壁を更新をする
-	*  @param v 区画の座標
-	*  @param d 壁の方向
-	*  @param b 壁の有無 true:壁あり，false:壁なし
+	*   @brief 壁を更新をする
+	*   @param v 区画の座標
+	*   @param d 壁の方向
+	*   @param b 壁の有無 true:壁あり，false:壁なし
 	*/
 	void setWall(const Vector& v, const Dir& d, const bool& b) { return setWall(v.x, v.y, d, b); }
 	void setWall(const int8_t& x, const int8_t& y, const Dir& d, const bool& b) {
@@ -229,10 +235,10 @@ public:
 		}
 	}
 	/** @function isKnown
-	*  @brief 壁が探索済みかを返す
-	*  @param v 区画の座標
-	*  @param d 壁の方向
-	*  @return true: 探索済み，false: 未探索
+	*   @brief 壁が探索済みかを返す
+	*   @param v 区画の座標
+	*   @param d 壁の方向
+	*   @return true: 探索済み，false: 未探索
 	*/
 	bool isKnown(const Vector& v, const Dir& d) const { return isKnown(v.x, v.y, d); }
 	bool isKnown(const int8_t& x, const int8_t& y, const Dir& d) const {
@@ -258,10 +264,10 @@ public:
 		return false;
 	}
 	/** @function setWall
-	*  @brief 壁の既知を更新する
-	*  @param v 区画の座標
-	*  @param d 壁の方向
-	*  @param b 壁の未知既知 true:既知，false:未知
+	*   @brief 壁の既知を更新する
+	*   @param v 区画の座標
+	*   @param d 壁の方向
+	*   @param b 壁の未知既知 true:既知，false:未知
 	*/
 	void setKnown(const Vector& v, const Dir& d, const bool& b) { return setKnown(v.x, v.y, d, b); }
 	void setKnown(const int8_t& x, const int8_t& y, const Dir& d, const bool& b) {
@@ -285,44 +291,44 @@ public:
 		}
 	}
 	/** @function canGo
-	*  @brief 通過可能かどうかを返す
-	*  @param v 区画の座標
-	*  @param d 壁の方向
-	*  @return true:既知かつ壁なし，false:それ以外
+	*   @brief 通過可能かどうかを返す
+	*   @param v 区画の座標
+	*   @param d 壁の方向
+	*   @return true:既知かつ壁なし，false:それ以外
 	*/
 	bool canGo(const Vector& v, const Dir& d) const {
 		return isKnown(v, d) && !isWall(v, d);
 	}
 	/** @function wallCount
-	*  @brief 引数区画の壁の数を返す
-	*  @param v 区画の座標
-	*  @return 壁の数 0~4
+	*   @brief 引数区画の壁の数を返す
+	*   @param v 区画の座標
+	*   @return 壁の数 0~4
 	*/
 	int8_t wallCount(const Vector& v) const {
 		auto dirs = Dir::All();
 		return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return isWall(v, d);});
 	}
 	/** @function wallCount
-	*  @brief 引数区画の既知壁の数を返す
-	*  @param v 区画の座標
-	*  @return 既知壁の数 0~4
+	*   @brief 引数区画の既知壁の数を返す
+	*   @param v 区画の座標
+	*   @return 既知壁の数 0~4
 	*/
 	int8_t knownCount(const Vector& v) const {
 		auto dirs = Dir::All();
 		return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return isKnown(v, d);});
 	}
 	/** @function updateWall
-	*  @brief 壁を更新して既知とする関数
-	*  @param v 区画の座標
-	*  @param d 壁の方向
+	*   @brief 壁を更新して既知とする関数
+	*   @param v 区画の座標
+	*   @param d 壁の方向
 	*/
 	void updateWall(const Vector& v, const Dir& d, const bool& b){
 		setWall(v, d, b);
 		setKnown(v, d, true);
 	}
 	/** @function print
-	*  @brief 迷路の表示
-	*  @param v ハイライト区画の座標
+	*   @brief 迷路の表示
+	*   @param v ハイライト区画の座標
 	*/
 	void print(const Vector v = Vector(-1,-1)) const {
 		printf("\n");
@@ -342,9 +348,9 @@ public:
 		printf("+\n");
 	}
 	/** @function printPath
-	*  @brief パス付の迷路の表示
-	*  @param start パスのスタート座標
-	*  @param dirs 移動方向の配列
+	*   @brief パス付の迷路の表示
+	*   @param start パスのスタート座標
+	*   @param dirs 移動方向の配列
 	*/
 	void printPath(const Vector start, const std::vector<Dir>& dirs) const {
 		int steps[MAZE_SIZE][MAZE_SIZE]={0};
@@ -372,6 +378,6 @@ public:
 		printf("+\n");
 	}
 private:
-	uint32_t wall[2][MAZE_SIZE-1]; /**< 壁情報 */
-	uint32_t known[2][MAZE_SIZE-1]; /**< 既知壁情報 */
+	wall_size_t wall[2][MAZE_SIZE-1]; /**< 壁情報 */
+	wall_size_t known[2][MAZE_SIZE-1]; /**< 既知壁情報 */
 };
