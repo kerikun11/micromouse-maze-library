@@ -14,7 +14,7 @@
 /** @def MAZE_SIZE
 *   @brief 迷路の1辺の区画数
 */
-#define MAZE_SIZE      32
+#define MAZE_SIZE      16
 /** @typedef
 *   @brief 迷路のサイズのbit数の整数型
 *   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
@@ -330,7 +330,7 @@ public:
 	*   @brief 迷路の表示
 	*   @param v ハイライト区画の座標
 	*/
-	void print(const Vector v = Vector(-1,-1)) const {
+	void print(const Vector v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const {
 		printf("\n");
 		for(int8_t y=MAZE_SIZE-1; y>=0; y--){
 			for(uint8_t x=0; x<MAZE_SIZE; x++)
@@ -338,7 +338,7 @@ public:
 			printf("+\n");
 			for(uint8_t x=0; x<MAZE_SIZE; x++){
 				printf("%s" C_RESET, isKnown(x,y,Dir::West) ? (isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
-				printf("%s" C_RESET, v==Vector(x,y)?(C_YELLOW " X "):"   ");
+				printf(" %s%c " C_RESET, C_YELLOW, v==Vector(x,y)?(">^<vX"[d]):' ');
 			}
 			printf("%s" C_RESET, isKnown(MAZE_SIZE-1,y,Dir::East) ? (isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
 			printf("\n");

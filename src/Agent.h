@@ -222,19 +222,19 @@ public:
 			switch(state){
 				case IDOLE:
 				case SEARCHING_FOR_GOAL:
-				stepMap.print(StepMap::Goal, curVec);
+				stepMap.print(StepMap::Goal, curVec, curDir);
 				break;
 				case REACHED_GOAL:
 				case SEARCHING_ADDITIONALLY:
-				stepMap.print(StepMap::General, curVec);
+				stepMap.print(StepMap::General, curVec, curDir);
 				break;
 				case BACKING_TO_START:
-				stepMap.print(StepMap::Start, curVec);
+				stepMap.print(StepMap::Start, curVec, curDir);
 				break;
 				case REACHED_START:
 				case GOT_LOST:
 				default:
-				stepMap.print(StepMap::Goal, curVec);
+				stepMap.print(StepMap::Goal, curVec, curDir);
 				break;
 			}
 		}
@@ -263,6 +263,11 @@ private:
 	std::vector<Vector> candidates; /**< 最短経路上になり得る候補を入れるコンテナ */
 	int step=0,f=0,l=0,r=0,b=0; /**< 探索の評価のためのカウンタ */
 
+	/** @function calcNextDirByStepMap
+	*   @brief ステップマップにより次に行くべき方向列を生成する
+	*   @param sp ステップマップの選択
+	*   @return true:成功, false:失敗(迷子)
+	*/
 	bool calcNextDirByStepMap(const enum StepMap::Purpose& sp){
 		nextDirs.clear();
 		Vector focus_v = curVec;
@@ -283,6 +288,9 @@ private:
 		}
 		return true;
 	}
+	/** @function findShortestCandidates
+	*   @brief ステップマップにより最短経路上になりうる区画を洗い出す
+	*/
 	void findShortestCandidates(){
 		stepMap.update(goal, StepMap::Goal);
 		stepMap.update({start}, StepMap::Start);
@@ -294,17 +302,25 @@ private:
 			for(int j=0; j<MAZE_SIZE; j++){
 				Vector v(i,j);
 				#if DEEPNESS == 0
-				if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= goal_step && maze.knownCount(Vector(i,j))!=4){
+				if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= 1+goal_step && maze.knownCount(Vector(i,j))!=4){
 					candidates.push_back(v);
 				}
 				#elif DEEPNESS == 1
-				if(stepMap.getStep(i,j) != MAZE_STEP_MAX && maze.nKnown(Vector(i,j))!=4){
+				if(stepMap.getStep(i,j) != MAZE_STEP_MAX && maze.knownCount(Vector(i,j))!=4){
 					candidates.push_back(v);
 				}
 				#endif
 			}
 		}
 	}
+	/** @function calcNextDir
+	*   @brief 次に行くべき方向を計算する
+	*   @param pv 出発位置
+	*   @param pd 出発方向
+	*   @param state 出発時の探索状態
+	*   @return 計算後の探索状態
+	*   計算結果はメンバ変数のnextDirsに保存される．
+	*/
 	const enum State calcNextDir(const Vector& pv, const Dir& pd, enum State state){
 		if(state == IDOLE){
 			step=0; f=0; l=0; r=0; b=0;

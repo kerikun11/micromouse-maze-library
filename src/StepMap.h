@@ -66,7 +66,7 @@ public:
 	 *  @param sp ステップマップの用途
 	 *  @param v ハイライト区画
 	 */
-	void print(const enum Purpose& sp = Goal, const Vector& v = Vector(-1,-1)) const {
+	void print(const enum Purpose& sp = Goal, const Vector& v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const {
 		printf("\n");
 		for(int8_t y=MAZE_SIZE-1; y>=0; y--){
 			for(uint8_t x=0; x<MAZE_SIZE; x++)
@@ -74,7 +74,11 @@ public:
 			printf("+\n");
 			for(uint8_t x=0; x<MAZE_SIZE; x++){
 				printf("%s" C_RESET, maze.isKnown(x,y,Dir::West) ? (maze.isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
-				printf("%s%3d" C_RESET, v==Vector(x,y)?C_YELLOW:C_CYAN, stepMap[sp][y][x]);
+				if(v==Vector(x, y)){
+					printf(" %s%c " C_RESET, C_YELLOW, v==Vector(x,y)?(">^<vX"[d]):' ');
+				}else{
+					printf("%s%3d" C_RESET, v==Vector(x,y)?C_YELLOW:C_CYAN, stepMap[sp][y][x]);
+				}
 			}
 			printf("%s" C_RESET, maze.isKnown(MAZE_SIZE-1,y,Dir::East) ? (maze.isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
 			printf("\n");
@@ -84,11 +88,11 @@ public:
 		printf("+\n");
 	}
 	/** @function update
-	 *  @brief ステップマップの更新
-	 *  @param dest ステップを0とする区画の配列
-	 *  @param sp 更新するステップマップの用途
-	 *  @param onlyCanGo true:未知の壁は通貨不可能とする，false:未知の壁はないものとする
-	 */
+	*  @brief ステップマップの更新
+	*  @param dest ステップを0とする区画の配列
+	*  @param sp 更新するステップマップの用途
+	*  @param onlyCanGo true:未知の壁は通貨不可能とする，false:未知の壁はないものとする
+	*/
 	void update(const std::vector<Vector>& dest, const enum Purpose& sp, const bool& onlyCanGo = false){
 		// 全区画のステップを最大値に設定
 		for(uint8_t y=0; y<MAZE_SIZE; y++)

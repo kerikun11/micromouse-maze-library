@@ -115,22 +115,23 @@ extern const char mazeData_maze4[16+1][16+1] = {
 
 extern const char mazeData_2017_East_MC[16+1][16+1] = {
 	"6a2b63762b6aaa2b",
-	"569695c1c3c23603",
+	"569695c1c3c23617",
 	"5569696969695541",
-	"5c9696968bd69409",
+	"5c9696968bd6941d",
 	"5e29696962283543",
-	"569696975dc35401",
+	"569696975dc35415",
 	"55696969dea15541",
-	"5c9696163ea15401",
+	"5c9696163ea15415",
 	"5e2969d49ea15d41",
-	"5696822837e09681",
+	"5696822837e09695",
 	"5ca8a9569569e969",
 	"c36a3e88a896a3c3",
 	"e81e82aaaa356169",
 	"6296b4a2a295d5c3",
-	"5574282828282821",
+	"5574282828282835",
 	"dc89ca8a8a8a8bc9",
 };
+
 
 const char mazeData_maze2013half[32+1][32+1] = {
 	{"95555115555555395555555395555393"},
@@ -210,8 +211,8 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 //Maze sample(mazeData_maze, false);
 //Maze sample(mazeData_maze3, false);
 //Maze sample(mazeData_maze4, false);
-//Maze sample(mazeData_maze2013exp, false);
 //Maze sample(mazeData_maze2013fr, false);
+//Maze sample(mazeData_maze2013exp, false);
 Maze sample(mazeData_2017_East_MC, true);
 #elif MAZE_SIZE == 32
 #if 0
@@ -262,16 +263,16 @@ bool searchRun(){
 			return false;
 		}
 		for(Dir nextDir: nextDirs){
-#if DISPLAY
+			#if DISPLAY
 			usleep(100000); agent.printInfo();
-#endif
+			#endif
 			Vector nextVec = agent.getCurVec().next(nextDir);
 			// queue action(s) here
 			agent.updateCurVecDir(nextVec, nextDir);
 		}
-#if DISPLAY
+		#if DISPLAY
 		usleep(400000);
-#endif
+		#endif
 	}
 	// queue Action::START_INIT
 	// move robot here
