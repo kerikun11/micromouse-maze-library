@@ -18,7 +18,7 @@ trim = bw(ne:(se+size(rowsum,1)/2), we:(ee+size(colsum,2)/2));
 
 %% ƒmƒCƒY‚Ìœ‹‚Æ•Ç‚Ì–c’£
 trim = imopen(trim, ones(5));
-trim = imdilate(trim, ones(3));
+trim = imdilate(trim, ones(10));
 imshow(trim);
 
 %% •Ç‚Ì’Šo
