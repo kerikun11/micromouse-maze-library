@@ -1,3 +1,9 @@
+/**
+* @file StepMap.h
+* @brief マイクロマウスの迷路のステップマップを扱うクラス
+* @author KERI (Github: kerikun11)
+* @date 2017.11.05
+*/
 #pragma once
 
 #include "Maze.h"
