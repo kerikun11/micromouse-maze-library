@@ -1,8 +1,12 @@
 #include <cstdio>
 #include <cstdint>
-#include <unistd.h>
 #include "Maze.h"
 #include "Agent.h"
+
+#include <unistd.h>
+#include <time.h>
+#include <iostream>
+#include <chrono>
 
 #define DISPLAY 0
 #define MAZE_BACKUP_SIZE 5
@@ -132,7 +136,6 @@ extern const char mazeData_2017_East_MC[16+1][16+1] = {
 	"dc89ca8a8a8a8bc9",
 };
 
-
 const char mazeData_maze2013half[32+1][32+1] = {
 	{"95555115555555395555555395555393"},
 	{"a9153aa9515153aa9515153aa955382a"},
@@ -225,53 +228,66 @@ Maze sample(mazeData_maze2016half);
 #endif
 
 Maze maze;
-std::queue<Maze> maze_backup;
+std::deque<Maze> maze_backup;
 Agent agent(maze, goal);
 
-bool searchRun(){
-	maze = maze_backup.back();
-	agent.reset();
-	if(agent.getState()==Agent::REACHED_START) return true;
-	maze = maze_backup.front();
-	agent.reset();
-
-	// queue Action::START_STEP
+bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0, 1), const Dir& startDir = Dir::North){
+	if (isStartStep) {
+		// queue Action::START_STEP
+	}
+	agent.updateCurVecDir(startVec, startDir);
 	// conduct machine calibration
 	// move robot here
 	Agent::State prevState = agent.getState();
 	int count=0;
 	while(1){
-		//if(count++>10) return false; // for debug
+		// if(count++>50) return false; // for debug
 		// move robot here
 		const Vector& v = agent.getCurVec();
 		const Dir& d = agent.getCurDir();
 		agent.updateWall(v, d-1, sample.isWall(v, d-1)); // right
 		agent.updateWall(v, d+0, sample.isWall(v, d+0)); // front
 		agent.updateWall(v, d+1, sample.isWall(v, d+1)); // left
-		maze_backup.push(maze);
-		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop();
+		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop_front();
 
 		agent.calcNextDir();
 		Agent::State newState = agent.getState();
-		if(newState!=prevState && newState == Agent::REACHED_START) break;
-		if(newState!=prevState && newState == Agent::REACHED_GOAL){ /* REACHED_GOAL */ }
-		if(newState!=prevState && newState == Agent::BACKING_TO_START){ /* BACKING_TO_START */ }
+		if(newState != prevState && newState == Agent::REACHED_START) break;
+		if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ /* SEARCHING_ADDITIONALLY */ }
+		if(newState != prevState && newState == Agent::BACKING_TO_START){ /* BACKING_TO_START */ }
+		if(newState != prevState && newState == Agent::GOT_LOST){ /* GOT_LOST */ }
 		prevState = newState;
 		auto nextDirs = agent.getNextDirs();
 		if(nextDirs.empty()){
 			// Action::STOP
 			return false;
 		}
+		// backup the maze
+		maze_backup.push_back(maze);
+		// queue move actions
 		for(Dir nextDir: nextDirs){
 			#if DISPLAY
-			usleep(100000); agent.printInfo();
+			usleep(50000); agent.printInfo();
 			#endif
 			Vector nextVec = agent.getCurVec().next(nextDir);
-			// queue action(s) here
+			switch (Dir(nextDir - agent.getCurDir())) {
+				case Dir::East:
+				// queue SearchRun::GO_STRAIGHT
+				break;
+				case Dir::North:
+				// queue SearchRun::TURN_LEFT_90
+				break;
+				case Dir::West:
+				// queue SearchRun::TURN_BACK
+				break;
+				case Dir::South:
+				// queeu SearchRun::TURN_RIGHT_90
+				break;
+			}
 			agent.updateCurVecDir(nextVec, nextDir);
 		}
 		#if DISPLAY
-		usleep(400000);
+		usleep(200000);
 		#endif
 	}
 	// queue Action::START_INIT
@@ -280,20 +296,26 @@ bool searchRun(){
 	return true;
 }
 
-void fastRun(){
+bool fastRun(){
 	if(!agent.calcShortestDirs()){
 		printf("Failed to find shortest path!\n");
-	}else{
-		agent.printPath();
+		return false;
 	}
+	return true;
 }
 
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
-	maze_backup.push(maze);
+	auto start = std::chrono::system_clock::now();
+	maze_backup.push_back(maze);
 	while(!searchRun());
 	agent.printInfo();
-	sleep(1);
 	fastRun();
+	agent.printPath();
+	auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
+	auto dur = end - start;        // 要した時間を計算
+	auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+	// 要した時間をミリ秒（1/1000秒）に変換して表示
+	std::cout << msec << " milli sec \n";
 	return 0;
 }

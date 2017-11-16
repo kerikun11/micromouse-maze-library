@@ -34,14 +34,14 @@ public:
 	*   @brief 探索状態を列挙
 	*/
 	enum State{
-		IDOLE, //< 初期状態
-		SEARCHING_FOR_GOAL, //< ゴール区画を探索中
-		REACHED_GOAL, //< ゴールに到着
-		SEARCHING_ADDITIONALLY, //< 追加探索中
-		BACKING_TO_START, //< スタートに戻っている
-		REACHED_START, //< スタートに戻ってきた
-		FORCE_BACKING_TO_START, //< 探索をやめてスタートに戻っている
-		GOT_LOST, //< ゴールにだどりつくことができないと判明した
+		IDOLE,									//< 初期状態
+		SEARCHING_FOR_GOAL,			//< ゴール区画を探索中
+		REACHED_GOAL,						//< ゴール区画内を走行中
+		SEARCHING_ADDITIONALLY,	//< 追加探索中
+		BACKING_TO_START, 			//< スタートに戻っている
+		REACHED_START,					//< スタートに戻ってきた
+		FORCE_BACKING_TO_START,	//< 探索をやめてスタートに戻っている
+		GOT_LOST,								//< ゴールにだどりつくことができないと判明した
 	};
 	/** @function stateString
 	*   @brief Agent::Stateの表示用文字列を返す関数
@@ -341,7 +341,6 @@ private:
 		if(state == SEARCHING_FOR_GOAL){
 			if(std::find(goal.begin(), goal.end(), pv)!=goal.end()){
 				state = REACHED_GOAL;
-				candidates = goal;
 			}else{
 				stepMap.update(goal, StepMap::Goal);
 				if(!calcNextDirByStepMap(StepMap::Goal)) return GOT_LOST;
@@ -349,7 +348,12 @@ private:
 		}
 
 		if(state == REACHED_GOAL){
-			candidates.erase(std::find(candidates.begin(),candidates.end(), pv));
+			candidates.clear();
+			for(auto v: goal){
+					if(maze.knownCount(v)!=4){
+						candidates.push_back(v);
+					}
+			}
 			if(candidates.empty()){
 				state = SEARCHING_ADDITIONALLY;
 			}else{
@@ -357,6 +361,7 @@ private:
 				if(!calcNextDirByStepMap(StepMap::General)) return GOT_LOST;
 			}
 		}
+
 
 		if(state == SEARCHING_ADDITIONALLY){
 			findShortestCandidates();
