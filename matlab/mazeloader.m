@@ -1,15 +1,15 @@
 %% 入力
-maze_size = 16;
-file_name = '2017MC.png';
+[filename, pathname] = uigetfile({'*.jpg;*.png;*.gif'}, 'Select the Maze Imgae');
 
 %% 二値化＆色反転(壁を1にするため)
-original = imread(file_name);
+original = imread([pathname, filename]);
 bw = imbinarize(rgb2gray(original));
 bw = imcomplement(bw);
+imshow(bw);
 
 %% 迷路の輪郭を抽出
 colsum = sum(bw);
-rowsum = sum(bw,2);
+rowsum = sum(bw, 2);
 [wM, we] = max(colsum(1:end/2));
 [eM, ee] = max(colsum(end/2:end));
 [nM, ne] = max(rowsum(1:end/2));
@@ -17,9 +17,15 @@ rowsum = sum(bw,2);
 trim = bw(ne:(se+size(rowsum,1)/2), we:(ee+size(colsum,2)/2));
 
 %% ノイズの除去と壁の膨張
-trim = imopen(trim, ones(5));
-trim = imdilate(trim, ones(10));
+trim = imopen(trim, ones(3));   % 白点線を除去
+trim = imdilate(trim, ones(6)); % 白線を太くする
 imshow(trim);
+
+%% 迷路サイズを検出
+trimsum = sum(trim);
+trimsum = trimsum < sum(trimsum) / length(trimsum);
+maze_size = sum(([trimsum 0]-[0 trimsum])>0);
+msgbox(sprintf('迷路サイズは %d です', maze_size)); % 迷路サイズの表示
 
 %% 壁の抽出
 segsize = size(trim)/maze_size;
@@ -29,11 +35,11 @@ vwall = [vwall, ones(maze_size, 1)];
 hwall = [hwall; ones(1, maze_size)];
 
 %% 壁の合成
-wall =        1*vwall(:, 2:end);
-wall = wall + 2*hwall(1:end-1, :);
-wall = wall + 4*vwall(:, 1:end-1);
-wall = wall + 8*hwall(2:end, :);
+wall =        1 * vwall(:, 2:end);
+wall = wall + 2 * hwall(1:end-1, :);
+wall = wall + 4 * vwall(:, 1:end-1);
+wall = wall + 8 * hwall(2:end, :);
 
 %% ファイルに保存
-new_file_name = sprintf('%s.txt', file_name);
-dlmwrite(new_file_name, wall, 'precision', '%x', 'delimiter', '');
+new_filename = sprintf('%s.txt', filename);
+dlmwrite(new_filename, wall, 'precision', '%x', 'delimiter', '');
