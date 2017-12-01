@@ -136,6 +136,25 @@ extern const char mazeData_2017_East_MC[16+1][16+1] = {
 	"dc89ca8a8a8a8bc9",
 };
 
+extern const char mazeData_MM2017CX[16+1][16+1] = {
+"762aaaaaaaaaa22b",
+"4956aa36aa363dc3",
+"4a1563c963c9ca35",
+"4a9c9caa9caa3695",
+"5636362362369c35",
+"55c9c9dc9dc9e295",
+"5c362b62a363e0b5",
+"5695c3543c9ca0b5",
+"5569695c9762a8b5",
+"5c968bcaa89caa35",
+"56a963763762b695",
+"5c369c09c0957c35",
+"569c37d63d694a95",
+"556a94a9ca975621",
+"49577caaaaa89dd5",
+"de888aaaaaaaaaa9",
+};
+
 const char mazeData_maze2013half[32+1][32+1] = {
 	{"95555115555555395555555395555393"},
 	{"a9153aa9515153aa9515153aa955382a"},
@@ -285,7 +304,8 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 //Maze sample(mazeData_maze4, false);
 //Maze sample(mazeData_maze2013fr, false);
 //Maze sample(mazeData_maze2013exp, false);
-Maze sample(mazeData_2017_East_MC, true);
+// Maze sample(mazeData_2017_East_MC, true);
+Maze sample(mazeData_MM2017CX, true);
 #elif MAZE_SIZE == 32
 #define YEAR 2015
 #if YEAR == 2015
