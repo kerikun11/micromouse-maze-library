@@ -47,7 +47,7 @@ typedef uint32_t wall_size_t;
 */
 class Maze{
 public:
-	/** @struc Dir
+	/** @struct Dir
 	*   @brief 迷路上の方向を定義
 	*/
 	struct Dir{
@@ -233,6 +233,7 @@ public:
 			if(y-1<0 || y-1>MAZE_SIZE-2){ return; }
 			if(b) wall[0][y-1] |= (1<<x); else wall[0][y-1] &= ~(1<<x); return;
 		}
+		printf("Warning: invalid direction\n");
 	}
 	/** @function isKnown
 	*   @brief 壁が探索済みかを返す
@@ -289,6 +290,7 @@ public:
 			if(y-1<0 || y-1>MAZE_SIZE-2){ return; }
 			if(b) known[0][y-1] |= (1<<x); else known[0][y-1] &= ~(1<<x); return;
 		}
+		printf("Warning: invalid direction\n");
 	}
 	/** @function canGo
 	*   @brief 通過可能かどうかを返す
