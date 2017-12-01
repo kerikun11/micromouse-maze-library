@@ -10,6 +10,7 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <x86intrin.h>
 
 /** @def MAZE_SIZE
 *   @brief 迷路の1辺の区画数
@@ -308,7 +309,7 @@ public:
 		auto dirs = Dir::All();
 		return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return isWall(v, d);});
 	}
-	/** @function wallCount
+	/** @function knownCount
 	*   @brief 引数区画の既知壁の数を返す
 	*   @param v 区画の座標
 	*   @return 既知壁の数 0~4
@@ -316,6 +317,29 @@ public:
 	int8_t knownCount(const Vector& v) const {
 		auto dirs = Dir::All();
 		return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return isKnown(v, d);});
+	}
+	/** @function unknownCount
+	*   @brief 引数区画の未知壁の数を返す
+	*   @param v 区画の座標
+	*   @return 既知壁の数 0~4
+	*/
+	int8_t unknownCount(const Vector& v) const {
+		auto dirs = Dir::All();
+		return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return !isKnown(v, d);});
+	}
+	/** @function unknownCount
+	*   @brief 未知壁の数を返す
+	*   @param v 区画の座標
+	*   @return 既知壁の数 0~4
+	*/
+	int unknownCount() const {
+		int sum = 0;
+		for(int j=0; j<MAZE_SIZE-1; j++){
+			for(int i=0; i<2; i++){
+				sum += _popcnt64(~known[i][j]);
+			}
+		}
+		return sum;
 	}
 	/** @function updateWall
 	*   @brief 壁を更新して既知とする関数
@@ -377,6 +401,21 @@ public:
 		printf("+%s" C_RESET, isKnown(x,0,Dir::South) ? (isWall(x,0,Dir::South)?"---":"   ") : C_RED " - ");
 		printf("+\n");
 	}
+	const int diffKnownWall(const Maze& obj){
+		int diffs = 0;
+		for(int j=0; j<MAZE_SIZE-1; j++){
+			for(int i=0; i<2; i++){
+				wall_size_t bits = known[i][j] & (wall[i][j] ^ obj.wall[i][j]);
+				diffs += _popcnt64(bits);
+			}
+		}
+	}
+public:
+	/** @function popcnt
+	*   @brief 引数のセットされているbit数を返す静的関数
+	*/
+	static const int popcnt(const uint32_t value){ return _popcnt32(value); }
+	static const int popcnt(const uint64_t value){ return _popcnt64(value); }
 private:
 	wall_size_t wall[2][MAZE_SIZE-1]; /**< 壁情報 */
 	wall_size_t known[2][MAZE_SIZE-1]; /**< 既知壁情報 */

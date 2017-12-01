@@ -9,16 +9,16 @@
 #include "Maze.h"
 #include "StepMap.h"
 
-/** @def DEEPNESS
-*   @brief 探索の深さ
-*   0: 歩数最短になり得ないところは排除
-*   1: 全探索
+/** @def FIND_ALL_WALL
+*   @brief 全探索するかどうか
+*   true: 全探索
+*   false: 最短になり得ないところは排除
 */
-#define DEEPNESS 0
+#define FIND_ALL_WALL false
 /** @def SEARCHING_ADDITIALLY_AT_START
 *   @brief 追加探索状態で探索を始める(ゴールを急がない)
 */
-#define SEARCHING_ADDITIALLY_AT_START 0
+#define SEARCHING_ADDITIALLY_AT_START false
 
 /** @class Agent
 *   @brief 迷路探索アルゴリズムを司るクラス
@@ -224,7 +224,7 @@ public:
 	*/
 	void printInfo(const bool& showMaze = true) const {
 		if(showMaze){
-			for(int i=0; i<MAZE_SIZE*2+4; i++) printf("\x1b[A");
+			for(int i=0; i<MAZE_SIZE*2+5; i++) printf("\x1b[A");
 			switch(state){
 				case IDOLE:
 				case SEARCHING_FOR_GOAL:
@@ -246,6 +246,7 @@ public:
 		}
 		printf("Cur: ( %3d, %3d, %3d), State: %s       \n", curVec.x, curVec.y, uint8_t(curDir), stateString(state));
 		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d\n", step, f, l, r, b);
+		printf("Unknown Wall: %d\n", maze.unknownCount());
 	}
 	/** @function printPath
 	*   @brief 最短経路の表示
@@ -307,12 +308,12 @@ private:
 		for(int i=0; i<MAZE_SIZE; i++){
 			for(int j=0; j<MAZE_SIZE; j++){
 				Vector v(i,j);
-				#if DEEPNESS == 0
-				if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= 1+goal_step && maze.knownCount(Vector(i,j))!=4){
+				#if FIND_ALL_WALL
+				if(stepMap.getStep(i,j) != MAZE_STEP_MAX && maze.knownCount(Vector(i,j))!=4){
 					candidates.push_back(v);
 				}
-				#elif DEEPNESS == 1
-				if(stepMap.getStep(i,j) != MAZE_STEP_MAX && maze.knownCount(Vector(i,j))!=4){
+				#else
+				if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= 1+goal_step && maze.knownCount(Vector(i,j))!=4){
 					candidates.push_back(v);
 				}
 				#endif
@@ -350,9 +351,9 @@ private:
 		if(state == REACHED_GOAL){
 			candidates.clear();
 			for(auto v: goal){
-					if(maze.knownCount(v)!=4){
-						candidates.push_back(v);
-					}
+				if(maze.knownCount(v)!=4){
+					candidates.push_back(v);
+				}
 			}
 			if(candidates.empty()){
 				state = SEARCHING_ADDITIONALLY;
@@ -361,7 +362,6 @@ private:
 				if(!calcNextDirByStepMap(StepMap::General)) return GOT_LOST;
 			}
 		}
-
 
 		if(state == SEARCHING_ADDITIONALLY){
 			findShortestCandidates();

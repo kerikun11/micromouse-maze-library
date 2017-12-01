@@ -171,7 +171,41 @@ const char mazeData_maze2013half[32+1][32+1] = {
 	{"ec555455555555555555555555555556"},
 };
 
-const char mazeData_maze2016half[32+1][32+1] = {
+const char mazeData_MM2015HX[32+1][32+1] = {
+	"6aaaaaaaaa2aaaaaaaaaaaaaaaaaaaa3",
+	"56aaaaaaa356aaaaaaa36aaa22aaaaa1",
+	"556a22aa35556aaaaaa9caaa94aaaa35",
+	"554a9caa81d5caaaaaa36aaa296aaa95",
+	"55c36aaa3c356222223556aa83562235",
+	"55695623c3c140000015556aa9540015",
+	"554b54017c3d400000154956a3540015",
+	"54969c8143c3c000001483c821540015",
+	"55696a281c3c3c00001434aa95540015",
+	"555e0a0a0a0bc3c000155562a95c8895",
+	"5556828282837c3c8895555423caaa21",
+	"5554a0a0a0a143c3e2a955c95436aa15",
+	"555c282828295c3c3d7754aa15556355",
+	"555e0a0a0a0bc3c3c3c1556b55c95c15",
+	"555682828283683c3c3c89435caa9755",
+	"555ca0a0a0a94a8bc3c3e2954aaaa095",
+	"55caa8b43caa16aaa8bc28355e2aa961",
+	"5caaaaa9ca2a156aaaaa8295c3caa355",
+	"4a2b6aaaaa8a955622223c3c3caa3415",
+	"5683562222236154000003c3c2a35555",
+	"5c295400000155540000003c29695555",
+	"568354000001555400000003c3429c15",
+	"5c29540000015554000000003c1c3615",
+	"568354000001555c888888888bc3d555",
+	"5c295c88888955caaa2aaaaaaa3c3415",
+	"568bcaaaaaaa9caaaa8aa2aaa3c3c155",
+	"556aaaaa22aaaaaa236235623c3c3555",
+	"5c96aaa3556aaaa35555555543ca1555",
+	"56356a3555caaa35c95c148954aa1555",
+	"4955c355556aa35563435c2a882a1555",
+	"569ca9555556a9555555ca8aaa8a15c1",
+	"dcaaaa9c9c9caa9c9c9caaaaaaaa88a9",
+};
+const char mazeData_MM2016HX[32+1][32+1] = {
 	{"76aaaaaaaaaaaaaa2b637762376236a3"},
 	{"4836a36aaaaaaaa3c355401540154961"},
 	{"4b55694b6aaaaaa83555554015409695"},
@@ -206,6 +240,41 @@ const char mazeData_maze2016half[32+1][32+1] = {
 	{"dcaa9caaaaaaaaaaaaaaaaaaaaa8888b"},
 };
 
+const char mazeData_MM2017HX[32+1][32+1] = {
+	"63636aaa36236aaaaa36236aaaaa3623",
+	"c955caa35c89caaaa35c89caaaa35c89",
+	"6a956aa95e2a2aaa35caaaaaaaa9caa3",
+	"c2b5caa343c3d6aa9caaaaa2aaa36361",
+	"683562355c3c356236aaaa3562355c9d",
+	"c295401543c35540156aaa954015caa3",
+	"6835c8955c3c15c895caaa35c8957635",
+	"c29c2ab5ca8a15eaa16aaa9caa2949c9",
+	"e8368aa16aaa15eaa14aaa36a2834aab",
+	"63556361562355637556235c28295623",
+	"41541415540155555554015682835401",
+	"c95541415c8955555554895c28295c89",
+	"6a949c9d4aaa949c95c8aa8a8a8bcaa3",
+	"c2b4aaa34aaabcaaa9e2a2a2aaa36a29",
+	"e0b56235caaa376237e0a0b56235c283",
+	"e0b540156aaa95401568283540156829",
+	"e0b5c895caaa35c8954a0a15c8948283",
+	"68b4aaa96aaa88aaa88a8a9caa296829",
+	"ca34aaabcaaa362a222aaa3636174a8b",
+	"635caaa3762355d7d556234141415623",
+	"4156aaa9540154282154015414155401",
+	"c95caaa35c8955d7d55c894141415c89",
+	"6a96aa294aaa9c28a9caa2949c9c8aa3",
+	"ca3caa835636368aa36a2834aaa22221",
+	"635762354141416235c2829562355555",
+	"55554015541415401568283540155555",
+	"5c95c895414155c894828295c8955555",
+	"42b4aaa1dc1c9caa29e8a8a8aaa9c881",
+	"5c3caa356a8a3636176aaa22a2a37775",
+	"5756aa95562355414156235561600001",
+	"555caa35540154141554015494955dd5",
+	"ddcaaa9c9c89c9c9c89c89dca8a88aa9",
+};
+
 #if MAZE_SIZE == 8
 std::vector<Vector> goal = {Vector(7,7)};
 Maze sample(mazeData_fp2016);
@@ -218,12 +287,16 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 //Maze sample(mazeData_maze2013exp, false);
 Maze sample(mazeData_2017_East_MC, true);
 #elif MAZE_SIZE == 32
-#if 0
-std::vector<Vector> goal = {Vector(6,5)};
-Maze sample(mazeData_maze2013half, false);
-#else
+#define YEAR 2015
+#if YEAR == 2015
+std::vector<Vector> goal = {Vector(7,24)};
+Maze sample(mazeData_MM2015HX);
+#elif YEAR ==2016
 std::vector<Vector> goal = {Vector(3,3)};
-Maze sample(mazeData_maze2016half);
+Maze sample(mazeData_MM2016HX);
+#elif YEAR ==2017
+std::vector<Vector> goal = {Vector(19,20)};
+Maze sample(mazeData_MM2017HX, true);
 #endif
 #endif
 
@@ -250,7 +323,13 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		agent.updateWall(v, d+1, sample.isWall(v, d+1)); // left
 		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop_front();
 
+		#if DISPLAY
+		auto start = std::chrono::system_clock::now();
+		#endif
 		agent.calcNextDir();
+		#if DISPLAY
+		auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
+		#endif
 		Agent::State newState = agent.getState();
 		if(newState != prevState && newState == Agent::REACHED_START) break;
 		if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ /* SEARCHING_ADDITIONALLY */ }
@@ -268,6 +347,11 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		for(Dir nextDir: nextDirs){
 			#if DISPLAY
 			usleep(50000); agent.printInfo();
+			auto dur = end - start;        // 要した時間を計算
+			auto msec = std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
+			// 要した時間をミリ秒（1/1000秒）に変換して表示
+			std::cout << msec << " micro sec \n";
+			printf("\x1b[A");
 			#endif
 			Vector nextVec = agent.getCurVec().next(nextDir);
 			switch (Dir(nextDir - agent.getCurDir())) {
@@ -315,7 +399,10 @@ int main(void){
 	auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
 	auto dur = end - start;        // 要した時間を計算
 	auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-	// 要した時間をミリ秒（1/1000秒）に変換して表示
+	#ifdef DISPLAY
 	std::cout << msec << " milli sec \n";
+	#endif
+	// Maze sample2(mazeData_maze2013half, false);
+	// printf("diff: %d\n", maze.diffKnownWall(sample2));
 	return 0;
 }
