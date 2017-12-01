@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdint>
 #include "Maze.h"
-#include "Agent.h"
+#include "SearchAlgorithm.h"
 
 #include <unistd.h>
 #include <time.h>
@@ -295,10 +295,10 @@ const char mazeData_MM2017HX[32+1][32+1] = {
 };
 
 #if MAZE_SIZE == 8
-std::vector<Vector> goal = {Vector(7,7)};
+std::vector<Maze::Vector> goal = {Maze::Vector(7,7)};
 Maze sample(mazeData_fp2016);
 #elif MAZE_SIZE == 16
-std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
+std::vector<Maze::Vector> goal = {Maze::Vector(7,7),Maze::Vector(7,8),Maze::Vector(8,8),Maze::Vector(8,7)};
 //Maze sample(mazeData_maze, false);
 //Maze sample(mazeData_maze3, false);
 //Maze sample(mazeData_maze4, false);
@@ -307,56 +307,56 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 // Maze sample(mazeData_2017_East_MC, true);
 Maze sample(mazeData_MM2017CX, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2015
+#define YEAR 2017
 #if YEAR == 2015
-std::vector<Vector> goal = {Vector(7,24)};
+std::vector<Maze::Vector> goal = {Maze::Vector(7,24)};
 Maze sample(mazeData_MM2015HX);
 #elif YEAR ==2016
-std::vector<Vector> goal = {Vector(3,3)};
+std::vector<Maze::Vector> goal = {Maze::Vector(3,3)};
 Maze sample(mazeData_MM2016HX);
 #elif YEAR ==2017
-std::vector<Vector> goal = {Vector(19,20)};
+std::vector<Maze::Vector> goal = {Maze::Vector(19,20)};
 Maze sample(mazeData_MM2017HX, true);
 #endif
 #endif
 
 Maze maze;
 std::deque<Maze> maze_backup;
-Agent agent(maze, goal);
+SearchAlgorithm searchAlgorithm(maze, goal);
 
-bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0, 1), const Dir& startDir = Dir::North){
+bool searchRun(const bool isStartStep = true, const Maze::Vector& startVec = Maze::Vector(0, 1), const Maze::Dir& startDir = Maze::Maze::Dir::North){
 	if (isStartStep) {
 		// queue Action::START_STEP
 	}
-	agent.updateCurVecDir(startVec, startDir);
+	searchAlgorithm.updateCurVecDir(startVec, startDir);
 	// conduct machine calibration
 	// move robot here
-	Agent::State prevState = agent.getState();
+	SearchAlgorithm::State prevState = searchAlgorithm.getState();
 	int count=0;
 	while(1){
 		// if(count++>50) return false; // for debug
 		// move robot here
-		const Vector& v = agent.getCurVec();
-		const Dir& d = agent.getCurDir();
-		agent.updateWall(v, d-1, sample.isWall(v, d-1)); // right
-		agent.updateWall(v, d+0, sample.isWall(v, d+0)); // front
-		agent.updateWall(v, d+1, sample.isWall(v, d+1)); // left
+		const auto& v = searchAlgorithm.getCurVec();
+		const auto& d = searchAlgorithm.getCurDir();
+		searchAlgorithm.updateWall(v, d-1, sample.isWall(v, d-1)); // right
+		searchAlgorithm.updateWall(v, d+0, sample.isWall(v, d+0)); // front
+		searchAlgorithm.updateWall(v, d+1, sample.isWall(v, d+1)); // left
 		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop_front();
 
 		#if DISPLAY
 		auto start = std::chrono::system_clock::now();
 		#endif
-		agent.calcNextDir();
+		searchAlgorithm.calcNextDir();
 		#if DISPLAY
 		auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
 		#endif
-		Agent::State newState = agent.getState();
-		if(newState != prevState && newState == Agent::REACHED_START) break;
-		if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ /* SEARCHING_ADDITIONALLY */ }
-		if(newState != prevState && newState == Agent::BACKING_TO_START){ /* BACKING_TO_START */ }
-		if(newState != prevState && newState == Agent::GOT_LOST){ /* GOT_LOST */ }
+		SearchAlgorithm::State newState = searchAlgorithm.getState();
+		if(newState != prevState && newState == SearchAlgorithm::REACHED_START) break;
+		if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ /* SEARCHING_ADDITIONALLY */ }
+		if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){ /* BACKING_TO_START */ }
+		if(newState != prevState && newState == SearchAlgorithm::GOT_LOST){ /* GOT_LOST */ }
 		prevState = newState;
-		auto nextDirs = agent.getNextDirs();
+		const auto& nextDirs = searchAlgorithm.getNextDirs();
 		if(nextDirs.empty()){
 			// Action::STOP
 			return false;
@@ -364,31 +364,31 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		// backup the maze
 		maze_backup.push_back(maze);
 		// queue move actions
-		for(Dir nextDir: nextDirs){
+		for(const auto& nextDir: nextDirs){
 			#if DISPLAY
-			usleep(50000); agent.printInfo();
+			usleep(50000); searchAlgorithm.printInfo();
 			auto dur = end - start;        // 要した時間を計算
 			auto msec = std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
 			// 要した時間をミリ秒（1/1000秒）に変換して表示
 			std::cout << msec << " micro sec \n";
 			printf("\x1b[A");
 			#endif
-			Vector nextVec = agent.getCurVec().next(nextDir);
-			switch (Dir(nextDir - agent.getCurDir())) {
-				case Dir::East:
+			auto nextVec = searchAlgorithm.getCurVec().next(nextDir);
+			switch (Maze::Dir(nextDir - searchAlgorithm.getCurDir())) {
+				case Maze::Maze::Dir::East:
 				// queue SearchRun::GO_STRAIGHT
 				break;
-				case Dir::North:
+				case Maze::Maze::Dir::North:
 				// queue SearchRun::TURN_LEFT_90
 				break;
-				case Dir::West:
+				case Maze::Maze::Dir::West:
 				// queue SearchRun::TURN_BACK
 				break;
-				case Dir::South:
+				case Maze::Maze::Dir::South:
 				// queeu SearchRun::TURN_RIGHT_90
 				break;
 			}
-			agent.updateCurVecDir(nextVec, nextDir);
+			searchAlgorithm.updateCurVecDir(nextVec, nextDir);
 		}
 		#if DISPLAY
 		usleep(200000);
@@ -401,7 +401,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 }
 
 bool fastRun(){
-	if(!agent.calcShortestDirs()){
+	if(!searchAlgorithm.calcShortestDirs()){
 		printf("Failed to find shortest path!\n");
 		return false;
 	}
@@ -413,9 +413,9 @@ int main(void){
 	auto start = std::chrono::system_clock::now();
 	maze_backup.push_back(maze);
 	while(!searchRun());
-	agent.printInfo();
+	searchAlgorithm.printInfo();
 	fastRun();
-	agent.printPath();
+	searchAlgorithm.printPath();
 	auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
 	auto dur = end - start;        // 要した時間を計算
 	auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();

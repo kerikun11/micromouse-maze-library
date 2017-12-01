@@ -1,5 +1,5 @@
 /**
-* @file Agent.h
+* @file SearchAlgorithm.h
 * @brief マイクロマウスの迷路の探索アルゴリズムを扱うクラス
 * @author KERI (Github: kerikun11)
 * @date 2017.11.05
@@ -20,16 +20,16 @@
 */
 #define SEARCHING_ADDITIALLY_AT_START false
 
-/** @class Agent
+/** @class SearchAlgorithm
 *   @brief 迷路探索アルゴリズムを司るクラス
 */
-class Agent{
+class SearchAlgorithm{
 public:
 	/** @brief コンストラクタ
 	*   @param maze 使用する迷路の参照
 	*   @param goal ゴール区画の配列
 	*/
-	Agent(Maze& maze, const std::vector<Vector>& goal) : maze(maze), stepMap(maze), goal(goal){ reset(); }
+	SearchAlgorithm(Maze& maze, const std::vector<Maze::Vector>& goal) : maze(maze), stepMap(maze), goal(goal){ reset(); }
 	/** @enum State
 	*   @brief 探索状態を列挙
 	*/
@@ -44,7 +44,7 @@ public:
 		GOT_LOST,								//< ゴールにだどりつくことができないと判明した
 	};
 	/** @function stateString
-	*   @brief Agent::Stateの表示用文字列を返す関数
+	*   @brief SearchAlgorithm::Stateの表示用文字列を返す関数
 	*/
 	static const char* stateString(const enum State s){
 		static const char* str[]={
@@ -65,8 +65,8 @@ public:
 	*/
 	void reset(){
 		stepMap.reset();
-		curVec = Vector(0, 0);
-		curDir = Dir::North;
+		curVec = Maze::Vector(0, 0);
+		curDir = Maze::Dir::North;
 		state = IDOLE;
 		calcNextDir();
 	}
@@ -75,7 +75,7 @@ public:
 	*   @param goal ゴール区画の配列
 	*   迷路情報はそのまま保持
 	*/
-	void reset(const std::vector<Vector>& goal) {
+	void reset(const std::vector<Maze::Vector>& goal) {
 		this->goal = goal;
 		reset();
 	}
@@ -91,14 +91,14 @@ public:
 	*   @param v 区画座標
 	*   @param d 絶対方向
 	*/
-	void updateCurVecDir(const Vector& v, const Dir& d){ curVec = v; curDir=d; }
+	void updateCurVecDir(const Maze::Vector& v, const Maze::Dir& d){ curVec = v; curDir=d; }
 	/** @function updateWall
 	*   @brief 絶対座標絶対方向で壁の1枚更新
 	*   @param v 区画座標
 	*   @param d 絶対方向
 	*   @param b 壁の有無
 	*/
-	void updateWall(const Vector& v, const Dir& d, const bool& b){ maze.updateWall(v, d, b); }
+	void updateWall(const Maze::Vector& v, const Maze::Dir& d, const bool& b){ maze.updateWall(v, d, b); }
 
 	/** @function calcNextDir
 	*   @brief 次に行くべき方向配列を計算
@@ -116,15 +116,15 @@ public:
 	bool calcShortestDirs(){
 		stepMap.update(goal, StepMap::Goal, true);
 		shortestDirs.clear();
-		Vector v = start;
-		Dir dir = Dir::North;
-		Dir prev_dir = Dir::North;
+		auto v = start;
+		auto dir = Maze::Dir(Maze::Dir::North);
+		auto prev_dir = Maze::Dir(Maze::Dir::North);
 		while(1){
-			std::vector<Dir> dirs;
-			if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir, Dir(dir+1)};
-			else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir, Dir(dir+3)};
-			else dirs={dir, Dir(dir+1), Dir(dir+3)};
-			auto it = std::find_if(dirs.begin(), dirs.end(),[&](const Dir& d){
+			std::vector<Maze::Dir> dirs;
+			if(Maze::Dir(dir-prev_dir)==Maze::Dir::Left) dirs={Maze::Dir(dir+3), dir, Maze::Dir(dir+1)};
+			else if(Maze::Dir(dir-prev_dir)==Maze::Dir::Right) dirs={Maze::Dir(dir+1), dir, Maze::Dir(dir+3)};
+			else dirs={dir, Maze::Dir(dir+1), Maze::Dir(dir+3)};
+			auto it = std::find_if(dirs.begin(), dirs.end(),[&](const Maze::Dir& d){
 				if(!maze.canGo(v, d)) return false;
 				return stepMap.getStep(v.next(d)) == stepMap.getStep(v)-1;
 			});
@@ -146,12 +146,12 @@ public:
 	*   取り得るすべての壁パターンについて計算
 	*   開発中
 	*/
-	const std::vector<std::vector<Dir>> calcNextDirInAdvance(){
+	const std::vector<std::vector<Maze::Dir>> calcNextDirInAdvance(){
 		calcNextDir();
-		std::vector<std::vector<Dir>> nextDirss;
+		std::vector<std::vector<Maze::Dir>> nextDirss;
 		while(1){
 			auto dirs = curDir.ordered();
-			auto it = std::find_if(dirs.begin(), dirs.end(),[&](const Dir& d){
+			auto it = std::find_if(dirs.begin(), dirs.end(),[&](const Maze::Dir& d){
 				if(maze.isWall(curVec, d)) return false;
 				return stepMap.getStep(curVec.next(d)) == stepMap.getStep(curVec)-1;
 			});
@@ -172,11 +172,11 @@ public:
 			nextDirss.push_back(getNextDirs());
 			maze.setWall(curVec, *it, true);
 		}
-		for(auto d: Dir::All()) if(!maze.isKnown(curVec, d)) maze.setWall(curVec, d, false);
+		for(const auto& d: Maze::Dir::All()) if(!maze.isKnown(curVec, d)) maze.setWall(curVec, d, false);
 		calcNextDir();
-		for(auto nd: nextDirss) {
+		for(const auto& nd: nextDirss) {
 			printf(">");
-			for(auto d: nd) printf("%d ", int8_t(d));
+			for(const auto &d: nd) printf("%d ", int8_t(d));
 			printf("\n");
 		}
 		return nextDirss;
@@ -197,25 +197,25 @@ public:
 	/** @function getNextDirs
 	*   @brief 次に行くべき方向配列の計算結果を取得
 	*/
-	const std::vector<Dir>& getNextDirs() const {
+	const std::vector<Maze::Dir>& getNextDirs() const {
 		return nextDirs;
 	}
 	/** @function getCurVec
 	*   @brief 現在区画を取得
 	*/
-	const Vector& getCurVec() const {
+	const Maze::Vector& getCurVec() const {
 		return curVec;
 	}
 	/** @function getCurDir
 	*   @brief 現在の方向を取得
 	*/
-	const Dir& getCurDir() const {
+	const Maze::Dir& getCurDir() const {
 		return curDir;
 	}
 	/** @function getNextDirs
 	*   @brief 最短経路の方向配列の計算結果を取得
 	*/
-	const std::vector<Dir>& getShortestDirs() const {
+	const std::vector<Maze::Dir>& getShortestDirs() const {
 		return shortestDirs;
 	}
 	/** @function printInfo
@@ -253,7 +253,7 @@ public:
 	*/
 	void printPath() const {
 		//for(int i=0; i<MAZE_SIZE*2+5; i++) printf("\x1b[A");
-		maze.printPath(Vector(0, 0), shortestDirs);
+		maze.printPath(Maze::Vector(0, 0), shortestDirs);
 		printf("\n\n");
 		printf("Shortest Step: %d\n", shortestDirs.size()-1);
 	}
@@ -261,13 +261,13 @@ private:
 	State state; /**< 現在の探索状態を保持 */
 	Maze& maze; /**< 使用する迷路の参照 */
 	StepMap stepMap; /**< 使用するステップマップ */
-	const Vector start{0, 0}; /**< スタート区画を定義 */
-	std::vector<Vector> goal; /**< ゴール区画を定義 */
-	Vector curVec; /**< 現在の区画座標 */
-	Dir curDir; /**< 現在向いている方向 */
-	std::vector<Dir> nextDirs; /**< 次に行くべき探索方向配列 */
-	std::vector<Dir> shortestDirs; /**< 最短経路の方向配列 */
-	std::vector<Vector> candidates; /**< 最短経路上になり得る候補を入れるコンテナ */
+	const Maze::Vector start{0, 0}; /**< スタート区画を定義 */
+	std::vector<Maze::Vector> goal; /**< ゴール区画を定義 */
+	Maze::Vector curVec; /**< 現在の区画座標 */
+	Maze::Dir curDir; /**< 現在向いている方向 */
+	std::vector<Maze::Dir> nextDirs; /**< 次に行くべき探索方向配列 */
+	std::vector<Maze::Dir> shortestDirs; /**< 最短経路の方向配列 */
+	std::vector<Maze::Vector> candidates; /**< 最短経路上になり得る候補を入れるコンテナ */
 	int step=0,f=0,l=0,r=0,b=0; /**< 探索の評価のためのカウンタ */
 
 	/** @function calcNextDirByStepMap
@@ -277,11 +277,11 @@ private:
 	*/
 	bool calcNextDirByStepMap(const enum StepMap::Purpose& sp){
 		nextDirs.clear();
-		Vector focus_v = curVec;
-		Dir focus_d = curDir;
+		auto focus_v = curVec;
+		auto focus_d = curDir;
 		while(1){
 			auto dirs = focus_d.ordered();
-			auto it = std::find_if(dirs.begin(), dirs.end(), [&](const Dir& d){
+			auto it = std::find_if(dirs.begin(), dirs.end(), [&](const Maze::Dir& d){
 				if(!maze.canGo(focus_v, d)) return false;
 				return stepMap.getStep(focus_v.next(d), sp) == stepMap.getStep(focus_v, sp)-1;
 			});
@@ -303,17 +303,17 @@ private:
 		stepMap.update({start}, StepMap::Start);
 		candidates.clear();
 		std::vector<step_t> goal_steps;
-		for(auto g:goal) goal_steps.push_back(stepMap.getStep(g, StepMap::Start));
+		for(const auto& g: goal) goal_steps.push_back(stepMap.getStep(g, StepMap::Start));
 		step_t goal_step = *(std::min_element(goal_steps.begin(), goal_steps.end()));
 		for(int i=0; i<MAZE_SIZE; i++){
 			for(int j=0; j<MAZE_SIZE; j++){
-				Vector v(i,j);
+				Maze::Vector v(i,j);
 				#if FIND_ALL_WALL
-				if(stepMap.getStep(i,j) != MAZE_STEP_MAX && maze.knownCount(Vector(i,j))!=4){
+				if(stepMap.getStep(i,j) != MAZE_STEP_MAX && maze.knownCount(Maze::Vector(i,j))!=4){
 					candidates.push_back(v);
 				}
 				#else
-				if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= 1+goal_step && maze.knownCount(Vector(i,j))!=4){
+				if(stepMap.getStep(i,j) + stepMap.getStep(i,j,StepMap::Start) <= 1+goal_step && maze.knownCount(Maze::Vector(i,j))!=4){
 					candidates.push_back(v);
 				}
 				#endif
@@ -328,7 +328,7 @@ private:
 	*   @return 計算後の探索状態
 	*   計算結果はメンバ変数のnextDirsに保存される．
 	*/
-	const enum State calcNextDir(const Vector& pv, const Dir& pd, enum State state){
+	const enum State calcNextDir(const Maze::Vector& pv, const Maze::Dir& pd, enum State state){
 		if(state == IDOLE){
 			step=0; f=0; l=0; r=0; b=0;
 			findShortestCandidates();
@@ -350,7 +350,7 @@ private:
 
 		if(state == REACHED_GOAL){
 			candidates.clear();
-			for(auto v: goal){
+			for(const auto& v: goal){
 				if(maze.knownCount(v)!=4){
 					candidates.push_back(v);
 				}
@@ -391,12 +391,12 @@ private:
 			}
 		}
 
-		for(auto d: nextDirs){
+		for(const auto& d: nextDirs){
 			step++;
-			f += pd.getRelative(Dir::Forward) == d;
-			l += pd.getRelative(Dir::Left   ) == d;
-			r += pd.getRelative(Dir::Right  ) == d;
-			b += pd.getRelative(Dir::Back   ) == d;
+			f += pd.getRelative(Maze::Dir::Forward) == d;
+			l += pd.getRelative(Maze::Dir::Left   ) == d;
+			r += pd.getRelative(Maze::Dir::Right  ) == d;
+			b += pd.getRelative(Maze::Dir::Back   ) == d;
 		}
 		return state;
 	}

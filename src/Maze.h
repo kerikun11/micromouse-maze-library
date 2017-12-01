@@ -10,7 +10,6 @@
 #include <vector>
 #include <array>
 #include <algorithm>
-#include <x86intrin.h>
 
 /** @def MAZE_SIZE
 *   @brief 迷路の1辺の区画数
@@ -43,90 +42,90 @@ typedef uint32_t wall_size_t;
 #define C_RESET   ""
 #endif
 
-/** @struc Dir
-*   @brief 迷路上の方向を定義
-*/
-struct Dir{
-public:
-	/** @enum Dir::AbsoluteDir
-	*   @brief 絶対方向の列挙型
-	*/
-	enum AbsoluteDir: int8_t { East, North, West, South, AbsMax };
-	/** @enum Dir::RelativeDir
-	*   @brief 相対方向の列挙型
-	*/
-	enum RelativeDir: int8_t { Forward, Left, Back, Right, RelMax };
-	/** @function Constructor
-	*   @param d Absolute Direction
-	*/
-	Dir(const enum AbsoluteDir d = East) : d(d) {}
-	Dir(const int8_t d) : d(AbsoluteDir(d&3)) {}
-
-	/** @brief 整数へのキャスト
-	*/
-	operator int8_t() const { return d; }
-	/** @brief 代入演算子のオーバーロード
-	*/
-	inline const Dir operator=(const Dir& obj) { this->d = obj.d; return *this; }
-
-	/** @function getRelative
-	*   @brief 自オブジェクト方向から見た引数方向を返す．
-	*   @param rd 対象方向
-	*   @return 相対方向
-	*/
-	inline const Dir getRelative(const enum RelativeDir& rd) const { return Dir(rd-d); }
-	/** @function ordered
-	*   @brief 「正面，左，右，後」の順序の方向配列を生成する関数
-	*/
-	inline const std::array<Dir, 4> ordered() const {
-		std::array<Dir, 4> order{d, d+1, d+3, d+2};
-		return order;
-	}
-	/** @function All
-	*   @brief 全方向の方向配列を生成する静的関数
-	*/
-	static const std::array<Dir, 4>& All(){
-		static const std::array<Dir, 4> all = {East, North, West, South};
-		return all;
-	}
-private:
-	enum AbsoluteDir d; /**< @brief 方向の実体 */
-};
-
-/** @struct Vector
-*   @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
-*/
-struct Vector{
-public:
-	int8_t x, y; /**< @brief 迷路の区画座標 */
-	Vector(int8_t x=0, int8_t y=0) : x(x), y(y) {} /**< @brief コンストラクタ */
-	Vector(const Vector& obj) : x(obj.x), y(obj.y) {} /**< @brief コンストラクタ */
-	/** @brief 演算子のオーバーロード
-	*/
-	inline const Vector& operator=(const Vector& obj) { x=obj.x; y=obj.y; return *this; }
-	inline const bool operator==(const Vector& obj) const { return x==obj.x && y==obj.y; }
-	inline const bool operator!=(const Vector& obj) const { return x!=obj.x || y!=obj.y; }
-	/** @function next
-	*   @brief 自分の引数方向に隣接した区画のVectorを返す
-	*   @param 隣接方向
-	*   @return 隣接座標
-	*/
-	inline const Vector next(const Dir &dir) const {
-		switch(dir){
-			case Dir::East: return Vector(x+1, y);
-			case Dir::North: return Vector(x, y+1);
-			case Dir::West: return Vector(x-1, y);
-			case Dir::South: return Vector(x, y-1);
-		}
-		printf("Warning: invalid direction\n");
-		return *this;
-	}
-};
-
 /** @class Maze
 *   @brief 迷路の壁情報を管理するクラス
 */
 class Maze{
+public:
+	/** @struc Dir
+	*   @brief 迷路上の方向を定義
+	*/
+	struct Dir{
+	public:
+		/** @enum Dir::AbsoluteDir
+		*   @brief 絶対方向の列挙型
+		*/
+		enum AbsoluteDir: int8_t { East, North, West, South, AbsMax };
+		/** @enum Dir::RelativeDir
+		*   @brief 相対方向の列挙型
+		*/
+		enum RelativeDir: int8_t { Forward, Left, Back, Right, RelMax };
+		/** @function Constructor
+		*   @param d Absolute Direction
+		*/
+		Dir(const enum AbsoluteDir d = East) : d(d) {}
+		Dir(const int8_t d) : d(AbsoluteDir(d&3)) {}
+
+		/** @brief 整数へのキャスト
+		*/
+		operator int8_t() const { return d; }
+		/** @brief 代入演算子のオーバーロード
+		*/
+		inline const Dir operator=(const Dir& obj) { this->d = obj.d; return *this; }
+
+		/** @function getRelative
+		*   @brief 自オブジェクト方向から見た引数方向を返す．
+		*   @param rd 対象方向
+		*   @return 相対方向
+		*/
+		inline const Dir getRelative(const enum RelativeDir& rd) const { return Dir(rd-d); }
+		/** @function ordered
+		*   @brief 「正面，左，右，後」の順序の方向配列を生成する関数
+		*/
+		inline const std::array<Dir, 4> ordered() const {
+			std::array<Dir, 4> order{d, d+1, d+3, d+2};
+			return order;
+		}
+		/** @function All
+		*   @brief 全方向の方向配列を生成する静的関数
+		*/
+		static const std::array<Dir, 4>& All(){
+			static const std::array<Dir, 4> all = {East, North, West, South};
+			return all;
+		}
+	private:
+		enum AbsoluteDir d; /**< @brief 方向の実体 */
+	};
+
+	/** @struct Vector
+	*   @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
+	*/
+	struct Vector{
+	public:
+		int8_t x, y; /**< @brief 迷路の区画座標 */
+		Vector(int8_t x=0, int8_t y=0) : x(x), y(y) {} /**< @brief コンストラクタ */
+		Vector(const Vector& obj) : x(obj.x), y(obj.y) {} /**< @brief コンストラクタ */
+		/** @brief 演算子のオーバーロード
+		*/
+		inline const Vector& operator=(const Vector& obj) { x=obj.x; y=obj.y; return *this; }
+		inline const bool operator==(const Vector& obj) const { return x==obj.x && y==obj.y; }
+		inline const bool operator!=(const Vector& obj) const { return x!=obj.x || y!=obj.y; }
+		/** @function next
+		*   @brief 自分の引数方向に隣接した区画のVectorを返す
+		*   @param 隣接方向
+		*   @return 隣接座標
+		*/
+		inline const Vector next(const Dir &dir) const {
+			switch(dir){
+				case Dir::East: return Vector(x+1, y);
+				case Dir::North: return Vector(x, y+1);
+				case Dir::West: return Vector(x-1, y);
+				case Dir::South: return Vector(x, y-1);
+			}
+			printf("Warning: invalid direction\n");
+			return *this;
+		}
+	};
 public:
 	Maze() { reset(); } /**< @brief 空の迷路のコンストラクタ */
 	Maze(const Maze& obj){ *this = obj; } /**< @brief コピーコンストラクタ */
@@ -328,15 +327,13 @@ public:
 		return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return !isKnown(v, d);});
 	}
 	/** @function unknownCount
-	*   @brief 未知壁の数を返す
-	*   @param v 区画の座標
-	*   @return 既知壁の数 0~4
+	*   @brief 迷路全体の未知壁の数を返す
 	*/
 	int unknownCount() const {
 		int sum = 0;
 		for(int j=0; j<MAZE_SIZE-1; j++){
 			for(int i=0; i<2; i++){
-				sum += _popcnt64(~known[i][j]);
+				sum += popcnt(~known[i][j]);
 			}
 		}
 		return sum;
@@ -380,7 +377,7 @@ public:
 		int steps[MAZE_SIZE][MAZE_SIZE]={0};
 		Vector v = start;
 		int counter = 1;
-		for(auto d: dirs){
+		for(const auto& d: dirs){
 			v = v.next(d);
 			steps[v.y][v.x] = counter++;
 		}
@@ -406,7 +403,7 @@ public:
 		for(int j=0; j<MAZE_SIZE-1; j++){
 			for(int i=0; i<2; i++){
 				wall_size_t bits = known[i][j] & (wall[i][j] ^ obj.wall[i][j]);
-				diffs += _popcnt64(bits);
+				diffs += popcnt(bits);
 			}
 		}
 	}
@@ -414,8 +411,37 @@ public:
 	/** @function popcnt
 	*   @brief 引数のセットされているbit数を返す静的関数
 	*/
-	static const int popcnt(const uint32_t value){ return _popcnt32(value); }
-	static const int popcnt(const uint64_t value){ return _popcnt64(value); }
+	static const int popcnt(uint8_t n) {
+		n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
+		n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
+		n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
+		n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
+		return n;
+	}
+	static const int popcnt(uint16_t n) {
+		n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
+		n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
+		n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
+		n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
+		return n;
+	}
+	static const int popcnt(uint32_t n) {
+		n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
+		n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
+		n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
+		n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
+		n = (n & 0x0000ffff0000ffff) + ((n>>16) & 0x0000ffff0000ffff);
+		return n;
+	}
+	static const int popcnt(uint64_t n) {
+		n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
+		n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
+		n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
+		n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
+		n = (n & 0x0000ffff0000ffff) + ((n>>16) & 0x0000ffff0000ffff);
+		n = (n & 0x00000000ffffffff) + ((n>>32) & 0x00000000ffffffff);
+		return n;
+	}
 private:
 	wall_size_t wall[2][MAZE_SIZE-1]; /**< 壁情報 */
 	wall_size_t known[2][MAZE_SIZE-1]; /**< 既知壁情報 */
