@@ -8,7 +8,9 @@
 #include <iostream>
 #include <chrono>
 
-#define DISPLAY 0
+using namespace MazeLib;
+
+#define DISPLAY 1
 #define MAZE_BACKUP_SIZE 5
 
 const char mazeData_fp2016[8+1][8+1] = {
@@ -137,22 +139,22 @@ extern const char mazeData_2017_East_MC[16+1][16+1] = {
 };
 
 extern const char mazeData_MM2017CX[16+1][16+1] = {
-"762aaaaaaaaaa22b",
-"4956aa36aa363dc3",
-"4a1563c963c9ca35",
-"4a9c9caa9caa3695",
-"5636362362369c35",
-"55c9c9dc9dc9e295",
-"5c362b62a363e0b5",
-"5695c3543c9ca0b5",
-"5569695c9762a8b5",
-"5c968bcaa89caa35",
-"56a963763762b695",
-"5c369c09c0957c35",
-"569c37d63d694a95",
-"556a94a9ca975621",
-"49577caaaaa89dd5",
-"de888aaaaaaaaaa9",
+	"762aaaaaaaaaa22b",
+	"4956aa36aa363dc3",
+	"4a1563c963c9ca35",
+	"4a9c9caa9caa3695",
+	"5636362362369c35",
+	"55c9c9dc9dc9e295",
+	"5c362b62a363e0b5",
+	"5695c3543c9ca0b5",
+	"5569695c9762a8b5",
+	"5c968bcaa89caa35",
+	"56a963763762b695",
+	"5c369c09c0957c35",
+	"569c37d63d694a95",
+	"556a94a9ca975621",
+	"49577caaaaa89dd5",
+	"de888aaaaaaaaaa9",
 };
 
 const char mazeData_maze2013half[32+1][32+1] = {
@@ -295,10 +297,10 @@ const char mazeData_MM2017HX[32+1][32+1] = {
 };
 
 #if MAZE_SIZE == 8
-std::vector<Maze::Vector> goal = {Maze::Vector(7,7)};
+std::vector<Vector> goal = {Vector(7,7)};
 Maze sample(mazeData_fp2016);
 #elif MAZE_SIZE == 16
-std::vector<Maze::Vector> goal = {Maze::Vector(7,7),Maze::Vector(7,8),Maze::Vector(8,8),Maze::Vector(8,7)};
+std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 //Maze sample(mazeData_maze, false);
 //Maze sample(mazeData_maze3, false);
 //Maze sample(mazeData_maze4, false);
@@ -309,13 +311,13 @@ Maze sample(mazeData_MM2017CX, true);
 #elif MAZE_SIZE == 32
 #define YEAR 2017
 #if YEAR == 2015
-std::vector<Maze::Vector> goal = {Maze::Vector(7,24)};
+std::vector<Vector> goal = {Vector(7,24)};
 Maze sample(mazeData_MM2015HX);
 #elif YEAR ==2016
-std::vector<Maze::Vector> goal = {Maze::Vector(3,3)};
+std::vector<Vector> goal = {Vector(3,3)};
 Maze sample(mazeData_MM2016HX);
 #elif YEAR ==2017
-std::vector<Maze::Vector> goal = {Maze::Vector(19,20)};
+std::vector<Vector> goal = {Vector(19,20)};
 Maze sample(mazeData_MM2017HX, true);
 #endif
 #endif
@@ -324,7 +326,7 @@ Maze maze;
 std::deque<Maze> maze_backup;
 SearchAlgorithm searchAlgorithm(maze, goal);
 
-bool searchRun(const bool isStartStep = true, const Maze::Vector& startVec = Maze::Vector(0, 1), const Maze::Dir& startDir = Maze::Maze::Dir::North){
+bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0, 1), const Dir& startDir = Dir::North){
 	if (isStartStep) {
 		// queue Action::START_STEP
 	}
@@ -374,17 +376,17 @@ bool searchRun(const bool isStartStep = true, const Maze::Vector& startVec = Maz
 			printf("\x1b[A");
 			#endif
 			auto nextVec = searchAlgorithm.getCurVec().next(nextDir);
-			switch (Maze::Dir(nextDir - searchAlgorithm.getCurDir())) {
-				case Maze::Maze::Dir::East:
+			switch (Dir(nextDir - searchAlgorithm.getCurDir())) {
+				case Dir::East:
 				// queue SearchRun::GO_STRAIGHT
 				break;
-				case Maze::Maze::Dir::North:
+				case Dir::North:
 				// queue SearchRun::TURN_LEFT_90
 				break;
-				case Maze::Maze::Dir::West:
+				case Dir::West:
 				// queue SearchRun::TURN_BACK
 				break;
-				case Maze::Maze::Dir::South:
+				case Dir::South:
 				// queeu SearchRun::TURN_RIGHT_90
 				break;
 			}
