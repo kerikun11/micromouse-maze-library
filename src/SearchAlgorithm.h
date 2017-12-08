@@ -139,9 +139,22 @@ namespace MazeLib {
 				shortestDirs.push_back(dir);
 				if(stepMapGoal.getStep(v)==0) break;
 			}
-			while(maze.canGo(v, dir)){
-				shortestDirs.push_back(dir);
-				v=v.next(dir);
+			bool loop = true;
+			while(loop){
+				loop = false;
+				std::vector<Dir> dirs;
+				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir};
+				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir};
+				else dirs={dir, Dir(dir+1)};
+				for(auto& d: dirs){
+					if(maze.canGo(v, d)){
+						shortestDirs.push_back(d);
+						v=v.next(d);
+						prev_dir = dir;
+						dir = d;
+						loop = true;
+					}
+				}
 			}
 			return true;
 		}
