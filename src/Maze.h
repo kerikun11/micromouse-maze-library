@@ -336,7 +336,7 @@ namespace MazeLib {
 			int sum = 0;
 			for(int j=0; j<MAZE_SIZE-1; j++){
 				for(int i=0; i<2; i++){
-					sum += popcnt(~known[i][j]);
+					sum += popcnt((wall_size_t)~known[i][j]);
 				}
 			}
 			return sum;
@@ -418,7 +418,6 @@ namespace MazeLib {
 			n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
 			n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
 			n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
-			n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
 			return n;
 		}
 		static const int popcnt(uint16_t n) {

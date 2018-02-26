@@ -15,11 +15,11 @@ namespace MazeLib {
 	*   true: 全探索
 	*   false: 最短になり得ないところは排除
 	*/
-	#define FIND_ALL_WALL false
+	#define FIND_ALL_WALL 0
 	/** @def SEARCHING_ADDITIALLY_AT_START
 	*   @brief 追加探索状態で探索を始める(ゴールを急がない)
 	*/
-	#define SEARCHING_ADDITIALLY_AT_START false
+	#define SEARCHING_ADDITIALLY_AT_START 0
 
 	/** @class SearchAlgorithm
 	*   @brief 迷路探索アルゴリズムを司るクラス
