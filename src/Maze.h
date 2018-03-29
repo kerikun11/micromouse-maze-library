@@ -67,18 +67,18 @@ namespace MazeLib {
 		operator int8_t() const { return d; }
 		/** @brief 代入演算子のオーバーロード
 		*/
-		inline const Dir operator=(const Dir& obj) { this->d = obj.d; return *this; }
+		const Dir operator=(const Dir& obj) { this->d = obj.d; return *this; }
 
 		/** @function getRelative
 		*   @brief 自オブジェクト方向から見た引数方向を返す．
 		*   @param rd 対象方向
 		*   @return 相対方向
 		*/
-		inline const Dir getRelative(const enum RelativeDir& rd) const { return Dir(rd-d); }
+		const Dir getRelative(const enum RelativeDir& rd) const { return Dir(rd-d); }
 		/** @function ordered
 		*   @brief 「正面，左，右，後」の順序の方向配列を生成する関数
 		*/
-		inline const std::array<Dir, 4> ordered() const {
+		const std::array<Dir, 4> ordered() const {
 			std::array<Dir, 4> order{d, d+1, d+3, d+2};
 			return order;
 		}
@@ -103,15 +103,15 @@ namespace MazeLib {
 		Vector(const Vector& obj) : x(obj.x), y(obj.y) {} /**< @brief コンストラクタ */
 		/** @brief 演算子のオーバーロード
 		*/
-		inline const Vector& operator=(const Vector& obj) { x=obj.x; y=obj.y; return *this; }
-		inline const bool operator==(const Vector& obj) const { return x==obj.x && y==obj.y; }
-		inline const bool operator!=(const Vector& obj) const { return x!=obj.x || y!=obj.y; }
+		const Vector& operator=(const Vector& obj) { x=obj.x; y=obj.y; return *this; }
+		bool operator==(const Vector& obj) const { return x==obj.x && y==obj.y; }
+		bool operator!=(const Vector& obj) const { return x!=obj.x || y!=obj.y; }
 		/** @function next
 		*   @brief 自分の引数方向に隣接した区画のVectorを返す
 		*   @param 隣接方向
 		*   @return 隣接座標
 		*/
-		inline const Vector next(const Dir &dir) const {
+		const Vector next(const Dir &dir) const {
 			switch(dir){
 				case Dir::East: return Vector(x+1, y);
 				case Dir::North: return Vector(x, y+1);
@@ -246,20 +246,16 @@ namespace MazeLib {
 		bool isKnown(const int8_t& x, const int8_t& y, const Dir& d) const {
 			switch(d){
 				case Dir::East:
-				if(x<0 || x>MAZE_SIZE-2){ return true; }
-				if(y<0 || y>MAZE_SIZE-1){ return true; }
+				if(x<0 || x>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return true; //< 盤面外
 				return known[1][x] & (1<<y);
 				case Dir::North:
-				if(x<0 || x>MAZE_SIZE-1){ return true; }
-				if(y<0 || y>MAZE_SIZE-2){ return true; }
+				if(x<0 || x>MAZE_SIZE-1 || y<0 || y>MAZE_SIZE-2) return true; //< 盤面外
 				return known[0][y] & (1<<x);
 				case Dir::West:
-				if(x-1<0 || x-1>MAZE_SIZE-2){ return true; }
-				if(y<0 || y>MAZE_SIZE-1){ return true; }
+				if(x-1<0 || x-1>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return true; //< 盤面外
 				return known[1][x-1] & (1<<y);
 				case Dir::South:
-				if(x<0 || x>MAZE_SIZE-1){ return true; }
-				if(y-1<0 || y-1>MAZE_SIZE-2){ return true; }
+				if(x<0 || x>MAZE_SIZE-1 || y-1<0 || y-1>MAZE_SIZE-2) return true; //< 盤面外
 				return known[0][y-1] & (1<<x);
 			}
 			printf("Warning: invalid direction\n");
@@ -275,20 +271,16 @@ namespace MazeLib {
 		void setKnown(const int8_t& x, const int8_t& y, const Dir& d, const bool& b) {
 			switch(d){
 				case Dir::East:
-				if(x<0 || x>MAZE_SIZE-2){ return; }
-				if(y<0 || y>MAZE_SIZE-1){ return; }
+				if(x<0 || x>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return; //< 盤面外
 				if(b) known[1][x] |= (1<<y); else known[1][x] &= ~(1<<y); return;
 				case Dir::North:
-				if(x<0 || x>MAZE_SIZE-1){ return; }
-				if(y<0 || y>MAZE_SIZE-2){ return; }
+				if(x<0 || x>MAZE_SIZE-1 || y<0 || y>MAZE_SIZE-2) return; //< 盤面外
 				if(b) known[0][y] |= (1<<x); else known[0][y] &= ~(1<<x); return;
 				case Dir::West:
-				if(x-1<0 || x-1>MAZE_SIZE-2){ return; }
-				if(y<0 || y>MAZE_SIZE-1){ return; }
+				if(x-1<0 || x-1>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return; //< 盤面外
 				if(b) known[1][x-1] |= (1<<y); else known[1][x-1] &= ~(1<<y); return;
 				case Dir::South:
-				if(x<0 || x>MAZE_SIZE-1){ return; }
-				if(y-1<0 || y-1>MAZE_SIZE-2){ return; }
+				if(x<0 || x>MAZE_SIZE-1 || y-1<0 || y-1>MAZE_SIZE-2) return; //< 盤面外
 				if(b) known[0][y-1] |= (1<<x); else known[0][y-1] &= ~(1<<x); return;
 			}
 			printf("Warning: invalid direction\n");
@@ -311,15 +303,6 @@ namespace MazeLib {
 			auto dirs = Dir::All();
 			return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return isWall(v, d);});
 		}
-		/** @function knownCount
-		*   @brief 引数区画の既知壁の数を返す
-		*   @param v 区画の座標
-		*   @return 既知壁の数 0~4
-		*/
-		int8_t knownCount(const Vector& v) const {
-			auto dirs = Dir::All();
-			return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return isKnown(v, d);});
-		}
 		/** @function unknownCount
 		*   @brief 引数区画の未知壁の数を返す
 		*   @param v 区画の座標
@@ -328,18 +311,6 @@ namespace MazeLib {
 		int8_t unknownCount(const Vector& v) const {
 			auto dirs = Dir::All();
 			return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return !isKnown(v, d);});
-		}
-		/** @function unknownCount
-		*   @brief 迷路全体の未知壁の数を返す
-		*/
-		int unknownCount() const {
-			int sum = 0;
-			for(int j=0; j<MAZE_SIZE-1; j++){
-				for(int i=0; i<2; i++){
-					sum += popcnt((wall_size_t)~known[i][j]);
-				}
-			}
-			return sum;
 		}
 		/** @function updateWall
 		*   @brief 壁を更新して既知とする関数
@@ -401,7 +372,7 @@ namespace MazeLib {
 			printf("+%s" C_RESET, isKnown(x,0,Dir::South) ? (isWall(x,0,Dir::South)?"---":"   ") : C_RED " - ");
 			printf("+\n");
 		}
-		const int diffKnownWall(const Maze& obj){
+		int diffKnownWall(const Maze& obj){
 			int diffs = 0;
 			for(int j=0; j<MAZE_SIZE-1; j++){
 				for(int i=0; i<2; i++){
@@ -414,34 +385,25 @@ namespace MazeLib {
 		/** @function popcnt
 		*   @brief 引数のセットされているbit数を返す静的関数
 		*/
-		static const int popcnt(uint8_t n) {
+		static int popcnt(uint8_t n) {
 			n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
 			n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
 			n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
 			return n;
 		}
-		static const int popcnt(uint16_t n) {
-			n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
-			n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
-			n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
-			n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
-			return n;
-		}
-		static const int popcnt(uint32_t n) {
+		static int popcnt(uint16_t n) {
 			n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
 			n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
 			n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
 			n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
-			n = (n & 0x0000ffff0000ffff) + ((n>>16) & 0x0000ffff0000ffff);
 			return n;
 		}
-		static const int popcnt(uint64_t n) {
+		static int popcnt(uint32_t n) {
 			n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
 			n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
 			n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
 			n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
 			n = (n & 0x0000ffff0000ffff) + ((n>>16) & 0x0000ffff0000ffff);
-			n = (n & 0x00000000ffffffff) + ((n>>32) & 0x00000000ffffffff);
 			return n;
 		}
 	private:

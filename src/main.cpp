@@ -309,7 +309,7 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 // Maze sample(mazeData_2017_East_MC, true);
 Maze sample(mazeData_MM2017CX, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2017
+#define YEAR 2016
 #if YEAR == 2015
 std::vector<Vector> goal = {Vector(7,24)};
 Maze sample(mazeData_MM2015HX);
@@ -326,17 +326,21 @@ Maze maze;
 std::deque<Maze> maze_backup;
 SearchAlgorithm searchAlgorithm(maze, goal);
 
-bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0, 1), const Dir& startDir = Dir::North){
-	if (isStartStep) {
-		// queue Action::START_STEP
-	}
+bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0, 0), const Dir& startDir = Dir::North){
+	searchAlgorithm.reset();
 	searchAlgorithm.updateCurVecDir(startVec, startDir);
+	searchAlgorithm.calcNextDir();
+	if(searchAlgorithm.getState() == SearchAlgorithm::REACHED_START) return true;
+	if(isStartStep) {
+		// queue Action::START_STEP
+		searchAlgorithm.updateCurVecDir(startVec.next(startDir), startDir);
+	}
 	// conduct machine calibration
 	// move robot here
 	SearchAlgorithm::State prevState = searchAlgorithm.getState();
 	int count=0;
 	while(1){
-		// if(count++>50) return false; // for debug
+		// if(count++>10) return false; // for debug
 		// move robot here
 		const auto& v = searchAlgorithm.getCurVec();
 		const auto& d = searchAlgorithm.getCurDir();
@@ -361,6 +365,10 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		const auto& nextDirs = searchAlgorithm.getNextDirs();
 		if(nextDirs.empty()){
 			// Action::STOP
+			printf("Got Lost!");
+			searchAlgorithm.printInfo();
+			searchAlgorithm.printInfo();
+			while (1);
 			return false;
 		}
 		// backup the maze
@@ -407,6 +415,7 @@ bool fastRun(){
 		printf("Failed to find shortest path!\n");
 		return false;
 	}
+	// move robot here
 	return true;
 }
 
@@ -415,6 +424,7 @@ int main(void){
 	auto start = std::chrono::system_clock::now();
 	maze_backup.push_back(maze);
 	while(!searchRun());
+	// searchRun(false, Vector(6,6), Dir::South);
 	searchAlgorithm.printInfo();
 	fastRun();
 	searchAlgorithm.printPath();

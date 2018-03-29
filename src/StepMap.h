@@ -24,34 +24,26 @@ namespace MazeLib {
 		*  @param maze 使用する迷路の参照
 		*/
 		StepMap(Maze& maze) : maze(maze) { reset(); }
-		/** @brief 代入演算子のオーバーロード
-		*/
-		const StepMap& operator=(StepMap& obj){
-			for(int8_t y=0; y<MAZE_SIZE; y++)
-			for(uint8_t x=0; x<MAZE_SIZE; x++)
-			getStep(x, y) = obj.getStep(x, y); //< ステップをコピー
-			return *this;
-		}
 		/** @function reset
 		*  @brief ステップマップの初期化
 		*/
-		void reset(){
+		void reset(const step_t step = MAZE_STEP_MAX){
 			for(int8_t y=0; y<MAZE_SIZE; y++)
-			for(uint8_t x=0; x<MAZE_SIZE; x++)
-			getStep(x, y) = 0; //< ステップをクリア
+			for(int8_t x=0; x<MAZE_SIZE; x++)
+			getStep(x, y) = step; //< ステップをクリア
 		}
 		/** @function getStep
 		*  @param ステップへの参照の取得，書き込み可能
 		*  @param v 区画の座標
 		*  @return ステップメモリの参照
 		*/
-		inline step_t& getStep(const Vector& v) { return getStep(v.x, v.y); }
-		inline step_t& getStep(const int8_t& x, const int8_t& y) {
-			static step_t outside;  //< フィールド外のときの戻りメモリ
-			outside = MAZE_STEP_MAX; //< フィールド外なら最大ステップとする
+		step_t& getStep(const Vector& v) { return getStep(v.x, v.y); }
+		step_t& getStep(const int8_t& x, const int8_t& y) {
 			// (x, y) がフィールド内か確認
 			if(x<0 || y<0 || x>MAZE_SIZE-1 || y>MAZE_SIZE-1){
 				printf("Warning: refered to out of field ------------------------------------------> %2d, %2d\n", x, y);
+				static step_t outside;  //< フィールド外のときの戻りメモリ
+				outside = MAZE_STEP_MAX; //< フィールド外なら最大ステップとする
 				return outside;
 			}
 			return stepMap[y][x];
@@ -100,15 +92,15 @@ namespace MazeLib {
 			// ステップの更新がなくなるまで更新処理
 			while(!q.empty()){
 				// 注目する区画を取得
-				Vector focus = q.front(); q.pop();
-				step_t focus_step = getStep(focus);
+				const Vector& focus = q.front(); q.pop();
+				const step_t& focus_step = getStep(focus);
 				// 4方向更新がないか調べる
 				for(const auto& d: Dir::All()){
-					Vector next = focus.next(d); //< となりの区画のステップを取得
 					if(maze.isWall(focus, d)) continue; //< 壁があったら更新はしない
 					if(onlyCanGo && !maze.isKnown(focus, d)) continue; //< onlyCanGoで未知壁なら更新はしない
 					// となりの区画のステップが注目する区画のステップ+1よりも大きければ更新
-					if(getStep(next)>focus_step+1){
+					const Vector& next = focus.next(d); //< となりの区画のステップを取得
+					if(getStep(next) > focus_step+1){
 						getStep(next) = focus_step+1;
 						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
 					}

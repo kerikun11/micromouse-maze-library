@@ -72,7 +72,7 @@ namespace MazeLib {
 			curVec = Vector(0, 0);
 			curDir = Dir::North;
 			state = IDOLE;
-			calcNextDir();
+			// calcNextDir();
 		}
 		/** @function reset
 		*   @brief ゴール区画を更新し，探索状態をリセットして，現在地をスタート区画にセット
@@ -115,7 +115,7 @@ namespace MazeLib {
 		}
 		/** @function calcShortestDirs
 		*   @brief 最短経路を導出
-		*   @return 最短経路の方向配列
+		*   @return 成功 or 失敗
 		*/
 		bool calcShortestDirs(){
 			stepMapGoal.update(goal, true);
@@ -124,6 +124,7 @@ namespace MazeLib {
 			auto dir = Dir(Dir::North);
 			auto prev_dir = Dir(Dir::North);
 			while(1){
+				// 直線優先のDirsを生成
 				std::vector<Dir> dirs;
 				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir, Dir(dir+1)};
 				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir, Dir(dir+3)};
@@ -132,20 +133,21 @@ namespace MazeLib {
 					if(!maze.canGo(v, d)) return false;
 					return stepMapGoal.getStep(v.next(d)) == stepMapGoal.getStep(v)-1;
 				});
-				if(it == dirs.end()) return false;
+				if(it == dirs.end()) return false; //< 失敗
 				prev_dir = dir;
 				dir = *it;
-				v=v.next(dir);
+				v = v.next(dir);
 				shortestDirs.push_back(dir);
-				if(stepMapGoal.getStep(v)==0) break;
+				if(stepMapGoal.getStep(v) == 0) break; //< ゴール区画
 			}
+			// ゴール区画を行けるところまで直進する
 			bool loop = true;
 			while(loop){
 				loop = false;
 				std::vector<Dir> dirs;
 				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir};
 				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir};
-				else dirs={dir, Dir(dir+1)};
+				else dirs={dir};
 				for(auto& d: dirs){
 					if(maze.canGo(v, d)){
 						shortestDirs.push_back(d);
@@ -158,47 +160,6 @@ namespace MazeLib {
 			}
 			return true;
 		}
-		/** @function calcNextDirInAdvance
-		*   @brief 壁を見る前に前もって行くべき方向を計算
-		*   取り得るすべての壁パターンについて計算
-		*   開発中
-		*/
-		const std::vector<std::vector<Dir>> calcNextDirInAdvance(){
-			calcNextDir();
-			std::vector<std::vector<Dir>> nextDirss;
-			while(1){
-				auto dirs = curDir.ordered();
-				auto it = std::find_if(dirs.begin(), dirs.end(),[&](const Dir& d){
-					if(maze.isWall(curVec, d)) return false;
-					return stepMapGoal.getStep(curVec.next(d)) == stepMapGoal.getStep(curVec)-1;
-				});
-				if(it == dirs.end()) break;
-				printf("curVec:(%d,%d), curDir:%d, *it:%d\n", curVec.x, curVec.y, int8_t(curDir), int8_t(*it));
-				if(maze.isKnown(curVec, *it)){
-					printf("isKnown; break;\n");
-					calcNextDir();
-					nextDirss.push_back(getNextDirs());
-					break;
-				}
-				maze.setKnown(curVec, *it, true);
-				if(calcNextDir(curVec, curDir, state)==GOT_LOST){
-					//printInfo();
-					break;
-				}
-				maze.setKnown(curVec, *it, false);
-				nextDirss.push_back(getNextDirs());
-				maze.setWall(curVec, *it, true);
-			}
-			for(const auto& d: Dir::All()) if(!maze.isKnown(curVec, d)) maze.setWall(curVec, d, false);
-			calcNextDir();
-			for(const auto& nd: nextDirss) {
-				printf(">");
-				for(const auto &d: nd) printf("%d ", int8_t(d));
-				printf("\n");
-			}
-			return nextDirss;
-		}
-
 		/** @function getState
 		*   @brief 探索状態の取得
 		*/
@@ -241,7 +202,7 @@ namespace MazeLib {
 		*/
 		void printInfo(const bool& showMaze = true) const {
 			if(showMaze){
-				for(int i=0; i<MAZE_SIZE*2+5; i++) printf("\x1b[A");
+				for(int i=0; i<MAZE_SIZE*2+4; i++) printf("\x1b[A");
 				switch(state){
 					case IDOLE:
 					case SEARCHING_FOR_GOAL:
@@ -262,8 +223,7 @@ namespace MazeLib {
 				}
 			}
 			printf("Cur: ( %3d, %3d, %3d), State: %s       \n", curVec.x, curVec.y, uint8_t(curDir), stateString(state));
-			printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d\n", step, f, l, r, b);
-			printf("Unknown Wall: %d\n", maze.unknownCount());
+			printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 		}
 		/** @function printPath
 		*   @brief 最短経路の表示
@@ -287,7 +247,7 @@ namespace MazeLib {
 		std::vector<Dir> nextDirs; /**< 次に行くべき探索方向配列 */
 		std::vector<Dir> shortestDirs; /**< 最短経路の方向配列 */
 		std::vector<Vector> candidates; /**< 最短経路上になり得る候補を入れるコンテナ */
-		int step=0,f=0,l=0,r=0,b=0; /**< 探索の評価のためのカウンタ */
+		int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
 
 		/** @function calcNextDirByStepMap
 		*   @brief ステップマップにより次に行くべき方向列を生成する
@@ -328,11 +288,11 @@ namespace MazeLib {
 				for(int j=0; j<MAZE_SIZE; j++){
 					Vector v(i,j);
 					#if FIND_ALL_WALL
-					if(stepMapGoal.getStep(i, j) != MAZE_STEP_MAX && maze.knownCount(Vector(i, j))!=4){
+					if(stepMapGoal.getStep(i, j) != MAZE_STEP_MAX && maze.unknownCount(v)){
 						candidates.push_back(v);
 					}
 					#else
-					if(stepMapGoal.getStep(i, j) + stepMapStart.getStep(i, j) <= 1+goal_step && maze.knownCount(Vector(i,j))!=4){
+					if(stepMapGoal.getStep(i, j) + stepMapStart.getStep(i, j) <= goal_step && maze.unknownCount(v)){
 						candidates.push_back(v);
 					}
 					#endif
@@ -347,19 +307,21 @@ namespace MazeLib {
 		*   @return 計算後の探索状態
 		*   計算結果はメンバ変数のnextDirsに保存される．
 		*/
-		const enum State calcNextDir(const Vector& pv, const Dir& pd, enum State state){
+		enum State calcNextDir(const Vector& pv, const Dir& pd, enum State state){
 			if(state == IDOLE){
-				step=0; f=0; l=0; r=0; b=0;
-				findShortestCandidates();
-				if(candidates.empty()) state = BACKING_TO_START;
-				else state = SEARCHING_FOR_GOAL;
 				#if SEARCHING_ADDITIALLY_AT_START
 				state = SEARCHING_ADDITIONALLY;
+				#else
+				state = SEARCHING_FOR_GOAL;
 				#endif
+				// ゴール区画が探索済みなら次のstateへ
+				if(std::find_if(goal.begin(), goal.end(), [&](const Vector& v){ return maze.unknownCount(v); }) == goal.end()){
+					state = SEARCHING_ADDITIONALLY;
+				}
 			}
 
 			if(state == SEARCHING_FOR_GOAL){
-				if(std::find(goal.begin(), goal.end(), pv)!=goal.end()){
+				if(std::find(goal.begin(), goal.end(), pv) != goal.end()){
 					state = REACHED_GOAL;
 				}else{
 					stepMapGoal.update(goal);
@@ -370,7 +332,7 @@ namespace MazeLib {
 			if(state == REACHED_GOAL){
 				candidates.clear();
 				for(const auto& v: goal){
-					if(maze.knownCount(v)!=4){
+					if(maze.unknownCount(v)){
 						candidates.push_back(v);
 					}
 				}
@@ -411,12 +373,13 @@ namespace MazeLib {
 			}
 
 			for(const auto& d: nextDirs){
-				step++;
 				f += pd.getRelative(Dir::Forward) == d;
 				l += pd.getRelative(Dir::Left   ) == d;
 				r += pd.getRelative(Dir::Right  ) == d;
 				b += pd.getRelative(Dir::Back   ) == d;
 			}
+			step += nextDirs.size();
+			k += nextDirs.size()-1;
 			return state;
 		}
 	};
