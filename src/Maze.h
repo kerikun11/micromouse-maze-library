@@ -96,16 +96,20 @@ namespace MazeLib {
 	/** @struct Vector
 	*   @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
 	*/
-	struct Vector {
+	union Vector {
 	public:
-		int8_t x, y; /**< @brief 迷路の区画座標 */
+		struct{
+			int8_t x : 8; /**< @brief 迷路の区画座標 */
+			int8_t y : 8; /**< @brief 迷路の区画座標 */
+		};
+		uint16_t all;
 		Vector(int8_t x=0, int8_t y=0) : x(x), y(y) {} /**< @brief コンストラクタ */
 		Vector(const Vector& obj) : x(obj.x), y(obj.y) {} /**< @brief コンストラクタ */
 		/** @brief 演算子のオーバーロード
 		*/
-		const Vector& operator=(const Vector& obj) { x=obj.x; y=obj.y; return *this; }
-		bool operator==(const Vector& obj) const { return x==obj.x && y==obj.y; }
-		bool operator!=(const Vector& obj) const { return x!=obj.x || y!=obj.y; }
+		const Vector& operator=(const Vector& obj) { all=obj.all; return *this; }
+		bool operator==(const Vector& obj) const { return all==obj.all; }
+		bool operator!=(const Vector& obj) const { return all!=obj.all; }
 		/** @function next
 		*   @brief 自分の引数方向に隣接した区画のVectorを返す
 		*   @param 隣接方向
@@ -189,21 +193,17 @@ namespace MazeLib {
 		bool isWall(const int8_t& x, const int8_t& y, const Dir& d) const {
 			switch(d){
 				case Dir::East:
-				if(x<0 || x>MAZE_SIZE-2){ return true; }
-				if(y<0 || y>MAZE_SIZE-1){ return true; }
-				return wall[1][x] & (1<<y);
+				if(x<0 || x>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return true; //< 盤面外
+				return wall[0][x] & (1<<y);
 				case Dir::North:
-				if(x<0 || x>MAZE_SIZE-1){ return true; }
-				if(y<0 || y>MAZE_SIZE-2){ return true; }
-				return wall[0][y] & (1<<x);
+				if(x<0 || x>MAZE_SIZE-1 || y<0 || y>MAZE_SIZE-2) return true; //< 盤面外
+				return wall[1][y] & (1<<x);
 				case Dir::West:
-				if(x-1<0 || x-1>MAZE_SIZE-2){ return true; }
-				if(y<0 || y>MAZE_SIZE-1){ return true; }
-				return wall[1][x-1] & (1<<y);
+				if(x-1<0 || x-1>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return true; //< 盤面外
+				return wall[0][x-1] & (1<<y);
 				case Dir::South:
-				if(x<0 || x>MAZE_SIZE-1){ return true; }
-				if(y-1<0 || y-1>MAZE_SIZE-2){ return true; }
-				return wall[0][y-1] & (1<<x);
+				if(x<0 || x>MAZE_SIZE-1 || y-1<0 || y-1>MAZE_SIZE-2) return true; //< 盤面外
+				return wall[1][y-1] & (1<<x);
 			}
 			printf("Warning: invalid direction\n");
 			return true;
@@ -218,21 +218,17 @@ namespace MazeLib {
 		void setWall(const int8_t& x, const int8_t& y, const Dir& d, const bool& b) {
 			switch(d){
 				case Dir::East:
-				if(x<0 || x>MAZE_SIZE-2){ return; }
-				if(y<0 || y>MAZE_SIZE-1){ return; }
-				if(b) wall[1][x] |= (1<<y); else wall[1][x] &= ~(1<<y); return;
+				if(x<0 || x>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return; //< 盤面外
+				if(b) wall[0][x] |= (1<<y); else wall[0][x] &= ~(1<<y); return;
 				case Dir::North:
-				if(x<0 || x>MAZE_SIZE-1){ return; }
-				if(y<0 || y>MAZE_SIZE-2){ return; }
-				if(b) wall[0][y] |= (1<<x); else wall[0][y] &= ~(1<<x); return;
+				if(x<0 || x>MAZE_SIZE-1 || y<0 || y>MAZE_SIZE-2) return; //< 盤面外
+				if(b) wall[1][y] |= (1<<x); else wall[1][y] &= ~(1<<x); return;
 				case Dir::West:
-				if(x-1<0 || x-1>MAZE_SIZE-2){ return; }
-				if(y<0 || y>MAZE_SIZE-1){ return; }
-				if(b) wall[1][x-1] |= (1<<y); else wall[1][x-1] &= ~(1<<y); return;
+				if(x-1<0 || x-1>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return; //< 盤面外
+				if(b) wall[0][x-1] |= (1<<y); else wall[0][x-1] &= ~(1<<y); return;
 				case Dir::South:
-				if(x<0 || x>MAZE_SIZE-1){ return; }
-				if(y-1<0 || y-1>MAZE_SIZE-2){ return; }
-				if(b) wall[0][y-1] |= (1<<x); else wall[0][y-1] &= ~(1<<x); return;
+				if(x<0 || x>MAZE_SIZE-1 || y-1<0 || y-1>MAZE_SIZE-2) return; //< 盤面外
+				if(b) wall[1][y-1] |= (1<<x); else wall[1][y-1] &= ~(1<<x); return;
 			}
 			printf("Warning: invalid direction\n");
 		}
@@ -247,16 +243,16 @@ namespace MazeLib {
 			switch(d){
 				case Dir::East:
 				if(x<0 || x>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return true; //< 盤面外
-				return known[1][x] & (1<<y);
+				return known[0][x] & (1<<y);
 				case Dir::North:
 				if(x<0 || x>MAZE_SIZE-1 || y<0 || y>MAZE_SIZE-2) return true; //< 盤面外
-				return known[0][y] & (1<<x);
+				return known[1][y] & (1<<x);
 				case Dir::West:
 				if(x-1<0 || x-1>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return true; //< 盤面外
-				return known[1][x-1] & (1<<y);
+				return known[0][x-1] & (1<<y);
 				case Dir::South:
 				if(x<0 || x>MAZE_SIZE-1 || y-1<0 || y-1>MAZE_SIZE-2) return true; //< 盤面外
-				return known[0][y-1] & (1<<x);
+				return known[1][y-1] & (1<<x);
 			}
 			printf("Warning: invalid direction\n");
 			return false;
@@ -272,16 +268,16 @@ namespace MazeLib {
 			switch(d){
 				case Dir::East:
 				if(x<0 || x>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return; //< 盤面外
-				if(b) known[1][x] |= (1<<y); else known[1][x] &= ~(1<<y); return;
+				if(b) known[0][x] |= (1<<y); else known[0][x] &= ~(1<<y); return;
 				case Dir::North:
 				if(x<0 || x>MAZE_SIZE-1 || y<0 || y>MAZE_SIZE-2) return; //< 盤面外
-				if(b) known[0][y] |= (1<<x); else known[0][y] &= ~(1<<x); return;
+				if(b) known[1][y] |= (1<<x); else known[1][y] &= ~(1<<x); return;
 				case Dir::West:
 				if(x-1<0 || x-1>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return; //< 盤面外
-				if(b) known[1][x-1] |= (1<<y); else known[1][x-1] &= ~(1<<y); return;
+				if(b) known[0][x-1] |= (1<<y); else known[0][x-1] &= ~(1<<y); return;
 				case Dir::South:
 				if(x<0 || x>MAZE_SIZE-1 || y-1<0 || y-1>MAZE_SIZE-2) return; //< 盤面外
-				if(b) known[0][y-1] |= (1<<x); else known[0][y-1] &= ~(1<<x); return;
+				if(b) known[1][y-1] |= (1<<x); else known[1][y-1] &= ~(1<<x); return;
 			}
 			printf("Warning: invalid direction\n");
 		}

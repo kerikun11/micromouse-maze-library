@@ -15,11 +15,11 @@ namespace MazeLib {
 	*   true: 全探索
 	*   false: 最短になり得ないところは排除
 	*/
-	#define FIND_ALL_WALL 0
+	#define FIND_ALL_WALL 1
 	/** @def SEARCHING_ADDITIALLY_AT_START
 	*   @brief 追加探索状態で探索を始める(ゴールを急がない)
 	*/
-	#define SEARCHING_ADDITIALLY_AT_START 0
+	#define SEARCHING_ADDITIALLY_AT_START 1
 
 	/** @class SearchAlgorithm
 	*   @brief 迷路探索アルゴリズムを司るクラス
@@ -226,7 +226,6 @@ namespace MazeLib {
 		void printPath() const {
 			//for(int i=0; i<MAZE_SIZE*2+5; i++) printf("\x1b[A");
 			maze.printPath(Vector(0, 0), shortestDirs);
-			printf("\n\n");
 			printf("Shortest Step: %d\n", shortestDirs.size()-1);
 		}
 	private:
@@ -292,7 +291,7 @@ namespace MazeLib {
 			for(int i=0; i<MAZE_SIZE; i++){
 				for(int j=0; j<MAZE_SIZE; j++){
 					Vector v(i,j);
-					if(stepMapGoal.getStep(i, j) + stepMapStart.getStep(i, j) <= goal_step && maze.unknownCount(v)){
+					if(stepMapGoal.getStep(i, j) + stepMapStart.getStep(i, j) <= goal_step+stepMapStart.factor && maze.unknownCount(v)){
 						candidates.push_back(v);
 					}
 				}

@@ -24,7 +24,10 @@ namespace MazeLib {
 		/** @brief コンストラクタ
 		*  @param maze 使用する迷路の参照
 		*/
-		StepMap(Maze& maze) : maze(maze) { reset(); }
+		StepMap(Maze& maze) : maze(maze) {
+			calcStraightStepTable();
+			reset();
+		}
 		/** @function reset
 		*  @brief ステップマップの初期化
 		*/
@@ -32,7 +35,6 @@ namespace MazeLib {
 			for(int8_t y=0; y<MAZE_SIZE; y++)
 			for(int8_t x=0; x<MAZE_SIZE; x++)
 			setStep(x, y, step); //< ステップをクリア
-			calcStraightStepTable();
 		}
 		/** @function getStep
 		*  @param ステップへの参照の取得，書き込み可能
@@ -58,7 +60,7 @@ namespace MazeLib {
 		bool setStep(const Vector& v, const step_t& step) { return setStep(v.x, v.y, step); }
 		bool setStep(const int8_t& x, const int8_t& y, const step_t& step) {
 			// (x, y) がフィールド内か確認
-			if(x<0 || y<0 || x>MAZE_SIZE-1 || y>MAZE_SIZE-1){
+			if(x<0 || y<0 || x>=MAZE_SIZE || y>=MAZE_SIZE){
 				printf("Warning: refered to out of field ------------------------------------------> %2d, %2d\n", x, y);
 				return false;
 			}
@@ -111,6 +113,7 @@ namespace MazeLib {
 				const step_t& focus_step = getStep(focus);
 				// 4方向更新がないか調べる
 				for(const auto& d: Dir::All()){
+				// for(int8_t d=0; d<Dir::AbsMax; d++){
 					Vector next = focus;
 					for(int i=0; true; i++){
 						if(maze.isWall(next, d)) break; //< 壁があったら更新はしない
@@ -118,22 +121,30 @@ namespace MazeLib {
 						// となりの区画のステップが注目する区画のステップよりも大きければ更新
 						next = next.next(d); //< となりの区画のステップを取得
 						step_t step = focus_step + straightStepTable[i];
+						#if 1
 						if(getStep(next) <= step) break; //< これより先，更新されることはない
 						setStep(next, step);
 						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+						#else
+						if(getStep(next) > step){
+						setStep(next, step);
+						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
 					}
+					#endif
 				}
 			}
 		}
-		void calcStraightStepTable(){
-			for(int i=0; i<MAZE_SIZE; i++){
-				static const float factor = (sqrt((float)MAZE_SIZE) - sqrt((float)MAZE_SIZE-1));
-				straightStepTable[i] = sqrt((float)i+1) / factor;
-			}
+	}
+	void calcStraightStepTable(){
+		for(int i=0; i<MAZE_SIZE; i++){
+			straightStepTable[i] = sqrt((float)i+1) * factor;
 		}
-	private:
-		Maze& maze; /**< @brief 使用する迷路の参照 */
-		step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
-		step_t straightStepTable[MAZE_SIZE];
-	};
+	}
+public:
+	const float factor = 1.0f / (sqrt((float)MAZE_SIZE-1) - sqrt((float)MAZE_SIZE-2));
+private:
+	Maze& maze; /**< @brief 使用する迷路の参照 */
+	step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
+	step_t straightStepTable[MAZE_SIZE];
+};
 }
