@@ -5,12 +5,11 @@
 
 #include <unistd.h>
 #include <time.h>
-#include <iostream>
 #include <chrono>
 
 using namespace MazeLib;
 
-#define DISPLAY 0
+#define DISPLAY 1
 #define MAZE_BACKUP_SIZE 5
 
 const char mazeData_fp2016[8+1][8+1] = {
@@ -157,7 +156,26 @@ extern const char mazeData_MM2017CX[16+1][16+1] = {
 	"de888aaaaaaaaaa9",
 };
 
-const char mazeData_maze2013half[32+1][32+1] = {
+extern const char mazeData_Cheese2017[16+1][16+1] = {
+	"d1555553b9111113",
+	"d051557aa8000002",
+	"d410153828000002",
+	"b92a83aaa8000002",
+	"86c4682aa8000002",
+	"a9393e82a8000002",
+	"aac6c3eea8000002",
+	"aa9396bba8000002",
+	"a86ac382a8000002",
+	"869296aaa8000002",
+	"e96ac56aa8000002",
+	"9456953aa8000002",
+	"c393c3c2a8000002",
+	"bc46b83ea8000002",
+	"83bb82eba8000002",
+	"ec446c546c444446",
+};
+
+const char mazeData_MM2013HX[32+1][32+1] = {
 	{"95555115555555395555555395555393"},
 	{"a9153aa9515153aa9515153aa955382a"},
 	{"aa816aac16bc16aac16bc16ac417aaaa"},
@@ -190,6 +208,41 @@ const char mazeData_maze2013half[32+1][32+1] = {
 	{"a941438554156d4152c55555555556aa"},
 	{"805452c555455554545555555555556a"},
 	{"ec555455555555555555555555555556"},
+};
+
+const char mazeData_MM2014HX[32+1][32+1] = {
+	"62aaaaaaaaaaaa2223636363636a2363",
+	"5caaaaaaaaaaa35d5c14141414969555",
+	"56aaaaaaaaaa35ca8341414149696955",
+	"556362222223556a35dc9c1496968b55",
+	"55554000000155569caaa3c96974aa15",
+	"5555400000015555763635e28b556a95",
+	"555540000001555549c9496962155635",
+	"5555c8880001555c8a36968b40155555",
+	"555caaa3400155caa349696340155541",
+	"55caaa35c889556aa9d696954015c9d5",
+	"54aaa35caaaa95ca3e296835401caa35",
+	"556aa9caaaaaa96a968b4a95c89ea295",
+	"55caaaaaaaaaaa9e2963563caaaaa0b5",
+	"54aa2aa3636363769695c9caaaa3e0b5",
+	"54a3ca3c9c9c9c1ca8a8a22aaaa1e0b5",
+	"5c3ca356222223caaaaa355636a9e835",
+	"434a3c140000016aaaaa9489c96aaa95",
+	"55c3c3d400000142aaaaa8aaa3caa361",
+	"557c283c8888015c2a2a3622356aa955",
+	"5543c3c2aaa34156828294001556a355",
+	"55403c3c3e35415ca8a8340015556955",
+	"554003c3c3d5c956aaaa140015c9ca15",
+	"5dc888bc3c3c2a956aaa940015eaaa95",
+	"caaaaaa3c3c3c3f5caaa34009caaaa35",
+	"6aaaaa35fc3c3ca16aa35c896236a295",
+	"56aaa35563c3ca3d56354363401c2835",
+	"556a35555c3ca3ca95555415c8168295",
+	"55560955569634aaa89541416a082835",
+	"5555ca955ca9c96aaa3c9c9c8a8a8a95",
+	"555caaa9caaaaa96a3caaaaaaaaaaa35",
+	"55caaaaaaaaaaaa97caaaaaaaaaaaa95",
+	"dcaaaaaaaaaaaaaa8aaaaaaaaaaaaaa9",
 };
 
 const char mazeData_MM2015HX[32+1][32+1] = {
@@ -300,17 +353,25 @@ const char mazeData_MM2017HX[32+1][32+1] = {
 std::vector<Vector> goal = {Vector(7,7)};
 Maze sample(mazeData_fp2016);
 #elif MAZE_SIZE == 16
-std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
+// std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
+std::vector<Vector> goal = {Vector(2,2),Vector(2,3),Vector(3,2),Vector(3,3)};
 //Maze sample(mazeData_maze, false);
 //Maze sample(mazeData_maze3, false);
 //Maze sample(mazeData_maze4, false);
 //Maze sample(mazeData_maze2013fr, false);
 //Maze sample(mazeData_maze2013exp, false);
-Maze sample(mazeData_2017_East_MC, true);
+// Maze sample(mazeData_2017_East_MC, true);
 // Maze sample(mazeData_MM2017CX, true);
+Maze sample(mazeData_Cheese2017, false);
 #elif MAZE_SIZE == 32
-#define YEAR 2016
-#if YEAR == 2015
+#define YEAR 2014
+#if YEAR == 2013
+std::vector<Vector> goal = {Vector(6,5)};
+Maze sample(mazeData_MM2013HX);
+#elif YEAR == 2014
+std::vector<Vector> goal = {Vector(26,5)};
+Maze sample(mazeData_MM2014HX);
+#elif YEAR == 2015
 std::vector<Vector> goal = {Vector(7,24)};
 Maze sample(mazeData_MM2015HX);
 #elif YEAR ==2016
@@ -342,7 +403,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	// move robot here
 	SearchAlgorithm::State prevState = searchAlgorithm.getState();
 	int count=0;
-	auto max_msec = 0;
+	auto max_usec = 0;
 	while(1){
 		// if(count++>10) return false; // for debug
 		// move robot here
@@ -377,12 +438,12 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		// queue move actions
 		for(const auto& nextDir: nextDirs){
 			auto dur = end - start;        // 要した時間を計算
-			auto msec = std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
-			if(max_msec < msec) max_msec = msec;
+			auto usec = std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
+			if(max_usec < usec) max_usec = usec;
 			#if DISPLAY
 			usleep(50000); searchAlgorithm.printInfo();
 			// 要した時間をミリ秒（1/1000秒）に変換して表示
-			printf("It took %5d [us], the max is %5d [us]\n", msec, max_msec);
+			printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
 			printf("\x1b[A");
 			#endif
 			auto nextVec = searchAlgorithm.getCurVec().next(nextDir);
@@ -409,7 +470,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	// queue Action::START_INIT
 	// move robot here
 	// COMPLETE
-	printf("the max is %5d [us]\n", max_msec);
+	printf("the max is %5d [us]\n", max_usec);
 	return true;
 }
 
@@ -437,7 +498,7 @@ int main(void){
 	auto dur = end - start;        // 要した時間を計算
 	auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
 	#ifdef DISPLAY
-	std::cout << msec << " milli sec \n";
+	printf("It took %5d [ms]\n", msec);
 	#endif
 	#else
 	// Maze sample2(mazeData_maze2013half, false);

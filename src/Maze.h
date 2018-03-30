@@ -380,6 +380,7 @@ namespace MazeLib {
 					diffs += popcnt(bits);
 				}
 			}
+			return diffs;
 		}
 	public:
 		/** @function popcnt
