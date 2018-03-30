@@ -129,9 +129,19 @@ namespace MazeLib {
 				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir, Dir(dir+1)};
 				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir, Dir(dir+3)};
 				else dirs={dir, Dir(dir+1), Dir(dir+3)};
-				auto it = std::find_if(dirs.begin(), dirs.end(),[&](const Dir& d){
-					if(!maze.canGo(v, d)) return false;
-					return stepMapGoal.getStep(v.next(d)) == stepMapGoal.getStep(v)-1;
+				// auto it = std::find_if(dirs.begin(), dirs.end(),[&](const Dir& d){
+				// 	if(!maze.canGo(v, d)) return false;
+				// 	return stepMapGoal.getStep(v.next(d)) == stepMapGoal.getStep(v)-1;
+				// });
+				Vector& focus_v = v;
+				StepMap& stepMap = stepMapGoal;
+				std::vector<step_t> steps;
+				for(const auto& d: dirs) if(maze.canGo(focus_v, d)) steps.push_back(stepMap.getStep(focus_v.next(d)));
+				step_t min_step = *(std::min_element(steps.begin(), steps.end()));
+				if(stepMap.getStep(focus_v) <= min_step) return false;
+				auto it = std::find_if(dirs.begin(), dirs.end(), [&](const Dir& d){
+					if(!maze.canGo(focus_v, d)) return false;
+					return stepMap.getStep(focus_v.next(d)) == min_step;
 				});
 				if(it == dirs.end()) return false; //< 失敗
 				prev_dir = dir;
@@ -254,15 +264,17 @@ namespace MazeLib {
 		*   @param stepMap ステップマップの選択
 		*   @return true:成功, false:失敗(迷子)
 		*/
-		bool calcNextDirByStepMap(StepMap& stepMap){
+		bool calcNextDirByStepMap(StepMap& stepMap, Vector focus_v, Dir focus_d){
 			nextDirs.clear();
-			auto focus_v = curVec;
-			auto focus_d = curDir;
 			while(1){
 				auto dirs = focus_d.ordered();
+				std::vector<step_t> steps;
+				for(const auto& d: dirs) if(maze.canGo(focus_v, d)) steps.push_back(stepMap.getStep(focus_v.next(d)));
+				step_t min_step = *(std::min_element(steps.begin(), steps.end()));
+				if(stepMap.getStep(focus_v) <= min_step) break;
 				auto it = std::find_if(dirs.begin(), dirs.end(), [&](const Dir& d){
 					if(!maze.canGo(focus_v, d)) return false;
-					return stepMap.getStep(focus_v.next(d)) == stepMap.getStep(focus_v)-1;
+					return stepMap.getStep(focus_v.next(d)) == min_step;
 				});
 				if(it==dirs.end()) break;
 				nextDirs.push_back(*it);
@@ -309,15 +321,12 @@ namespace MazeLib {
 		*/
 		enum State calcNextDir(const Vector& pv, const Dir& pd, enum State state){
 			if(state == IDOLE){
+				state = SEARCHING_FOR_GOAL;
+				// ゴール区画が探索済みなら次のstateへ
+				if(std::find_if(goal.begin(), goal.end(), [&](const Vector& v){ return maze.unknownCount(v); }) == goal.end()) state = SEARCHING_ADDITIONALLY;
 				#if SEARCHING_ADDITIALLY_AT_START
 				state = SEARCHING_ADDITIONALLY;
-				#else
-				state = SEARCHING_FOR_GOAL;
 				#endif
-				// ゴール区画が探索済みなら次のstateへ
-				if(std::find_if(goal.begin(), goal.end(), [&](const Vector& v){ return maze.unknownCount(v); }) == goal.end()){
-					state = SEARCHING_ADDITIONALLY;
-				}
 			}
 
 			if(state == SEARCHING_FOR_GOAL){
@@ -325,7 +334,7 @@ namespace MazeLib {
 					state = REACHED_GOAL;
 				}else{
 					stepMapGoal.update(goal);
-					if(!calcNextDirByStepMap(stepMapGoal)) return GOT_LOST;
+					if(!calcNextDirByStepMap(stepMapGoal, pv, pd)) return GOT_LOST;
 				}
 			}
 
@@ -340,7 +349,7 @@ namespace MazeLib {
 					state = SEARCHING_ADDITIONALLY;
 				}else{
 					stepMapCandidates.update(candidates);
-					if(!calcNextDirByStepMap(stepMapCandidates)) return GOT_LOST;
+					if(!calcNextDirByStepMap(stepMapCandidates, pv, pd)) return GOT_LOST;
 				}
 			}
 
@@ -350,7 +359,7 @@ namespace MazeLib {
 					state = BACKING_TO_START;
 				}else{
 					stepMapCandidates.update(candidates);
-					if(!calcNextDirByStepMap(stepMapCandidates)) return GOT_LOST;
+					if(!calcNextDirByStepMap(stepMapCandidates, pv, pd)) return GOT_LOST;
 				}
 			}
 
@@ -359,7 +368,7 @@ namespace MazeLib {
 					state = REACHED_START;
 				}else{
 					stepMapStart.update({start});
-					if(!calcNextDirByStepMap(stepMapStart)) return GOT_LOST;
+					if(!calcNextDirByStepMap(stepMapStart, pv, pd)) return GOT_LOST;
 				}
 			}
 
@@ -368,7 +377,7 @@ namespace MazeLib {
 					state = REACHED_START;
 				}else{
 					stepMapStart.update({start}, true);
-					if(!calcNextDirByStepMap(stepMapStart)) return GOT_LOST;
+					if(!calcNextDirByStepMap(stepMapStart, pv, pd)) return GOT_LOST;
 				}
 			}
 

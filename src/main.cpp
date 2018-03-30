@@ -306,8 +306,8 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 //Maze sample(mazeData_maze4, false);
 //Maze sample(mazeData_maze2013fr, false);
 //Maze sample(mazeData_maze2013exp, false);
-// Maze sample(mazeData_2017_East_MC, true);
-Maze sample(mazeData_MM2017CX, true);
+Maze sample(mazeData_2017_East_MC, true);
+// Maze sample(mazeData_MM2017CX, true);
 #elif MAZE_SIZE == 32
 #define YEAR 2016
 #if YEAR == 2015
@@ -315,12 +315,15 @@ std::vector<Vector> goal = {Vector(7,24)};
 Maze sample(mazeData_MM2015HX);
 #elif YEAR ==2016
 std::vector<Vector> goal = {Vector(3,3)};
+// std::vector<Vector> goal = {Vector(31,31)};
 Maze sample(mazeData_MM2016HX);
 #elif YEAR ==2017
 std::vector<Vector> goal = {Vector(19,20)};
 Maze sample(mazeData_MM2017HX, true);
 #endif
 #endif
+
+#if 1
 
 Maze maze;
 std::deque<Maze> maze_backup;
@@ -419,8 +422,11 @@ bool fastRun(){
 	return true;
 }
 
+#endif
+
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
+	#if 1
 	auto start = std::chrono::system_clock::now();
 	maze_backup.push_back(maze);
 	while(!searchRun());
@@ -434,7 +440,9 @@ int main(void){
 	#ifdef DISPLAY
 	std::cout << msec << " milli sec \n";
 	#endif
+	#else
 	// Maze sample2(mazeData_maze2013half, false);
 	// printf("diff: %d\n", maze.diffKnownWall(sample2));
+	#endif
 	return 0;
 }

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Maze.h"
+#include <complex>
 
 namespace MazeLib {
 	/** @def MAZE_STEP_MAX
@@ -30,15 +31,15 @@ namespace MazeLib {
 		void reset(const step_t step = MAZE_STEP_MAX){
 			for(int8_t y=0; y<MAZE_SIZE; y++)
 			for(int8_t x=0; x<MAZE_SIZE; x++)
-			getStep(x, y) = step; //< ステップをクリア
+			setStep(x, y, step); //< ステップをクリア
 		}
 		/** @function getStep
 		*  @param ステップへの参照の取得，書き込み可能
 		*  @param v 区画の座標
 		*  @return ステップメモリの参照
 		*/
-		step_t& getStep(const Vector& v) { return getStep(v.x, v.y); }
-		step_t& getStep(const int8_t& x, const int8_t& y) {
+		const step_t& getStep(const Vector& v) const { return getStep(v.x, v.y); }
+		const step_t& getStep(const int8_t& x, const int8_t& y) const {
 			// (x, y) がフィールド内か確認
 			if(x<0 || y<0 || x>MAZE_SIZE-1 || y>MAZE_SIZE-1){
 				printf("Warning: refered to out of field ------------------------------------------> %2d, %2d\n", x, y);
@@ -47,6 +48,21 @@ namespace MazeLib {
 				return outside;
 			}
 			return stepMap[y][x];
+		}
+		/** @function getStep
+		*  @param ステップへの参照の取得，書き込み可能
+		*  @param v 区画の座標
+		*  @return ステップメモリの参照
+		*/
+		bool setStep(const Vector& v, const step_t& step) { return setStep(v.x, v.y, step); }
+		bool setStep(const int8_t& x, const int8_t& y, const step_t& step) {
+			// (x, y) がフィールド内か確認
+			if(x<0 || y<0 || x>MAZE_SIZE-1 || y>MAZE_SIZE-1){
+				printf("Warning: refered to out of field ------------------------------------------> %2d, %2d\n", x, y);
+				return false;
+			}
+			stepMap[y][x] = step;
+			return true;
 		}
 		/** @function print
 		*  @param v ハイライト区画
@@ -79,14 +95,12 @@ namespace MazeLib {
 		*/
 		void update(const std::vector<Vector>& dest, const bool& onlyCanGo = false){
 			// 全区画のステップを最大値に設定
-			for(uint8_t y=0; y<MAZE_SIZE; y++)
-			for(uint8_t x=0; x<MAZE_SIZE; x++)
-			getStep(x, y) = MAZE_STEP_MAX;
+			reset();
 			// となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
 			std::queue<Vector> q;
 			// destに含まれる区画のステップを0とする
 			for(const auto& v: dest) {
-				getStep(v) = 0;
+				setStep(v, 0);
 				q.push(v);
 			}
 			// ステップの更新がなくなるまで更新処理
@@ -96,13 +110,19 @@ namespace MazeLib {
 				const step_t& focus_step = getStep(focus);
 				// 4方向更新がないか調べる
 				for(const auto& d: Dir::All()){
-					if(maze.isWall(focus, d)) continue; //< 壁があったら更新はしない
-					if(onlyCanGo && !maze.isKnown(focus, d)) continue; //< onlyCanGoで未知壁なら更新はしない
-					// となりの区画のステップが注目する区画のステップ+1よりも大きければ更新
-					const Vector& next = focus.next(d); //< となりの区画のステップを取得
-					if(getStep(next) > focus_step+1){
-						getStep(next) = focus_step+1;
-						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+					Vector next = focus;
+					for(int i=0; true; i++){
+						if(maze.isWall(next, d)) break; //< 壁があったら更新はしない
+						if(onlyCanGo && !maze.isKnown(next, d)) break; //< onlyCanGoで未知壁なら更新はしない
+						// となりの区画のステップが注目する区画のステップ+1よりも大きければ更新
+						next = next.next(d); //< となりの区画のステップを取得
+						static const float factor = (sqrt((float)MAZE_SIZE) - sqrt((float)MAZE_SIZE-1));
+						int step = focus_step + sqrt((float)i+1) / factor;
+						if(getStep(next) > step){
+							setStep(next, step);
+							q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+
+						}
 					}
 				}
 			}
