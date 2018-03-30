@@ -10,7 +10,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY 1
+#define DISPLAY 0
 #define MAZE_BACKUP_SIZE 5
 
 const char mazeData_fp2016[8+1][8+1] = {
@@ -342,6 +342,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	// move robot here
 	SearchAlgorithm::State prevState = searchAlgorithm.getState();
 	int count=0;
+	auto max_msec = 0;
 	while(1){
 		// if(count++>10) return false; // for debug
 		// move robot here
@@ -352,22 +353,19 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		searchAlgorithm.updateWall(v, d+1, sample.isWall(v, d+1)); // left
 		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop_front();
 
-		#if DISPLAY
 		auto start = std::chrono::system_clock::now();
-		#endif
 		searchAlgorithm.calcNextDir();
-		#if DISPLAY
 		auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
-		#endif
 		SearchAlgorithm::State newState = searchAlgorithm.getState();
 		if(newState != prevState && newState == SearchAlgorithm::REACHED_START) break;
 		if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ /* SEARCHING_ADDITIONALLY */ }
 		if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){ /* BACKING_TO_START */ }
-		if(newState != prevState && newState == SearchAlgorithm::GOT_LOST){ /* GOT_LOST */ }
 		prevState = newState;
 		const auto& nextDirs = searchAlgorithm.getNextDirs();
 		if(nextDirs.empty()){
-			// Action::STOP
+			/* GOT_LOST ! */
+			// queue SearchRun::STOP
+			// move robot here
 			printf("Got Lost!");
 			searchAlgorithm.printInfo();
 			searchAlgorithm.printInfo();
@@ -378,12 +376,13 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		maze_backup.push_back(maze);
 		// queue move actions
 		for(const auto& nextDir: nextDirs){
-			#if DISPLAY
-			usleep(50000); searchAlgorithm.printInfo();
 			auto dur = end - start;        // 要した時間を計算
 			auto msec = std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
+			if(max_msec < msec) max_msec = msec;
+			#if DISPLAY
+			usleep(50000); searchAlgorithm.printInfo();
 			// 要した時間をミリ秒（1/1000秒）に変換して表示
-			std::cout << msec << " micro sec \n";
+			printf("It took %5d [us], the max is %5d [us]\n", msec, max_msec);
 			printf("\x1b[A");
 			#endif
 			auto nextVec = searchAlgorithm.getCurVec().next(nextDir);
@@ -410,6 +409,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	// queue Action::START_INIT
 	// move robot here
 	// COMPLETE
+	printf("the max is %5d [us]\n", max_msec);
 	return true;
 }
 
@@ -430,7 +430,6 @@ int main(void){
 	auto start = std::chrono::system_clock::now();
 	maze_backup.push_back(maze);
 	while(!searchRun());
-	// searchRun(false, Vector(6,6), Dir::South);
 	searchAlgorithm.printInfo();
 	fastRun();
 	searchAlgorithm.printPath();
