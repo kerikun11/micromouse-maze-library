@@ -9,7 +9,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY 1
+#define DISPLAY 0
 #define MAZE_BACKUP_SIZE 5
 
 const char mazeData_fp2016[8+1][8+1] = {
@@ -364,10 +364,10 @@ std::vector<Vector> goal = {Vector(2,2),Vector(2,3),Vector(3,2),Vector(3,3)};
 // Maze sample(mazeData_MM2017CX, true);
 Maze sample(mazeData_Cheese2017, false);
 #elif MAZE_SIZE == 32
-#define YEAR 2014
+#define YEAR 2016
 #if YEAR == 2013
-std::vector<Vector> goal = {Vector(6,5)};
-Maze sample(mazeData_MM2013HX);
+std::vector<Vector> goal = {Vector(6,5), Vector(6,6), Vector(6,7), Vector(7,5), Vector(7,6), Vector(7,7), Vector(8,5), Vector(8,6), Vector(8,7)};
+Maze sample(mazeData_MM2013HX, false);
 #elif YEAR == 2014
 std::vector<Vector> goal = {Vector(26,5)};
 Maze sample(mazeData_MM2014HX);
@@ -380,7 +380,7 @@ std::vector<Vector> goal = {Vector(3,3)};
 Maze sample(mazeData_MM2016HX);
 #elif YEAR ==2017
 std::vector<Vector> goal = {Vector(19,20)};
-Maze sample(mazeData_MM2017HX, true);
+Maze sample(mazeData_MM2017HX);
 #endif
 #endif
 
@@ -441,7 +441,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 			auto usec = std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
 			if(max_usec < usec) max_usec = usec;
 			#if DISPLAY
-			usleep(50000); searchAlgorithm.printInfo();
+			usleep(10000); searchAlgorithm.printInfo();
 			// 要した時間をミリ秒（1/1000秒）に変換して表示
 			printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
 			printf("\x1b[A");
@@ -464,7 +464,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 			searchAlgorithm.updateCurVecDir(nextVec, nextDir);
 		}
 		#if DISPLAY
-		usleep(200000);
+		usleep(100000);
 		#endif
 	}
 	// queue Action::START_INIT
@@ -491,9 +491,9 @@ int main(void){
 	auto start = std::chrono::system_clock::now();
 	maze_backup.push_back(maze);
 	while(!searchRun());
-	searchAlgorithm.printInfo();
+	// searchAlgorithm.printInfo();
 	fastRun();
-	searchAlgorithm.printPath();
+	// searchAlgorithm.printPath();
 	auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
 	auto dur = end - start;        // 要した時間を計算
 	auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();

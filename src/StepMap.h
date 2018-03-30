@@ -32,6 +32,7 @@ namespace MazeLib {
 			for(int8_t y=0; y<MAZE_SIZE; y++)
 			for(int8_t x=0; x<MAZE_SIZE; x++)
 			setStep(x, y, step); //< ステップをクリア
+			calcStraightStepTable();
 		}
 		/** @function getStep
 		*  @param ステップへの参照の取得，書き込み可能
@@ -114,21 +115,25 @@ namespace MazeLib {
 					for(int i=0; true; i++){
 						if(maze.isWall(next, d)) break; //< 壁があったら更新はしない
 						if(onlyCanGo && !maze.isKnown(next, d)) break; //< onlyCanGoで未知壁なら更新はしない
-						// となりの区画のステップが注目する区画のステップ+1よりも大きければ更新
+						// となりの区画のステップが注目する区画のステップよりも大きければ更新
 						next = next.next(d); //< となりの区画のステップを取得
-						static const float factor = (sqrt((float)MAZE_SIZE) - sqrt((float)MAZE_SIZE-1));
-						int step = focus_step + sqrt((float)i+1) / factor;
-						if(getStep(next) > step){
-							setStep(next, step);
-							q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-
-						}
+						step_t step = focus_step + straightStepTable[i];
+						if(getStep(next) <= step) break; //< これより先，更新されることはない
+						setStep(next, step);
+						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
 					}
 				}
+			}
+		}
+		void calcStraightStepTable(){
+			for(int i=0; i<MAZE_SIZE; i++){
+				static const float factor = (sqrt((float)MAZE_SIZE) - sqrt((float)MAZE_SIZE-1));
+				straightStepTable[i] = sqrt((float)i+1) / factor;
 			}
 		}
 	private:
 		Maze& maze; /**< @brief 使用する迷路の参照 */
 		step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
+		step_t straightStepTable[MAZE_SIZE];
 	};
 }

@@ -120,7 +120,6 @@ namespace MazeLib {
 			shortestDirs.clear();
 			auto v = start;
 			auto dir = Dir(Dir::North);
-			auto prev_dir = Dir(Dir::North);
 			while(1){
 				step_t min_step = MAZE_STEP_MAX;
 				for(const auto& d: Dir::All()){
@@ -134,29 +133,10 @@ namespace MazeLib {
 				if(stepMapGoal.getStep(v) <= min_step) return false;
 				shortestDirs.push_back(dir);
 				v = v.next(dir);
-				// 直線優先のDirsを生成
-				// std::vector<Dir> dirs;
-				// if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir, Dir(dir+1)};
-				// else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir, Dir(dir+3)};
-				// else dirs={dir, Dir(dir+1), Dir(dir+3)};
-				// Vector& focus_v = v;
-				// StepMap& stepMap = stepMapGoal;
-				// std::vector<step_t> steps;
-				// for(const auto& d: dirs) if(maze.canGo(focus_v, d)) steps.push_back(stepMap.getStep(focus_v.next(d)));
-				// step_t min_step = *(std::min_element(steps.begin(), steps.end()));
-				// if(stepMap.getStep(focus_v) <= min_step) return false;
-				// auto it = std::find_if(dirs.begin(), dirs.end(), [&](const Dir& d){
-				// 	if(!maze.canGo(focus_v, d)) return false;
-				// 	return stepMap.getStep(focus_v.next(d)) == min_step;
-				// });
-				// if(it == dirs.end()) return false; //< 失敗
-				// prev_dir = dir;
-				// dir = *it;
-				// v = v.next(dir);
-				// shortestDirs.push_back(dir);
 				if(stepMapGoal.getStep(v) == 0) break; //< ゴール区画
 			}
 			// ゴール区画を行けるところまで直進する
+			auto prev_dir = dir;
 			bool loop = true;
 			while(loop){
 				loop = false;
@@ -284,20 +264,6 @@ namespace MazeLib {
 				if(stepMap.getStep(focus_v) <= min_step) break;
 				nextDirs.push_back(focus_d);
 				focus_v = focus_v.next(focus_d);
-
-				// auto dirs = focus_d.ordered();
-				// std::vector<step_t> steps;
-				// for(const auto& d: dirs) if(maze.canGo(focus_v, d)) steps.push_back(stepMap.getStep(focus_v.next(d)));
-				// step_t min_step = *(std::min_element(steps.begin(), steps.end()));
-				// if(stepMap.getStep(focus_v) <= min_step) break;
-				// auto it = std::find_if(dirs.begin(), dirs.end(), [&](const Dir& d){
-				// 	if(!maze.canGo(focus_v, d)) return false;
-				// 	return stepMap.getStep(focus_v.next(d)) == min_step;
-				// });
-				// if(it==dirs.end()) break;
-				// nextDirs.push_back(*it);
-				// focus_d = *it;
-				// focus_v = focus_v.next(*it);
 			}
 			return nextDirs;
 		}
@@ -305,6 +271,18 @@ namespace MazeLib {
 		*   @brief ステップマップにより最短経路上になりうる区画を洗い出す
 		*/
 		void findShortestCandidates(){
+			#if FIND_ALL_WALL
+			stepMapGoal.update(goal);
+			candidates.clear();
+			for(int i=0; i<MAZE_SIZE; i++){
+				for(int j=0; j<MAZE_SIZE; j++){
+					Vector v(i,j);
+					if(stepMapGoal.getStep(i, j) != MAZE_STEP_MAX && maze.unknownCount(v)){
+						candidates.push_back(v);
+					}
+				}
+			}
+			#else
 			stepMapStart.update({start});
 			stepMapGoal.update(goal);
 			candidates.clear();
@@ -314,17 +292,12 @@ namespace MazeLib {
 			for(int i=0; i<MAZE_SIZE; i++){
 				for(int j=0; j<MAZE_SIZE; j++){
 					Vector v(i,j);
-					#if FIND_ALL_WALL
-					if(stepMapGoal.getStep(i, j) != MAZE_STEP_MAX && maze.unknownCount(v)){
-						candidates.push_back(v);
-					}
-					#else
 					if(stepMapGoal.getStep(i, j) + stepMapStart.getStep(i, j) <= goal_step && maze.unknownCount(v)){
 						candidates.push_back(v);
 					}
-					#endif
 				}
 			}
+			#endif
 		}
 		/** @function calcNextDir
 		*   @brief 次に行くべき方向を計算する
