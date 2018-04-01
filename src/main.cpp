@@ -9,7 +9,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY 0
+#define DISPLAY 1
 #define MAZE_BACKUP_SIZE 5
 
 const char mazeData_fp2016[8+1][8+1] = { "6beab6ab", "4aaa3c37", "c2ab4a1d", "b8a35683", "6a2954b5", "57575c29", "5549ca17", "dc8aaa9d", };
@@ -148,22 +148,22 @@ extern const char mazeData_MM2017CX[16+1][16+1] = {
 };
 
 extern const char mazeData_Cheese2017[16+1][16+1] = {
-	"d1555553b9111113",
-	"d051557aa8000002",
-	"d410153828000002",
-	"b92a83aaa8000002",
-	"86c4682aa8000002",
-	"a9393e82a8000002",
-	"aac6c3eea8000002",
-	"aa9396bba8000002",
-	"a86ac382a8000002",
-	"869296aaa8000002",
-	"e96ac56aa8000002",
-	"9456953aa8000002",
-	"c393c3c2a8000002",
-	"bc46b83ea8000002",
-	"83bb82eba8000002",
-	"ec446c546c444446",
+	"e2aaaaa377777777",
+	"e0a2aab555555555",
+	"e8202a3415555555",
+	"7615435555555555",
+	"49c8941555555555",
+	"56363d4155555555",
+	"55c9c3dd55555555",
+	"5563697755555555",
+	"5495c34155555555",
+	"c961695555555555",
+	"6a9dca9555555555",
+	"5776363555555555",
+	"c000955555555555",
+	"7ddd694955555555",
+	"4377c3d755555555",
+	"dc88a8a89ddddddd",
 };
 
 const char mazeData_MM2013HX[32+1][32+1] = {
@@ -353,9 +353,9 @@ std::vector<Vector> goal = {Vector(2,2),Vector(2,3),Vector(3,2),Vector(3,3)};
 //Maze sample(mazeData_maze2013exp, false);
 // Maze sample(mazeData_2017_East_MC, true);
 // Maze sample(mazeData_MM2017CX, true);
-Maze sample(mazeData_Cheese2017, false);
+Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2014
+#define YEAR 2015
 #if YEAR == 2013
 std::vector<Vector> goal = {Vector(6,5), Vector(6,6), Vector(6,7), Vector(7,5), Vector(7,6), Vector(7,7), Vector(8,5), Vector(8,6), Vector(8,7)};
 Maze sample(mazeData_MM2013HX, false);
@@ -366,8 +366,8 @@ Maze sample(mazeData_MM2014HX);
 std::vector<Vector> goal = {Vector(7,24)};
 Maze sample(mazeData_MM2015HX);
 #elif YEAR ==2016
-std::vector<Vector> goal = {Vector(3,3)};
-// std::vector<Vector> goal = {Vector(31,31)};
+std::vector<Vector> goal = {Vector(1,2), Vector(1,3), Vector(1,4), Vector(2,2), Vector(2,3), Vector(2,4), Vector(3,2), Vector(3,3), Vector(3,4)};
+// std::vector<Vector> goal = {Vector(0,31)};
 Maze sample(mazeData_MM2016HX);
 #elif YEAR ==2017
 std::vector<Vector> goal = {Vector(19,20)};
@@ -392,7 +392,6 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	}
 	// conduct machine calibration
 	// move robot here
-	SearchAlgorithm::State prevState = searchAlgorithm.getState();
 	int count=0;
 	auto max_usec = 0;
 	while(1){
@@ -400,14 +399,17 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		// move robot here
 		const auto& v = searchAlgorithm.getCurVec();
 		const auto& d = searchAlgorithm.getCurDir();
-		searchAlgorithm.updateWall(v, d-1, sample.isWall(v, d-1)); // right
-		searchAlgorithm.updateWall(v, d+0, sample.isWall(v, d+0)); // front
-		searchAlgorithm.updateWall(v, d+1, sample.isWall(v, d+1)); // left
-		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop_front();
+		searchAlgorithm.updateWall(v, d+1, sample.isWall(v, d+1)); // left wall
+		searchAlgorithm.updateWall(v, d+0, sample.isWall(v, d+0)); // front wall
+		searchAlgorithm.updateWall(v, d-1, sample.isWall(v, d-1)); // right wall
 
+		SearchAlgorithm::State prevState = searchAlgorithm.getState();
 		auto start = std::chrono::system_clock::now();
 		searchAlgorithm.calcNextDir();
 		auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
+		auto dur = end - start;        // 要した時間を計算
+		auto usec = std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
+		if(max_usec < usec) max_usec = usec;
 		SearchAlgorithm::State newState = searchAlgorithm.getState();
 		if(newState != prevState && newState == SearchAlgorithm::REACHED_START) break;
 		if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ /* SEARCHING_ADDITIONALLY */ }
@@ -418,49 +420,49 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 			/* GOT_LOST ! */
 			// queue SearchRun::STOP
 			// move robot here
-			printf("Got Lost!");
-			searchAlgorithm.printInfo();
-			searchAlgorithm.printInfo();
+			// printf("Got Lost!");
+			// searchAlgorithm.printInfo();
+			// searchAlgorithm.printInfo();
 			while (1);
 			return false;
 		}
-		// backup the maze
-		maze_backup.push_back(maze);
 		// queue move actions
 		for(const auto& nextDir: nextDirs){
-			auto dur = end - start;        // 要した時間を計算
-			auto usec = std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
-			if(max_usec < usec) max_usec = usec;
 			#if DISPLAY
-			usleep(10000); searchAlgorithm.printInfo();
-			// 要した時間をミリ秒（1/1000秒）に変換して表示
-			printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
-			printf("\x1b[A");
+			usleep(10000);
+			searchAlgorithm.printInfo();
+			printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec); printf("\x1b[A");
 			#endif
 			auto nextVec = searchAlgorithm.getCurVec().next(nextDir);
 			switch (Dir(nextDir - searchAlgorithm.getCurDir())) {
-				case Dir::East:
+				case Dir::Forward:
 				// queue SearchRun::GO_STRAIGHT
 				break;
-				case Dir::North:
+				case Dir::Left:
 				// queue SearchRun::TURN_LEFT_90
 				break;
-				case Dir::West:
+				case Dir::Right:
 				// queue SearchRun::TURN_BACK
 				break;
-				case Dir::South:
+				case Dir::Back:
 				// queeu SearchRun::TURN_RIGHT_90
 				break;
 			}
 			searchAlgorithm.updateCurVecDir(nextVec, nextDir);
 		}
+		// backup the maze
+		maze_backup.push_back(maze);
+		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop_front();
 		#if DISPLAY
 		usleep(100000);
 		#endif
 	}
+	if (searchAlgorithm.getState() != SearchAlgorithm::REACHED_START) return false;
+	// backup maze to flash memory
 	// queue Action::START_INIT
+	searchAlgorithm.updateCurVecDir(Vector(0, 0), Dir::North);
 	// move robot here
-	// COMPLETE
+	// stop robot here
 	printf("the max is %5d [us]\n", max_usec);
 	return true;
 }
@@ -487,6 +489,9 @@ int main(void){
 	#else
 	// Maze sample2(mazeData_maze2013half, false);
 	// printf("diff: %d\n", maze.diffKnownWall(sample2));
+	StepMap stepMap(maze);
+	stepMap.update({Vector(0,31)});
+	stepMap.print();
 	#endif
 	return 0;
 }

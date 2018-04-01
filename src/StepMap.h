@@ -13,7 +13,7 @@ namespace MazeLib {
 	/** @def MAZE_STEP_MAX
 	*  @brief ステップマップの最大値
 	*/
-	#define MAZE_STEP_MAX  999
+	#define MAZE_STEP_MAX  9999
 	typedef uint16_t step_t; /**< @brief ステップマップの型 */
 
 	/** @class StepMap
@@ -74,21 +74,21 @@ namespace MazeLib {
 			printf("\n");
 			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
 				for(uint8_t x=0; x<MAZE_SIZE; x++)
-				printf("+%s" C_RESET, maze.isKnown(x,y,Dir::North) ? (maze.isWall(x,y,Dir::North)?"---":"   ") : C_RED " - ");
+				printf("+%s" C_RESET, maze.isKnown(x,y,Dir::North) ? (maze.isWall(x,y,Dir::North)?"----":"    ") : C_RED " - -");
 				printf("+\n");
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
 					printf("%s" C_RESET, maze.isKnown(x,y,Dir::West) ? (maze.isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
-					if(v==Vector(x, y)){
-						printf(" %s%c " C_RESET, C_YELLOW, v==Vector(x,y)?(">^<vX"[d]):' ');
-					}else{
-						printf("%s%3d" C_RESET, v==Vector(x,y)?C_YELLOW:C_CYAN, stepMap[y][x]);
-					}
+					// if(v==Vector(x, y)){
+					// 	printf(" %s%c " C_RESET, C_YELLOW, v==Vector(x,y)?(">^<vX"[d]):' ');
+					// }else{
+						printf("%s%4d" C_RESET, v==Vector(x,y)?C_YELLOW:C_CYAN, stepMap[y][x]);
+					// }
 				}
 				printf("%s" C_RESET, maze.isKnown(MAZE_SIZE-1,y,Dir::East) ? (maze.isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
 				printf("\n");
 			}
 			for(uint8_t x=0; x<MAZE_SIZE; x++)
-			printf("+%s" C_RESET, maze.isKnown(x,0,Dir::South) ? (maze.isWall(x,0,Dir::South)?"---":"   ") : C_RED " - ");
+			printf("+%s" C_RESET, maze.isKnown(x,0,Dir::South) ? (maze.isWall(x,0,Dir::South)?"----":"    ") : C_RED " - -");
 			printf("+\n");
 		}
 		/** @function update
@@ -113,7 +113,6 @@ namespace MazeLib {
 				const step_t& focus_step = getStep(focus);
 				// 4方向更新がないか調べる
 				for(const auto& d: Dir::All()){
-				// for(int8_t d=0; d<Dir::AbsMax; d++){
 					Vector next = focus;
 					for(int i=0; true; i++){
 						if(maze.isWall(next, d)) break; //< 壁があったら更新はしない
@@ -127,24 +126,118 @@ namespace MazeLib {
 						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
 						#else
 						if(getStep(next) > step){
-						setStep(next, step);
-						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+							setStep(next, step);
+							q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+						}
+						#endif
 					}
-					#endif
+				}
+				for(const auto& d: Dir::All()){
+					if(maze.isWall(focus, d)) continue; //< 壁があったら更新はしない
+					if(onlyCanGo && !maze.isKnown(focus, d)) continue; //< onlyCanGoで未知壁なら更新はしない
+					{
+						Vector next = focus.next(d);
+						for(int i=1; i<MAZE_SIZE; i++){
+							const Dir next_d = d+(i&1);
+							if(maze.isWall(next, next_d)) break; //< 壁があったら更新はしない
+							if(onlyCanGo && !maze.isKnown(next, next_d)) break; //< onlyCanGoで未知壁なら更新はしない
+							// となりの区画のステップが注目する区画のステップよりも大きければ更新
+							next = next.next(next_d); //< となりの区画のステップを取得
+							step_t step = focus_step + straightStepTable[i];
+							#if 1
+							if(getStep(next) <= step) break; //< これより先，更新されることはない
+							setStep(next, step);
+							q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+							#else
+							if(getStep(next) > step){
+								setStep(next, step);
+								q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+							}
+							#endif
+							// char c; scanf("%c", &c); print();
+						}
+					}
+					{
+						Vector next = focus.next(d);
+						for(int i=1; i<MAZE_SIZE; i++){
+							const Dir next_d = d-(i&1);
+							if(maze.isWall(next, next_d)) break; //< 壁があったら更新はしない
+							if(onlyCanGo && !maze.isKnown(next, next_d)) break; //< onlyCanGoで未知壁なら更新はしない
+							// となりの区画のステップが注目する区画のステップよりも大きければ更新
+							next = next.next(next_d); //< となりの区画のステップを取得
+							step_t step = focus_step + straightStepTable[i];
+							#if 1
+							if(getStep(next) <= step) break; //< これより先，更新されることはない
+							setStep(next, step);
+							q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+							#else
+							if(getStep(next) > step){
+								setStep(next, step);
+								q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+							}
+							#endif
+							// char c; scanf("%c", &c); print();
+						}
+					}
 				}
 			}
 		}
-	}
-	void calcStraightStepTable(){
-		for(int i=0; i<MAZE_SIZE; i++){
-			straightStepTable[i] = sqrt((float)i+1) * factor;
+		void updateSimple(const std::vector<Vector>& dest, const bool& onlyCanGo = false){
+			// 全区画のステップを最大値に設定
+			reset();
+			// となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
+			std::queue<Vector> q;
+			// destに含まれる区画のステップを0とする
+			for(const auto& v: dest) {
+				setStep(v, 0);
+				q.push(v);
+			}
+			// ステップの更新がなくなるまで更新処理
+			while(!q.empty()){
+				// 注目する区画を取得
+				const Vector& focus = q.front(); q.pop();
+				const step_t& focus_step = getStep(focus);
+				// 4方向更新がないか調べる
+				for(const auto& d: Dir::All()){
+					if(maze.isWall(focus, d)) continue; //< 壁があったら更新はしない
+					if(onlyCanGo && !maze.isKnown(focus, d)) continue; //< onlyCanGoで未知壁なら更新はしない
+					Vector next = focus.next(d);
+					step_t step = focus_step + 1;
+					if(getStep(next) > step){
+						setStep(next, step);
+						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
+					}
+				}
+			}
 		}
-	}
-public:
-	const float factor = 1.0f / (sqrt((float)MAZE_SIZE-1) - sqrt((float)MAZE_SIZE-2));
-private:
-	Maze& maze; /**< @brief 使用する迷路の参照 */
-	step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
-	step_t straightStepTable[MAZE_SIZE];
-};
+		void calcStraightStepTable(){
+			for(int i=0; i<MAZE_SIZE*2; i++){
+				float x = 90*(i+1);
+				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
+				// printf("%d: %d\n", i, straightStepTable[i]);
+			}
+			step_t max = 0;
+			step_t min = MAZE_STEP_MAX;
+			for(int i=0; i<MAZE_SIZE*2; i++){
+				float x = 90*(i+1);
+				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
+				step_t step = straightStepTable[i]+straightStepTable[MAZE_SIZE*2-1-i];
+				// printf("%d: %d\n", i, step);
+				if(max < step) max = step;
+				if(min > step) min = step;
+			}
+			extra = max-min;
+			// printf("factor: %f\n", factor);
+			// printf("min: %d, max: %d, extra: %d\n", min, max, extra);
+		}
+	public:
+		const float a = 12000;
+		const float v0 = 600;
+		const float factor = 1.0f / (sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2)/a) - sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2-1)/a));
+		step_t extra;
+	private:
+		Maze& maze; /**< @brief 使用する迷路の参照 */
+		step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
+		step_t straightStepTable[MAZE_SIZE*2];
+	};
 }
