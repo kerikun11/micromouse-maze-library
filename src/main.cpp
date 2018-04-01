@@ -9,7 +9,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY 1
+#define DISPLAY 0
 #define MAZE_BACKUP_SIZE 5
 
 const char mazeData_fp2016[8+1][8+1] = { "6beab6ab", "4aaa3c37", "c2ab4a1d", "b8a35683", "6a2954b5", "57575c29", "5549ca17", "dc8aaa9d", };
@@ -355,7 +355,7 @@ std::vector<Vector> goal = {Vector(2,2),Vector(2,3),Vector(3,2),Vector(3,3)};
 // Maze sample(mazeData_MM2017CX, true);
 Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2015
+#define YEAR 2016
 #if YEAR == 2013
 std::vector<Vector> goal = {Vector(6,5), Vector(6,6), Vector(6,7), Vector(7,5), Vector(7,6), Vector(7,7), Vector(8,5), Vector(8,6), Vector(8,7)};
 Maze sample(mazeData_MM2013HX, false);
@@ -380,6 +380,40 @@ Maze sample(mazeData_MM2017HX);
 Maze maze;
 std::deque<Maze> maze_backup;
 SearchAlgorithm searchAlgorithm(maze, goal);
+auto max_usec = 0;
+auto start = std::chrono::system_clock::now();
+auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
+auto usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+
+void queueActions(const std::vector<Dir>& nextDirs){
+	#if DISPLAY
+	usleep(100000);
+	#endif
+	for(const auto& nextDir: nextDirs){
+		#if DISPLAY
+		usleep(10000);
+		// char c; scanf("%c", &c);
+		searchAlgorithm.printInfo();
+		printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec); printf("\x1b[A");
+		#endif
+		auto nextVec = searchAlgorithm.getCurVec().next(nextDir);
+		switch (Dir(nextDir - searchAlgorithm.getCurDir())) {
+			case Dir::Forward:
+			// queue SearchRun::GO_STRAIGHT
+			break;
+			case Dir::Left:
+			// queue SearchRun::TURN_LEFT_90
+			break;
+			case Dir::Right:
+			// queeu SearchRun::TURN_RIGHT_90
+			break;
+			case Dir::Back:
+			// queue SearchRun::TURN_BACK
+			break;
+		}
+		searchAlgorithm.updateCurVecDir(nextVec, nextDir);
+	}
+}
 
 bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0, 0), const Dir& startDir = Dir::North){
 	searchAlgorithm.reset();
@@ -390,80 +424,67 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		// queue Action::START_STEP
 		searchAlgorithm.updateCurVecDir(startVec.next(startDir), startDir);
 	}
-	// conduct machine calibration
-	// move robot here
+	// キューの消化を開始する
 	int count=0;
-	auto max_usec = 0;
 	while(1){
-		// if(count++>10) return false; // for debug
-		// move robot here
+		// if(count++>50) return false; // for debug
+		SearchAlgorithm::State prevState = searchAlgorithm.getState();
+		start = std::chrono::system_clock::now();
+		searchAlgorithm.calcNextDir(); //< 時間がかかる処理！
+		end = std::chrono::system_clock::now();       // 計測終了時刻を保存
+		usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+		if(max_usec < usec) max_usec = usec;
+		SearchAlgorithm::State newState = searchAlgorithm.getState();
+		if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){
+			// backup maze to flash memory
+		}
+		if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){
+			// backup maze to flash memory
+		}
+		if(newState != prevState && newState == SearchAlgorithm::GOT_LOST){
+			// queue SearchRun::STOP
+			// move robot here
+			printf("Got Lost!");
+			while (1);
+			return false;
+		}
+
+		// 既知区間移動をキューにつめる
+		const auto& nextDirs = searchAlgorithm.getNextDirs();
+		queueActions(searchAlgorithm.getNextDirs());
+
+		 // 探索終了
+		if(searchAlgorithm.getState() == SearchAlgorithm::REACHED_START) break;
+
+		// ここでキューが消化されるまで待つ
+
+		// 壁を確認
 		const auto& v = searchAlgorithm.getCurVec();
 		const auto& d = searchAlgorithm.getCurDir();
 		searchAlgorithm.updateWall(v, d+1, sample.isWall(v, d+1)); // left wall
 		searchAlgorithm.updateWall(v, d+0, sample.isWall(v, d+0)); // front wall
 		searchAlgorithm.updateWall(v, d-1, sample.isWall(v, d-1)); // right wall
+		// 候補の中で行ける方向を探す
+		const auto nextDirsInAdvance = searchAlgorithm.getNextDirsInAdvance();
+		const auto nextDirInAdvance = *std::find_if(nextDirsInAdvance.begin(), nextDirsInAdvance.end(), [&](const Dir& dir){
+			return !maze.isWall(v, dir);
+		});
+		queueActions({nextDirInAdvance});
 
-		SearchAlgorithm::State prevState = searchAlgorithm.getState();
-		auto start = std::chrono::system_clock::now();
-		searchAlgorithm.calcNextDir();
-		auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
-		auto dur = end - start;        // 要した時間を計算
-		auto usec = std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
-		if(max_usec < usec) max_usec = usec;
-		SearchAlgorithm::State newState = searchAlgorithm.getState();
-		if(newState != prevState && newState == SearchAlgorithm::REACHED_START) break;
-		if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ /* SEARCHING_ADDITIONALLY */ }
-		if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){ /* BACKING_TO_START */ }
-		prevState = newState;
-		const auto& nextDirs = searchAlgorithm.getNextDirs();
-		if(nextDirs.empty()){
-			/* GOT_LOST ! */
-			// queue SearchRun::STOP
-			// move robot here
-			// printf("Got Lost!");
-			// searchAlgorithm.printInfo();
-			// searchAlgorithm.printInfo();
-			while (1);
-			return false;
-		}
-		// queue move actions
-		for(const auto& nextDir: nextDirs){
-			#if DISPLAY
-			usleep(10000);
-			searchAlgorithm.printInfo();
-			printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec); printf("\x1b[A");
-			#endif
-			auto nextVec = searchAlgorithm.getCurVec().next(nextDir);
-			switch (Dir(nextDir - searchAlgorithm.getCurDir())) {
-				case Dir::Forward:
-				// queue SearchRun::GO_STRAIGHT
-				break;
-				case Dir::Left:
-				// queue SearchRun::TURN_LEFT_90
-				break;
-				case Dir::Right:
-				// queue SearchRun::TURN_BACK
-				break;
-				case Dir::Back:
-				// queeu SearchRun::TURN_RIGHT_90
-				break;
-			}
-			searchAlgorithm.updateCurVecDir(nextVec, nextDir);
-		}
 		// backup the maze
 		maze_backup.push_back(maze);
 		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop_front();
-		#if DISPLAY
-		usleep(100000);
-		#endif
 	}
 	if (searchAlgorithm.getState() != SearchAlgorithm::REACHED_START) return false;
-	// backup maze to flash memory
 	// queue Action::START_INIT
 	searchAlgorithm.updateCurVecDir(Vector(0, 0), Dir::North);
 	// move robot here
 	// stop robot here
-	printf("the max is %5d [us]\n", max_usec);
+	// 最短経路が導出できるか確かめる
+	if (!searchAlgorithm.calcShortestDirs()) {
+		printf("Couldn't solve the maze!\n");
+		return false;
+	}
 	return true;
 }
 
@@ -479,11 +500,12 @@ bool fastRun(){
 #endif
 
 int main(void){
-	setvbuf(stdout, (char *)NULL, _IONBF, 0);
+	// setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
 	maze_backup.push_back(maze);
 	while(!searchRun());
 	searchAlgorithm.printInfo(false);
+	printf("the max is %5d [us]\n", max_usec);
 	fastRun();
 	searchAlgorithm.printPath();
 	#else
