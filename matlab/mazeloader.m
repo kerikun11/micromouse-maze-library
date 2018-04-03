@@ -18,7 +18,7 @@ trim = bw(ne:(se+size(rowsum,1)/2), we:(ee+size(colsum,2)/2));
 
 %% ノイズの除去と壁の膨張
 trim = imopen(trim, ones(3));   % 白点線を除去
-trim = imdilate(trim, ones(4)); % 白線を太くする
+trim = imdilate(trim, ones(8)); % 白線を太くする
 imshow(trim);
 
 %% 迷路サイズを検出
