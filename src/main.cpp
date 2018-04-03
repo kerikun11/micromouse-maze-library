@@ -378,7 +378,6 @@ Maze sample(mazeData_MM2017HX);
 #if 1
 
 Maze maze;
-std::deque<Maze> maze_backup;
 SearchAlgorithm searchAlgorithm(maze, goal);
 auto max_usec = 0;
 auto start = std::chrono::system_clock::now();
@@ -492,10 +491,6 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 			return !maze.isWall(v, dir);
 		});
 		queueActions({nextDirInAdvance});
-
-		// backup the maze
-		maze_backup.push_back(maze);
-		if(maze_backup.size()>MAZE_BACKUP_SIZE) maze_backup.pop_front();
 	}
 	/* queue Action::START_INIT */
 	searchAlgorithm.updateCurVecDir(Vector(0, 0), Dir::North);
@@ -525,7 +520,6 @@ bool fastRun(){
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
-	maze_backup.push_back(maze);
 	while(!searchRun());
 	searchAlgorithm.printInfo(false);
 	printf("the max is %5d [us]\n", max_usec);
