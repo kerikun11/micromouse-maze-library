@@ -166,6 +166,41 @@ extern const char mazeData_Cheese2017[16+1][16+1] = {
 	"dc88a8a89ddddddd",
 };
 
+const char mazeData_MM2012HX[32+1][32+1] = {
+	"eaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",
+	"6363636363636aaa363f6aa2a36aaaa3",
+	"54141414141416a355ca8abca88aaa35",
+	"55414141414155e8956aaaaa3636a295",
+	"5554141414141caaa9563623555c3c35",
+	"49c9c9c9c9ddcaaaa355540155569695",
+	"56362222236aaaaaa9c95c095408bca1",
+	"555400000156aaaaaaaa961695caaa35",
+	"5554000001542aaaaaaa3555696aaa15",
+	"55540000015556b6a23694155696aa95",
+	"5554000001555d6969496955c9616aa1",
+	"555c88888955569696969614a2155635",
+	"55caaaaaaa9549696969695569555555",
+	"5caa2aaaaaa896969696975556955555",
+	"4363caaaaaaaa96968297555c8a9c9c1",
+	"5554aaa36236a2968296881caaaaaa35",
+	"5c9caa35554169682960235622236355",
+	"4aaaaa9c9c9c968a9755555400015555",
+	"436aaaaaaaaaa0222000809400015555",
+	"5556aaaaaaaa3dddd55d683400015c95",
+	"55556aaaaaa35622355682940001ca35",
+	"555556aaaa355400155c283400016355",
+	"5555556aa3555400155e829400015555",
+	"555555563555540015563c3400015555",
+	"55555555555554001555569c88895555",
+	"555555c95555540015555caaaaaa9c95",
+	"55555caa955554001555ca2a2a2aaa21",
+	"5555caaaa9555400155ca34a0a82aa15",
+	"555caaaaaa9554001556a14a1ea1ea15",
+	"55caaaaaaaa95c889c94a9ca1ea1ea01",
+	"54aaaaaaaaaa96aaaaa8aaaa8aa8a295",
+	"dcaaaaaaaaaaa8aaaaaaaaaaaaaaa8a9",
+};
+
 const char mazeData_MM2013HX[32+1][32+1] = {
 	"95555115555555395555555395555393",
 	"a9153aa9515153aa9515153aa955382a",
@@ -355,8 +390,11 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2013
-#if YEAR == 2013
+#define YEAR 2012
+#if YEAR == 2012
+std::vector<Vector> goal = {Vector(22,25)};
+Maze sample(mazeData_MM2012HX);
+#elif YEAR == 2014
 std::vector<Vector> goal = {Vector(6,5), Vector(6,6), Vector(6,7), Vector(7,5), Vector(7,6), Vector(7,7), Vector(8,5), Vector(8,6), Vector(8,7)};
 Maze sample(mazeData_MM2013HX, false);
 #elif YEAR == 2014
@@ -383,34 +421,44 @@ auto max_usec = 0;
 auto start = std::chrono::system_clock::now();
 auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
 auto usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
+int wall_log=0,log_max=0;
 
 void queueActions(const std::vector<Dir>& nextDirs){
 	#if DISPLAY
-	// usleep(200000);
+	usleep(200000);
 	#endif
 	for(const auto& nextDir: nextDirs){
 		#if DISPLAY
 		// char c; scanf("%c", &c);
 		searchAlgorithm.printInfo();
-		printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec); printf("\x1b[A");
-		// usleep(100000);
+		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
+		printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
+		printf("wall_log: %5d, log_max: %5d\n", wall_log, log_max);
+		usleep(100000);
 		#endif
 		auto nextVec = searchAlgorithm.getCurVec().next(nextDir);
 		switch (Dir(nextDir - searchAlgorithm.getCurDir())) {
 			case Dir::Forward:
 			/* queue SearchRun::GO_STRAIGHT */
+			f++;
 			break;
 			case Dir::Left:
 			/* queue SearchRun::TURN_LEFT_90 */
+			l++;
 			break;
 			case Dir::Right:
 			/* queeu SearchRun::TURN_RIGHT_90 */
+			r++;
 			break;
 			case Dir::Back:
 			/* queue SearchRun::TURN_BACK */
+			b++;
+			wall_log=0;
 			break;
 		}
 		searchAlgorithm.updateCurVecDir(nextVec, nextDir);
+		step++;
 	}
 }
 
@@ -472,6 +520,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 
 		// 既知区間移動をキューにつめる
 		queueActions(searchAlgorithm.getNextDirs());
+		k += searchAlgorithm.getNextDirs().size();
 
 		// reached start and searching finised
 		if(v == Vector(0, 0)) break;
@@ -479,9 +528,13 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		/* wait for queue being empty */
 
 		// find walls
+		if(!maze.isKnown(v, d+1)) wall_log++;
+		if(!maze.isKnown(v, d+0)) wall_log++;
+		if(!maze.isKnown(v, d-1)) wall_log++;
 		searchAlgorithm.updateWall(v, d+1, sample.isWall(v, d+1)); // left wall
 		searchAlgorithm.updateWall(v, d+0, sample.isWall(v, d+0)); // front wall
 		searchAlgorithm.updateWall(v, d-1, sample.isWall(v, d-1)); // right wall
+		if(log_max < wall_log) log_max = wall_log;
 		// if(!maze.isWall(v,d)) searchAlgorithm.updateWall(v.next(d), d, sample.isWall(v.next(d), d)); // front wall
 		/* backup the wall */
 
@@ -523,7 +576,10 @@ int main(void){
 	while(!searchRun());
 	searchAlgorithm.printInfo();
 	printf("the max is %5d [us]\n", max_usec);
+	printf("the log_max is %5d\n", log_max);
 	fastRun();
+	searchAlgorithm.printPath();
+	searchAlgorithm.calcShortestDirs(false);
 	searchAlgorithm.printPath();
 	#else
 	// Maze sample2(mazeData_maze2013half, false);
