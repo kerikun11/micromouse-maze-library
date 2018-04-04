@@ -9,7 +9,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY 1
+#define DISPLAY 0
 #define MAZE_BACKUP_SIZE 5
 
 const char mazeData_fp2016[8+1][8+1] = { "6beab6ab", "4aaa3c37", "c2ab4a1d", "b8a35683", "6a2954b5", "57575c29", "5549ca17", "dc8aaa9d", };
@@ -355,7 +355,7 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2014
+#define YEAR 2013
 #if YEAR == 2013
 std::vector<Vector> goal = {Vector(6,5), Vector(6,6), Vector(6,7), Vector(7,5), Vector(7,6), Vector(7,7), Vector(8,5), Vector(8,6), Vector(8,7)};
 Maze sample(mazeData_MM2013HX, false);
@@ -521,7 +521,7 @@ int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
 	while(!searchRun());
-	searchAlgorithm.printInfo(false);
+	searchAlgorithm.printInfo();
 	printf("the max is %5d [us]\n", max_usec);
 	fastRun();
 	searchAlgorithm.printPath();
