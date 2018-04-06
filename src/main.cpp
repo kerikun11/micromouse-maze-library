@@ -390,11 +390,11 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2012
+#define YEAR 2014
 #if YEAR == 2012
 std::vector<Vector> goal = {Vector(22,25)};
 Maze sample(mazeData_MM2012HX);
-#elif YEAR == 2014
+#elif YEAR == 2013
 std::vector<Vector> goal = {Vector(6,5), Vector(6,6), Vector(6,7), Vector(7,5), Vector(7,6), Vector(7,7), Vector(8,5), Vector(8,6), Vector(8,7)};
 Maze sample(mazeData_MM2013HX, false);
 #elif YEAR == 2014
@@ -426,7 +426,7 @@ int wall_log=0,log_max=0;
 
 void queueActions(const std::vector<Dir>& nextDirs){
 	#if DISPLAY
-	usleep(200000);
+	// usleep(200000);
 	#endif
 	for(const auto& nextDir: nextDirs){
 		#if DISPLAY

@@ -138,11 +138,7 @@ namespace MazeLib {
 			auto prev_dir = dir;
 			while(1){
 				step_t min_step = MAZE_STEP_MAX;
-				// for(const auto& d: Dir::All()){
-				std::vector<Dir> dirs;
-				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir, Dir(dir+1)};
-				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir, Dir(dir+3)};
-				else dirs={dir, Dir(dir+1), Dir(dir+3)};
+				const auto& dirs = dir.ordered(prev_dir);
 				prev_dir = dir;
 				for(const auto& d: dirs){
 					if(!maze.canGo(v, d)) continue;
@@ -162,16 +158,19 @@ namespace MazeLib {
 			while(loop){
 				loop = false;
 				std::vector<Dir> dirs;
-				if(Dir(dir-prev_dir)==Dir::Left) dirs={Dir(dir+3), dir};
-				else if(Dir(dir-prev_dir)==Dir::Right) dirs={Dir(dir+1), dir};
-				else dirs={dir};
-				for(auto& d: dirs){
+				switch (Dir(dir-prev_dir)) {
+					case Dir::Left: dirs = {dir.getRelative(Dir::Right), dir}; break;
+					case Dir::Right: dirs = {dir.getRelative(Dir::Left), dir}; break;
+					case Dir::Forward: default: dirs = {dir}; break;
+				}
+				for(const auto& d: dirs){
 					if(maze.canGo(v, d)){
 						shortestDirs.push_back(d);
-						v=v.next(d);
+						v = v.next(d);
 						prev_dir = dir;
 						dir = d;
 						loop = true;
+						break;
 					}
 				}
 			}
