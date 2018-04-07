@@ -138,8 +138,8 @@ namespace MazeLib {
 		*   @return 成功 or 失敗
 		*/
 		bool calcShortestDirs(std::vector<Dir>& shortestDirs, const bool diagonal = true){
-			stepMapGoal.update(goal, true, diagonal);
-			// stepMapGoal.update(goal, false, diagonal); //< for debug
+			// stepMapGoal.update(goal, true, diagonal);
+			stepMapGoal.update(goal, false, diagonal); //< for debug
 			shortestDirs.clear();
 			auto v = start;
 			Dir dir = Dir::North;
@@ -257,24 +257,54 @@ namespace MazeLib {
 		/** @function findShortestCandidates
 		*   @brief ステップマップにより最短経路上になりうる区画を洗い出す
 		*/
-		void findShortestCandidates(){
-			stepMapStart.update({start});
-			stepMapGoal.update(goal);
+		bool findShortestCandidates(){
 			candidates.clear();
-			std::vector<step_t> goal_steps;
-			for(const auto& g: goal) goal_steps.push_back(stepMapStart.getStep(g));
-			step_t goal_step = *(std::min_element(goal_steps.begin(), goal_steps.end()));
-			for(int i=0; i<MAZE_SIZE; i++){
-				for(int j=0; j<MAZE_SIZE; j++){
-					Vector v(i,j);
-					#if FIND_ALL_WALL
-					if(stepMapGoal.getStep(i, j) != MAZE_STEP_MAX && maze.unknownCount(v)) candidates.push_back(v);
-					#else
-					if(stepMapGoal.getStep(i, j)+stepMapStart.getStep(i, j) <= goal_step+stepMapStart.extra && maze.unknownCount(v)) candidates.push_back(v);
-					if(stepMapGoal.getStep(i, j)+stepMapStart.getStep(i, j) <= goal_step && maze.unknownCount(v)) candidates.push_back(v);
-					#endif
+			for(const bool diagonal: {true, false}){
+				stepMapGoal.update(goal, false, diagonal);
+				auto v = start;
+				Dir dir = Dir::North;
+				auto prev_dir = dir;
+				while(1){
+					step_t min_step = MAZE_STEP_MAX;
+					const auto& dirs = dir.ordered(prev_dir);
+					prev_dir = dir;
+					for(const auto& d: dirs){
+						if(maze.isWall(v, d)) continue;
+						step_t next_step = stepMapGoal.getStep(v.next(d));
+						if(min_step > next_step) {
+							min_step = next_step;
+							dir = d;
+						}
+					}
+					if(stepMapGoal.getStep(v) <= min_step) return false; //< 失敗
+					if(maze.unknownCount(v)) candidates.push_back(v);
+					v = v.next(dir);
+					if(stepMapGoal.getStep(v) == 0) break; //< ゴール区画
+				}
+				// ゴール区画を行けるところまで直進する
+				bool loop = true;
+				while(loop){
+					loop = false;
+					std::vector<Dir> dirs;
+					switch (Dir(dir-prev_dir)) {
+						case Dir::Left: dirs = {dir.getRelative(Dir::Right), dir}; break;
+						case Dir::Right: dirs = {dir.getRelative(Dir::Left), dir}; break;
+						case Dir::Forward: default: dirs = {dir}; break;
+					}
+					if(!diagonal) dirs = {dir};
+					for(const auto& d: dirs){
+						if(!maze.isWall(v, d)){
+							if(maze.unknownCount(v)) candidates.push_back(v);
+							v = v.next(d);
+							prev_dir = dir;
+							dir = d;
+							loop = true;
+							break;
+						}
+					}
 				}
 			}
+			return true;
 		}
 	};
 }
