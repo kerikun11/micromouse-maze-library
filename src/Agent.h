@@ -8,12 +8,12 @@ namespace MazeLib {
   public:
     Agent(Maze& maze, std::vector<Vector>& goal)
     : maze(maze), searchAlgorithm(maze, goal) {}
-		/** @function getState
-		*   @brief 探索状態の取得
-		*/
-		const SearchAlgorithm::State& getState() const {
-			return state;
-		}
+    /** @function getState
+    *   @brief 探索状態の取得
+    */
+    const SearchAlgorithm::State& getState() const {
+      return state;
+    }
     void reset(){
       state = SearchAlgorithm::IDOLE;
       updateCurVecDir(Vector(0, 0), Dir::North);
@@ -23,7 +23,7 @@ namespace MazeLib {
     *   @param v 区画座標
     *   @param d 絶対方向
     */
-    void updateCurVecDir(const Vector& v, const Dir& d){ curVec = v; curDir=d; }
+    void updateCurVecDir(const Vector& v, const Dir& d){ curVec = v; curDir = d; }
     /** @function updateWall
     *   @brief 絶対座標絶対方向で壁の1枚更新
     *   @param v 区画座標
@@ -49,7 +49,7 @@ namespace MazeLib {
     *   @return 探索状態
     */
     bool calcNextDirs(){
-      return searchAlgorithm.calcNextDirs(state, curVec, curDir, nextDirs, nextDirsInAdvance);
+      return searchAlgorithm.calcNextDirs(state, curVec, curDir, nextDirs, nextDirsInAdvance, isForceBackToStart);
     }
     bool calcShortestDirs(const bool diagonal = true){
       return searchAlgorithm.calcShortestDirs(shortestDirs, diagonal);
@@ -59,45 +59,45 @@ namespace MazeLib {
     *   時間が残りわずかな時などに使う
     */
     void forceBackToStart(){
-      state = SearchAlgorithm::FORCE_BACKING_TO_START;
+      isForceBackToStart = true;
     }
-		/** @function getNextDirs
-		*   @brief 次に行くべき方向配列の計算結果を取得
-		*/
-		const std::vector<Dir>& getNextDirs() const {
-			return nextDirs;
-		}
-		/** @function getNextDirs
-		*   @brief 次に行くべき方向配列の計算結果を取得
-		*/
-		const std::vector<Dir>& getNextDirsInAdvance() const {
-			return nextDirsInAdvance;
-		}
-		/** @function getCurVec
-		*   @brief 現在区画を取得
-		*/
-		const Vector& getCurVec() const {
-			return curVec;
-		}
-		/** @function getCurDir
-		*   @brief 現在の方向を取得
-		*/
-		const Dir& getCurDir() const {
-			return curDir;
-		}
-		/** @function getNextDirs
-		*   @brief 最短経路の方向配列の計算結果を取得
-		*/
-		const std::vector<Dir>& getShortestDirs() const {
-			return shortestDirs;
-		}
-		/** @function printInfo
-		*   @brief 探索状態を表示
-		*   @param showMaze true:迷路も表示, false:迷路は非表示
-		*/
-		void printInfo(const bool& showMaze = true) const {
+    /** @function getNextDirs
+    *   @brief 次に行くべき方向配列の計算結果を取得
+    */
+    const std::vector<Dir>& getNextDirs() const {
+      return nextDirs;
+    }
+    /** @function getNextDirs
+    *   @brief 次に行くべき方向配列の計算結果を取得
+    */
+    const std::vector<Dir>& getNextDirsInAdvance() const {
+      return nextDirsInAdvance;
+    }
+    /** @function getCurVec
+    *   @brief 現在区画を取得
+    */
+    const Vector& getCurVec() const {
+      return curVec;
+    }
+    /** @function getCurDir
+    *   @brief 現在の方向を取得
+    */
+    const Dir& getCurDir() const {
+      return curDir;
+    }
+    /** @function getNextDirs
+    *   @brief 最短経路の方向配列の計算結果を取得
+    */
+    const std::vector<Dir>& getShortestDirs() const {
+      return shortestDirs;
+    }
+    /** @function printInfo
+    *   @brief 探索状態を表示
+    *   @param showMaze true:迷路も表示, false:迷路は非表示
+    */
+    void printInfo(const bool& showMaze = true) const {
       for(int i=0; i<8; i++) printf("\x1b[A");
-			if(showMaze){
+      if(showMaze){
         searchAlgorithm.printMap(state, curVec, curDir);
       }
       printf("Cur: ( %2d, %2d,  %c), State: %s       \n", curVec.x, curVec.y, ">^<v"[curDir], SearchAlgorithm::stateString(state));
@@ -114,7 +114,7 @@ namespace MazeLib {
     void printPath() const {
       //for(int i=0; i<MAZE_SIZE*2+5; i++) printf("\x1b[A");
       maze.printPath(Vector(0, 0), shortestDirs);
-      printf("Shortest Step: %d\n", shortestDirs.size()-1);
+      printf("Shortest Step: %d\n", shortestDirs.size());
     }
     std::vector<WallLog>& getWallLog(){
       return wallLog;
@@ -129,5 +129,6 @@ namespace MazeLib {
     std::vector<Dir> nextDirs; /**< 次に行くべき探索方向配列 */
     std::vector<Dir> nextDirsInAdvance; /**< 最短経路の方向配列 */
     std::vector<Dir> shortestDirs; /**< 最短経路の方向配列 */
+    bool isForceBackToStart = false;
   };
 }

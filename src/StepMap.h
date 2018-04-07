@@ -113,72 +113,46 @@ namespace MazeLib {
 				const step_t& focus_step = getStep(focus);
 				// 4方向更新がないか調べる
 				for(const auto& d: Dir::All()){
+					if(maze.isWall(focus, d)) continue; //< 壁があったら更新はしない
+					if(onlyCanGo && !maze.isKnown(focus, d)) continue; //< onlyCanGoで未知壁なら更新はしない
+					// 直線で行けるところまで更新する
 					Vector next = focus;
-					for(int i=0; true; i++){
+					for(int i=1; i<MAZE_SIZE; i++){
 						if(maze.isWall(next, d)) break; //< 壁があったら更新はしない
 						if(onlyCanGo && !maze.isKnown(next, d)) break; //< onlyCanGoで未知壁なら更新はしない
 						// となりの区画のステップが注目する区画のステップよりも大きければ更新
 						next = next.next(d); //< となりの区画のステップを取得
 						step_t step = focus_step + straightStepTable[i];
-						#if 1
 						if(getStep(next) <= step) break; //< これより先，更新されることはない
 						setStep(next, step);
 						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-						#else
-						if(getStep(next) > step){
-							setStep(next, step);
-							q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-						}
-						#endif
 					}
-				}
-				if(!diagonal) continue;
-				for(const auto& d: Dir::All()){
-					if(maze.isWall(focus, d)) continue; //< 壁があったら更新はしない
-					if(onlyCanGo && !maze.isKnown(focus, d)) continue; //< onlyCanGoで未知壁なら更新はしない
-					{
-						Vector next = focus.next(d);
-						for(int i=1; i<MAZE_SIZE; i++){
-							const Dir next_d = d+(i&1);
-							if(maze.isWall(next, next_d)) break; //< 壁があったら更新はしない
-							if(onlyCanGo && !maze.isKnown(next, next_d)) break; //< onlyCanGoで未知壁なら更新はしない
-							// となりの区画のステップが注目する区画のステップよりも大きければ更新
-							next = next.next(next_d); //< となりの区画のステップを取得
-							step_t step = focus_step + straightStepTable[i]+1;
-							#if 1
-							if(getStep(next) < step) break; //< これより先，更新されることはない
-							setStep(next, step);
-							q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-							#else
-							if(getStep(next) > step){
-								setStep(next, step);
-								q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-							}
-							#endif
-							// char c; scanf("%c", &c); print();
-						}
+					if(!diagonal) continue; //< 斜めなしの場合
+					// 斜め直線で行けるところまで更新する
+					next = focus.next(d);
+					for(int i=1; i<MAZE_SIZE*2; i++){
+						const Dir next_d = d+(i&1);
+						if(maze.isWall(next, next_d)) break; //< 壁があったら更新はしない
+						if(onlyCanGo && !maze.isKnown(next, next_d)) break; //< onlyCanGoで未知壁なら更新はしない
+						// となりの区画のステップが注目する区画のステップよりも大きければ更新
+						next = next.next(next_d); //< となりの区画のステップを取得
+						step_t step = focus_step + straightStepTable[i+1]+1;
+						if(getStep(next) < step) break; //< これより先，更新されることはない
+						setStep(next, step);
+						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
 					}
-					{
-						Vector next = focus.next(d);
-						for(int i=1; i<MAZE_SIZE; i++){
-							const Dir next_d = d-(i&1);
-							if(maze.isWall(next, next_d)) break; //< 壁があったら更新はしない
-							if(onlyCanGo && !maze.isKnown(next, next_d)) break; //< onlyCanGoで未知壁なら更新はしない
-							// となりの区画のステップが注目する区画のステップよりも大きければ更新
-							next = next.next(next_d); //< となりの区画のステップを取得
-							step_t step = focus_step + straightStepTable[i]+1;
-							#if 1
-							if(getStep(next) < step) break; //< これより先，更新されることはない
-							setStep(next, step);
-							q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-							#else
-							if(getStep(next) > step){
-								setStep(next, step);
-								q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-							}
-							#endif
-							// char c; scanf("%c", &c); print();
-						}
+					// 斜め直線で行けるところまで更新する
+					next = focus.next(d);
+					for(int i=1; i<MAZE_SIZE*2; i++){
+						const Dir next_d = d-(i&1);
+						if(maze.isWall(next, next_d)) break; //< 壁があったら更新はしない
+						if(onlyCanGo && !maze.isKnown(next, next_d)) break; //< onlyCanGoで未知壁なら更新はしない
+						// となりの区画のステップが注目する区画のステップよりも大きければ更新
+						next = next.next(next_d); //< となりの区画のステップを取得
+						step_t step = focus_step + straightStepTable[i+1]+1;
+						if(getStep(next) < step) break; //< これより先，更新されることはない
+						setStep(next, step);
+						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
 					}
 				}
 			}

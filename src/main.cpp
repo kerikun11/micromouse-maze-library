@@ -11,8 +11,8 @@
 
 using namespace MazeLib;
 
-#define DISPLAY 0
-#define MAZE_BACKUP_SIZE 5
+#define DISPLAY						0
+#define MAZE_BACKUP_SIZE	5
 
 #if MAZE_SIZE == 8
 std::vector<Vector> goal = {Vector(7,7)};
@@ -29,7 +29,7 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2013
+#define YEAR 2017
 #if YEAR == 2012
 std::vector<Vector> goal = {Vector(22,25)};
 Maze sample(mazeData_MM2012HX);
@@ -44,10 +44,11 @@ std::vector<Vector> goal = {Vector(7,24)};
 Maze sample(mazeData_MM2015HX);
 #elif YEAR == 2016
 std::vector<Vector> goal = {Vector(1,2), Vector(1,3), Vector(1,4), Vector(2,2), Vector(2,3), Vector(2,4), Vector(3,2), Vector(3,3), Vector(3,4)};
-// std::vector<Vector> goal = {Vector(0,31)};
+// std::vector<Vector> goal = {Vector(1,2)};
 Maze sample(mazeData_MM2016HX);
 #elif YEAR == 2017
-std::vector<Vector> goal = {Vector(19,20)};
+std::vector<Vector> goal = {Vector(19,20), Vector(19,21), Vector(19,22), Vector(20,20), Vector(20,21), Vector(20,22), Vector(21,20), Vector(21,21), Vector(21,22)};
+// std::vector<Vector> goal = {Vector(19,20)};
 Maze sample(mazeData_MM2017HX);
 #endif
 #endif
@@ -132,22 +133,12 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		const auto& d = agent.getCurDir();
 		SearchAlgorithm::State prevState = agent.getState();
 		start = std::chrono::system_clock::now();
-		agent.calcNextDirs(); //< 時間がかかる処理！
+		const auto result = agent.calcNextDirs(); //< 時間がかかる処理！
 		end = std::chrono::system_clock::now();
 		usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
 		if(max_usec < usec) max_usec = usec;
 		SearchAlgorithm::State newState = agent.getState();
-		if(newState != prevState && newState == SearchAlgorithm::REACHED_GOAL){
-		}
-		if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){
-			stopAndSaveMaze();
-			continue;
-		}
-		if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){
-			stopAndSaveMaze();
-			continue;
-		}
-		if(newState != prevState && newState == SearchAlgorithm::GOT_LOST){
+		if(!result) {
 			/* queue SearchRun::STOP */
 			/* wait for queue being empty */
 			/* stop the robot */
@@ -156,6 +147,9 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 			while (1);
 			return false;
 		}
+		if(newState != prevState && newState == SearchAlgorithm::REACHED_GOAL){ }
+		if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ }
+		if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){ }
 
 		// 既知区間移動をキューにつめる
 		queueActions(agent.getNextDirs());
@@ -180,7 +174,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		// 候補の中で行ける方向を探す
 		const auto nextDirsInAdvance = agent.getNextDirsInAdvance();
 		const auto nextDirInAdvance = *std::find_if(nextDirsInAdvance.begin(), nextDirsInAdvance.end(), [&](const Dir& dir){
-			return !maze.isWall(v, dir);
+			return maze.canGo(v, dir);
 		});
 		queueActions({nextDirInAdvance});
 	}
@@ -213,7 +207,9 @@ int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
 	while(!searchRun());
+	// agent.printInfo(false);
 	agent.printInfo();
+	printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 	printf("the max is %5d [us]\n", max_usec);
 	printf("the log_max is %5d\n", log_max);
 	fastRun();
