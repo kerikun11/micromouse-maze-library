@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdint>
-#include "Maze.h"
-#include "Agent.h"
+#include "MazeLib/Maze.h"
+#include "MazeLib/Agent.h"
 
 #include "mazedata.h"
 
@@ -64,6 +64,19 @@ int wall_log=0,log_max=0;
 
 #if 1
 
+void stopAndSaveMaze(){
+	/* queue Action::STOP */
+	/* wait for queue being empty */
+	/* stop the robot */
+	/* backup maze to flash memory */
+	// const auto& v = agent.getCurVec();
+	// const auto& d = agent.getCurDir();
+	// agent.updateCurVecDir(v.next(d + 2), d + 2); // u-turn
+	/* queue Action::RETURN */
+	/* queue Action::GO_HALF */
+	/* start the robot */
+}
+
 void queueActions(const std::vector<Dir>& nextDirs){
 	#if DISPLAY
 	// usleep(200000);
@@ -77,7 +90,7 @@ void queueActions(const std::vector<Dir>& nextDirs){
 		printf("wall_log: %5d, log_max: %5d\n", wall_log, log_max);
 		usleep(100000);
 		#endif
-		auto nextVec = agent.getCurVec().next(nextDir);
+		const auto& nextVec = agent.getCurVec().next(nextDir);
 		switch (Dir(nextDir - agent.getCurDir())) {
 			case Dir::Forward:
 			/* queue SearchRun::GO_STRAIGHT */
@@ -102,19 +115,6 @@ void queueActions(const std::vector<Dir>& nextDirs){
 	}
 }
 
-void stopAndSaveMaze(){
-	/* queue Action::STOP */
-	/* wait for queue being empty */
-	/* stop the robot */
-	/* backup maze to flash memory */
-	const auto& v = agent.getCurVec();
-	const auto& d = agent.getCurDir();
-	agent.updateCurVecDir(v.next(d + 2), d + 2); // u-turn
-	/* queue Action::RETURN */
-	/* queue Action::GO_HALF */
-	/* start the robot */
-}
-
 bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0, 0), const Dir& startDir = Dir::North){
 	agent.reset();
 	agent.updateCurVecDir(startVec, startDir);
@@ -127,6 +127,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	/* conduct calibration of sensors */
 	/* start the robot */
 	int count=0;
+	// agent.forceBackToStart(); // for debug
 	while(1){
 		// if(count++>50) return false; // for debug
 		const auto& v = agent.getCurVec();
@@ -184,11 +185,6 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	/* wait for queue being empty */
 	/* stop the robot */
 	/* backup the maze */
-	// 最短経路が導出できるか確かめる
-	if (!agent.calcShortestDirs()) {
-		printf("Couldn't solve the maze!\n");
-		return false;
-	}
 	return true;
 }
 

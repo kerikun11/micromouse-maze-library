@@ -6,7 +6,7 @@
 namespace MazeLib {
   class Agent{
   public:
-    Agent(Maze& maze, std::vector<Vector>& goal)
+    Agent(Maze& maze, const std::vector<Vector>& goal)
     : maze(maze), searchAlgorithm(maze, goal) {}
     /** @function getState
     *   @brief 探索状態の取得
@@ -17,6 +17,10 @@ namespace MazeLib {
     void reset(){
       state = SearchAlgorithm::IDOLE;
       updateCurVecDir(Vector(0, 0), Dir::North);
+    }
+    void reset(const std::vector<Vector>& goal) {
+      searchAlgorithm.setGoal(goal);
+      reset();
     }
     /** @function updateCurVecDir
     *   @brief 現在地を更新

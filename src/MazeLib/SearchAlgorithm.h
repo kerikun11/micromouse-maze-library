@@ -74,9 +74,6 @@ namespace MazeLib {
 		bool calcNextDirs(enum State& state, const Vector& pv, const Dir& pd, std::vector<Dir>& nextDirs, std::vector<Dir>& nextDirsInAdvance, const bool isForceBackToStart = false) {
 			if(state == IDOLE){
 				state = SEARCHING_FOR_GOAL;
-				// ゴール区画が探索済みなら次のstateへ
-				const auto unknownGoal = std::find_if(goal.begin(), goal.end(), [&](const Vector& v){ return maze.unknownCount(v); });
-				if(unknownGoal == goal.end()) state = SEARCHING_ADDITIONALLY;
 				#if SEARCHING_ADDITIALLY_AT_START
 				state = SEARCHING_ADDITIONALLY;
 				#endif
@@ -85,13 +82,16 @@ namespace MazeLib {
 			}
 
 			if(state == SEARCHING_FOR_GOAL){
+				// ゴール区画が探索済みなら次のstateへ
+				const auto unknownGoal = std::find_if(goal.begin(), goal.end(), [&](const Vector& v){ return maze.unknownCount(v); });
+				if(unknownGoal == goal.end()) state = SEARCHING_ADDITIONALLY;
 				// ゴール区画かどうか判定
 				if(std::find(goal.begin(), goal.end(), pv) != goal.end()){
 					state = REACHED_GOAL;
 					state = SEARCHING_ADDITIONALLY;
 				}else{
 					// ゴールを目指して探索
-					stepMapGoal.update(goal);
+					stepMapGoal.update(goal, false, false);
 					return calcNextDirsByStepMap(stepMapGoal, pv, pd, nextDirs, nextDirsInAdvance);
 				}
 			}
@@ -116,7 +116,7 @@ namespace MazeLib {
 				if(candidates.empty()){
 					state = BACKING_TO_START;
 				}else{
-					stepMapCandidates.update(candidates);
+					stepMapCandidates.update(candidates, false, false);
 					return calcNextDirsByStepMap(stepMapCandidates, pv, pd, nextDirs, nextDirsInAdvance);
 				}
 			}
@@ -125,8 +125,7 @@ namespace MazeLib {
 				if(pv == start) {
 					state = REACHED_START;
 				}else{
-					// stepMapStart.update({start}, isForceBackToStart);
-					stepMapStart.update({start});
+					stepMapStart.update({start}, false, false);
 					return calcNextDirsByStepMap(stepMapStart, pv, pd, nextDirs, nextDirsInAdvance);
 				}
 			}
@@ -138,8 +137,8 @@ namespace MazeLib {
 		*   @return 成功 or 失敗
 		*/
 		bool calcShortestDirs(std::vector<Dir>& shortestDirs, const bool diagonal = true){
-			// stepMapGoal.update(goal, true, diagonal);
-			stepMapGoal.update(goal, false, diagonal); //< for debug
+			stepMapGoal.update(goal, true, diagonal);
+			// stepMapGoal.update(goal, false, diagonal); //< for debug
 			shortestDirs.clear();
 			auto v = start;
 			Dir dir = Dir::North;
