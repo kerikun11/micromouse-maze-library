@@ -105,7 +105,7 @@ namespace MazeLib {
 			// ステップの更新がなくなるまで更新処理
 			while(!q.empty()){
 				// 注目する区画を取得
-				const Vector& focus = q.front(); q.pop();
+				const Vector focus = q.front(); q.pop();
 				const step_t& focus_step = getStep(focus);
 				// 4方向更新がないか調べる
 				for(const auto& d: Dir::All()){
