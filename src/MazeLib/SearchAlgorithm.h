@@ -244,6 +244,7 @@ namespace MazeLib {
 			if(nextDirs.empty()) dir = start_d;
 			else dir = nextDirs.back();
 			std::vector<Dir> dirs;
+			for(const auto& d: {dir+0, dir+1, dir-1, dir+2}) if(!maze.isKnown(focus_v, d)) dirs.push_back(d);
 			for(const auto& d: {dir+0, dir+1, dir-1, dir+2})
 			if(!maze.isWall(focus_v, d) && stepMap.getStep(focus_v.next(d))!=MAZE_STEP_MAX) dirs.push_back(d);
 			std::sort(dirs.begin(), dirs.end(), [&](const Dir& d1, const Dir& d2){
