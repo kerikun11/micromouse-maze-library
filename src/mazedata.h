@@ -2,6 +2,28 @@
 
 extern const char mazeData_fp2016[8+1][8+1] = { "6beab6ab", "4aaa3c37", "c2ab4a1d", "b8a35683", "6a2954b5", "57575c29", "5549ca17", "dc8aaa9d", };
 
+extern const char mazeData_b[8+1][8+1] = {
+	"ffffffff",
+	"ffffffff",
+	"ffffffff",
+	"ffffffff",
+	"6363ffff",
+	"5555ffff",
+	"5c95ffff",
+	"dea9ffff",
+};
+
+extern const char mazeData_c[8+1][8+1] = {
+	"ffffffff",
+	"ffffffff",
+	"ff6363ff",
+	"ff5555ff",
+	"ff5c95ff",
+	"ffdea9ff",
+	"ffffffff",
+	"ffffffff",
+};
+
 extern const char mazeData_maze[16+1][16+1] = {
 	"9551553ff9551553",
 	"af92ffc556ffaffa",

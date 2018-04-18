@@ -15,16 +15,18 @@ using namespace MazeLib;
 #define MAZE_BACKUP_SIZE	5
 
 #if MAZE_SIZE == 8
-std::vector<Vector> goal = {Vector(7,7)};
-Maze sample(mazeData_fp2016);
+// std::vector<Vector> goal = {Vector(7,7)};
+std::vector<Vector> goal = {Vector(1,0)};
+// Maze sample(mazeData_fp2016);
+Maze sample(mazeData_b);
 #elif MAZE_SIZE == 16
 std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 // std::vector<Vector> goal = {Vector(3,3),Vector(3,4),Vector(4,3),Vector(4,4)};
-//Maze sample(mazeData_maze, false);
-//Maze sample(mazeData_maze3, false);
-//Maze sample(mazeData_maze4, false);
+// Maze sample(mazeData_maze, false);
+// Maze sample(mazeData_maze3, false);
+// Maze sample(mazeData_maze4, false);
 //Maze sample(mazeData_maze2013fr, false);
-//Maze sample(mazeData_maze2013exp, false);
+// Maze sample(mazeData_maze2013exp, false);
 // Maze sample(mazeData_2017_East_MC, true);
 Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_Cheese2017, true);
@@ -82,14 +84,6 @@ void queueActions(const std::vector<Dir>& nextDirs){
 	// usleep(200000);
 	#endif
 	for(const auto& nextDir: nextDirs){
-		#if DISPLAY
-		// char c; scanf("%c", &c);
-		agent.printInfo();
-		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
-		printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
-		printf("wall_log: %5d, log_max: %5d\n", wall_log, log_max);
-		usleep(100000);
-		#endif
 		const auto& nextVec = agent.getCurVec().next(nextDir);
 		switch (Dir(nextDir - agent.getCurDir())) {
 			case Dir::Forward:
@@ -112,6 +106,14 @@ void queueActions(const std::vector<Dir>& nextDirs){
 		}
 		agent.updateCurVecDir(nextVec, nextDir);
 		step++;
+		#if DISPLAY
+		agent.printInfo();
+		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
+		printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
+		printf("wall_log: %5d, log_max: %5d\n", wall_log, log_max);
+		usleep(100000);
+		char c; scanf("%c", &c);
+		#endif
 	}
 }
 
@@ -203,7 +205,6 @@ int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
 	while(!searchRun());
-	// agent.printInfo(false);
 	agent.printInfo();
 	printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 	printf("the max is %5d [us]\n", max_usec);
@@ -213,11 +214,47 @@ int main(void){
 	agent.calcShortestDirs(false);
 	agent.printPath();
 	#else
-	// Maze sample2(mazeData_maze2013half, false);
-	// printf("diff: %d\n", maze.diffKnownWall(sample2));
-	StepMap stepMap(maze);
-	stepMap.update({Vector(0,31)});
-	stepMap.print();
+	sample.print();
+	maze = sample;
+	std::vector<WallLog> tmpWall;
+	tmpWall.push_back(WallLog(-1, -1, Dir::East, false));
+	tmpWall.push_back(WallLog(-1, -1, Dir::North, false));
+	tmpWall.push_back(WallLog(0, -1, Dir::East, true));
+	tmpWall.push_back(WallLog(0, -1, Dir::North, false));
+	tmpWall.push_back(WallLog(-1, 0, Dir::East, true));
+	tmpWall.push_back(WallLog(-1, 0, Dir::North, false));
+	tmpWall.push_back(WallLog(0, 0, Dir::East, true));
+	tmpWall.push_back(WallLog(0, 0, Dir::North, false));
+	tmpWall.push_back(WallLog(-1, 1, Dir::East, true));
+	tmpWall.push_back(WallLog(-1, 1, Dir::North, true));
+	tmpWall.push_back(WallLog(0, 1, Dir::East, false));
+	tmpWall.push_back(WallLog(0, 1, Dir::North, true));
+	tmpWall.push_back(WallLog(1, 1, Dir::East, true));
+	tmpWall.push_back(WallLog(1, 1, Dir::North, true));
+	tmpWall.push_back(WallLog(1, 0, Dir::East, true));
+	tmpWall.push_back(WallLog(1, 0, Dir::North, false));
+	tmpWall.push_back(WallLog(1, -1, Dir::East, true));
+	tmpWall.push_back(WallLog(1, -1, Dir::North, false));
+	tmpWall.push_back(WallLog(1, -2, Dir::East, true));
+	tmpWall.push_back(WallLog(1, -2, Dir::North, false));
+	tmpWall.push_back(WallLog(0, -2, Dir::East, false));
+	tmpWall.push_back(WallLog(0, -2, Dir::North, true));
+	Maze tmpMaze;
+	for(auto wl: tmpWall) tmpMaze.updateWall(Vector(wl.x+MAZE_SIZE/2, wl.y+MAZE_SIZE/2), wl.d, wl.b);
+	tmpMaze.print();
+	for(int x=-MAZE_SIZE; x<MAZE_SIZE; x++)
+	for(int y=-MAZE_SIZE; y<MAZE_SIZE; y++) {
+		int matchs=0;
+		for(auto wl: tmpWall){
+			Vector v(wl.x+x, wl.y+y);
+			Dir d = wl.d;
+			if(maze.isKnown(v, d) && maze.isWall(v, d) != wl.b) matchs++;
+		}
+		printf("%3d, %3d: %3d\n", x, y, matchs);
+	}
+	// StepMap stepMap(maze);
+	// stepMap.update({Vector(0,31)});
+	// stepMap.print();
 	#endif
 	return 0;
 }
