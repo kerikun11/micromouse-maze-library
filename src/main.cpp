@@ -28,10 +28,11 @@ std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 //Maze sample(mazeData_maze2013fr, false);
 // Maze sample(mazeData_maze2013exp, false);
 // Maze sample(mazeData_2017_East_MC, true);
-Maze sample(mazeData_MM2017CX, true);
+Maze sample(mazeData_MM2017CXpre, true);
+//Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2017
+#define YEAR 2014
 #if YEAR == 2012
 std::vector<Vector> goal = {Vector(22,25)};
 Maze sample(mazeData_MM2012HX);

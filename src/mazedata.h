@@ -157,6 +157,25 @@ extern const char mazeData_MM2017CX[16+1][16+1] = {
 	"de888aaaaaaaaaa9",
 };
 
+extern const char mazeData_MM2017CXpre[16+1][16+1] = {
+"62a3e22a2a2b7e23",
+"5c3c21c3c3c28295",
+"434a9435e8296169",
+"5c96294837ca1c17",
+"4369569694a3c349",
+"5c1680296960b497",
+"c349695682943c21",
+"7482169435694a1d",
+"4969483c948343c3",
+"4a1e03c369615ca1",
+"c3c21ca1c29c9621",
+"7c294a3c3d6b695d",
+"5e16969682969683",
+"434961683c3c2021",
+"5496949616835dd5",
+"dca9e8a9c9e88aa9",
+};
+
 extern const char mazeData_Cheese2017[16+1][16+1] = {
 	"e2aaaaa377777777",
 	"e0a2aab555555555",
