@@ -87,7 +87,6 @@ namespace MazeLib {
 				if(unknownGoal == goal.end()) state = SEARCHING_ADDITIONALLY;
 				// ゴール区画かどうか判定
 				if(std::find(goal.begin(), goal.end(), pv) != goal.end()){
-					state = REACHED_GOAL;
 					state = SEARCHING_ADDITIONALLY;
 				}else{
 					// ゴールを目指して探索
@@ -246,8 +245,11 @@ namespace MazeLib {
 			for(const auto& d: {dir+0, dir+1, dir-1, dir+2}) if(!maze.isWall(focus_v, d) && stepMap.getStep(focus_v.next(d))!=MAZE_STEP_MAX) dirs.push_back(d);
 			// ステップが小さい順に並べ替え
 			std::sort(dirs.begin(), dirs.end(), [&](const Dir& d1, const Dir& d2){
-				if(maze.unknownCount(focus_v.next(d2))) return false; //< 未知壁優先
+				// if(maze.unknownCount(focus_v.next(d2))) return false; //< 未知壁優先
 				return stepMap.getStep(focus_v.next(d1)) < stepMap.getStep(focus_v.next(d2)); //< 低コスト優先
+			});
+			std::sort(dirs.begin(), dirs.end(), [&](const Dir& d1, const Dir& d2){
+				return !maze.unknownCount(focus_v.next(d2)); //< 未知壁優先
 			});
 			nextDirsInAdvance = dirs;
 			if(nextDirsInAdvance.empty()) return false;

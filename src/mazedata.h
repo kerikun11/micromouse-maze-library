@@ -13,6 +13,17 @@ extern const char mazeData_b[8+1][8+1] = {
 	"dea9ffff",
 };
 
+extern const char mazeData_a[8+1][8+1] = {
+	"ffffffff",
+	"ffffffff",
+	"ffffffff",
+	"ffffffff",
+	"6363ffff",
+	"4155ffff",
+	"4895ffff",
+	"dea9ffff",
+};
+
 extern const char mazeData_c[8+1][8+1] = {
 	"ffffffff",
 	"ffffffff",

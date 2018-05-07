@@ -12,13 +12,12 @@
 using namespace MazeLib;
 
 #define DISPLAY						0
-#define MAZE_BACKUP_SIZE	5
 
 #if MAZE_SIZE == 8
 // std::vector<Vector> goal = {Vector(7,7)};
 std::vector<Vector> goal = {Vector(1,0)};
 // Maze sample(mazeData_fp2016);
-Maze sample(mazeData_b);
+Maze sample(mazeData_a);
 #elif MAZE_SIZE == 16
 std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 // std::vector<Vector> goal = {Vector(3,3),Vector(3,4),Vector(4,3),Vector(4,4)};
@@ -86,6 +85,14 @@ void queueActions(const std::vector<Dir>& nextDirs){
 	#endif
 	for(const auto& nextDir: nextDirs){
 		const auto& nextVec = agent.getCurVec().next(nextDir);
+		#if DISPLAY
+		agent.printInfo();
+		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
+		printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
+		printf("wall_log: %5d, log_max: %5d\n", wall_log, log_max);
+		usleep(100000);
+		char c; scanf("%c", &c);
+		#endif
 		switch (Dir(nextDir - agent.getCurDir())) {
 			case Dir::Forward:
 			/* queue SearchRun::GO_STRAIGHT */
@@ -107,14 +114,6 @@ void queueActions(const std::vector<Dir>& nextDirs){
 		}
 		agent.updateCurVecDir(nextVec, nextDir);
 		step++;
-		#if DISPLAY
-		agent.printInfo();
-		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
-		printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
-		printf("wall_log: %5d, log_max: %5d\n", wall_log, log_max);
-		usleep(100000);
-		char c; scanf("%c", &c);
-		#endif
 	}
 }
 
