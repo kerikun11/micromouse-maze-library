@@ -16,7 +16,7 @@ namespace MazeLib {
 	/** @def MAZE_SIZE
 	*   @brief 迷路の1辺の区画数
 	*/
-	constexpr int8_t MAZE_SIZE = 32;
+	#define MAZE_SIZE			32
 	/** @typedef
 	*   @brief 迷路のサイズのbit数の整数型
 	*   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
@@ -180,6 +180,8 @@ namespace MazeLib {
 
 	/** @class Maze
 	*   @brief 迷路の壁情報を管理するクラス
+	*   バックアップする際の情報量を最小限にするため，
+	*   スタートとゴールの情報は持たず，壁の情報のみを保持する．
 	*/
 	class Maze {
 	public:
@@ -394,7 +396,7 @@ namespace MazeLib {
 		*   @param start パスのスタート座標
 		*   @param dirs 移動方向の配列
 		*/
-		void printPath(const Vector start, const std::vector<Dir>& dirs) const {
+		void printPath(const Vector start, const Dirs& dirs) const {
 			int steps[MAZE_SIZE][MAZE_SIZE]={0};
 			Vector v = start;
 			int counter = 1;
@@ -419,31 +421,7 @@ namespace MazeLib {
 			printf("+%s" C_RESET, isKnown(x,0,Dir::South) ? (isWall(x,0,Dir::South)?"---":"   ") : C_RED " - ");
 			printf("+\n");
 		}
-	public:
-		/** @function popcnt
-		*   @brief 引数のセットされているbit数を返す静的関数
-		*/
-		static int popcnt(uint8_t n) {
-			n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
-			n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
-			n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
-			return n;
-		}
-		static int popcnt(uint16_t n) {
-			n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
-			n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
-			n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
-			n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
-			return n;
-		}
-		static int popcnt(uint32_t n) {
-			n = (n & 0x5555555555555555) + ((n>>1)  & 0x5555555555555555);
-			n = (n & 0x3333333333333333) + ((n>>2)  & 0x3333333333333333);
-			n = (n & 0x0f0f0f0f0f0f0f0f) + ((n>>4)  & 0x0f0f0f0f0f0f0f0f);
-			n = (n & 0x00ff00ff00ff00ff) + ((n>>8)  & 0x00ff00ff00ff00ff);
-			n = (n & 0x0000ffff0000ffff) + ((n>>16) & 0x0000ffff0000ffff);
-			return n;
-		}
+
 	private:
 		wall_size_t wall[2][MAZE_SIZE-1]; /**< 壁情報 */
 		wall_size_t known[2][MAZE_SIZE-1]; /**< 既知壁情報 */

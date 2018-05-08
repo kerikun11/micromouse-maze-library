@@ -13,16 +13,16 @@
 
 using namespace MazeLib;
 
-#define DISPLAY						1
+#define DISPLAY		0
 
 #if MAZE_SIZE == 8
-// std::vector<Vector> goal = {Vector(7,7)};
-std::vector<Vector> goal = {Vector(1,0)};
+// Vectors goal = {Vector(7,7)};
+Vectors goal = {Vector(1,0)};
 // Maze sample(mazeData_fp2016);
 Maze sample(mazeData_a);
 #elif MAZE_SIZE == 16
-std::vector<Vector> goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
-// std::vector<Vector> goal = {Vector(3,3),Vector(3,4),Vector(4,3),Vector(4,4)};
+Vectors goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
+// Vectors goal = {Vector(3,3),Vector(3,4),Vector(4,3),Vector(4,4)};
 // Maze sample(mazeData_maze, false);
 // Maze sample(mazeData_maze3, false);
 // Maze sample(mazeData_maze4, false);
@@ -35,24 +35,24 @@ Maze sample(mazeData_MM2017CXpre, true);
 #elif MAZE_SIZE == 32
 #define YEAR 2015
 #if YEAR == 2012
-std::vector<Vector> goal = {Vector(22,25)};
+Vectors goal = {Vector(22,25)};
 Maze sample(mazeData_MM2012HX);
 #elif YEAR == 2013
-std::vector<Vector> goal = {Vector(6,5)};
+Vectors goal = {Vector(6,5)};
 Maze sample(mazeData_MM2013HX, false);
 #elif YEAR == 2014
-std::vector<Vector> goal = {Vector(26,5)};
+Vectors goal = {Vector(26,5)};
 Maze sample(mazeData_MM2014HX);
 #elif YEAR == 2015
-std::vector<Vector> goal = {Vector(7,24)};
+Vectors goal = {Vector(7,24)};
 Maze sample(mazeData_MM2015HX);
 #elif YEAR == 2016
-std::vector<Vector> goal = {Vector(1,2), Vector(1,3), Vector(1,4), Vector(2,2), Vector(2,3), Vector(2,4), Vector(3,2), Vector(3,3), Vector(3,4)};
-// std::vector<Vector> goal = {Vector(1,2)};
+Vectors goal = {Vector(1,2), Vector(1,3), Vector(1,4), Vector(2,2), Vector(2,3), Vector(2,4), Vector(3,2), Vector(3,3), Vector(3,4)};
+// Vectors goal = {Vector(1,2)};
 Maze sample(mazeData_MM2016HX);
 #elif YEAR == 2017
-std::vector<Vector> goal = {Vector(19,20), Vector(19,21), Vector(19,22), Vector(20,20), Vector(20,21), Vector(20,22), Vector(21,20), Vector(21,21), Vector(21,22)};
-// std::vector<Vector> goal = {Vector(19,20)};
+Vectors goal = {Vector(19,20), Vector(19,21), Vector(19,22), Vector(20,20), Vector(20,21), Vector(20,22), Vector(21,20), Vector(21,21), Vector(21,22)};
+// Vectors goal = {Vector(19,20)};
 Maze sample(mazeData_MM2017HX);
 #endif
 #endif
@@ -81,7 +81,7 @@ void stopAndSaveMaze(){
 	/* start the robot */
 }
 
-void queueActions(const std::vector<Dir>& nextDirs){
+void queueActions(const Dirs& nextDirs){
 	#if DISPLAY
 	// usleep(200000);
 	#endif
@@ -205,7 +205,7 @@ bool fastRun(){
 
 PositionIdentifier pi;
 
-void queueActions(const std::vector<Dir>& nextDirs){
+void queueActions(const Dirs& nextDirs){
 	#if DISPLAY
 	// usleep(200000);
 	#endif

@@ -95,7 +95,7 @@ namespace MazeLib {
 		*  @param onlyCanGo true:未知の壁は通過不可能とする，false:未知の壁はないものとする
 		*  @param diagonal true: 斜め直線あり false: 斜めはジグザグ
 		*/
-		void update(const std::vector<Vector>& dest, const bool& onlyCanGo = false, const bool& diagonal = true){
+		void update(const Vectors& dest, const bool& onlyCanGo = false, const bool& diagonal = true){
 			// 全区画のステップを最大値に設定
 			reset();
 			// となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
@@ -194,7 +194,7 @@ namespace MazeLib {
 				focus_v = focus_v.next(dir); //< 位置を更新
 			}
 			// ステップマップから未知壁方向の優先順位方向列を生成
-			std::vector<Dir> dirs;
+			Dirs dirs;
 			// 方向の候補を抽出
 			for(const auto& d: {dir+0, dir+1, dir-1, dir+2}) if(!maze.isWall(focus_v, d) && getStep(focus_v.next(d))!=MAZE_STEP_MAX) dirs.push_back(d);
 			// ステップが小さい順に並べ替え

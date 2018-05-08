@@ -30,7 +30,7 @@ namespace MazeLib {
 		*   @param maze 使用する迷路の参照
 		*   @param goal ゴール区画の配列
 		*/
-		SearchAlgorithm(Maze& maze, const std::vector<Vector>& goal) : maze(maze),
+		SearchAlgorithm(Maze& maze, const Vectors& goal) : maze(maze),
 		stepMapGoal(maze), stepMapStart(maze), stepMapCandidates(maze),
 		goal(goal) {}
 		/** @enum State
@@ -62,7 +62,7 @@ namespace MazeLib {
 			};
 			return str[s];
 		}
-		void replaceGoal(const std::vector<Vector>& goal) {
+		void replaceGoal(const Vectors& goal) {
 			this->goal = goal;
 		}
 		/** @function calcNextDirs
@@ -71,7 +71,7 @@ namespace MazeLib {
 		*   @param pd 出発方向
 		*   @param state 出発時の探索状態
 		*/
-		bool calcNextDirs(enum State& state, const Vector& pv, const Dir& pd, std::vector<Dir>& nextDirs, std::vector<Dir>& nextDirsInAdvance, const bool isForceBackToStart = false) {
+		bool calcNextDirs(enum State& state, const Vector& pv, const Dir& pd, Dirs& nextDirs, Dirs& nextDirsInAdvance, const bool isForceBackToStart = false) {
 			if(state == IDOLE){
 				state = SEARCHING_FOR_GOAL;
 				#if SEARCHING_ADDITIALLY_AT_START
@@ -135,7 +135,7 @@ namespace MazeLib {
 		*   @brief 最短経路を導出
 		*   @return 成功 or 失敗
 		*/
-		bool calcShortestDirs(std::vector<Dir>& shortestDirs, const bool diagonal = true){
+		bool calcShortestDirs(Dirs& shortestDirs, const bool diagonal = true){
 			stepMapGoal.update(goal, true, diagonal);
 			// stepMapGoal.update(goal, false, diagonal); //< for debug
 			shortestDirs.clear();
@@ -163,7 +163,7 @@ namespace MazeLib {
 			bool loop = true;
 			while(loop){
 				loop = false;
-				std::vector<Dir> dirs;
+				Dirs dirs;
 				switch (Dir(dir-prev_dir)) {
 					case Dir::Left: dirs = {dir.getRelative(Dir::Right), dir}; break;
 					case Dir::Right: dirs = {dir.getRelative(Dir::Left), dir}; break;
@@ -210,8 +210,8 @@ namespace MazeLib {
 		StepMap stepMapStart; /**< 使用するステップマップ */
 		StepMap stepMapCandidates; /**< 使用するステップマップ */
 		const Vector start{0, 0}; /**< スタート区画を定義 */
-		std::vector<Vector> goal; /**< ゴール区画を定義 */
-		std::vector<Vector> candidates; /**< 最短経路上になり得る候補を入れるコンテナ */
+		Vectors goal; /**< ゴール区画を定義 */
+		Vectors candidates; /**< 最短経路上になり得る候補を入れるコンテナ */
 
 		/** @function findShortestCandidates
 		*   @brief ステップマップにより最短経路上になりうる区画を洗い出す
@@ -244,7 +244,7 @@ namespace MazeLib {
 				bool loop = true;
 				while(loop){
 					loop = false;
-					std::vector<Dir> dirs;
+					Dirs dirs;
 					switch (Dir(dir-prev_dir)) {
 						case Dir::Left: dirs = {dir.getRelative(Dir::Right), dir}; break;
 						case Dir::Right: dirs = {dir.getRelative(Dir::Left), dir}; break;

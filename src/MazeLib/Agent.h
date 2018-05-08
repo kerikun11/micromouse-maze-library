@@ -5,26 +5,15 @@
 #include "PositionIdentifier.h"
 
 namespace MazeLib {
-  class Agent{
+  class Agent {
   public:
-    Agent(Maze& maze, const std::vector<Vector>& goal)
-    : maze(maze), searchAlgorithm(maze, goal) {
-      agentState = SEARCHING;
-    }
-
-    enum AgentState : int8_t {
-      SEARCHING,
-      BACKING,
-      RECOVERING,
-      IDENTIFYING,
-    };
-
+    Agent(Maze& maze, const Vectors& goal) : maze(maze), searchAlgorithm(maze, goal) { }
     void reset(){
       state = SearchAlgorithm::IDOLE;
       updateCurVecDir(Vector(0, 0), Dir::North);
     }
-    void reset(const std::vector<Vector>& goal) {
-      searchAlgorithm.setGoal(goal);
+    void reset(const Vectors& goal) {
+      searchAlgorithm.replaceGoal(goal);
       reset();
     }
     /** @function updateCurVecDir
@@ -40,7 +29,6 @@ namespace MazeLib {
     *   @param b 壁の有無
     */
     bool updateWall(const Vector& v, const Dir& d, const bool& b){
-      if(agentState == IDENTIFYING) return positionIdentifier.updateWall(v, d, b);
       // 既知の壁と食い違いがあったら未知壁とする
       if(maze.isKnown(v, d) && maze.isWall(v, d) != b){
         maze.setWall(v, d, false);
@@ -49,17 +37,17 @@ namespace MazeLib {
       }
       if(!maze.isKnown(v, d)){
         maze.updateWall(v, d, b);
-        wallLog.push_back(WallLog(v, d, b));
+        wallLogs.push_back(WallLog(v, d, b));
       }
       return true;
     }
     bool resetLastWall(const int num = 1){
       for(int i=0;i<num;i++){
-        if(wallLog.empty()) return true;
-        auto wl = wallLog.back();
+        if(wallLogs.empty()) return true;
+        auto wl = wallLogs.back();
         maze.setWall(Vector(wl), wl.d, false);
         maze.setKnown(Vector(wl), wl.d, false);
-        wallLog.pop_back();
+        wallLogs.pop_back();
       }
     }
     /** @function calcNextDir
@@ -68,15 +56,7 @@ namespace MazeLib {
     *   @return 探索状態
     */
     bool calcNextDirs(){
-      switch (agentState) {
-        case SEARCHING:
-        case BACKING:
-        return searchAlgorithm.calcNextDirs(state, curVec, curDir, nextDirs, nextDirsInAdvance, isForceBackToStart);
-        case IDENTIFYING:
-        return positionIdentifier.calcNextDirs(curVec, curDir, nextDirs, nextDirsInAdvance);
-        default:
-        return false;
-      }
+      return searchAlgorithm.calcNextDirs(state, curVec, curDir, nextDirs, nextDirsInAdvance, isForceBackToStart);
     }
     bool calcShortestDirs(const bool diagonal = true){
       return searchAlgorithm.calcShortestDirs(shortestDirs, diagonal);
@@ -97,13 +77,13 @@ namespace MazeLib {
     /** @function getNextDirs
     *   @brief 次に行くべき方向配列の計算結果を取得
     */
-    const std::vector<Dir>& getNextDirs() const {
+    const Dirs& getNextDirs() const {
       return nextDirs;
     }
     /** @function getNextDirs
     *   @brief 次に行くべき方向配列の計算結果を取得
     */
-    const std::vector<Dir>& getNextDirsInAdvance() const {
+    const Dirs& getNextDirsInAdvance() const {
       return nextDirsInAdvance;
     }
     /** @function getCurVec
@@ -121,7 +101,7 @@ namespace MazeLib {
     /** @function getNextDirs
     *   @brief 最短経路の方向配列の計算結果を取得
     */
-    const std::vector<Dir>& getShortestDirs() const {
+    const Dirs& getShortestDirs() const {
       return shortestDirs;
     }
     /** @function printInfo
@@ -129,23 +109,15 @@ namespace MazeLib {
     *   @param showMaze true:迷路も表示, false:迷路は非表示
     */
     void printInfo(const bool& showMaze = true) const {
+      // カーソルを移動
       for(int i=0; i<9; i++) printf("\x1b[A");
-      if(showMaze){
-        switch (agentState) {
-          case SEARCHING:
-          case BACKING:
-          searchAlgorithm.printMap(state, curVec, curDir);
-          break;
-          case IDENTIFYING:
-          positionIdentifier.printMap(curVec, curDir);
-          break;
-          default: break;
-        }
-      }
+      // 迷路を表示
+      if(showMaze) searchAlgorithm.printMap(state, curVec, curDir);
+      // 詳細を表示
       printf("Cur: ( %2d, %2d,  %c), State: %s       \n", curVec.x, curVec.y, ">^<v"[curDir], SearchAlgorithm::stateString(state));
       printf("nextDirs: ");
       for (const auto d : getNextDirs()) printf("%c", ">^<v"[d]);
-      printf("                                               \n");
+      printf("                                                     \n");
       printf("nextDirsInAdvance: ");
       for(const auto d: getNextDirsInAdvance()) printf("%c", ">^<v"[d]);
       printf("        \n");
@@ -154,25 +126,24 @@ namespace MazeLib {
     *   @brief 最短経路の表示
     */
     void printPath() const {
-      //for(int i=0; i<MAZE_SIZE*2+5; i++) printf("\x1b[A");
       maze.printPath(Vector(0, 0), shortestDirs);
       printf("Shortest Step: %d\n", shortestDirs.size());
     }
-    std::vector<WallLog>& getWallLog(){
-      return wallLog;
+    WallLogs& getWallLog(){
+      return wallLogs;
     }
+
   private:
     Maze& maze; /**< 使用する迷路の参照 */
-    AgentState agentState;
     SearchAlgorithm searchAlgorithm; /**< 探索器 */
     PositionIdentifier positionIdentifier; /**< 自己位置推定器 */
     SearchAlgorithm::State state; /**< 現在の探索状態を保持 */
     Vector curVec; /**< 現在の区画座標 */
     Dir curDir; /**< 現在向いている方向 */
-    std::vector<WallLog> wallLog;
-    std::vector<Dir> nextDirs; /**< 次に行くべき探索方向配列 */
-    std::vector<Dir> nextDirsInAdvance; /**< 最短経路の方向配列 */
-    std::vector<Dir> shortestDirs; /**< 最短経路の方向配列 */
+    WallLogs wallLogs;
+    Dirs nextDirs; /**< 次に行くべき探索方向配列 */
+    Dirs nextDirsInAdvance; /**< 最短経路の方向配列 */
+    Dirs shortestDirs; /**< 最短経路の方向配列 */
     bool isForceBackToStart = false;
   };
 }
