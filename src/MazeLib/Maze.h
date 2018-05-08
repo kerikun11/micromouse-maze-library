@@ -10,12 +10,13 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <iostream>
 
 namespace MazeLib {
 	/** @def MAZE_SIZE
 	*   @brief 迷路の1辺の区画数
 	*/
-	#define MAZE_SIZE			32
+	constexpr int8_t MAZE_SIZE = 32;
 	/** @typedef
 	*   @brief 迷路のサイズのbit数の整数型
 	*   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
@@ -94,9 +95,20 @@ namespace MazeLib {
 			static const std::array<Dir, 4> all = {East, North, West, South};
 			return all;
 		}
+		/** @function <<
+		*/
+		friend std::ostream& operator<<(std::ostream& os, const Dir& d) {
+			static const char dir_str[] = ">^<v";
+			os << dir_str[d];
+			return os;
+		}
 	private:
 		enum AbsoluteDir d; /**< @brief 方向の実体 */
 	};
+	/** @typedef Dirs
+	*   @brief Dir構造体の動的配列
+	*/
+	typedef std::vector<Dir> Dirs;
 
 	/** @struct Vector
 	*   @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
@@ -113,6 +125,7 @@ namespace MazeLib {
 		/** @brief 演算子のオーバーロード
 		*/
 		const Vector operator+(const Vector& obj) const { return Vector(x+obj.x, y+obj.y); }
+		const Vector operator-(const Vector& obj) const { return Vector(x-obj.x, y-obj.y); }
 		const Vector& operator=(const Vector& obj) { all=obj.all; return *this; }
 		bool operator==(const Vector& obj) const { return all==obj.all; }
 		bool operator!=(const Vector& obj) const { return all!=obj.all; }
@@ -131,7 +144,17 @@ namespace MazeLib {
 			printf("Warning: invalid direction\n");
 			return *this;
 		}
+		/** @function <<
+		*/
+		friend std::ostream& operator<<(std::ostream& os, const Vector& v) {
+			os << "(" << (int)v.x << ", " << (int)v.y << ")";
+			return os;
+		}
 	};
+	/** @typedef Vectors
+	*   @brief Vector構造体の動的配列
+	*/
+	typedef std::vector<Vector> Vectors;
 
 	/** @union WallLog
 	*   @brief 区画位置，方向，壁の有無を保持する構造体
@@ -148,7 +171,12 @@ namespace MazeLib {
 		WallLog(const int8_t x, const int8_t y, const Dir& d, const bool b): x(x), y(y), d(d), b(b) {}
 		WallLog(const uint16_t all): all(all) {}
 		WallLog() {}
+		operator Vector(){ return Vector(x, y); }
 	};
+	/** @typedef WallLogs
+	*   @brief WallLog構造体の動的配列
+	*/
+	typedef std::vector<WallLog> WallLogs;
 
 	/** @class Maze
 	*   @brief 迷路の壁情報を管理するクラス

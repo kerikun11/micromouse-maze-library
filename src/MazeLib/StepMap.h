@@ -92,7 +92,8 @@ namespace MazeLib {
 		/** @function update
 		*  @brief ステップマップの更新
 		*  @param dest ステップを0とする区画の配列
-		*  @param onlyCanGo true:未知の壁は通貨不可能とする，false:未知の壁はないものとする
+		*  @param onlyCanGo true:未知の壁は通過不可能とする，false:未知の壁はないものとする
+		*  @param diagonal true: 斜め直線あり false: 斜めはジグザグ
 		*/
 		void update(const std::vector<Vector>& dest, const bool& onlyCanGo = false, const bool& diagonal = true){
 			// 全区画のステップを最大値に設定
@@ -167,37 +168,67 @@ namespace MazeLib {
 				}
 			}
 		}
-		void calcStraightStepTable(){
-			for(int i=0; i<MAZE_SIZE*2; i++){
-				float x = 90*(i+1);
-				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
-				// printf("%d: %d\n", i, straightStepTable[i]);
+		/** @function calcNextDirs
+		*   @brief ステップマップにより次に行くべき方向列を生成する
+		*   @return true:成功, false:失敗(迷子)
+		*/
+		bool calcNextDirs(const Vector& start_v, const Dir& start_d, Dirs& nextDirs, Dirs& nextDirsInAdvance) const {
+			// ステップマップから既知区間方向列を生成
+			nextDirs.clear();
+			auto focus_v = start_v;
+			auto dir = start_d;
+			while(1){
+				if(maze.unknownCount(focus_v)) break; //< 未知壁があれば，既知区間は終了
+				// 周囲の区画のうち，最小ステップの方向を求める
+				step_t min_step = MAZE_STEP_MAX;
+				for(const auto& d: {dir+0, dir+1, dir-1, dir+2}){
+					if(maze.isWall(focus_v, d)) continue;
+					step_t next_step = getStep(focus_v.next(d));
+					if(min_step > next_step) {
+						min_step = next_step;
+						dir = d;
+					}
+				}
+				if(getStep(focus_v) <= min_step) break; //< 永遠ループ防止
+				nextDirs.push_back(dir); //< 既知区間移動
+				focus_v = focus_v.next(dir); //< 位置を更新
 			}
-			step_t max = 0;
-			step_t min = MAZE_STEP_MAX;
-			for(int i=0; i<MAZE_SIZE*2; i++){
-				float x = 90*(i+1);
-				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
-				step_t step = straightStepTable[i]+straightStepTable[MAZE_SIZE*2-1-i];
-				// printf("%d: %d\n", i, step);
-				if(max < step) max = step;
-				if(min > step) min = step;
-			}
-			extra = max-min;
-			// printf("factor: %f\n", factor);
-			// printf("min: %d, max: %d, extra: %d\n", min, max, extra);
-			// for(int i=0; i<MAZE_SIZE*2-1; i++){
-			// 	printf("%d: %6.3f\n", i, straightStepTable[i+1]-straightStepTable[i]);
-			// }
+			// ステップマップから未知壁方向の優先順位方向列を生成
+			std::vector<Dir> dirs;
+			// 方向の候補を抽出
+			for(const auto& d: {dir+0, dir+1, dir-1, dir+2}) if(!maze.isWall(focus_v, d) && getStep(focus_v.next(d))!=MAZE_STEP_MAX) dirs.push_back(d);
+			// ステップが小さい順に並べ替え
+			std::sort(dirs.begin(), dirs.end(), [&](const Dir& d1, const Dir& d2){
+				// if(maze.unknownCount(focus_v.next(d2))) return false; //< 未知壁優先
+				return getStep(focus_v.next(d1)) < getStep(focus_v.next(d2)); //< 低コスト優先
+			});
+			std::sort(dirs.begin(), dirs.end(), [&](const Dir& d1, const Dir& d2){
+				return !maze.unknownCount(focus_v.next(d2)); //< 未知壁優先
+			});
+			nextDirsInAdvance = dirs;
+			if(nextDirsInAdvance.empty()) return false;
+			return true;
 		}
-	public:
-		const float a = 9000;
-		const float v0 = 300;
-		const float factor = 1.0f / (sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2)/a) - sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2-1)/a));
-		step_t extra;
+
 	private:
 		Maze& maze; /**< @brief 使用する迷路の参照 */
 		step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
 		step_t straightStepTable[MAZE_SIZE*2];
+
+		const float a = 9000;
+		const float v0 = 300;
+		const float factor = 1.0f / (sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2)/a) - sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2-1)/a));
+
+		void calcStraightStepTable(){
+			for(int i=0; i<MAZE_SIZE*2; i++){
+				float x = 90*(i+1);
+				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
+			}
+			for(int i=0; i<MAZE_SIZE*2; i++){
+				float x = 90*(i+1);
+				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
+				step_t step = straightStepTable[i]+straightStepTable[MAZE_SIZE*2-1-i];
+			}
+		}
 	};
 }

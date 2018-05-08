@@ -3,6 +3,8 @@
 #include "MazeLib/Maze.h"
 #include "MazeLib/Agent.h"
 
+#include <iostream>
+
 #include "mazedata.h"
 
 #include <unistd.h>
@@ -11,7 +13,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY						0
+#define DISPLAY						1
 
 #if MAZE_SIZE == 8
 // std::vector<Vector> goal = {Vector(7,7)};
@@ -31,7 +33,7 @@ Maze sample(mazeData_MM2017CXpre, true);
 //Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2014
+#define YEAR 2015
 #if YEAR == 2012
 std::vector<Vector> goal = {Vector(22,25)};
 Maze sample(mazeData_MM2012HX);
@@ -199,6 +201,48 @@ bool fastRun(){
 	return true;
 }
 
+#else
+
+PositionIdentifier pi;
+
+void queueActions(const std::vector<Dir>& nextDirs){
+	#if DISPLAY
+	// usleep(200000);
+	#endif
+	for(const auto& nextDir: nextDirs){
+		const auto& nextVec = pi.getCurVec().next(nextDir);
+		#if DISPLAY
+		pi.printInfo();
+		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
+		printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
+		printf("wall_log: %5d, log_max: %5d\n", wall_log, log_max);
+		usleep(100000);
+		char c; scanf("%c", &c);
+		#endif
+		switch (Dir(nextDir - pi.getCurDir())) {
+			case Dir::Forward:
+			/* queue SearchRun::GO_STRAIGHT */
+			f++;
+			break;
+			case Dir::Left:
+			/* queue SearchRun::TURN_LEFT_90 */
+			l++;
+			break;
+			case Dir::Right:
+			/* queeu SearchRun::TURN_RIGHT_90 */
+			r++;
+			break;
+			case Dir::Back:
+			/* queue SearchRun::TURN_BACK */
+			b++;
+			wall_log=0;
+			break;
+		}
+		pi.updateCurVecDir(nextVec, nextDir);
+		step++;
+	}
+}
+
 #endif
 
 int main(void){
@@ -214,44 +258,95 @@ int main(void){
 	agent.calcShortestDirs(false);
 	agent.printPath();
 	#else
-	sample.print();
+	// sample.print();
+	// maze = sample;
+	// std::vector<WallLog> tmpWall;
+	// // tmpWall.push_back(WallLog(-1, -1, Dir::East, false));
+	// // tmpWall.push_back(WallLog(-1, -1, Dir::North, false));
+	// tmpWall.push_back(WallLog(0, -1, Dir::East, true));
+	// tmpWall.push_back(WallLog(0, -1, Dir::North, false));
+	// tmpWall.push_back(WallLog(-1, 0, Dir::East, true));
+	// tmpWall.push_back(WallLog(-1, 0, Dir::North, false));
+	// tmpWall.push_back(WallLog(0, 0, Dir::East, true));
+	// tmpWall.push_back(WallLog(0, 0, Dir::North, false));
+	// tmpWall.push_back(WallLog(-1, 1, Dir::East, true));
+	// tmpWall.push_back(WallLog(-1, 1, Dir::North, true));
+	// tmpWall.push_back(WallLog(0, 1, Dir::East, false));
+	// tmpWall.push_back(WallLog(0, 1, Dir::North, true));
+	// tmpWall.push_back(WallLog(1, 1, Dir::East, true));
+	// tmpWall.push_back(WallLog(1, 1, Dir::North, true));
+	// tmpWall.push_back(WallLog(1, 0, Dir::East, true));
+	// tmpWall.push_back(WallLog(1, 0, Dir::North, false));
+	// tmpWall.push_back(WallLog(1, -1, Dir::East, true));
+	// tmpWall.push_back(WallLog(1, -1, Dir::North, false));
+	// tmpWall.push_back(WallLog(1, -2, Dir::East, true));
+	// tmpWall.push_back(WallLog(1, -2, Dir::North, false));
+	// tmpWall.push_back(WallLog(0, -2, Dir::East, false));
+	// tmpWall.push_back(WallLog(0, -2, Dir::North, true));
+	// Maze tmpMaze;
+	// for(auto wl: tmpWall) tmpMaze.updateWall(Vector(wl.x+MAZE_SIZE/2, wl.y+MAZE_SIZE/2), wl.d, wl.b);
+	// tmpMaze.print();
+	// int cnt = 0;
+	// for(int x=-MAZE_SIZE; x<MAZE_SIZE; x++)
+	// for(int y=-MAZE_SIZE; y<MAZE_SIZE; y++) {
+	// 	int diffs=0;
+	// 	for(auto wl: tmpWall){
+	// 		Vector v(wl.x+x, wl.y+y);
+	// 		Dir d = wl.d;
+	// 		if(maze.isKnown(v, d) && maze.isWall(v, d) != wl.b) diffs++;
+	// 	}
+	// 	if(diffs == 0) {
+	// 		cnt++;
+	// 		printf("%3d, %3d: %3d\n", x, y, diffs);
+	// 	}
+	// }
+	// printf("cnt: %d\n", cnt);
+	// printf("%d, %d\n", ans.x, ans.y);
+	// maze = sample;
+	// for(int x=0; x<MAZE_SIZE; x++){
+	// 	for(int y=0; y<MAZE_SIZE; y++) {
+	// 		for(const Dir d: {Dir::East, Dir::North}){
+	// 			Vector v = Vector(x, y);
+	// 			pi.updateWall(v, d, maze.isWall(v,d));
+	// 			Vector ans;
+	// 			auto cnt = pi.identify(maze, ans);
+	// 			std::cout << "v: " << v << " d: " << d << " cnt: " << cnt << " ans: " << ans << std::endl;
+	// 			if(cnt == 1) goto idd;
+	// 		}
+	// 	}
+	// }
+	// idd:
 	maze = sample;
-	std::vector<WallLog> tmpWall;
-	tmpWall.push_back(WallLog(-1, -1, Dir::East, false));
-	tmpWall.push_back(WallLog(-1, -1, Dir::North, false));
-	tmpWall.push_back(WallLog(0, -1, Dir::East, true));
-	tmpWall.push_back(WallLog(0, -1, Dir::North, false));
-	tmpWall.push_back(WallLog(-1, 0, Dir::East, true));
-	tmpWall.push_back(WallLog(-1, 0, Dir::North, false));
-	tmpWall.push_back(WallLog(0, 0, Dir::East, true));
-	tmpWall.push_back(WallLog(0, 0, Dir::North, false));
-	tmpWall.push_back(WallLog(-1, 1, Dir::East, true));
-	tmpWall.push_back(WallLog(-1, 1, Dir::North, true));
-	tmpWall.push_back(WallLog(0, 1, Dir::East, false));
-	tmpWall.push_back(WallLog(0, 1, Dir::North, true));
-	tmpWall.push_back(WallLog(1, 1, Dir::East, true));
-	tmpWall.push_back(WallLog(1, 1, Dir::North, true));
-	tmpWall.push_back(WallLog(1, 0, Dir::East, true));
-	tmpWall.push_back(WallLog(1, 0, Dir::North, false));
-	tmpWall.push_back(WallLog(1, -1, Dir::East, true));
-	tmpWall.push_back(WallLog(1, -1, Dir::North, false));
-	tmpWall.push_back(WallLog(1, -2, Dir::East, true));
-	tmpWall.push_back(WallLog(1, -2, Dir::North, false));
-	tmpWall.push_back(WallLog(0, -2, Dir::East, false));
-	tmpWall.push_back(WallLog(0, -2, Dir::North, true));
-	Maze tmpMaze;
-	for(auto wl: tmpWall) tmpMaze.updateWall(Vector(wl.x+MAZE_SIZE/2, wl.y+MAZE_SIZE/2), wl.d, wl.b);
-	tmpMaze.print();
-	for(int x=-MAZE_SIZE; x<MAZE_SIZE; x++)
-	for(int y=-MAZE_SIZE; y<MAZE_SIZE; y++) {
-		int matchs=0;
-		for(auto wl: tmpWall){
-			Vector v(wl.x+x, wl.y+y);
-			Dir d = wl.d;
-			if(maze.isKnown(v, d) && maze.isWall(v, d) != wl.b) matchs++;
-		}
-		printf("%3d, %3d: %3d\n", x, y, matchs);
+	while(1){
+		const auto& v = pi.getCurVec();
+		const auto& d = pi.getCurDir();
+		pi.calcNextDirs();
+		// pi.printInfo();
+		Vector ans;
+		auto cnt = pi.identify(maze, ans);
+		std::cout << "v: " << v << " d: " << d << " cnt: " << cnt << " ans: " << ans << std::endl;
+		if(cnt == 1) break;
+		if(cnt == 0) break;
+
+		// 既知区間移動をキューにつめる
+		queueActions(pi.getNextDirs());
+
+		// find walls
+		const Vector offset = Vector(12, 6) - Vector(MAZE_SIZE/2, MAZE_SIZE/2);
+		pi.updateWall(v, d+1, sample.isWall(v+offset, d+1)); // left wall
+		pi.updateWall(v, d+0, sample.isWall(v+offset, d+0)); // front wall
+		pi.updateWall(v, d-1, sample.isWall(v+offset, d-1)); // right wall
+		// pi.updateWall(v, d+2, false); // right wall
+		/* backup the wall */
+
+		// 候補の中で行ける方向を探す
+		const auto nextDirsInAdvance = pi.getNextDirsInAdvance();
+		const auto nextDirInAdvance = *std::find_if(nextDirsInAdvance.begin(), nextDirsInAdvance.end(), [&](const Dir& dir){
+			return pi.getMaze().canGo(v, dir);
+		});
+		queueActions({nextDirInAdvance});
 	}
+
 	// StepMap stepMap(maze);
 	// stepMap.update({Vector(0,31)});
 	// stepMap.print();
