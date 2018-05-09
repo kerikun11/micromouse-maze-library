@@ -31,11 +31,11 @@ namespace MazeLib{
       }
       return true;
     }
-    bool calcNextDirs(const Vector& pv, const Dir& pd, std::vector<Dir>& nextDirs, std::vector<Dir>& nextDirsInAdvance) {
+    bool calcNextDirs(const Vector& pv, const Dir& pd, Dirs& nextDirs, Dirs& nextDirsInAdvance) {
       stepMap.update(findCandidates, false, false);
       stepMap.calcNextDirs(pv, pd, nextDirs, nextDirsInAdvance);
     }
-    int identify(const Maze& maze, Vector& ans){
+    int identify(const Maze& maze, Vector& ans) {
       findCandidates.clear();
       int cnt = 0;
       for(int x=-MAZE_SIZE+1; x<MAZE_SIZE; x++)
@@ -67,8 +67,8 @@ namespace MazeLib{
   private:
     const Vector start{MAZE_SIZE/2, MAZE_SIZE/2};
     Maze tmpMaze;
-    std::vector<WallLog> wallLog;
-    std::vector<Vector> findCandidates;
+    WallLogs wallLog;
+    Vectors findCandidates;
     StepMap stepMap;
   };
 }

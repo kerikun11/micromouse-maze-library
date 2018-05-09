@@ -82,16 +82,20 @@ namespace MazeLib {
 			}
 
 			if(state == SEARCHING_FOR_GOAL){
+				// state = SEARCHING_ADDITIONALLY;
 				// ゴール区画が探索済みなら次のstateへ
 				const auto unknownGoal = std::find_if(goal.begin(), goal.end(), [&](const Vector& v){ return maze.unknownCount(v); });
-				if(unknownGoal == goal.end()) state = SEARCHING_ADDITIONALLY;
-				// ゴール区画かどうか判定
-				if(std::find(goal.begin(), goal.end(), pv) != goal.end()){
+				if(unknownGoal == goal.end()){
 					state = SEARCHING_ADDITIONALLY;
 				}else{
-					// ゴールを目指して探索
-					stepMapGoal.update(goal, false, false);
-					return stepMapGoal.calcNextDirs(pv, pd, nextDirs, nextDirsInAdvance);
+					// ゴール区画かどうか判定
+					if(std::find(goal.begin(), goal.end(), pv) != goal.end()){
+						state = SEARCHING_ADDITIONALLY;
+					}else{
+						// ゴールを目指して探索
+						stepMapGoal.update(goal, false, false);
+						return stepMapGoal.calcNextDirs(pv, pd, nextDirs, nextDirsInAdvance);
+					}
 				}
 			}
 
@@ -218,6 +222,7 @@ namespace MazeLib {
 		*/
 		bool findShortestCandidates(){
 			candidates.clear();
+			// 斜めありなしの双方の最短経路上を候補とする
 			for(const bool diagonal: {true, false}){
 				stepMapGoal.update(goal, false, diagonal);
 				auto v = start;
@@ -263,7 +268,7 @@ namespace MazeLib {
 					}
 				}
 			}
-			return true;
+			return true; //< 成功
 		}
 	};
 }

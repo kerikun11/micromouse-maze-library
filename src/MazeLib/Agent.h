@@ -29,6 +29,7 @@ namespace MazeLib {
     *   @param b 壁の有無
     */
     bool updateWall(const Vector& v, const Dir& d, const bool& b){
+      if(isPositionIdentifying) return positionIdentifier.updateWall(v, d, b);
       // 既知の壁と食い違いがあったら未知壁とする
       if(maze.isKnown(v, d) && maze.isWall(v, d) != b){
         maze.setWall(v, d, false);
@@ -39,6 +40,18 @@ namespace MazeLib {
         maze.updateWall(v, d, b);
         wallLogs.push_back(WallLog(v, d, b));
       }
+      return true;
+    }
+    bool updateWall(const Vector& v, const Dir& d, const bool left, const bool front, const bool right, Dir& nextDirInAdvance){
+      updateWall(v, d+1, left); // left wall
+      updateWall(v, d+0, front); // front wall
+      updateWall(v, d-1, right); // right wall
+
+      // 候補の中で行ける方向を探す
+      nextDirInAdvance = *std::find_if(nextDirsInAdvance.begin(), nextDirsInAdvance.end(), [&](const Dir& dir){
+        if(isPositionIdentifying) return positionIdentifier.getMaze().canGo(v, dir);
+        return maze.canGo(v, dir);
+      });
       return true;
     }
     bool resetLastWall(const int num = 1){
@@ -56,6 +69,19 @@ namespace MazeLib {
     *   @return 探索状態
     */
     bool calcNextDirs(){
+      if(isPositionIdentifying) {
+        Vector ans;
+        auto res = positionIdentifier.identify(maze, ans);
+        matchCount = res;
+        if(res==1){
+          curVec = ans + curVec - positionIdentifier.getStart();
+          isPositionIdentifying = false;
+        }else if(res==0) {
+          return false;
+        }else{
+          return positionIdentifier.calcNextDirs(curVec, curDir, nextDirs, nextDirsInAdvance);
+        }
+      }
       return searchAlgorithm.calcNextDirs(state, curVec, curDir, nextDirs, nextDirsInAdvance, isForceBackToStart);
     }
     bool calcShortestDirs(const bool diagonal = true){
@@ -67,6 +93,11 @@ namespace MazeLib {
     */
     void forceBackToStart(){
       isForceBackToStart = true;
+    }
+    void positionIdentify(const Dir d = Dir::North){
+      curDir = d;
+      curVec = positionIdentifier.getStart();
+      isPositionIdentifying = true;
     }
     /** @function getState
     *   @brief 探索状態の取得
@@ -109,10 +140,16 @@ namespace MazeLib {
     *   @param showMaze true:迷路も表示, false:迷路は非表示
     */
     void printInfo(const bool& showMaze = true) const {
-      // カーソルを移動
-      for(int i=0; i<9; i++) printf("\x1b[A");
       // 迷路を表示
-      if(showMaze) searchAlgorithm.printMap(state, curVec, curDir);
+      if(showMaze) {
+        // カーソルを移動
+        for(int i=0; i<10; i++) printf("\x1b[A");
+        if(isPositionIdentifying){
+          positionIdentifier.printMap(curVec, curDir);
+        }else{
+          searchAlgorithm.printMap(state, curVec, curDir);
+        }
+      }
       // 詳細を表示
       printf("Cur: ( %2d, %2d,  %c), State: %s       \n", curVec.x, curVec.y, ">^<v"[curDir], SearchAlgorithm::stateString(state));
       printf("nextDirs: ");
@@ -121,6 +158,7 @@ namespace MazeLib {
       printf("nextDirsInAdvance: ");
       for(const auto d: getNextDirsInAdvance()) printf("%c", ">^<v"[d]);
       printf("        \n");
+      printf("Match Count: %d      \n", matchCount);
     }
     /** @function printPath
     *   @brief 最短経路の表示
@@ -145,5 +183,7 @@ namespace MazeLib {
     Dirs nextDirsInAdvance; /**< 最短経路の方向配列 */
     Dirs shortestDirs; /**< 最短経路の方向配列 */
     bool isForceBackToStart = false;
+    bool isPositionIdentifying = false;
+    int matchCount = 0;
   };
 }
