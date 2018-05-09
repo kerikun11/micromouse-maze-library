@@ -24,7 +24,7 @@ namespace MazeLib {
 		/** @brief コンストラクタ
 		*  @param maze 使用する迷路の参照
 		*/
-		StepMap(Maze& maze) : maze(maze) {
+		StepMap() {
 			calcStraightStepTable();
 			reset();
 		}
@@ -70,7 +70,7 @@ namespace MazeLib {
 		/** @function print
 		*  @param v ハイライト区画
 		*/
-		void print(const Vector& v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const {
+		void print(const Maze& maze, const Vector& v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const {
 			printf("\n");
 			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
 				for(uint8_t x=0; x<MAZE_SIZE; x++)
@@ -95,7 +95,7 @@ namespace MazeLib {
 		*  @param onlyCanGo true:未知の壁は通過不可能とする，false:未知の壁はないものとする
 		*  @param diagonal true: 斜め直線あり false: 斜めはジグザグ
 		*/
-		void update(const Vectors& dest, const bool& onlyCanGo = false, const bool& diagonal = true){
+		void update(const Maze& maze, const Vectors& dest, const bool onlyCanGo = false, const bool diagonal = true){
 			// 全区画のステップを最大値に設定
 			reset();
 			// となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
@@ -172,7 +172,7 @@ namespace MazeLib {
 		*   @brief ステップマップにより次に行くべき方向列を生成する
 		*   @return true:成功, false:失敗(迷子)
 		*/
-		bool calcNextDirs(const Vector& start_v, const Dir& start_d, Dirs& nextDirs, Dirs& nextDirsInAdvance) const {
+		bool calcNextDirs(const Maze& maze, const Vector& start_v, const Dir& start_d, Dirs& nextDirs, Dirs& nextDirsInAdvance) const {
 			// ステップマップから既知区間方向列を生成
 			nextDirs.clear();
 			auto focus_v = start_v;
@@ -211,7 +211,6 @@ namespace MazeLib {
 		}
 
 	private:
-		Maze& maze; /**< @brief 使用する迷路の参照 */
 		step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
 		step_t straightStepTable[MAZE_SIZE*2];
 

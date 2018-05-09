@@ -31,34 +31,32 @@ namespace MazeLib {
 		*   @param goal ゴール区画の配列
 		*/
 		SearchAlgorithm(Maze& maze, const Vectors& goal) : maze(maze),
-		stepMapGoal(maze), stepMapStart(maze), stepMapCandidates(maze),
 		goal(goal) {}
 		/** @enum State
 		*   @brief 探索状態を列挙
 		*/
 		enum State{
-			IDOLE,									//< 初期状態
+			START,									//< 初期位置，初期姿勢
 			SEARCHING_FOR_GOAL,			//< ゴール区画を探索中
-			REACHED_GOAL,           //< ゴール区画内を走行中
 			SEARCHING_ADDITIONALLY,	//< 追加探索中
 			BACKING_TO_START, 			//< スタートに戻っている
 			REACHED_START,					//< スタートに戻ってきた
-			FORCE_BACKING_TO_START,	//< 探索をやめてスタートに戻っている
 			IMPOSSIBLE,							//< ゴールにだどりつくことができないと判明した
+			IDENTIFYING_POSITION,		//< 自己位置同定中
+			FAILED_TO_IDENTIFY,			//< 自己位置同定失敗
 		};
 		/** @function stateString
 		*   @brief SearchAlgorithm::Stateの表示用文字列を返す関数
 		*/
 		static const char* stateString(const enum State s){
 			static const char* str[]={
-				"idole",
+				"start",
 				"Searching for Goal",
-				"Reached Goal",
 				"Searching Additionally",
 				"Backing to Start",
 				"Reached Start",
-				"Force Backing to Start",
-				"Got Lost",
+				"Impossible",
+				"Identifying Position",
 			};
 			return str[s];
 		}
@@ -72,7 +70,7 @@ namespace MazeLib {
 		*   @param state 出発時の探索状態
 		*/
 		bool calcNextDirs(enum State& state, const Vector& pv, const Dir& pd, Dirs& nextDirs, Dirs& nextDirsInAdvance, const bool isForceBackToStart = false) {
-			if(state == IDOLE){
+			if(state == START){
 				state = SEARCHING_FOR_GOAL;
 				#if SEARCHING_ADDITIALLY_AT_START
 				state = SEARCHING_ADDITIONALLY;
@@ -87,27 +85,10 @@ namespace MazeLib {
 				const auto unknownGoal = std::find_if(goal.begin(), goal.end(), [&](const Vector& v){ return maze.unknownCount(v); });
 				if(unknownGoal == goal.end()){
 					state = SEARCHING_ADDITIONALLY;
-				}else{
-					// ゴール区画かどうか判定
-					if(std::find(goal.begin(), goal.end(), pv) != goal.end()){
-						state = SEARCHING_ADDITIONALLY;
-					}else{
-						// ゴールを目指して探索
-						stepMapGoal.update(goal, false, false);
-						return stepMapGoal.calcNextDirs(pv, pd, nextDirs, nextDirsInAdvance);
-					}
-				}
-			}
-
-			if(state == REACHED_GOAL){
-				// ゴール区画をすべて探索
-				candidates.clear();
-				for(const auto& v: goal) if(maze.unknownCount(v)) candidates.push_back(v);
-				if(candidates.empty()){
-					state = SEARCHING_ADDITIONALLY;
-				}else{
-					stepMapCandidates.update(candidates);
-					return stepMapCandidates.calcNextDirs(pv, pd, nextDirs, nextDirsInAdvance);
+				} else {
+					// ゴールを目指して探索
+					stepMapGoal.update(maze, goal, false, false);
+					return stepMapGoal.calcNextDirs(maze, pv, pd, nextDirs, nextDirsInAdvance);
 				}
 			}
 
@@ -115,12 +96,12 @@ namespace MazeLib {
 				// 強制帰還がリクエストされていたら帰る
 				if(isForceBackToStart) state = BACKING_TO_START;
 				// 最短になりうる区画の洗い出し
-				findShortestCandidates();
+				findShortestCandidates(candidates);
 				if(candidates.empty()){
 					state = BACKING_TO_START;
 				}else{
-					stepMapCandidates.update(candidates, false, false);
-					return stepMapCandidates.calcNextDirs(pv, pd, nextDirs, nextDirsInAdvance);
+					stepMapCandidates.update(maze, candidates, false, false);
+					return stepMapCandidates.calcNextDirs(maze, pv, pd, nextDirs, nextDirsInAdvance);
 				}
 			}
 
@@ -128,9 +109,24 @@ namespace MazeLib {
 				if(pv == start) {
 					state = REACHED_START;
 				}else{
-					stepMapStart.update({start}, false, false);
-					return stepMapStart.calcNextDirs(pv, pd, nextDirs, nextDirsInAdvance);
+					stepMapStart.update(maze, {start}, false, false);
+					return stepMapStart.calcNextDirs(maze, pv, pd, nextDirs, nextDirsInAdvance);
 				}
+			}
+
+			if(state == REACHED_START){
+				nextDirs.clear();
+				nextDirsInAdvance.clear();
+				return true;
+			}
+
+			if(state == IDENTIFYING_POSITION){
+				Vector ans;
+				int cnt = findIndentifyCandidate(idWallLogs, ans, candidates);
+				Maze idMaze;
+				for(auto& wl: idWallLogs) idMaze.updateWall(Vector(wl), wl.d, wl.b);
+				stepMapCandidates.update(idMaze, candidates, false, false);
+				stepMapCandidates.calcNextDirs(maze, pv, pd, nextDirs, nextDirsInAdvance);
 			}
 
 			return state == REACHED_START;
@@ -140,8 +136,8 @@ namespace MazeLib {
 		*   @return 成功 or 失敗
 		*/
 		bool calcShortestDirs(Dirs& shortestDirs, const bool diagonal = true){
-			stepMapGoal.update(goal, true, diagonal);
-			// stepMapGoal.update(goal, false, diagonal); //< for debug
+			stepMapGoal.update(maze, goal, true, diagonal);
+			// stepMapGoal.update(maze, goal, false, diagonal); //< for debug
 			shortestDirs.clear();
 			auto v = start;
 			Dir dir = Dir::North;
@@ -190,26 +186,28 @@ namespace MazeLib {
 		void printMap(const State& state, const Vector& v, const Dir& d) const {
 			for(int i=0; i<MAZE_SIZE*2; i++) printf("\x1b[A");
 			switch(state){
-				case SearchAlgorithm::IDOLE:
+				case SearchAlgorithm::START:
 				case SearchAlgorithm::SEARCHING_FOR_GOAL:
-				stepMapGoal.print(v, d);
+				stepMapGoal.print(maze, v, d);
 				break;
-				case SearchAlgorithm::REACHED_GOAL:
 				case SearchAlgorithm::SEARCHING_ADDITIONALLY:
-				stepMapCandidates.print(v, d);
+				stepMapCandidates.print(maze, v, d);
 				break;
 				case SearchAlgorithm::BACKING_TO_START:
-				stepMapStart.print(v, d);
+				stepMapStart.print(maze, v, d);
 				break;
 				case SearchAlgorithm::REACHED_START:
 				case SearchAlgorithm::IMPOSSIBLE:
 				default:
-				stepMapGoal.print(v, d);
+				stepMapGoal.print(maze, v, d);
 				break;
 			}
 		}
+
 	private:
 		Maze& maze; /**< 使用する迷路の参照 */
+		Maze idMaze;
+    WallLogs idWallLogs;
 		StepMap stepMapGoal; /**< 使用するステップマップ */
 		StepMap stepMapStart; /**< 使用するステップマップ */
 		StepMap stepMapCandidates; /**< 使用するステップマップ */
@@ -220,11 +218,11 @@ namespace MazeLib {
 		/** @function findShortestCandidates
 		*   @brief ステップマップにより最短経路上になりうる区画を洗い出す
 		*/
-		bool findShortestCandidates(){
+		bool findShortestCandidates(Vectors& candidates) {
 			candidates.clear();
 			// 斜めありなしの双方の最短経路上を候補とする
 			for(const bool diagonal: {true, false}){
-				stepMapGoal.update(goal, false, diagonal);
+				stepMapGoal.update(maze, goal, false, diagonal);
 				auto v = start;
 				Dir dir = Dir::North;
 				auto prev_dir = dir;
@@ -269,6 +267,26 @@ namespace MazeLib {
 				}
 			}
 			return true; //< 成功
+		}
+		int findIndentifyCandidate(const WallLogs idWallLogs, Vector& ans, Vectors& findCandidates) {
+			findCandidates.clear();
+			int cnt = 0;
+			for(int x=-MAZE_SIZE+1; x<MAZE_SIZE; x++)
+			for(int y=-MAZE_SIZE+1; y<MAZE_SIZE; y++) {
+				const Vector offset(x, y);
+				int diffs=0;
+				for(auto wl: idWallLogs){
+					Vector v(wl.x, wl.y);
+					Dir d = wl.d;
+					if(maze.isKnown(v+offset, d) && maze.isWall(v+offset, d) != wl.b) diffs++;
+				}
+				if(diffs == 0) {
+					cnt++;
+					ans = offset;
+					if(ans.x>=0 && ans.x<MAZE_SIZE && ans.y>=0 && ans.y<MAZE_SIZE) candidates.push_back(ans);
+				}
+			}
+			return cnt;
 		}
 	};
 }

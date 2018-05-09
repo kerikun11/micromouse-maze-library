@@ -64,7 +64,6 @@ auto start = std::chrono::system_clock::now();
 auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
 auto usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
 int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
-int wall_log=0,log_max=0;
 
 #if 1
 
@@ -91,7 +90,6 @@ void queueActions(const Dirs& nextDirs){
 		agent.printInfo();
 		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 		printf("It took %5d [us], the max is %5d [us]\n", usec, max_usec);
-		printf("wall_log: %5d, log_max: %5d\n", wall_log, log_max);
 		usleep(100000);
 		char c; scanf("%c", &c);
 		#endif
@@ -111,13 +109,14 @@ void queueActions(const Dirs& nextDirs){
 			case Dir::Back:
 			/* queue SearchRun::TURN_BACK */
 			b++;
-			wall_log=0;
 			break;
 		}
 		agent.updateCurVecDir(nextVec, nextDir);
 		step++;
 	}
 }
+
+Vector offset(0, 0);
 
 bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0, 0), const Dir& startDir = Dir::North){
 	agent.reset();
@@ -128,10 +127,6 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		/* queue Action::START_STEP */
 		agent.updateCurVecDir(startVec.next(startDir), startDir);
 	}
-	/* debug */
-	maze = sample;
-	agent.positionIdentify();
-	/* debug */
 	/* conduct calibration of sensors */
 	/* start the robot */
 	int count=0;
@@ -151,15 +146,15 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 			/* queue SearchRun::STOP */
 			/* wait for queue being empty */
 			/* stop the robot */
-		agent.printInfo();
+			agent.printInfo();
 			printf("\n");
 			printf("Got Lost!");
 			while (1);
 			return false;
 		}
-		if(newState != prevState && newState == SearchAlgorithm::REACHED_GOAL){ }
-		if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ }
-		if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){ }
+		// if(newState != prevState && newState == SearchAlgorithm::REACHED_GOAL){ }
+		// if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ }
+		// if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){ }
 
 		// 既知区間移動をキューにつめる
 		queueActions(agent.getNextDirs());
@@ -171,13 +166,8 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		/* wait for queue being empty */
 
 		// find walls
-		if(!maze.isKnown(v, d+1)) wall_log++;
-		if(!maze.isKnown(v, d+0)) wall_log++;
-		if(!maze.isKnown(v, d-1)) wall_log++;
-		// agent.updateWall(v, d+1, sample.isWall(v+Vector(10,12), d+1)); // left wall
 		Dir nextDirInAdvance;
-		agent.updateWall(v, d, sample.isWall(v, d+1), sample.isWall(v, d), sample.isWall(v, d-1), nextDirInAdvance);
-		if(log_max < wall_log) log_max = wall_log;
+		agent.updateWall(v, d, sample.isWall(v+offset, d+1), sample.isWall(v+offset, d), sample.isWall(v+offset, d-1), nextDirInAdvance);
 
 		/* backup the wall */
 
@@ -206,47 +196,20 @@ bool fastRun(){
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
-	// while(!searchRun());
-	searchRun();
+	while(!searchRun());
+	// display=true;
+	// agent.positionIdentify();
+	// offset = Vector(-10,14);
+	// maze = sample;
+	// searchRun(false, Vector(MAZE_SIZE/2, MAZE_SIZE/2), Dir::North);
 	agent.printInfo();
 	printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 	printf("the max is %5d [us]\n", max_usec);
-	printf("the log_max is %5d\n", log_max);
 	fastRun();
 	agent.printPath();
 	agent.calcShortestDirs(false);
 	agent.printPath();
 	#else
-	maze = sample;
-	while(1){
-		const auto& v = pi.getCurVec();
-		const auto& d = pi.getCurDir();
-		pi.calcNextDirs();
-		// pi.printInfo();
-		Vector ans;
-		auto cnt = pi.identify(maze, ans);
-		std::cout << "v: " << v << " d: " << d << " cnt: " << cnt << " ans: " << ans << std::endl;
-		if(cnt == 1) break;
-		if(cnt == 0) break;
-
-		// 既知区間移動をキューにつめる
-		queueActions(pi.getNextDirs());
-
-		// find walls
-		const Vector offset = Vector(12, 6) - Vector(MAZE_SIZE/2, MAZE_SIZE/2);
-		pi.updateWall(v, d+1, sample.isWall(v+offset, d+1)); // left wall
-		pi.updateWall(v, d+0, sample.isWall(v+offset, d+0)); // front wall
-		pi.updateWall(v, d-1, sample.isWall(v+offset, d-1)); // right wall
-		// pi.updateWall(v, d+2, false); // right wall
-		/* backup the wall */
-
-		// 候補の中で行ける方向を探す
-		const auto nextDirsInAdvance = pi.getNextDirsInAdvance();
-		const auto nextDirInAdvance = *std::find_if(nextDirsInAdvance.begin(), nextDirsInAdvance.end(), [&](const Dir& dir){
-			return pi.getMaze().canGo(v, dir);
-		});
-		queueActions({nextDirInAdvance});
-	}
 
 	// StepMap stepMap(maze);
 	// stepMap.update({Vector(0,31)});

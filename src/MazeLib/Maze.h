@@ -16,7 +16,7 @@ namespace MazeLib {
 	/** @def MAZE_SIZE
 	*   @brief 迷路の1辺の区画数
 	*/
-	#define MAZE_SIZE			32
+	#define MAZE_SIZE			16
 	/** @typedef
 	*   @brief 迷路のサイズのbit数の整数型
 	*   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
