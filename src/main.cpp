@@ -13,7 +13,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY		1
+#define DISPLAY		0
 
 #if MAZE_SIZE == 8
 // Vectors goal = {Vector(7,7)};
@@ -35,7 +35,7 @@ Maze sample(mazeData_MM2017CXpre, true);
 // Maze sample(mazeData_fp2016C);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2017
+#define YEAR 2016
 #if YEAR == 2012
 Vectors goal = {Vector(22,25)};
 Maze sample(mazeData_MM2012HX);
@@ -90,7 +90,7 @@ void stopAndSaveMaze(){
 	/* start the robot */
 }
 
-bool display = 0;
+bool display = 1;
 
 void queueActions(const Dirs& nextDirs){
 		if(agent.getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
@@ -144,7 +144,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	/* start the robot */
 	int cnt=0;
 	while(1){
-		// if(cnt++ > 200) return false;
+		if(cnt++ > 400) return false;
 		const auto& v = agent.getCurVec();
 		const auto& d = agent.getCurDir();
 		SearchAlgorithm::State prevState = agent.getState();

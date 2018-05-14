@@ -64,6 +64,7 @@ namespace MazeLib {
     *   @return 探索状態
     */
     bool calcNextDirs(){
+      // return searchAlgorithm.calcNextDirsInAdvance(state, curVec, curDir, nextDirs, nextDirCandidates, isForceBackToStart);
       return searchAlgorithm.calcNextDirs(state, curVec, curDir, nextDirs, nextDirCandidates, isForceBackToStart);
     }
     bool calcShortestDirs(const bool diagonal = true){

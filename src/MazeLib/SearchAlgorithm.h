@@ -76,7 +76,7 @@ namespace MazeLib {
 		*   @param state 出発時の探索状態
 		*   @return true: 成功, false: 失敗
 		*/
-		bool calcNextDirs(enum State& state, Vector& pv, const Dir& pd, Dirs& nextDirs, Dirs& nextDirCandidates, const bool isForceBackToStart = false) {
+		bool calcNextDirs(enum State& state, Vector& pv, const Dir& pd, Dirs& nextDirs, Dirs& nextDirCandidates, const bool isForceBackToStart) {
 			nextDirs.clear();
 			nextDirCandidates.clear();
 
@@ -146,6 +146,29 @@ namespace MazeLib {
 			// ここには達しない
 			return false;
 		}
+		bool calcNextDirsInAdvance(enum State& state, Vector& pv, const Dir& pd, Dirs& nextDirs, Dirs& nextDirCandidates, const bool isForceBackToStart = false) {
+			calcNextDirs(state, pv, pd, nextDirs, nextDirCandidates, isForceBackToStart);
+			auto v = pv; for(auto d: nextDirs) v = v.next(d);
+			Dirs ndcs;
+			WallLogs cache;
+			while(1){
+				if(nextDirCandidates.empty()) break;
+				const Dir d = nextDirCandidates[0];
+				ndcs.push_back(d);
+				if(maze.isKnown(v, d)) break; //< 既知なら終わり
+				cache.push_back(WallLog(v, d, maze.isWall(v, d)));
+				maze.setWall (v, d, true);
+				State tmp_state = state;
+				Dirs tmp_nds;
+				calcNextDirs(tmp_state, v, d, tmp_nds, nextDirCandidates, isForceBackToStart);
+			}
+			for(auto wl: cache) {
+				maze.setWall (Vector(wl), wl.d, false);
+				maze.setKnown(Vector(wl), wl.d, false);
+			}
+			nextDirCandidates = ndcs;
+			return !ndcs.empty();
+		}
 		/** @function calcShortestDirs
 		*   @brief 最短経路を導出
 		*   @return 成功 or 失敗
@@ -211,7 +234,7 @@ namespace MazeLib {
 		}
 		// const StepMap& getStepMap() const { return stepMap; }
 		const Vector idStartVector = Vector(MAZE_SIZE/2, MAZE_SIZE/2);
-    int matchCount = 0;
+		int matchCount = 0;
 
 	private:
 		Maze& maze; /**< 使用する迷路の参照 */
