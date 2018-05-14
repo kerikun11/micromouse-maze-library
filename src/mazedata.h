@@ -2,6 +2,17 @@
 
 extern const char mazeData_fp2016[8+1][8+1] = { "6beab6ab", "4aaa3c37", "c2ab4a1d", "b8a35683", "6a2954b5", "57575c29", "5549ca17", "dc8aaa9d", };
 
+extern const char mazeData_a[8+1][8+1] = {
+	"ffffffff",
+	"ffffffff",
+	"ffffffff",
+	"ffffffff",
+	"6363ffff",
+	"4155ffff",
+	"4895ffff",
+	"dea9ffff",
+};
+
 extern const char mazeData_b[8+1][8+1] = {
 	"ffffffff",
 	"ffffffff",
@@ -13,13 +24,13 @@ extern const char mazeData_b[8+1][8+1] = {
 	"dea9ffff",
 };
 
-extern const char mazeData_a[8+1][8+1] = {
+extern const char mazeData_d[8+1][8+1] = {
 	"ffffffff",
 	"ffffffff",
 	"ffffffff",
 	"ffffffff",
-	"6363ffff",
-	"4155ffff",
+	"7763ffff",
+	"5555ffff",
 	"4895ffff",
 	"dea9ffff",
 };
@@ -33,6 +44,25 @@ extern const char mazeData_c[8+1][8+1] = {
 	"ffdea9ff",
 	"ffffffff",
 	"ffffffff",
+};
+
+extern const char mazeData_fp2016C[16+1][16+1] = {
+	"ffffffffffffffff",
+	"ffffffffffffffff",
+	"ffffffffffffffff",
+	"ffffffffffffffff",
+	"ffffffffffffffff",
+	"ffffffffffffffff",
+	"ffffffffffffffff",
+	"ffffffffffffffff",
+	"6beab6abffffffff",
+	"4aaa3c37ffffffff",
+	"c2ab4a1dffffffff",
+	"b8a35683ffffffff",
+	"6a2954b5ffffffff",
+	"57575c29ffffffff",
+	"5549ca17ffffffff",
+	"dc8aaa9dffffffff",
 };
 
 extern const char mazeData_maze[16+1][16+1] = {
@@ -169,22 +199,22 @@ extern const char mazeData_MM2017CX[16+1][16+1] = {
 };
 
 extern const char mazeData_MM2017CXpre[16+1][16+1] = {
-"62a3e22a2a2b7e23",
-"5c3c21c3c3c28295",
-"434a9435e8296169",
-"5c96294837ca1c17",
-"4369569694a3c349",
-"5c1680296960b497",
-"c349695682943c21",
-"7482169435694a1d",
-"4969483c948343c3",
-"4a1e03c369615ca1",
-"c3c21ca1c29c9621",
-"7c294a3c3d6b695d",
-"5e16969682969683",
-"434961683c3c2021",
-"5496949616835dd5",
-"dca9e8a9c9e88aa9",
+	"62a3e22a2a2b7e23",
+	"5c3c21c3c3c28295",
+	"434a9435e8296169",
+	"5c96294837ca1c17",
+	"4369569694a3c349",
+	"5c1680296960b497",
+	"c349695682943c21",
+	"7482169435694a1d",
+	"4969483c948343c3",
+	"4a1e03c369615ca1",
+	"c3c21ca1c29c9621",
+	"7c294a3c3d6b695d",
+	"5e16969682969683",
+	"434961683c3c2021",
+	"5496949616835dd5",
+	"dca9e8a9c9e88aa9",
 };
 
 extern const char mazeData_Cheese2017[16+1][16+1] = {

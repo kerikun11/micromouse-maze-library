@@ -16,7 +16,7 @@ namespace MazeLib {
 	/** @def MAZE_SIZE
 	*   @brief 迷路の1辺の区画数
 	*/
-	#define MAZE_SIZE			16
+	#define MAZE_SIZE			32
 	/** @typedef
 	*   @brief 迷路のサイズのbit数の整数型
 	*   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
@@ -362,13 +362,25 @@ namespace MazeLib {
 			return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return !isKnown(v, d);});
 		}
 		/** @function updateWall
-		*   @brief 壁を更新して既知とする関数
+		*   @brief 既知の壁と照らしあわせながら，壁を更新する関数
 		*   @param v 区画の座標
 		*   @param d 壁の方向
+		*   @param b 壁の有無
+		*   @return true: 正常に更新された, false: 既知の情報と不一致だった
 		*/
-		void updateWall(const Vector& v, const Dir& d, const bool& b){
-			setWall(v, d, b);
-			setKnown(v, d, true);
+		bool updateWall(const Vector& v, const Dir& d, const bool& b){
+      // 既知の壁と食い違いがあったら未知壁としてreturn
+      if(isKnown(v, d) && isWall(v, d) != b){
+        setWall(v, d, false);
+        setKnown(v, d, false);
+        return false;
+      }
+      // 未知壁なら壁情報を更新
+      if(!isKnown(v, d)){
+        setWall(v, d, b);
+        setKnown(v, d, true);
+      }
+      return true;
 		}
 		/** @function print
 		*   @brief 迷路の表示
