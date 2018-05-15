@@ -403,6 +403,38 @@ namespace MazeLib {
 			printf("+%s" C_RESET, isKnown(x,0,Dir::South) ? (isWall(x,0,Dir::South)?"---":"   ") : C_RED " - ");
 			printf("+\n");
 		}
+		void print(std::ostream& os) const {
+			for(int8_t y=MAZE_SIZE; y>=0; y--){
+				if(y != MAZE_SIZE){
+					os << '|';
+					for(uint8_t x=0; x<MAZE_SIZE; x++) os << "   " << (isKnown(x,y,Dir::East)?(isWall(x,y,Dir::East)?"|":" "):".");
+					os << std::endl;
+				}
+				for(uint8_t x=0; x<MAZE_SIZE; x++) os << "+" << (isKnown(x,y,Dir::South)?(isWall(x,y,Dir::South)?"---":"   "):" . ");
+				os << "+" << std::endl;
+			}
+		}
+		bool parse(std::istream& is){
+			reset();
+			for(int8_t y=MAZE_SIZE; y>=0; y--){
+				if(y!=MAZE_SIZE){
+					is.ignore(10, '|');
+					for(uint8_t x=0; x<MAZE_SIZE; x++) {
+						is.ignore(3); //< "   "
+						char c = is.get();
+						if     (c=='|') updateWall(Vector(x, y), Dir::East, true);
+						else if(c==' ') updateWall(Vector(x, y), Dir::East, false);
+					}
+				}
+				for(uint8_t x=0; x<MAZE_SIZE; x++){
+					is.ignore(10, '+');
+					char c = is.get();
+					if     (c=='-') updateWall(Vector(x, y), Dir::South, true);
+					else if(c==' ') updateWall(Vector(x, y), Dir::South, false);
+					is.ignore(2); //< "--"
+				}
+			}
+		}
 		/** @function printPath
 		*   @brief パス付の迷路の表示
 		*   @param start パスのスタート座標

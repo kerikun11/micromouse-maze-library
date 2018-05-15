@@ -219,6 +219,11 @@ int main(void){
 	agent.printPath();
 	#else
 
+	std::ifstream ifs("MM2016HX.txt", std::ifstream::in);
+	Maze m;
+	m.parse(ifs);
+	m.print(std::cout);
+	// sample.print(std::cout);
 	// StepMap stepMap(maze);
 	// stepMap.update({Vector(0,31)});
 	// stepMap.print();
