@@ -369,18 +369,18 @@ namespace MazeLib {
 		*   @return true: 正常に更新された, false: 既知の情報と不一致だった
 		*/
 		bool updateWall(const Vector& v, const Dir& d, const bool& b){
-      // 既知の壁と食い違いがあったら未知壁としてreturn
-      if(isKnown(v, d) && isWall(v, d) != b){
-        setWall(v, d, false);
-        setKnown(v, d, false);
-        return false;
-      }
-      // 未知壁なら壁情報を更新
-      if(!isKnown(v, d)){
-        setWall(v, d, b);
-        setKnown(v, d, true);
-      }
-      return true;
+			// 既知の壁と食い違いがあったら未知壁としてreturn
+			if(isKnown(v, d) && isWall(v, d) != b){
+				setWall(v, d, false);
+				setKnown(v, d, false);
+				return false;
+			}
+			// 未知壁なら壁情報を更新
+			if(!isKnown(v, d)){
+				setWall(v, d, b);
+				setKnown(v, d, true);
+			}
+			return true;
 		}
 		/** @function print
 		*   @brief 迷路の表示

@@ -4,6 +4,7 @@
 #include "MazeLib/Agent.h"
 
 #include <iostream>
+#include <fstream>
 
 #include "mazedata.h"
 
@@ -21,8 +22,8 @@ Vectors goal = {Vector(1,0)};
 // Maze sample(mazeData_fp2016);
 Maze sample(mazeData_a);
 #elif MAZE_SIZE == 16
-// Vectors goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
-Vectors goal = {Vector(7,7)};
+Vectors goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
+// Vectors goal = {Vector(7,7)};
 // Vectors goal = {Vector(3,3),Vector(3,4),Vector(4,3),Vector(4,4)};
 // Maze sample(mazeData_maze, false);
 // Maze sample(mazeData_maze3, false);
@@ -30,13 +31,16 @@ Vectors goal = {Vector(7,7)};
 //Maze sample(mazeData_maze2013fr, false);
 // Maze sample(mazeData_maze2013exp, false);
 // Maze sample(mazeData_2017_East_MC, true);
-Maze sample(mazeData_MM2017CXpre, true);
-// Maze sample(mazeData_MM2017CX, true);
+// Maze sample(mazeData_MM2017CXpre, true);
+Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_fp2016C);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2016
-#if YEAR == 2012
+#define YEAR 2017
+#if YEAR == 2011
+Vectors goal = {Vector(1,0)};
+Maze sample(mazeData_32);
+#elif YEAR == 2012
 Vectors goal = {Vector(22,25)};
 Maze sample(mazeData_MM2012HX);
 #elif YEAR == 2013
@@ -70,8 +74,8 @@ int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
 
 bool findWall(const Vector v, const Dir d) {
 	if (agent.getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
-		Vector offset(14, -14);
-		// Vector offset(-2, -2);
+		// Vector offset(15, -16);
+		Vector offset(-13, -13);
 		return sample.isWall(v+offset, d);
 	}
 	return sample.isWall(v, d);
@@ -90,7 +94,7 @@ void stopAndSaveMaze(){
 	/* start the robot */
 }
 
-bool display = 1;
+bool display = 0;
 
 void queueActions(const Dirs& nextDirs){
 		if(agent.getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
@@ -106,7 +110,7 @@ void queueActions(const Dirs& nextDirs){
 			agent.printInfo();
 			printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 			printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
-			usleep(100000);
+			// usleep(100000);
 			char c; scanf("%c", &c);
 		}
 		#endif
@@ -144,7 +148,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	/* start the robot */
 	int cnt=0;
 	while(1){
-		if(cnt++ > 400) return false;
+		if(cnt++ > 200) return false;
 		const auto& v = agent.getCurVec();
 		const auto& d = agent.getCurDir();
 		SearchAlgorithm::State prevState = agent.getState();
@@ -154,15 +158,6 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
 		if(max_usec < usec) max_usec = usec;
 		SearchAlgorithm::State newState = agent.getState();
-		if(!result) {
-			/* queue SearchRun::STOP */
-			/* wait for queue being empty */
-			/* stop the robot */
-			agent.printInfo();
-			printf("Got Lost!");
-			while (1);
-			return false;
-		}
 		// if(newState != prevState && newState == SearchAlgorithm::REACHED_GOAL){ }
 		// if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ }
 		// if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){ }
@@ -180,7 +175,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		Dir nextDirCandidate;
 		bool res = agent.updateWall(v, d, findWall(v, d+1), findWall(v, d), findWall(v, d-1), findWall(v, d+2), nextDirCandidate);
 		if(agent.getNextDirCandidates().empty()) {
-			printf("nextDirCandidates is empty!\n");
+			printf("nextDirCandidates is empty! \n");
 			while(1);
 		}
 

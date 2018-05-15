@@ -99,7 +99,14 @@ namespace MazeLib {
 				} else if(cnt == 0){
 					return false;
 				} else {
-					stepMap.update(idMaze, {Vector(MAZE_SIZE-1, MAZE_SIZE-1)}, false, false);
+					candidates.clear();
+					for(auto v: {Vector(MAZE_SIZE-1, MAZE_SIZE-1), Vector(MAZE_SIZE-1, 0), Vector(0, MAZE_SIZE-1)}){
+						if(idMaze.unknownCount(v)){
+							candidates.push_back(v);
+							break;
+						}
+					}
+					stepMap.updateSimple(idMaze, candidates, false);
 					return stepMap.calcNextDirs(idMaze, pv, pd, nextDirs, nextDirCandidates);
 				}
 			}
@@ -112,7 +119,7 @@ namespace MazeLib {
 					state = SEARCHING_ADDITIONALLY;
 				} else {
 					// ゴールを目指して探索
-					stepMap.update(maze, {*unknownGoal}, false, false);	//< ゴール，壁なし，斜めなし
+					stepMap.updateSimple(maze, {*unknownGoal}, false);	//< ゴール，壁なし，斜めなし
 					return stepMap.calcNextDirs(maze, pv, pd, nextDirs, nextDirCandidates);
 				}
 			}
@@ -125,7 +132,7 @@ namespace MazeLib {
 				if(candidates.empty()){
 					state = BACKING_TO_START;
 				}else{
-					stepMap.update(maze, candidates, false, false);
+					stepMap.updateSimple(maze, candidates, false);
 					return stepMap.calcNextDirs(maze, pv, pd, nextDirs, nextDirCandidates);
 				}
 			}
@@ -134,7 +141,7 @@ namespace MazeLib {
 				if(pv == start) {
 					state = REACHED_START;
 				}else{
-					stepMap.update(maze, {start}, false, false);
+					stepMap.updateSimple(maze, {start}, false);
 					return stepMap.calcNextDirs(maze, pv, pd, nextDirs, nextDirCandidates);
 				}
 			}
@@ -304,16 +311,21 @@ namespace MazeLib {
 			for(int y=-MAZE_SIZE+1; y<MAZE_SIZE; y++) {
 				const Vector offset(x, y);
 				int diffs=0;
+				int matchs=0;
 				int unknown=0;
 				for(auto wl: idWallLogs){
 					Vector v(wl.x, wl.y);
 					Dir d = wl.d;
 					if(maze.isKnown(v+offset, d) && maze.isWall(v+offset, d) != wl.b) diffs++;
+					if(maze.isKnown(v+offset, d) && maze.isWall(v+offset, d) == wl.b) matchs++;
 					if(!maze.isKnown(v+offset, d)) unknown++;
 				}
-				if(diffs <= 5 && unknown < idWallLogs.size()/2+MAZE_SIZE/2) {
-					ans = idStartVector + offset;
-					cnt++;
+				int size = idWallLogs.size();
+				if(diffs <= 4) {
+					if(size<4 || unknown<size/2 || matchs>size/2) {
+						ans = idStartVector + offset;
+						cnt++;
+					}
 				}
 			}
 			return cnt;

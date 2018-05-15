@@ -95,7 +95,7 @@ namespace MazeLib {
 		*  @param onlyCanGo true:未知の壁は通過不可能とする，false:未知の壁はないものとする
 		*  @param diagonal true: 斜め直線あり false: 斜めはジグザグ
 		*/
-		void update(const Maze& maze, const Vectors& dest, const bool onlyCanGo = false, const bool diagonal = true){
+		void update(const Maze& maze, const Vectors& dest, const bool onlyCanGo = false, const bool diagonal = true) {
 			// 全区画のステップを最大値に設定
 			reset();
 			// となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
@@ -125,10 +125,6 @@ namespace MazeLib {
 						if(getStep(next) < step) break; //< これより先，更新されることはない
 						setStep(next, step);
 						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-						// if(getStep(next) > step){
-						// 	setStep(next, step);
-						// 	q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-						// }
 					}
 					if(!diagonal) continue; //< 斜めなしの場合
 					// 斜め直線で行けるところまで更新する
@@ -143,10 +139,6 @@ namespace MazeLib {
 						if(getStep(next) < step) break; //< これより先，更新されることはない
 						setStep(next, step);
 						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-						// if(getStep(next) >= step){
-						// 	setStep(next, step);
-						// 	q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-						// }
 					}
 					// 斜め直線で行けるところまで更新する
 					next = focus.next(d);
@@ -160,11 +152,39 @@ namespace MazeLib {
 						if(getStep(next) < step) break; //< これより先，更新されることはない
 						setStep(next, step);
 						q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-						// if(getStep(next) >= step){
-						// 	setStep(next, step);
-						// 	q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
-						// }
 					}
+				}
+			}
+		}
+		/** @function updateSimple
+		*   @brief シンプルに1マス1ステップのステップマップ更新
+		*   @param dest ステップを0とする区画の配列(destination)
+		*   @param onlyCanGo true:未知の壁は通過不可能とする，false:未知の壁はないものとする
+		*/
+		void updateSimple(const Maze& maze, const Vectors& dest, const bool onlyCanGo = false) {
+			// return update(maze, dest, onlyCanGo, false);
+			// 全区画のステップを最大値に設定
+			reset();
+			// となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
+			std::queue<Vector> q;
+			// destに含まれる区画のステップを0とする
+			for(const auto& v: dest) {
+				setStep(v, 0);
+				q.push(v);
+			}
+			// ステップの更新がなくなるまで更新処理
+			while(!q.empty()){
+				// 注目する区画を取得
+				const Vector focus = q.front(); q.pop();
+				const step_t& focus_step = getStep(focus);
+				// 4方向更新がないか調べる
+				for(const auto& d: Dir::All()){
+					if(maze.isWall(focus, d)) continue; //< 壁があったら更新はしない
+					if(onlyCanGo && !maze.isKnown(focus, d)) continue; //< onlyCanGoで未知壁なら更新はしない
+					Vector next = focus.next(d);
+					if(getStep(next) <= focus_step+1) continue; //< 更新の必要がない
+					setStep(next, focus_step+1);
+					q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
 				}
 			}
 		}

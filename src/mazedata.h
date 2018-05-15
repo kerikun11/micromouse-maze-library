@@ -2,7 +2,7 @@
 
 extern const char mazeData_fp2016[8+1][8+1] = { "6beab6ab", "4aaa3c37", "c2ab4a1d", "b8a35683", "6a2954b5", "57575c29", "5549ca17", "dc8aaa9d", };
 
-extern const char mazeData_a[8+1][8+1] = {
+extern const char mazedata_a[8+1][8+1] = {
 	"ffffffff",
 	"ffffffff",
 	"ffffffff",
@@ -44,6 +44,41 @@ extern const char mazeData_c[8+1][8+1] = {
 	"ffdea9ff",
 	"ffffffff",
 	"ffffffff",
+};
+
+extern const char mazeData_32[32+1][32+1] = {
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"ffffffffffffffffffffffffffffffff",
+	"6363ffffffffffffffffffffffffffff",
+	"4155ffffffffffffffffffffffffffff",
+	"4895ffffffffffffffffffffffffffff",
+	"dea9ffffffffffffffffffffffffffff",
 };
 
 extern const char mazeData_fp2016C[16+1][16+1] = {
