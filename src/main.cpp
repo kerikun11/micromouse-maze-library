@@ -36,7 +36,7 @@ Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_fp2016C);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2015
+#define YEAR 2017
 #if YEAR == 2011
 Vectors goal = {Vector(1,0)};
 Maze sample(mazeData_32);
@@ -99,7 +99,7 @@ void stopAndSaveMaze(){
 	/* start the robot */
 }
 
-bool display = 0;
+bool display = 1;
 
 void queueActions(const Dirs& nextDirs){
 	if(agent.getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
@@ -116,7 +116,7 @@ void queueActions(const Dirs& nextDirs){
 			printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 			printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
 			// usleep(100000);
-			char c; scanf("%c", &c);
+			// char c; scanf("%c", &c);
 		}
 		#endif
 		switch (Dir(nextDir - agent.getCurDir())) {
@@ -143,7 +143,7 @@ void queueActions(const Dirs& nextDirs){
 }
 
 
-bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0, 0), const Dir& startDir = Dir::North){
+bool searchRun(bool isStartStep = true, const Vector& startVec = Vector(0, 0), const Dir& startDir = Dir::North){
 	if(isStartStep) {
 		agent.updateCurVecDir(startVec, startDir);
 		/* queue Action::START_STEP */
@@ -180,6 +180,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 		Dir nextDirCandidate;
 		bool res = agent.updateWall(v, d, findWall(v, d+1), findWall(v, d), findWall(v, d-1), findWall(v, d+2), nextDirCandidate);
 		if(agent.getNextDirCandidates().empty()) {
+			agent.printInfo();
 			printf("nextDirCandidates is empty! \n");
 			while(1);
 		}
@@ -244,10 +245,10 @@ int main(void){
 	// agent.printInfo();
 	printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 	printf("the max is %5d [us]\n", max_usec);
-	// fastRun();
-	// agent.printPath();
-	// agent.calcShortestDirs(false);
-	// agent.printPath();
+	fastRun();
+	agent.printPath();
+	agent.calcShortestDirs(false);
+	agent.printPath();
 	#else
 
 	std::ifstream ifs("MM2016HX.txt", std::ifstream::in);

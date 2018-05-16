@@ -106,21 +106,17 @@ namespace MazeLib {
 							break;
 						}
 					}
-					stepMap.updateSimple(idMaze, candidates, false);
-					return stepMap.calcNextDirs(idMaze, pv, pd, nextDirs, nextDirCandidates);
+					return calcNextdirsForCandidates(idMaze, candidates, pv, pd, nextDirs, nextDirCandidates);
 				}
 			}
 
 			if(state == SEARCHING_FOR_GOAL){
-				// state = SEARCHING_ADDITIONALLY;
-				// ゴール区画が探索済みなら次のstateへ
-				const auto unknownGoal = std::find_if(goal.begin(), goal.end(), [&](const Vector& v){ return maze.unknownCount(v); });
-				if(unknownGoal == goal.end()){
+				candidates.clear();
+				for(auto v: goal) if(maze.unknownCount(v)) candidates.push_back(v); //< ゴール区画の未知区画を洗い出す
+				if(candidates.empty()){
 					state = SEARCHING_ADDITIONALLY;
 				} else {
-					// ゴールを目指して探索
-					stepMap.updateSimple(maze, {*unknownGoal}, false);	//< ゴール，壁なし，斜めなし
-					return stepMap.calcNextDirs(maze, pv, pd, nextDirs, nextDirCandidates);
+					return calcNextdirsForCandidates(maze, candidates, pv, pd, nextDirs, nextDirCandidates);
 				}
 			}
 
@@ -132,8 +128,7 @@ namespace MazeLib {
 				if(candidates.empty()){
 					state = BACKING_TO_START;
 				}else{
-					stepMap.updateSimple(maze, candidates, false);
-					return stepMap.calcNextDirs(maze, pv, pd, nextDirs, nextDirCandidates);
+					return calcNextdirsForCandidates(maze, candidates, pv, pd, nextDirs, nextDirCandidates);
 				}
 			}
 
@@ -141,8 +136,7 @@ namespace MazeLib {
 				if(pv == start) {
 					state = REACHED_START;
 				}else{
-					stepMap.updateSimple(maze, {start}, false);
-					return stepMap.calcNextDirs(maze, pv, pd, nextDirs, nextDirCandidates);
+					return calcNextdirsForCandidates(maze, {start}, pv, pd, nextDirs, nextDirCandidates);
 				}
 			}
 
@@ -153,6 +147,10 @@ namespace MazeLib {
 			// ここには達しない
 			return false;
 		}
+		bool calcNextdirsForCandidates(Maze& maze, const Vectors& dest, const Vector vec, const Dir dir, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
+			stepMap.updateSimple(maze, dest, false);
+			return stepMap.calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
+		}
 		bool calcNextDirsInAdvance(enum State& state, Vector& pv, const Dir& pd, Dirs& nextDirs, Dirs& nextDirCandidates, const bool isForceBackToStart = false) {
 			calcNextDirs(state, pv, pd, nextDirs, nextDirCandidates, isForceBackToStart);
 			auto v = pv; for(auto d: nextDirs) v = v.next(d);
@@ -160,12 +158,12 @@ namespace MazeLib {
 			WallLogs cache;
 			while(1){
 				if(nextDirCandidates.empty()) break;
-				const Dir d = nextDirCandidates[0];
-				ndcs.push_back(d);
+				const Dir d = nextDirCandidates[0]; //< 行きたい方向
+				ndcs.push_back(d); //< 候補に入れる
 				if(maze.isKnown(v, d)) break; //< 既知なら終わり
-				cache.push_back(WallLog(v, d, false));
-				maze.setWall (v, d, true);
-				maze.setKnown (v, d, true);
+				cache.push_back(WallLog(v, d, false)); //< 壁をたてるのでキャッシュしておく
+				maze.setWall (v, d, true); //< 壁をたてる
+				maze.setKnown (v, d, true); //< 既知とする
 				State tmp_state = state;
 				Dirs tmp_nds;
 				calcNextDirs(tmp_state, v, d, tmp_nds, nextDirCandidates, isForceBackToStart);
