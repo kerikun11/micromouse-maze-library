@@ -163,11 +163,15 @@ namespace MazeLib {
 				const Dir d = nextDirCandidates[0];
 				ndcs.push_back(d);
 				if(maze.isKnown(v, d)) break; //< 既知なら終わり
-				cache.push_back(WallLog(v, d, maze.isWall(v, d)));
+				cache.push_back(WallLog(v, d, false));
 				maze.setWall (v, d, true);
+				maze.setKnown (v, d, true);
 				State tmp_state = state;
 				Dirs tmp_nds;
 				calcNextDirs(tmp_state, v, d, tmp_nds, nextDirCandidates, isForceBackToStart);
+				if(!tmp_nds.empty()) {
+					nextDirCandidates = tmp_nds;
+				}
 			}
 			for(auto wl: cache) {
 				maze.setWall (Vector(wl), wl.d, false);

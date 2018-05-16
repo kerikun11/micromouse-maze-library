@@ -14,7 +14,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY		1
+#define DISPLAY		0
 
 #if MAZE_SIZE == 8
 // Vectors goal = {Vector(7,7)};
@@ -153,7 +153,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	/* start the robot */
 	int cnt=0;
 	while(1){
-		// if(cnt++ > 200) return false;
+		// if(cnt++ > 400) return false;
 		const auto& v = agent.getCurVec();
 		const auto& d = agent.getCurDir();
 		SearchAlgorithm::State prevState = agent.getState();
@@ -236,16 +236,18 @@ int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
 	searchRun();
+	// display = true;
+	// searchRun();
 	// agent.getMaze() = sample;
-	agent.positionIdentify(Dir::East);
-	searchRun(false);
-	agent.printInfo();
+	// agent.positionIdentify(Dir::East);
+	// searchRun(false);
+	// agent.printInfo();
 	printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 	printf("the max is %5d [us]\n", max_usec);
-	fastRun();
-	agent.printPath();
-	agent.calcShortestDirs(false);
-	agent.printPath();
+	// fastRun();
+	// agent.printPath();
+	// agent.calcShortestDirs(false);
+	// agent.printPath();
 	#else
 
 	std::ifstream ifs("MM2016HX.txt", std::ifstream::in);
