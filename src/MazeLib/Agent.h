@@ -2,7 +2,6 @@
 
 #include "Maze.h"
 #include "SearchAlgorithm.h"
-// #include "PositionIdentifier.h"
 
 namespace MazeLib {
   class Agent {
@@ -81,7 +80,7 @@ namespace MazeLib {
       idWallLogs.clear();
       idMaze.reset();
       state = SearchAlgorithm::IDENTIFYING_POSITION;
-      curVec = searchAlgorithm.idStartVector;
+      curVec = SearchAlgorithm::idStartVector();
       curDir = d;
     }
     /** @function getState

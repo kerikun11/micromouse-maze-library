@@ -14,7 +14,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY		0
+#define DISPLAY		1
 
 #if MAZE_SIZE == 8
 // Vectors goal = {Vector(7,7)};
@@ -36,7 +36,7 @@ Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_fp2016C);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2017
+#define YEAR 2015
 #if YEAR == 2011
 Vectors goal = {Vector(1,0)};
 Maze sample(mazeData_32);
@@ -72,11 +72,16 @@ int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
 
 #if 1
 
+Vector offset;
+
 bool findWall(const Vector v, const Dir d) {
 	if (agent.getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
 		// Vector offset(15, -16);
-		Vector offset(-13, -13);
+		// Vector offset(-13, -13);
+		// offset = Vector(15, 15);
 		return sample.isWall(v+offset, d);
+	} else {
+		offset = v - SearchAlgorithm::idStartVector();
 	}
 	return sample.isWall(v, d);
 }
@@ -97,9 +102,9 @@ void stopAndSaveMaze(){
 bool display = 0;
 
 void queueActions(const Dirs& nextDirs){
-		if(agent.getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
-			display = true;
-		}
+	if(agent.getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
+		display = true;
+	}
 	#if DISPLAY
 	// usleep(200000);
 	#endif
@@ -148,7 +153,7 @@ bool searchRun(const bool isStartStep = true, const Vector& startVec = Vector(0,
 	/* start the robot */
 	int cnt=0;
 	while(1){
-		if(cnt++ > 200) return false;
+		// if(cnt++ > 200) return false;
 		const auto& v = agent.getCurVec();
 		const auto& d = agent.getCurDir();
 		SearchAlgorithm::State prevState = agent.getState();
@@ -200,6 +205,30 @@ bool fastRun(){
 	/* move robot here */
 	return true;
 }
+
+class Robot{
+public:
+	Robot(){
+	}
+	enum Action : char {
+		TURN_LEFT_90,
+		TURN_RIGHT_90,
+		ROTATE_LEFT_90,
+		ROTATE_RIGHT_90,
+		ROTATE_180,
+		STRAIGHT_FULL,
+		STRAIGHT_HALF,
+		STOP_HALF,
+	};
+private:
+protected:
+	virtual void calibrationAndStart(){
+	}
+	virtual void waitForAction(){
+	}
+	virtual void queueActions(){
+	}
+};
 
 #endif
 

@@ -31,7 +31,7 @@ namespace MazeLib {
 		*   @param goal ゴール区画の配列
 		*/
 		SearchAlgorithm(Maze& maze, Maze& idMaze, WallLogs& idWallLogs, const Vectors& goal)
-		 : maze(maze), idMaze(idMaze), idWallLogs(idWallLogs), goal(goal) {}
+		: maze(maze), idMaze(idMaze), idWallLogs(idWallLogs), goal(goal) {}
 		/** @enum State
 		*   @brief 探索状態を列挙
 		*/
@@ -94,7 +94,7 @@ namespace MazeLib {
 				int cnt = countIdentityCandidates(idWallLogs, ans);
 				matchCount = cnt;
 				if(cnt == 1) {
-					pv = pv - idStartVector + ans;
+					pv = pv - idStartVector() + ans;
 					state = SEARCHING_FOR_GOAL;
 				} else if(cnt == 0){
 					return false;
@@ -240,7 +240,10 @@ namespace MazeLib {
 			}
 		}
 		// const StepMap& getStepMap() const { return stepMap; }
-		const Vector idStartVector = Vector(MAZE_SIZE/2, MAZE_SIZE/2);
+		static const Vector& idStartVector() {
+			static auto v = Vector(MAZE_SIZE/2, MAZE_SIZE/2);
+			return v;
+		}
 		int matchCount = 0;
 
 	private:
@@ -307,8 +310,8 @@ namespace MazeLib {
 		}
 		int countIdentityCandidates(const WallLogs idWallLogs, Vector& ans) const {
 			int cnt = 0;
-			for(int x=-MAZE_SIZE+1; x<MAZE_SIZE; x++)
-			for(int y=-MAZE_SIZE+1; y<MAZE_SIZE; y++) {
+			for(int x=-MAZE_SIZE/2+1; x<MAZE_SIZE/2; x++)
+			for(int y=-MAZE_SIZE/2+1; y<MAZE_SIZE/2; y++) {
 				const Vector offset(x, y);
 				int diffs=0;
 				int matchs=0;
@@ -323,7 +326,7 @@ namespace MazeLib {
 				int size = idWallLogs.size();
 				if(diffs <= 4) {
 					if(size<4 || unknown<size/2 || matchs>size/2) {
-						ans = idStartVector + offset;
+						ans = idStartVector() + offset;
 						cnt++;
 					}
 				}
