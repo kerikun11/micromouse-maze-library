@@ -30,7 +30,7 @@ namespace MazeLib {
 		*   @param maze 使用する迷路の参照
 		*   @param goal ゴール区画の配列
 		*/
-		SearchAlgorithm(Maze& maze, const Vectors& goal) : maze(maze), goal(goal) {}
+		SearchAlgorithm(Maze& maze, const Vectors& goal, const Vector& start) : maze(maze), goal(goal), start(start) {}
 		/** @enum Status
 		*   @brief 進むべき方向の計算結果
 		*/
@@ -39,9 +39,6 @@ namespace MazeLib {
 			Reached,
 			Error,
 		};
-		void replaceGoal(const Vectors& goal) {
-			this->goal = goal;
-		}
 		/** @function isComplete
 		*   @brief 最短経路が導出されているか調べる関数
 		*/
@@ -67,7 +64,7 @@ namespace MazeLib {
 			if(cv == start) return Reached;
 			return calcNextdirsForCandidates(maze, {start}, cv, cd, nextDirsKnown, nextDirCandidates);
 		}
-		enum Status calcNextDirsPositionIdentification(Maze& idMaze, WallLogs& idWallLogs, Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
+		enum Status calcNextDirsPositionIdentification(Maze& idMaze, WallLogs& idWallLogs, Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates, int& matchCount){
 			Vector ans;
 			int cnt = countIdentityCandidates(idWallLogs, ans);
 			matchCount = cnt;
@@ -174,13 +171,12 @@ namespace MazeLib {
 			static auto v = Vector(MAZE_SIZE/2, MAZE_SIZE/2);
 			return v;
 		}
-		int matchCount = 0;
 
 	private:
 		Maze& maze; /**< 使用する迷路の参照 */
+		const Vectors& goal; /**< ゴール区画を定義 */
+		const Vector& start; /**< スタート区画を定義 */
 		StepMap stepMap; /**< 使用するステップマップ */
-		const Vector start{0, 0}; /**< スタート区画を定義 */
-		Vectors goal; /**< ゴール区画を定義 */
 
 		/** @function findShortestCandidates
 		*   @brief ステップマップにより最短経路上になりうる区画を洗い出す

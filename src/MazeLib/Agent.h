@@ -6,7 +6,9 @@
 namespace MazeLib {
   class Agent {
   public:
-    Agent(const Vectors& goal) : searchAlgorithm(maze, goal) {}
+    Agent(const Vectors& goal)
+    : searchAlgorithm(maze, goal, start)
+     { start = Vector(0,0); }
     /** @enum State
     *   @brief 探索状態を列挙
     */
@@ -37,7 +39,7 @@ namespace MazeLib {
     /** @function replaceGoal
     *   @brief ゴール区画を変更する関数
     */
-    void replaceGoal(const Vectors& goal) { searchAlgorithm.replaceGoal(goal); }
+    void replaceGoal(const Vectors& goal) { this->goal = goal; }
     /** @function updateCurVecDir
     *   @brief 現在地を更新
     *   @param v 区画座標
@@ -94,7 +96,7 @@ namespace MazeLib {
       SearchAlgorithm::Status status;
       if(isPositionIdentifying){
         state = IDENTIFYING_POSITION;
-        status = searchAlgorithm.calcNextDirsPositionIdentification(idMaze, idWallLogs, curVec, curDir, nextDirs, nextDirCandidates);
+        status = searchAlgorithm.calcNextDirsPositionIdentification(idMaze, idWallLogs, curVec, curDir, nextDirs, nextDirCandidates, matchCount);
         switch(status){
           case SearchAlgorithm::Processing: return status;
           case SearchAlgorithm::Reached: isPositionIdentifying = false; break;
@@ -209,7 +211,7 @@ namespace MazeLib {
       printf("nextDirCandidates: ");
       for(const auto d: getNextDirCandidates()) printf("%c", ">^<v"[d]);
       printf("        \n");
-      printf("Match Count: %d\t\t\t\n", searchAlgorithm.matchCount);
+      printf("Match Count: %d\t\t\t\n", matchCount);
     }
     /** @function printPath
     *   @brief 最短経路の表示
@@ -221,19 +223,24 @@ namespace MazeLib {
     WallLogs& getWallLog() { return wallLogs; }
     Maze& getMaze() { return maze; }
 
-  private:
-    Maze maze; /**< 使用する迷路の参照 */
-    Maze idMaze; /**< 使用する迷路の参照 */
-    WallLogs wallLogs;
-    WallLogs idWallLogs;
-    SearchAlgorithm searchAlgorithm; /**< 探索器 */
+  protected:
+    Maze maze; /**< 使用する迷路 */
+    WallLogs wallLogs; /**< 観測した壁のログ */
     State state; /**< 現在の探索状態を保持 */
     Vector curVec; /**< 現在の区画座標 */
     Dir curDir; /**< 現在向いている方向 */
+		Vectors goal; /**< ゴール区画を定義 */
+		Vector start; /**< スタート区画を定義 */
+
+  private:
+    Maze idMaze; /**< 自己位置同定に使用する迷路 */
+    WallLogs idWallLogs; //*< 自己位置同定に使用する壁ログ */
+    SearchAlgorithm searchAlgorithm; /**< 探索器 */
     Dirs nextDirs; /**< 次に行く探索方向配列 */
     Dirs nextDirCandidates; /**< 次に行く方向の候補の優先順 */
     Dirs shortestDirs; /**< 最短経路の方向配列 */
     bool isForceBackToStart = false;
     bool isPositionIdentifying = false;
+    int matchCount = 0;
   };
 }

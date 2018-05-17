@@ -2,6 +2,7 @@
 #include <cstdint>
 #include "MazeLib/Maze.h"
 #include "MazeLib/Agent.h"
+#include "MazeLib/RobotBase.h"
 
 #include <iostream>
 #include <fstream>
@@ -14,7 +15,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY		0
+#define DISPLAY		1
 
 #if MAZE_SIZE == 8
 // Vectors goal = {Vector(7,7)};
@@ -36,7 +37,7 @@ Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_fp2016C);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2017
+#define YEAR 2016
 #if YEAR == 2011
 Vectors goal = {Vector(1,0)};
 Maze sample(mazeData_32);
@@ -63,6 +64,8 @@ Maze sample(mazeData_MM2017HX);
 #endif
 #endif
 
+#if 0
+
 Agent agent(goal);
 auto max_usec = 0;
 auto start = std::chrono::system_clock::now();
@@ -70,152 +73,221 @@ auto end = std::chrono::system_clock::now();       // 計測終了時刻を保�
 auto usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
 int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
 
-#if 1
-
 Vector offset;
 
 bool findWall(const Vector v, const Dir d) {
-	if (agent.getState() == Agent::IDENTIFYING_POSITION) {
-		offset = Vector(13, 13);
-		return sample.isWall(v+offset, d);
-	} else {
-		offset = v - SearchAlgorithm::idStartVector();
-	}
-	return sample.isWall(v, d);
+if (agent.getState() == Agent::IDENTIFYING_POSITION) {
+offset = Vector(13, 13);
+return sample.isWall(v+offset, d);
+} else {
+offset = v - SearchAlgorithm::idStartVector();
+}
+return sample.isWall(v, d);
 }
 
 void stopAndSaveMaze(){
-	/* queue Action::STOP */
-	/* wait for queue being empty */
-	/* stop the robot */
-	/* backup maze to flash memory */
-	// const auto& v = agent.getCurVec();
-	// const auto& d = agent.getCurDir();
-	// agent.updateCurVecDir(v.next(d + 2), d + 2); // u-turn
-	/* queue Action::RETURN */
-	/* queue Action::GO_HALF */
-	/* start the robot */
+/* queue Action::STOP */
+/* wait for queue being empty */
+/* stop the robot */
+/* backup maze to flash memory */
+// const auto& v = agent.getCurVec();
+// const auto& d = agent.getCurDir();
+// agent.updateCurVecDir(v.next(d + 2), d + 2); // u-turn
+/* queue Action::RETURN */
+/* queue Action::GO_HALF */
+/* start the robot */
 }
 
 bool display = 0;
 
 void queueActions(const Dirs& nextDirs){
-	#if DISPLAY
-	// usleep(200000);
-	#endif
-	for(const auto& nextDir: nextDirs){
-		const auto& nextVec = agent.getCurVec().next(nextDir);
-		#if DISPLAY
-		if(display){
-			agent.printInfo();
-			printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
-			printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
-			// printf("offset: (%3d, %3d)\n", offset.x, offset.y);
-			// usleep(100000);
-			// char c; scanf("%c", &c);
-		}
-		#endif
-		switch (Dir(nextDir - agent.getCurDir())) {
-			case Dir::Forward:
-			/* queue SearchRun::GO_STRAIGHT */
-			f++;
-			break;
-			case Dir::Left:
-			/* queue SearchRun::TURN_LEFT_90 */
-			l++;
-			break;
-			case Dir::Right:
-			/* queeu SearchRun::TURN_RIGHT_90 */
-			r++;
-			break;
-			case Dir::Back:
-			/* queue SearchRun::TURN_BACK */
-			b++;
-			break;
-		}
-		agent.updateCurVecDir(nextVec, nextDir);
-		step++;
-	}
+#if DISPLAY
+// usleep(200000);
+#endif
+for(const auto& nextDir: nextDirs){
+const auto& nextVec = agent.getCurVec().next(nextDir);
+#if DISPLAY
+if(display){
+agent.printInfo();
+printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
+printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
+// printf("offset: (%3d, %3d)\n", offset.x, offset.y);
+// usleep(100000);
+// char c; scanf("%c", &c);
+}
+#endif
+switch (Dir(nextDir - agent.getCurDir())) {
+case Dir::Forward:
+/* queue SearchRun::GO_STRAIGHT */
+f++;
+break;
+case Dir::Left:
+/* queue SearchRun::TURN_LEFT_90 */
+l++;
+break;
+case Dir::Right:
+/* queeu SearchRun::TURN_RIGHT_90 */
+r++;
+break;
+case Dir::Back:
+/* queue SearchRun::TURN_BACK */
+b++;
+break;
+}
+agent.updateCurVecDir(nextVec, nextDir);
+step++;
+}
 }
 
 
 bool searchRun(bool isStartStep = true, const Vector& startVec = Vector(0, 0), const Dir& startDir = Dir::North){
-	if(isStartStep) {
-		agent.updateCurVecDir(startVec, startDir);
-		/* queue Action::START_STEP */
-		agent.updateCurVecDir(startVec.next(startDir), startDir);
-	}
-	/* conduct calibration of sensors */
-	/* start the robot */
-	int cnt=0;
-	while(1){
-		// if(cnt++ > 400) return false;
-		const auto& v = agent.getCurVec();
-		const auto& d = agent.getCurDir();
+if(isStartStep) {
+agent.updateCurVecDir(startVec, startDir);
+/* queue Action::START_STEP */
+agent.updateCurVecDir(startVec.next(startDir), startDir);
+}
+/* conduct calibration of sensors */
+/* start the robot */
+int cnt=0;
+while(1){
+// if(cnt++ > 400) return false;
+const auto& v = agent.getCurVec();
+const auto& d = agent.getCurDir();
 
-		Agent::State prevState = agent.getState();
-		start = std::chrono::system_clock::now();
-		const auto result = agent.calcNextDirs(); //< 時間がかかる処理！
-		end = std::chrono::system_clock::now();
-		usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
-		if(max_usec < usec) max_usec = usec;
-		Agent::State newState = agent.getState();
+Agent::State prevState = agent.getState();
+start = std::chrono::system_clock::now();
+const auto result = agent.calcNextDirs(); //< 時間がかかる処理！
+end = std::chrono::system_clock::now();
+usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+if(max_usec < usec) max_usec = usec;
+Agent::State newState = agent.getState();
 
-		// if(newState != prevState && newState == Agent::REACHED_GOAL){ }
-		// if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ }
-		// if(newState != prevState && newState == Agent::BACKING_TO_START){ }
+// if(newState != prevState && newState == Agent::REACHED_GOAL){ }
+// if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ }
+// if(newState != prevState && newState == Agent::BACKING_TO_START){ }
 
-		// 既知区間移動をキューにつめる
-		queueActions(agent.getNextDirs());
-		k += agent.getNextDirs().size();
+// 既知区間移動をキューにつめる
+queueActions(agent.getNextDirs());
+k += agent.getNextDirs().size();
 
-		// reached start and searching finised
-		if(v == Vector(0, 0)) break;
+// reached start and searching finised
+if(v == Vector(0, 0)) break;
 
-		/* wait for queue being empty */
+/* wait for queue being empty */
 
-		// find walls
-		Dir nextDirCandidate;
-		bool res = agent.updateWall(v, d, findWall(v, d+1), findWall(v, d), findWall(v, d-1), findWall(v, d+2), nextDirCandidate);
-		if(!res) {
-			agent.printInfo();
-			printf("There was a discrepancy with known information.");
-			// while(1);
-		}
-		if(agent.getNextDirCandidates().empty()) {
-			agent.printInfo();
-			printf("nextDirCandidates is empty! \n");
-			while(1);
-		}
+// find walls
+Dir nextDirCandidate;
+bool res = agent.updateWall(v, d, findWall(v, d+1), findWall(v, d), findWall(v, d-1), findWall(v, d+2), nextDirCandidate);
+if(!res) {
+agent.printInfo();
+printf("There was a discrepancy with known information.");
+// while(1);
+}
+if(agent.getNextDirCandidates().empty()) {
+agent.printInfo();
+printf("nextDirCandidates is empty! \n");
+while(1);
+}
 
-		/* backup the wall */
+/* backup the wall */
 
-		queueActions({nextDirCandidate});
-	}
-	/* queue Action::START_INIT */
-	agent.updateCurVecDir(Vector(0, 0), Dir::North);
-	agent.calcNextDirs(); //< 時間がかかる処理！
-	/* wait for queue being empty */
-	/* stop the robot */
-	/* backup the maze */
-	return true;
+queueActions({nextDirCandidate});
+}
+/* queue Action::START_INIT */
+agent.updateCurVecDir(Vector(0, 0), Dir::North);
+agent.calcNextDirs(); //< 時間がかかる処理！
+/* wait for queue being empty */
+/* stop the robot */
+/* backup the maze */
+return true;
 }
 
 bool fastRun(const bool diagonal){
-	if(!agent.calcShortestDirs(diagonal)){
-		printf("Failed to find shortest path!\n");
-		return false;
-	}
-	/* move robot here */
-	return true;
+if(!agent.calcShortestDirs(diagonal)){
+printf("Failed to find shortest path!\n");
+return false;
 }
-
+/* move robot here */
+return true;
+}
 
 #endif
 
+bool display = 0;
+
+class TestRobot : public RobotBase {
+public:
+	TestRobot(const Vectors& goal) : RobotBase(goal) { }
+
+	void printInfo(const bool showMaze = true){
+		Agent::printInfo(showMaze);
+		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
+		printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
+		// usleep(100000);
+		char c; scanf("%c", &c);
+	}
+private:
+	Vector offset;
+	int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
+	int max_usec = 0;
+	int usec;
+	std::chrono::_V2::system_clock::time_point start;
+	std::chrono::_V2::system_clock::time_point end;
+
+	bool findWall(const Vector v, const Dir d) override {
+		if (getState() == Agent::IDENTIFYING_POSITION) {
+			offset = Vector(13, 13);
+			return sample.isWall(v+offset, d);
+		} else {
+			offset = v - SearchAlgorithm::idStartVector();
+		}
+		return sample.isWall(v, d);
+	}
+	void calcNextDirsPreCallback() override {
+		start = std::chrono::system_clock::now();
+	}
+	void calcNextDirsPostCallback(Agent::State prevState, Agent::State postState) override {
+		end = std::chrono::system_clock::now();
+		usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+		if(max_usec < usec) max_usec = usec;
+	}
+	void queueAction(const Action action) override {
+		#if DISPLAY
+		if(display) {
+			printInfo();
+		}
+		#endif
+		step++;
+		switch (action) {
+			case RobotBase::START_STEP:  f++;
+			break;
+			case RobotBase::START_INIT:
+			break;
+			case RobotBase::STOP_HALF:
+			break;
+			case RobotBase::TURN_LEFT_90: l++;
+			break;
+			case RobotBase::TURN_RIGHT_90: r++;
+			break;
+			case RobotBase::ROTATE_LEFT_90:
+			break;
+			case RobotBase::ROTATE_RIGHT_90:
+			break;
+			case RobotBase::ROTATE_180: b++;
+			break;
+			case RobotBase::STRAIGHT_FULL: f++;
+			break;
+			case RobotBase::STRAIGHT_HALF:
+			break;
+		}
+	}
+};
+
+TestRobot robot(goal);
+
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
-	#if 1
+	#if 0
 	searchRun();
 	agent.positionIdentify(Dir::East);
 	display = 1;
@@ -229,14 +301,15 @@ int main(void){
 	agent.printPath();
 	#else
 
-	std::ifstream ifs("MM2016HX.txt", std::ifstream::in);
-	Maze m;
-	m.parse(ifs);
-	m.print(std::cout);
-	// sample.print(std::cout);
-	// StepMap stepMap(maze);
-	// stepMap.update({Vector(0,31)});
-	// stepMap.print();
+	robot.searchRun();
+	robot.printInfo();
+	display = 1;
+	robot.positionIdentifyRun(Dir::West);
+	robot.fastRun(true);
+	robot.printPath();
+	robot.fastRun(false);
+	robot.printPath();
+
 	#endif
 	return 0;
 }
