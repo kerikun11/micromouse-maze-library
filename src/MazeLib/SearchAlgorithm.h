@@ -87,12 +87,14 @@ namespace MazeLib {
 			return calcNextdirsForCandidates(idMaze, candidates, cv, cd, nextDirsKnown, nextDirCandidates);
 		}
 		enum Status calcNextdirsForCandidates(Maze& maze, const Vectors& dest, const Vector vec, const Dir dir, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
-			// stepMap.updateSimple(maze, dest, false);
-			// return stepMap.calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
+			// stepmap.updatesimple(maze, dest, false);
+			// stepmap.calcnextdirs(maze, vec, dir, nextdirsknown, nextdircandidates);
+			// if(nextdircandidates.empty()) return error;
+			// return processing;
 
 			stepMap.updateSimple(maze, dest, false);
 			stepMap.calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
-			auto v = vec; for(auto d: nextDirsKnown) v = v.next(d);
+			auto v = vec; for(auto d: nextDirsKnown) v = v.next(d); //< 未知壁区画まで移動する
 			Dirs ndcs;
 			WallLogs cache;
 			while(1){

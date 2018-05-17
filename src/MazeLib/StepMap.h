@@ -209,7 +209,7 @@ namespace MazeLib {
 						focus_d = d;
 					}
 				}
-				if(getStep(focus_v) < min_step) return false; //< 永遠ループ防止
+				if(getStep(focus_v) <= min_step) break; //< 永遠ループ防止
 				nextDirsKnown.push_back(focus_d); //< 既知区間移動
 				focus_v = focus_v.next(focus_d); //< 位置を更新
 			}

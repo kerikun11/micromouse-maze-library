@@ -14,7 +14,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY		1
+#define DISPLAY		0
 
 #if MAZE_SIZE == 8
 // Vectors goal = {Vector(7,7)};
@@ -76,9 +76,7 @@ Vector offset;
 
 bool findWall(const Vector v, const Dir d) {
 	if (agent.getState() == Agent::IDENTIFYING_POSITION) {
-		// Vector offset(15, -16);
-		// Vector offset(-13, -13);
-		// offset = Vector(15, 15);
+		offset = Vector(13, 13);
 		return sample.isWall(v+offset, d);
 	} else {
 		offset = v - SearchAlgorithm::idStartVector();
@@ -114,7 +112,7 @@ void queueActions(const Dirs& nextDirs){
 			printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
 			// printf("offset: (%3d, %3d)\n", offset.x, offset.y);
 			// usleep(100000);
-			char c; scanf("%c", &c);
+			// char c; scanf("%c", &c);
 		}
 		#endif
 		switch (Dir(nextDir - agent.getCurDir())) {
@@ -203,8 +201,8 @@ bool searchRun(bool isStartStep = true, const Vector& startVec = Vector(0, 0), c
 	return true;
 }
 
-bool fastRun(){
-	if(!agent.calcShortestDirs()){
+bool fastRun(const bool diagonal){
+	if(!agent.calcShortestDirs(diagonal)){
 		printf("Failed to find shortest path!\n");
 		return false;
 	}
@@ -212,29 +210,6 @@ bool fastRun(){
 	return true;
 }
 
-class Robot{
-public:
-	Robot(){
-	}
-	enum Action : char {
-		TURN_LEFT_90,
-		TURN_RIGHT_90,
-		ROTATE_LEFT_90,
-		ROTATE_RIGHT_90,
-		ROTATE_180,
-		STRAIGHT_FULL,
-		STRAIGHT_HALF,
-		STOP_HALF,
-	};
-private:
-protected:
-	virtual void calibrationAndStart(){
-	}
-	virtual void waitForAction(){
-	}
-	virtual void queueActions(){
-	}
-};
 
 #endif
 
@@ -248,9 +223,9 @@ int main(void){
 	agent.printInfo();
 	printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 	printf("the max is %5d [us]\n", max_usec);
-	fastRun();
+	fastRun(true);
 	agent.printPath();
-	agent.calcShortestDirs(false);
+	fastRun(false);
 	agent.printPath();
 	#else
 
