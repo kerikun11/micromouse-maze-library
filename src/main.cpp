@@ -14,7 +14,7 @@
 
 using namespace MazeLib;
 
-#define DISPLAY		0
+#define DISPLAY		1
 
 #if MAZE_SIZE == 8
 // Vectors goal = {Vector(7,7)};
@@ -75,7 +75,7 @@ int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
 Vector offset;
 
 bool findWall(const Vector v, const Dir d) {
-	if (agent.getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
+	if (agent.getState() == Agent::IDENTIFYING_POSITION) {
 		// Vector offset(15, -16);
 		// Vector offset(-13, -13);
 		// offset = Vector(15, 15);
@@ -99,12 +99,9 @@ void stopAndSaveMaze(){
 	/* start the robot */
 }
 
-bool display = 1;
+bool display = 0;
 
 void queueActions(const Dirs& nextDirs){
-	if(agent.getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
-		display = true;
-	}
 	#if DISPLAY
 	// usleep(200000);
 	#endif
@@ -115,8 +112,9 @@ void queueActions(const Dirs& nextDirs){
 			agent.printInfo();
 			printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 			printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
+			// printf("offset: (%3d, %3d)\n", offset.x, offset.y);
 			// usleep(100000);
-			// char c; scanf("%c", &c);
+			char c; scanf("%c", &c);
 		}
 		#endif
 		switch (Dir(nextDir - agent.getCurDir())) {
@@ -156,16 +154,18 @@ bool searchRun(bool isStartStep = true, const Vector& startVec = Vector(0, 0), c
 		// if(cnt++ > 400) return false;
 		const auto& v = agent.getCurVec();
 		const auto& d = agent.getCurDir();
-		SearchAlgorithm::State prevState = agent.getState();
+
+		Agent::State prevState = agent.getState();
 		start = std::chrono::system_clock::now();
 		const auto result = agent.calcNextDirs(); //< 時間がかかる処理！
 		end = std::chrono::system_clock::now();
 		usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
 		if(max_usec < usec) max_usec = usec;
-		SearchAlgorithm::State newState = agent.getState();
-		// if(newState != prevState && newState == SearchAlgorithm::REACHED_GOAL){ }
-		// if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ }
-		// if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){ }
+		Agent::State newState = agent.getState();
+
+		// if(newState != prevState && newState == Agent::REACHED_GOAL){ }
+		// if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ }
+		// if(newState != prevState && newState == Agent::BACKING_TO_START){ }
 
 		// 既知区間移動をキューにつめる
 		queueActions(agent.getNextDirs());
@@ -179,6 +179,11 @@ bool searchRun(bool isStartStep = true, const Vector& startVec = Vector(0, 0), c
 		// find walls
 		Dir nextDirCandidate;
 		bool res = agent.updateWall(v, d, findWall(v, d+1), findWall(v, d), findWall(v, d-1), findWall(v, d+2), nextDirCandidate);
+		if(!res) {
+			agent.printInfo();
+			printf("There was a discrepancy with known information.");
+			// while(1);
+		}
 		if(agent.getNextDirCandidates().empty()) {
 			agent.printInfo();
 			printf("nextDirCandidates is empty! \n");
@@ -237,12 +242,10 @@ int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
 	searchRun();
-	// display = true;
-	// searchRun();
-	// agent.getMaze() = sample;
-	// agent.positionIdentify(Dir::East);
-	// searchRun(false);
-	// agent.printInfo();
+	agent.positionIdentify(Dir::East);
+	display = 1;
+	searchRun(false);
+	agent.printInfo();
 	printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
 	printf("the max is %5d [us]\n", max_usec);
 	fastRun();

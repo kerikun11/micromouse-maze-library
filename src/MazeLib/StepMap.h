@@ -192,41 +192,42 @@ namespace MazeLib {
 		*   @brief ステップマップにより次に行くべき方向列を生成する
 		*   @return true:成功, false:失敗(迷子)
 		*/
-		bool calcNextDirs(const Maze& maze, const Vector& start_v, const Dir& start_d, Dirs& nextDirs, Dirs& nextDirsInAdvance) const {
+		bool calcNextDirs(const Maze& maze, const Vector& start_v, const Dir& start_d, Dirs& nextDirsKnown, Dirs& nextDirCandidates) const {
 			// ステップマップから既知区間方向列を生成
-			nextDirs.clear();
+			nextDirsKnown.clear();
 			auto focus_v = start_v;
-			auto dir = start_d;
+			auto focus_d = start_d;
 			while(1){
 				if(maze.unknownCount(focus_v)) break; //< 未知壁があれば，既知区間は終了
-				// 周囲の区画のうち，最小ステップの方向を求める
 				step_t min_step = MAZE_STEP_MAX;
-				for(const auto& d: {dir+0, dir+1, dir-1, dir+2}){
-					if(maze.isWall(focus_v, d)) continue;
+				// 周囲の区画のうち，最小ステップの方向を求める
+				for(const auto d: {focus_d+0, focus_d+1, focus_d-1, focus_d+2}){
+					if(maze.isWall(focus_v, d)) continue; //< 壁があったら行けない
 					step_t next_step = getStep(focus_v.next(d));
 					if(min_step > next_step) {
 						min_step = next_step;
-						dir = d;
+						focus_d = d;
 					}
 				}
-				if(getStep(focus_v) <= min_step) break; //< 永遠ループ防止
-				nextDirs.push_back(dir); //< 既知区間移動
-				focus_v = focus_v.next(dir); //< 位置を更新
+				if(getStep(focus_v) < min_step) return false; //< 永遠ループ防止
+				nextDirsKnown.push_back(focus_d); //< 既知区間移動
+				focus_v = focus_v.next(focus_d); //< 位置を更新
 			}
 			// ステップマップから未知壁方向の優先順位方向列を生成
 			Dirs dirs;
 			// 方向の候補を抽出
-			for(const auto& d: {dir+0, dir+1, dir-1, dir+2}) if(!maze.isWall(focus_v, d) && getStep(focus_v.next(d))!=MAZE_STEP_MAX) dirs.push_back(d);
+			for(const auto d: {focus_d+0, focus_d+1, focus_d-1, focus_d+2}) if(!maze.isWall(focus_v, d) && getStep(focus_v.next(d))!=MAZE_STEP_MAX) dirs.push_back(d);
 			// ステップが小さい順に並べ替え
 			std::sort(dirs.begin(), dirs.end(), [&](const Dir& d1, const Dir& d2){
-				// if(maze.unknownCount(focus_v.next(d2))) return false; //< 未知壁優先
 				return getStep(focus_v.next(d1)) < getStep(focus_v.next(d2)); //< 低コスト優先
 			});
+			// 未知壁優先で並べ替え
 			std::sort(dirs.begin(), dirs.end(), [&](const Dir& d1, const Dir& d2){
 				return !maze.unknownCount(focus_v.next(d2)); //< 未知壁優先
 			});
-			nextDirsInAdvance = dirs;
-			if(nextDirsInAdvance.empty()) return false;
+			// 結果を代入
+			nextDirCandidates = dirs;
+			if(nextDirCandidates.empty()) return false;
 			return true;
 		}
 
