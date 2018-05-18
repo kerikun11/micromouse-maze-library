@@ -16,7 +16,7 @@ namespace MazeLib {
 	/** @def MAZE_SIZE
 	*   @brief 迷路の1辺の区画数
 	*/
-	#define MAZE_SIZE			32
+	#define MAZE_SIZE			16
 	/** @typedef
 	*   @brief 迷路のサイズのbit数の整数型
 	*   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
@@ -56,7 +56,7 @@ namespace MazeLib {
 		/** @enum Dir::RelativeDir
 		*   @brief 相対方向の列挙型
 		*/
-		enum RelativeDir: int8_t { Forward, Left, Back, Right, RelMax };
+		enum RelativeDir: int8_t { Front, Left, Back, Right, RelMax };
 		/** @function Constructor
 		*   @param d Absolute Direction
 		*/
@@ -81,11 +81,11 @@ namespace MazeLib {
 		*/
 		const std::array<Dir, 4> ordered(const Dir& prev) const {
 			switch (Dir(d-prev)) {
-				case Forward: return std::array<Dir, 4>{d, d+1, d-1, d+2};
-				case Left:    return std::array<Dir, 4>{d-1, d, d+1, d+2};
-				case Right:   return std::array<Dir, 4>{d+1, d, d-1, d+2};
-				case Back:    return std::array<Dir, 4>{d, d+1, d-1, d+2};
-				default:      return std::array<Dir, 4>{d, d+1, d-1, d+2};
+				case Front: return std::array<Dir, 4>{d, d+1, d-1, d+2};
+				case Left:  return std::array<Dir, 4>{d-1, d, d+1, d+2};
+				case Right: return std::array<Dir, 4>{d+1, d, d-1, d+2};
+				case Back:  return std::array<Dir, 4>{d, d+1, d-1, d+2};
+				default:    return std::array<Dir, 4>{d, d+1, d-1, d+2};
 			}
 		}
 		/** @function All

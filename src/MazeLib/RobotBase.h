@@ -69,7 +69,11 @@ namespace MazeLib {
       backupMazeToFlash();
       return true;
     }
-    bool endFastRunBackingToStartRun(bool diagonal) {
+    bool endFastRunBackingToStartRun() {
+      Vector v = start;
+      for(auto d: getShortestDirs()) v = v.next(d);
+      updateCurVecDir(v, getShortestDirs().back());
+      updateCurVecDir(getCurVec().next(getCurDir()+Dir::Back), getCurDir()+Dir::Back);
       queueAction(ROTATE_180);
       queueAction(STRAIGHT_HALF);
       calibration();
@@ -99,13 +103,14 @@ namespace MazeLib {
   protected:
     virtual void waitForEndAction() {}
     virtual void queueAction(const Action action) {}
-    virtual bool findWall(const Vector v, const Dir d) { return false; }
+    virtual void findWall(bool& left, bool& front, bool& right, bool& back) {}
     virtual void backupMazeToFlash(){}
     virtual void stopDequeue() {}
     virtual void startDequeue() {}
     virtual void calibration() {}
     virtual void calcNextDirsPreCallback() {}
     virtual void calcNextDirsPostCallback(Agent::State prevState, Agent::State newState) {}
+    virtual void discrepancyWithKnownWall() {}
 
   private:
     void turnbackSave(){
@@ -121,10 +126,10 @@ namespace MazeLib {
       for(const auto nextDir: nextDirs){
         const auto nextVec = getCurVec().next(nextDir);
         switch (Dir(nextDir - getCurDir())) {
-          case Dir::Forward: queueAction(STRAIGHT_FULL); break;
-          case Dir::Left:    queueAction(TURN_LEFT_90);  break;
-          case Dir::Right:   queueAction(TURN_RIGHT_90); break;
-          case Dir::Back:    turnbackSave();             break;
+          case Dir::Front: queueAction(STRAIGHT_FULL); break;
+          case Dir::Left:  queueAction(TURN_LEFT_90);  break;
+          case Dir::Right: queueAction(TURN_RIGHT_90); break;
+          case Dir::Back:  turnbackSave();             break;
         }
         updateCurVecDir(nextVec, nextDir);
       }
@@ -132,7 +137,7 @@ namespace MazeLib {
     bool generalSearchRun(const Vectors dest){
       int cnt=0;
       while(1){
-        if(cnt++ > 100) return false;
+        // if(cnt++ > 300) return false;
 
         const auto& v = getCurVec();
         const auto& d = getCurDir();
@@ -146,22 +151,17 @@ namespace MazeLib {
         // 既知区間移動をキューにつめる
         queueNextDirs(getNextDirs());
 
-        if(status==SearchAlgorithm::Reached) break;
+        if(status==SearchAlgorithm::Reached) return true;
+        if(status==SearchAlgorithm::Error) return false;
 
         waitForEndAction();
 
-        // エラー検出
-        if(getNextDirCandidates().empty()) {
-          printInfo();
-          printf("nextDirCandidates is empty! \n");
-          return false;
-        }
-
         // 壁を確認
-        if(!updateWall(v, d, findWall(v, d+1), findWall(v, d), findWall(v, d-1), findWall(v, d+2))){
-          printInfo();
+        bool left, front, right, back;
+        findWall(left, front, right, back);
+        if(!updateWall(v, d, left, front, right, back)){
           printf("There was a discrepancy with known information.\n");
-          return false;
+          discrepancyWithKnownWall();
         }
 
         // 壁のない方向へ1マス移動

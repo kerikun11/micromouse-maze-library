@@ -4,12 +4,6 @@
 #include "SearchAlgorithm.h"
 
 namespace MazeLib {
-	/** @def FIND_ALL_WALL
-	*   @brief 全探索するかどうか
-	*   true: 全探索
-	*   false: 最短になり得ないところは排除
-	*/
-	#define FIND_ALL_WALL 0
 	/** @def SEARCHING_ADDITIALLY_AT_START
 	*   @brief 追加探索状態で探索を始める(ゴールを急がない)
 	*/
@@ -87,12 +81,12 @@ namespace MazeLib {
       }
       return updateWall(maze, wallLogs, v, d, left, front, right, back);
     }
-    bool updateWall(Maze& maze, WallLogs& wallLogs, const Vector& v, const Dir& d, const bool left, const bool front, const bool right, const bool back){
+    bool updateWall(Maze& maze, WallLogs& wallLogs, const Vector& v, const Dir& d, const bool left, const bool front, const bool right, const bool back) const {
       bool result = true;
-      result = result && updateWall(maze, wallLogs, v, d+1, left); // left wall
-      result = result && updateWall(maze, wallLogs, v, d+0, front); // front wall
-      result = result && updateWall(maze, wallLogs, v, d-1, right); // right wall
-      result = result && updateWall(maze, wallLogs, v, d+2, back); // back wall
+      result = result & updateWall(maze, wallLogs, v, d+1, left); // left wall
+      result = result & updateWall(maze, wallLogs, v, d+0, front); // front wall
+      result = result & updateWall(maze, wallLogs, v, d-1, right); // right wall
+      result = result & updateWall(maze, wallLogs, v, d+2, back); // back wall
       return result;
     }
     bool updateWall(Maze& maze, WallLogs& wallLogs, const Vector& v, const Dir& d, const bool& b) const {
@@ -186,7 +180,7 @@ namespace MazeLib {
       state = IDENTIFYING_POSITION;
       idWallLogs.clear();
       idMaze.reset();
-      curVec = SearchAlgorithm::idStartVector();
+      curVec = searchAlgorithm.getIdStartVector();
       curDir = d;
     }
     /** @function getState

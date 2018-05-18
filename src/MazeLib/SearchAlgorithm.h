@@ -67,18 +67,19 @@ namespace MazeLib {
 			int cnt = countIdentityCandidates(idWallLogs, ans);
 			matchCount = cnt;
 			if(cnt == 1) {
-				cv = cv - idStartVector() + ans;
+				cv = cv - idStartVector + ans;
 				return Reached;
 			} else if(cnt == 0){
 				return Error;
 			}
 			Vectors candidates;
-			for(auto v: {Vector(MAZE_SIZE-1, MAZE_SIZE-1), Vector(MAZE_SIZE-1, 0), Vector(0, MAZE_SIZE-1)}){
-				if(idMaze.unknownCount(v)){
-					candidates.push_back(v);
-					break;
-				}
-			}
+			// for(auto v: {Vector(MAZE_SIZE-1, MAZE_SIZE-1), Vector(MAZE_SIZE-1, 0), Vector(0, MAZE_SIZE-1)}){
+			// 	if(idMaze.unknownCount(v)){
+			// 		candidates.push_back(v);
+			// 		break;
+			// 	}
+			// }
+			for(int8_t x=0; x<MAZE_SIZE; ++x) for(int8_t y=0; y<MAZE_SIZE; ++y) if(idMaze.unknownCount(Vector(x,y))) candidates.push_back(Vector(x,y));
 			return calcNextdirsForCandidates(idMaze, candidates, cv, cd, nextDirsKnown, nextDirCandidates);
 		}
 		enum Status calcNextdirsForCandidates(Maze& maze, const Vectors& dest, const Vector vec, const Dir dir, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
@@ -148,7 +149,7 @@ namespace MazeLib {
 				switch (Dir(dir-prev_dir)) {
 					case Dir::Left: dirs = {dir.getRelative(Dir::Right), dir}; break;
 					case Dir::Right: dirs = {dir.getRelative(Dir::Left), dir}; break;
-					case Dir::Forward: default: dirs = {dir}; break;
+					case Dir::Front: default: dirs = {dir}; break;
 				}
 				if(!diagonal) dirs = {dir};
 				for(const auto& d: dirs){
@@ -165,16 +166,15 @@ namespace MazeLib {
 			return true;
 		}
 		const StepMap& getStepMap() const { return stepMap; }
-		static const Vector& idStartVector() {
-			static auto v = Vector(MAZE_SIZE/2, MAZE_SIZE/2);
-			return v;
-		}
+		const Vector& getIdStartVector() const { return idStartVector; }
+		void setIdStartVector(const Vector& v) { idStartVector=v; }
 
 	private:
 		Maze& maze; /**< 使用する迷路の参照 */
 		const Vectors& goal; /**< ゴール区画を定義 */
 		const Vector& start; /**< スタート区画を定義 */
 		StepMap stepMap; /**< 使用するステップマップ */
+		Vector idStartVector;
 
 		/** @function findShortestCandidates
 		*   @brief ステップマップにより最短経路上になりうる区画を洗い出す
@@ -212,7 +212,7 @@ namespace MazeLib {
 					switch (Dir(dir-prev_dir)) {
 						case Dir::Left: dirs = {dir.getRelative(Dir::Right), dir}; break;
 						case Dir::Right: dirs = {dir.getRelative(Dir::Left), dir}; break;
-						case Dir::Forward: default: dirs = {dir}; break;
+						case Dir::Front: default: dirs = {dir}; break;
 					}
 					if(!diagonal) dirs = {dir};
 					for(const auto& d: dirs){
@@ -246,10 +246,10 @@ namespace MazeLib {
 				}
 				int size = idWallLogs.size();
 				if(diffs <= 4) {
-					if(size<4 || unknown<size/2 || matchs>size/2) {
-						ans = idStartVector() + offset;
+					// if(size<4 || unknown<size/2 || matchs>size/2) {
+						ans = idStartVector + offset;
 						cnt++;
-					}
+					// }
 				}
 			}
 			return cnt;

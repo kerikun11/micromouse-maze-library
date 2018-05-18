@@ -75,7 +75,7 @@ public:
 		Agent::printInfo(showMaze);
 		printf("Cost: %5d, Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", cost, step, f, l, r, b, k);
 		printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
-		usleep(20000);
+		usleep(50000);
 		// char c; scanf("%c", &c);
 	}
 private:
@@ -86,14 +86,22 @@ private:
 	std::chrono::_V2::system_clock::time_point start;
 	std::chrono::_V2::system_clock::time_point end;
 
-	bool findWall(const Vector v, const Dir d) override {
+	void findWall(bool& left, bool& front, bool& right, bool& back) override {
+		const auto& v = getCurVec();
+		const auto& d = getCurDir();
 		if (getState() == Agent::IDENTIFYING_POSITION) {
 			// offset = Vector(13, 13);
-			return sample.isWall(v+offset, d);
+			left  = sample.isWall(v+offset, d+Dir::Left);
+			front = sample.isWall(v+offset, d+Dir::Front);
+			right = sample.isWall(v+offset, d+Dir::Right);
+			back  = sample.isWall(v+offset, d+Dir::Back);
 		} else {
-			// offset = v - SearchAlgorithm::idStartVector();
+			offset = v - Vector(MAZE_SIZE/2, MAZE_SIZE/2);
 		}
-		return sample.isWall(v, d);
+		left  = sample.isWall(v, d+Dir::Left);
+		front = sample.isWall(v, d+Dir::Front);
+		right = sample.isWall(v, d+Dir::Right);
+		back  = sample.isWall(v, d+Dir::Back);
 	}
 	void calcNextDirsPreCallback() override {
 		start = std::chrono::system_clock::now();
@@ -105,7 +113,6 @@ private:
 
 		if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ }
 		if(newState != prevState && newState == Agent::BACKING_TO_START){ }
-
 	}
 	void queueAction(const Action action) override {
 		#if DISPLAY
@@ -163,9 +170,10 @@ int main(void){
 	display = true;
 	robot.searchRun();
 	robot.printInfo();
-	robot.forceGoingToGoal();
-	robot.positionIdentifyRun(Dir::West);
-	robot.searchRun();
+	// while(!robot.searchRun());
+	// robot.forceGoingToGoal();
+	// while(!robot.positionIdentifyRun(Dir::West));
+	// robot.positionIdentifyRun(Dir::West);
 	// for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; ++x)
 	// for(int y=-MAZE_SIZE/2; y<MAZE_SIZE/2; ++y){
 	// 	offset = Vector(x, y);
@@ -180,8 +188,10 @@ int main(void){
 	// 	}
 	// }
 	robot.fastRun(true);
+	// robot.endFastRunBackingToStartRun();
 	robot.printPath();
 	robot.fastRun(false);
+	// robot.endFastRunBackingToStartRun();
 	robot.printPath();
 	#else
 
