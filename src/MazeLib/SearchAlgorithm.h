@@ -10,16 +10,6 @@
 #include "StepMap.h"
 
 namespace MazeLib {
-	/** @def FIND_ALL_WALL
-	*   @brief 全探索するかどうか
-	*   true: 全探索
-	*   false: 最短になり得ないところは排除
-	*/
-	#define FIND_ALL_WALL 0
-	/** @def SEARCHING_ADDITIALLY_AT_START
-	*   @brief 追加探索状態で探索を始める(ゴールを急がない)
-	*/
-	#define SEARCHING_ADDITIALLY_AT_START 0
 
 	/** @class SearchAlgorithm
 	*   @brief 迷路探索アルゴリズムを司るクラス
@@ -54,15 +44,23 @@ namespace MazeLib {
 			return calcNextdirsForCandidates(maze, candidates, cv, cd, nextDirsKnown, nextDirCandidates);
 		}
 		enum Status calcNextDirsSearchAdditionally(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
-			// if(isForceBackToStart) return calcNextDirsBackingToStart(); //< 強制帰還がリクエストされていたら帰る
 			Vectors candidates;
 			findShortestCandidates(candidates); //< 最短になりうる区画の洗い出し
 			if(candidates.empty()) return Reached;
 			return calcNextdirsForCandidates(maze, candidates, cv, cd, nextDirsKnown, nextDirCandidates);
 		}
 		enum Status calcNextDirsBackingToStart(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
-			if(cv == start) return Reached;
-			return calcNextdirsForCandidates(maze, {start}, cv, cd, nextDirsKnown, nextDirCandidates);
+			auto status = calcNextdirsForCandidates(maze, {start}, cv, cd, nextDirsKnown, nextDirCandidates);
+			auto v = cv; for(auto d: nextDirsKnown) v=v.next(d);
+			if(v == start) return Reached;
+			return status;
+		}
+		enum Status calcNextDirsGoingToGoal(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
+			auto status = calcNextdirsForCandidates(maze, goal, cv, cd, nextDirsKnown, nextDirCandidates);
+			auto v = cv; for(auto d: nextDirsKnown) v=v.next(d);
+			auto it = std::find_if(goal.begin(), goal.end(), [v](const Vector nv){ return v==nv; });
+			if(it != goal.end()) return Reached;
+			return status;
 		}
 		enum Status calcNextDirsPositionIdentification(Maze& idMaze, WallLogs& idWallLogs, Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates, int& matchCount){
 			Vector ans;
@@ -84,10 +82,10 @@ namespace MazeLib {
 			return calcNextdirsForCandidates(idMaze, candidates, cv, cd, nextDirsKnown, nextDirCandidates);
 		}
 		enum Status calcNextdirsForCandidates(Maze& maze, const Vectors& dest, const Vector vec, const Dir dir, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
-			// stepmap.updatesimple(maze, dest, false);
-			// stepmap.calcnextdirs(maze, vec, dir, nextdirsknown, nextdircandidates);
-			// if(nextdircandidates.empty()) return error;
-			// return processing;
+			// stepMap.updateSimple(maze, dest, false);
+			// stepMap.calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
+			// if(nextDirCandidates.empty()) return Error;
+			// return Processing;
 
 			stepMap.updateSimple(maze, dest, false);
 			stepMap.calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);

@@ -31,13 +31,13 @@ Vectors goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 // Maze sample(mazeData_maze4, false);
 //Maze sample(mazeData_maze2013fr, false);
 // Maze sample(mazeData_maze2013exp, false);
-// Maze sample(mazeData_2017_East_MC, true);
+Maze sample(mazeData_2017_East_MC, true);
 // Maze sample(mazeData_MM2017CXpre, true);
-Maze sample(mazeData_MM2017CX, true);
+// Maze sample(mazeData_MM2017CX, true);
 // Maze sample(mazeData_fp2016C);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2016
+#define YEAR 2017
 #if YEAR == 2011
 Vectors goal = {Vector(1,0)};
 Maze sample(mazeData_32);
@@ -64,156 +64,8 @@ Maze sample(mazeData_MM2017HX);
 #endif
 #endif
 
-#if 0
-
-Agent agent(goal);
-auto max_usec = 0;
-auto start = std::chrono::system_clock::now();
-auto end = std::chrono::system_clock::now();       // 計測終了時刻を保存
-auto usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
-int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
-
-Vector offset;
-
-bool findWall(const Vector v, const Dir d) {
-if (agent.getState() == Agent::IDENTIFYING_POSITION) {
-offset = Vector(13, 13);
-return sample.isWall(v+offset, d);
-} else {
-offset = v - SearchAlgorithm::idStartVector();
-}
-return sample.isWall(v, d);
-}
-
-void stopAndSaveMaze(){
-/* queue Action::STOP */
-/* wait for queue being empty */
-/* stop the robot */
-/* backup maze to flash memory */
-// const auto& v = agent.getCurVec();
-// const auto& d = agent.getCurDir();
-// agent.updateCurVecDir(v.next(d + 2), d + 2); // u-turn
-/* queue Action::RETURN */
-/* queue Action::GO_HALF */
-/* start the robot */
-}
-
 bool display = 0;
-
-void queueActions(const Dirs& nextDirs){
-#if DISPLAY
-// usleep(200000);
-#endif
-for(const auto& nextDir: nextDirs){
-const auto& nextVec = agent.getCurVec().next(nextDir);
-#if DISPLAY
-if(display){
-agent.printInfo();
-printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
-printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
-// printf("offset: (%3d, %3d)\n", offset.x, offset.y);
-// usleep(100000);
-// char c; scanf("%c", &c);
-}
-#endif
-switch (Dir(nextDir - agent.getCurDir())) {
-case Dir::Forward:
-/* queue SearchRun::GO_STRAIGHT */
-f++;
-break;
-case Dir::Left:
-/* queue SearchRun::TURN_LEFT_90 */
-l++;
-break;
-case Dir::Right:
-/* queeu SearchRun::TURN_RIGHT_90 */
-r++;
-break;
-case Dir::Back:
-/* queue SearchRun::TURN_BACK */
-b++;
-break;
-}
-agent.updateCurVecDir(nextVec, nextDir);
-step++;
-}
-}
-
-
-bool searchRun(bool isStartStep = true, const Vector& startVec = Vector(0, 0), const Dir& startDir = Dir::North){
-if(isStartStep) {
-agent.updateCurVecDir(startVec, startDir);
-/* queue Action::START_STEP */
-agent.updateCurVecDir(startVec.next(startDir), startDir);
-}
-/* conduct calibration of sensors */
-/* start the robot */
-int cnt=0;
-while(1){
-// if(cnt++ > 400) return false;
-const auto& v = agent.getCurVec();
-const auto& d = agent.getCurDir();
-
-Agent::State prevState = agent.getState();
-start = std::chrono::system_clock::now();
-const auto result = agent.calcNextDirs(); //< 時間がかかる処理！
-end = std::chrono::system_clock::now();
-usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
-if(max_usec < usec) max_usec = usec;
-Agent::State newState = agent.getState();
-
-// if(newState != prevState && newState == Agent::REACHED_GOAL){ }
-// if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ }
-// if(newState != prevState && newState == Agent::BACKING_TO_START){ }
-
-// 既知区間移動をキューにつめる
-queueActions(agent.getNextDirs());
-k += agent.getNextDirs().size();
-
-// reached start and searching finised
-if(v == Vector(0, 0)) break;
-
-/* wait for queue being empty */
-
-// find walls
-Dir nextDirCandidate;
-bool res = agent.updateWall(v, d, findWall(v, d+1), findWall(v, d), findWall(v, d-1), findWall(v, d+2), nextDirCandidate);
-if(!res) {
-agent.printInfo();
-printf("There was a discrepancy with known information.");
-// while(1);
-}
-if(agent.getNextDirCandidates().empty()) {
-agent.printInfo();
-printf("nextDirCandidates is empty! \n");
-while(1);
-}
-
-/* backup the wall */
-
-queueActions({nextDirCandidate});
-}
-/* queue Action::START_INIT */
-agent.updateCurVecDir(Vector(0, 0), Dir::North);
-agent.calcNextDirs(); //< 時間がかかる処理！
-/* wait for queue being empty */
-/* stop the robot */
-/* backup the maze */
-return true;
-}
-
-bool fastRun(const bool diagonal){
-if(!agent.calcShortestDirs(diagonal)){
-printf("Failed to find shortest path!\n");
-return false;
-}
-/* move robot here */
-return true;
-}
-
-#endif
-
-bool display = 0;
+Vector offset(-4, -4);
 
 class TestRobot : public RobotBase {
 public:
@@ -221,14 +73,14 @@ public:
 
 	void printInfo(const bool showMaze = true){
 		Agent::printInfo(showMaze);
-		printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
+		printf("Cost: %5d, Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", cost, step, f, l, r, b, k);
 		printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
-		// usleep(100000);
-		char c; scanf("%c", &c);
+		usleep(20000);
+		// char c; scanf("%c", &c);
 	}
 private:
-	Vector offset;
 	int step=0,f=0,l=0,r=0,b=0,k=0; /**< 探索の評価のためのカウンタ */
+	int cost = 0;
 	int max_usec = 0;
 	int usec;
 	std::chrono::_V2::system_clock::time_point start;
@@ -236,20 +88,24 @@ private:
 
 	bool findWall(const Vector v, const Dir d) override {
 		if (getState() == Agent::IDENTIFYING_POSITION) {
-			offset = Vector(13, 13);
+			// offset = Vector(13, 13);
 			return sample.isWall(v+offset, d);
 		} else {
-			offset = v - SearchAlgorithm::idStartVector();
+			// offset = v - SearchAlgorithm::idStartVector();
 		}
 		return sample.isWall(v, d);
 	}
 	void calcNextDirsPreCallback() override {
 		start = std::chrono::system_clock::now();
 	}
-	void calcNextDirsPostCallback(Agent::State prevState, Agent::State postState) override {
+	void calcNextDirsPostCallback(Agent::State prevState, Agent::State newState) override {
 		end = std::chrono::system_clock::now();
 		usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
 		if(max_usec < usec) max_usec = usec;
+
+		if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ }
+		if(newState != prevState && newState == Agent::BACKING_TO_START){ }
+
 	}
 	void queueAction(const Action action) override {
 		#if DISPLAY
@@ -257,6 +113,7 @@ private:
 			printInfo();
 		}
 		#endif
+		cost += getCost(action);
 		step++;
 		switch (action) {
 			case RobotBase::START_STEP:  f++;
@@ -281,34 +138,52 @@ private:
 			break;
 		}
 	}
+	int getCost(const Action action) {
+		switch (action) {
+			case RobotBase::START_STEP:				return 5;
+			case RobotBase::START_INIT:				return 10;
+			case RobotBase::STOP_HALF:				return 10;
+			case RobotBase::TURN_LEFT_90:			return 5;
+			case RobotBase::TURN_RIGHT_90:		return 5;
+			case RobotBase::ROTATE_LEFT_90:		return 5;
+			case RobotBase::ROTATE_RIGHT_90:	return 5;
+			case RobotBase::ROTATE_180:				return 10;
+			case RobotBase::STRAIGHT_FULL:		return 3;
+			case RobotBase::STRAIGHT_HALF:		return 2;
+		}
+		return 0;
+	}
 };
 
 TestRobot robot(goal);
 
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
-	#if 0
-	searchRun();
-	agent.positionIdentify(Dir::East);
-	display = 1;
-	searchRun(false);
-	agent.printInfo();
-	printf("Step: %4d, Forward: %3d, Left: %3d, Right: %3d, Back: %3d, Known: %3d\n", step, f, l, r, b, k);
-	printf("the max is %5d [us]\n", max_usec);
-	fastRun(true);
-	agent.printPath();
-	fastRun(false);
-	agent.printPath();
-	#else
-
+	#if 1
+	display = true;
 	robot.searchRun();
 	robot.printInfo();
-	display = 1;
+	robot.forceGoingToGoal();
 	robot.positionIdentifyRun(Dir::West);
+	robot.searchRun();
+	// for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; ++x)
+	// for(int y=-MAZE_SIZE/2; y<MAZE_SIZE/2; ++y){
+	// 	offset = Vector(x, y);
+	// 	bool res = robot.positionIdentifyRun(Dir::West);
+	// 	if(!res) {
+	// 		robot.printInfo();
+	// 		display = true;
+	// 		robot.positionIdentifyRun(Dir::West);
+	// 		printf("Failed to Identify! (%3d, %3d)\n", x, y);
+	// 		usleep(1000000);
+	// 		display = false;
+	// 	}
+	// }
 	robot.fastRun(true);
 	robot.printPath();
 	robot.fastRun(false);
 	robot.printPath();
+	#else
 
 	#endif
 	return 0;

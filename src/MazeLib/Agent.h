@@ -4,6 +4,17 @@
 #include "SearchAlgorithm.h"
 
 namespace MazeLib {
+	/** @def FIND_ALL_WALL
+	*   @brief 全探索するかどうか
+	*   true: 全探索
+	*   false: 最短になり得ないところは排除
+	*/
+	#define FIND_ALL_WALL 0
+	/** @def SEARCHING_ADDITIALLY_AT_START
+	*   @brief 追加探索状態で探索を始める(ゴールを急がない)
+	*/
+	#define SEARCHING_ADDITIALLY_AT_START 0
+
   class Agent {
   public:
     Agent(const Vectors& goal)
@@ -20,6 +31,7 @@ namespace MazeLib {
       REACHED_START,					//< スタートに戻ってきた
       IMPOSSIBLE,							//< ゴールにだどりつくことができないと判明した
       IDENTIFYING_POSITION,		//< 自己位置同定中
+      GOING_TO_GOAL,          //< ゴールへ向かっている
     };
     /** @function stateString
     *   @brief Stateの表示用文字列を返す関数
@@ -33,6 +45,7 @@ namespace MazeLib {
         "Reached Start",
         "Impossible",
         "Identifying Position",
+        "Going to Goal",
       };
       return str[s];
     }
@@ -40,30 +53,20 @@ namespace MazeLib {
     *   @brief ゴール区画を変更する関数
     */
     void replaceGoal(const Vectors& goal) { this->goal = goal; }
+    bool isComplete() { return searchAlgorithm.isComplete(); }
     /** @function updateCurVecDir
     *   @brief 現在地を更新
     *   @param v 区画座標
     *   @param d 絶対方向
     */
     void updateCurVecDir(const Vector& v, const Dir& d) { curVec = v; curDir = d; }
-    /** @function updateWall
-    *   @brief 絶対座標絶対方向で壁の1枚更新
-    *   @param v 区画座標
-    *   @param d 絶対方向
-    *   @param b 壁の有無
-    */
-    bool updateWall(const Vector& v, const Dir& d, const bool left, const bool front, const bool right, const bool back, Dir& nextDir){
+    bool findNextDir(const Vector v, const Dir d, Dir& nextDir) const {
       if(state == IDENTIFYING_POSITION){
-        return updateWall(idMaze, idWallLogs, v, d, left, front, right, back, nextDir);
+        return findNextDir(idMaze, v, d, nextDir);
       }
-      return updateWall(maze, wallLogs, v, d, left, front, right, back, nextDir);
+      return findNextDir(maze, v, d, nextDir);
     }
-    bool updateWall(Maze& maze, WallLogs& wallLogs, const Vector& v, const Dir& d, const bool left, const bool front, const bool right, const bool back, Dir& nextDir){
-      updateWall(maze, wallLogs, v, d+1, left); // left wall
-      updateWall(maze, wallLogs, v, d+0, front); // front wall
-      updateWall(maze, wallLogs, v, d-1, right); // right wall
-      updateWall(maze, wallLogs, v, d+2, back); // back wall
-
+    bool findNextDir(const Maze& maze, const Vector v, const Dir d, Dir& nextDir) const {
       // 候補の中で行ける方向を探す
       const auto it = std::find_if(nextDirCandidates.begin(), nextDirCandidates.end(), [&](const Dir& dir){
         return maze.canGo(v, dir);
@@ -72,20 +75,40 @@ namespace MazeLib {
       nextDir = *it;
       return true;
     }
+    /** @function updateWall
+    *   @brief 絶対座標絶対方向で壁の1枚更新
+    *   @param v 区画座標
+    *   @param d 絶対方向
+    *   @param b 壁の有無
+    */
+    bool updateWall(const Vector& v, const Dir& d, const bool left, const bool front, const bool right, const bool back){
+      if(state == IDENTIFYING_POSITION){
+        return updateWall(idMaze, idWallLogs, v, d, left, front, right, back);
+      }
+      return updateWall(maze, wallLogs, v, d, left, front, right, back);
+    }
+    bool updateWall(Maze& maze, WallLogs& wallLogs, const Vector& v, const Dir& d, const bool left, const bool front, const bool right, const bool back){
+      bool result = true;
+      result = result && updateWall(maze, wallLogs, v, d+1, left); // left wall
+      result = result && updateWall(maze, wallLogs, v, d+0, front); // front wall
+      result = result && updateWall(maze, wallLogs, v, d-1, right); // right wall
+      result = result && updateWall(maze, wallLogs, v, d+2, back); // back wall
+      return result;
+    }
     bool updateWall(Maze& maze, WallLogs& wallLogs, const Vector& v, const Dir& d, const bool& b) const {
       if(!maze.updateWall(v, d, b)) return false; //< 既知壁と食い違いがあった
       wallLogs.push_back(WallLog(v, d, b));
       return true;
     }
-    // bool resetLastWall(const int num = 1){
-    //   for(int i=0;i<num;i++){
-    //     if(wallLogs.empty()) return true;
-    //     auto wl = wallLogs.back();
-    //     maze.setWall(Vector(wl), wl.d, false);
-    //     maze.setKnown(Vector(wl), wl.d, false);
-    //     wallLogs.pop_back();
-    //   }
-    // }
+    bool resetLastWall(const int num = 1){
+      for(int i=0;i<num;i++){
+        if(wallLogs.empty()) return true;
+        auto wl = wallLogs.back();
+        maze.setWall(Vector(wl), wl.d, false);
+        maze.setKnown(Vector(wl), wl.d, false);
+        wallLogs.pop_back();
+      }
+    }
     /** @function calcNextDirs
     *   @brief 次に行くべき方向配列を計算
     *   注意: 処理に時間がかかる場合あり
@@ -103,12 +126,14 @@ namespace MazeLib {
           case SearchAlgorithm::Error: return status;
         }
       }
-      state = SEARCHING_FOR_GOAL;
-      status = searchAlgorithm.calcNextDirsSearchForGoal(curVec, curDir, nextDirs, nextDirCandidates);
-      switch(status){
-        case SearchAlgorithm::Processing: return status;
-        case SearchAlgorithm::Reached: break;
-        case SearchAlgorithm::Error: return status;
+      if(!SEARCHING_ADDITIALLY_AT_START){
+        state = SEARCHING_FOR_GOAL;
+        status = searchAlgorithm.calcNextDirsSearchForGoal(curVec, curDir, nextDirs, nextDirCandidates);
+        switch(status){
+          case SearchAlgorithm::Processing: return status;
+          case SearchAlgorithm::Reached: break;
+          case SearchAlgorithm::Error: return status;
+        }
       }
       if(!isForceBackToStart){
         state = SEARCHING_ADDITIONALLY;
@@ -116,6 +141,15 @@ namespace MazeLib {
         switch(status){
           case SearchAlgorithm::Processing: return status;
           case SearchAlgorithm::Reached: break;
+          case SearchAlgorithm::Error: return status;
+        }
+      }
+      if(isForceGoingToGoal){
+        state = GOING_TO_GOAL;
+        status = searchAlgorithm.calcNextDirsGoingToGoal(curVec, curDir, nextDirs, nextDirCandidates);
+        switch(status){
+          case SearchAlgorithm::Processing: return status;
+          case SearchAlgorithm::Reached: isForceGoingToGoal = false; return SearchAlgorithm::Processing;
           case SearchAlgorithm::Error: return status;
         }
       }
@@ -143,6 +177,9 @@ namespace MazeLib {
     */
     void forceBackToStart(){
       isForceBackToStart = true;
+    }
+    void forceGoingToGoal(){
+      isForceGoingToGoal = true;
     }
     void positionIdentify(const Dir d = Dir::North){
       isPositionIdentifying = true;
@@ -204,14 +241,14 @@ namespace MazeLib {
         else                      searchAlgorithm.getStepMap().print(maze, vec, dir);
       }
       // 詳細を表示
-      printf("Cur: ( %2d, %2d,  %c), State: %s\t\t\t\t\n", vec.x, vec.y, ">^<v"[dir], stateString(state));
+      printf("Cur: ( %2d, %2d,  %c), State: %s                    \n", vec.x, vec.y, ">^<v"[dir], stateString(state));
       printf("nextDirs: ");
       for (const auto d : getNextDirs()) printf("%c", ">^<v"[d]);
-      printf("                                                     \n");
+      printf("                                                           \n");
       printf("nextDirCandidates: ");
       for(const auto d: getNextDirCandidates()) printf("%c", ">^<v"[d]);
       printf("        \n");
-      printf("Match Count: %d\t\t\t\n", matchCount);
+      printf("Match Count: %d   \n", matchCount);
     }
     /** @function printPath
     *   @brief 最短経路の表示
@@ -229,8 +266,8 @@ namespace MazeLib {
     State state; /**< 現在の探索状態を保持 */
     Vector curVec; /**< 現在の区画座標 */
     Dir curDir; /**< 現在向いている方向 */
-		Vectors goal; /**< ゴール区画を定義 */
-		Vector start; /**< スタート区画を定義 */
+    Vectors goal; /**< ゴール区画を定義 */
+    Vector start; /**< スタート区画を定義 */
 
   private:
     Maze idMaze; /**< 自己位置同定に使用する迷路 */
@@ -240,6 +277,7 @@ namespace MazeLib {
     Dirs nextDirCandidates; /**< 次に行く方向の候補の優先順 */
     Dirs shortestDirs; /**< 最短経路の方向配列 */
     bool isForceBackToStart = false;
+    bool isForceGoingToGoal = false;
     bool isPositionIdentifying = false;
     int matchCount = 0;
   };
