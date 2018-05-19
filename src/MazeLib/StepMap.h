@@ -31,7 +31,7 @@ namespace MazeLib {
 		/** @function reset
 		*  @brief ステップマップの初期化
 		*/
-		void reset(const step_t step = MAZE_STEP_MAX){
+		void reset(const step_t step = MAZE_STEP_MAX) {
 			for(int8_t y=0; y<MAZE_SIZE; y++)
 			for(int8_t x=0; x<MAZE_SIZE; x++)
 			setStep(x, y, step); //< ステップをクリア
@@ -78,8 +78,7 @@ namespace MazeLib {
 				printf("+\n");
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
 					printf("%s" C_RESET, maze.isKnown(x,y,Dir::West) ? (maze.isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
-					// printf("%s%4d" C_RESET, v==Vector(x,y)?C_YELLOW:C_CYAN, stepMap[y][x]);
-					if(v==Vector(x, y)) printf("%s  %c " C_RESET, C_YELLOW, ">^<v"[d]);
+					if(v==Vector(x, y)) printf("%s  %c " C_RESET, C_YELLOW, ">^<v "[d]);
 					else printf("%s%4d" C_RESET, C_CYAN, stepMap[y][x]);
 				}
 				printf("%s" C_RESET, maze.isKnown(MAZE_SIZE-1,y,Dir::East) ? (maze.isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
@@ -188,12 +187,110 @@ namespace MazeLib {
 				}
 			}
 		}
+		const Vector calcNextDirs(Maze& maze, const Vectors& dest, const Vector vec, const Dir dir, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
+			updateSimple(maze, dest, false);
+			return calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
+
+			updateSimple(maze, dest, false);
+			const auto v = calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
+			Dirs ndcs;
+			WallLogs cache;
+			while(1){
+				if(nextDirCandidates.empty()) break;
+				const Dir d = nextDirCandidates[0]; //< 行きたい方向
+				ndcs.push_back(d); //< 候補に入れる
+				if(maze.isKnown(v, d)) break; //< 既知なら終わり
+				cache.push_back(WallLog(v, d, false)); //< 壁をたてるのでキャッシュしておく
+				maze.setWall (v, d, true); //< 壁をたてる
+				maze.setKnown (v, d, true); //< 既知とする
+				Dirs tmp_nds;
+				// 行く方向を計算しなおす
+				updateSimple(maze, dest, false);
+				calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates);
+				if(!tmp_nds.empty()) nextDirCandidates = tmp_nds; //< 既知区間になった場合
+			}
+			// キャッシュを復活
+			for(auto wl: cache) {
+				maze.setWall (Vector(wl), wl.d, false);
+				maze.setKnown(Vector(wl), wl.d, false);
+			}
+			nextDirCandidates = ndcs;
+			return v;
+		}
+		bool calcShortestDirs(const Maze& maze, const Vector& start, const Vectors& dest, Dirs& shortestDirs, const bool diagonal = true){
+			update(maze, dest, true, diagonal);
+			// update(maze, dest, false, diagonal); //< for debug
+			shortestDirs.clear();
+			auto v = start;
+			Dir dir = Dir::North;
+			auto prev_dir = dir;
+			while(1){
+				step_t min_step = MAZE_STEP_MAX;
+				const auto& dirs = dir.ordered(prev_dir);
+				prev_dir = dir;
+				for(const auto& d: dirs){
+					if(!maze.canGo(v, d)) continue;
+					step_t next_step = getStep(v.next(d));
+					if(min_step > next_step) {
+						min_step = next_step;
+						dir = d;
+					}
+				}
+				if(getStep(v) <= min_step) return false; //< 失敗
+				shortestDirs.push_back(dir);
+				v = v.next(dir);
+				if(getStep(v) == 0) break; //< ゴール区画
+			}
+			// ゴール区画を行けるところまで直進する
+			bool loop = true;
+			while(loop){
+				loop = false;
+				Dirs dirs;
+				switch (Dir(dir-prev_dir)) {
+					case Dir::Left: dirs = {dir.getRelative(Dir::Right), dir}; break;
+					case Dir::Right: dirs = {dir.getRelative(Dir::Left), dir}; break;
+					case Dir::Front: default: dirs = {dir}; break;
+				}
+				if(!diagonal) dirs = {dir};
+				for(const auto& d: dirs){
+					if(maze.canGo(v, d)){
+						shortestDirs.push_back(d);
+						v = v.next(d);
+						prev_dir = dir;
+						dir = d;
+						loop = true;
+						break;
+					}
+				}
+			}
+			return true;
+		}
+
+	private:
+		step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
+		step_t straightStepTable[MAZE_SIZE*2];
+
+		const float a = 9000;
+		const float v0 = 300;
+		const float factor = 1.0f / (sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2)/a) - sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2-1)/a));
+
+		void calcStraightStepTable(){
+			for(int i=0; i<MAZE_SIZE*2; i++){
+				float x = 90*(i+1);
+				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
+			}
+			for(int i=0; i<MAZE_SIZE*2; i++){
+				float x = 90*(i+1);
+				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
+				step_t step = straightStepTable[i]+straightStepTable[MAZE_SIZE*2-1-i];
+			}
+		}
 		/** @function calcNextDirs
 		*   @brief ステップマップにより次に行くべき方向列を生成する
 		*   @return true:成功, false:失敗(迷子)
 		*/
-		bool calcNextDirs(const Maze& maze, const Vector& start_v, const Dir& start_d, Dirs& nextDirsKnown, Dirs& nextDirCandidates) const {
-			// ステップマップから既知区間方向列を生成
+		Vector calcNextDirs(const Maze& maze, const Vector& start_v, const Dir& start_d, Dirs& nextDirsKnown, Dirs& nextDirCandidates) const {
+			// ステップマップから既知区間進行方向列を生成
 			nextDirsKnown.clear();
 			auto focus_v = start_v;
 			auto focus_d = start_d;
@@ -227,28 +324,7 @@ namespace MazeLib {
 			});
 			// 結果を代入
 			nextDirCandidates = dirs;
-			if(nextDirCandidates.empty()) return false;
-			return true;
-		}
-
-	private:
-		step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
-		step_t straightStepTable[MAZE_SIZE*2];
-
-		const float a = 9000;
-		const float v0 = 300;
-		const float factor = 1.0f / (sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2)/a) - sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2-1)/a));
-
-		void calcStraightStepTable(){
-			for(int i=0; i<MAZE_SIZE*2; i++){
-				float x = 90*(i+1);
-				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
-			}
-			for(int i=0; i<MAZE_SIZE*2; i++){
-				float x = 90*(i+1);
-				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
-				step_t step = straightStepTable[i]+straightStepTable[MAZE_SIZE*2-1-i];
-			}
+			return focus_v;
 		}
 	};
 }
