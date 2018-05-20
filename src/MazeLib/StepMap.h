@@ -310,7 +310,8 @@ namespace MazeLib {
 				nextDirsKnown.push_back(focus_d); //< 既知区間移動
 				focus_v = focus_v.next(focus_d); //< 位置を更新
 			}
-			// ステップマップから未知壁方向の優先順位方向列を生成
+			//< 既知区間終わり
+			// ステップマップから未知壁方向の優先順位付方向列を生成
 			Dirs dirs;
 			// 方向の候補を抽出
 			for(const auto d: {focus_d+0, focus_d+1, focus_d-1, focus_d+2}) if(!maze.isWall(focus_v, d) && getStep(focus_v.next(d))!=MAZE_STEP_MAX) dirs.push_back(d);
