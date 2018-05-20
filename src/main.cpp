@@ -37,7 +37,7 @@ Maze sample(mazeData_2017_East_MC, true);
 // Maze sample(mazeData_fp2016C);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2017
+#define YEAR 2016
 #if YEAR == 2011
 Vectors goal = {Vector(1,0)};
 Maze sample(mazeData_32);
@@ -65,7 +65,7 @@ Maze sample(mazeData_MM2017HX);
 #endif
 
 bool display = 0;
-Vector offset(-4, -4);
+Vector offset;
 
 class TestRobot : public RobotBase {
 public:
@@ -90,11 +90,12 @@ private:
 		const auto& v = getCurVec();
 		const auto& d = getCurDir();
 		if (getState() == Agent::IDENTIFYING_POSITION) {
-			// offset = Vector(13, 13);
+			// offset = Vector(12, 12);
 			left  = sample.isWall(v+offset, d+Dir::Left);
 			front = sample.isWall(v+offset, d+Dir::Front);
 			right = sample.isWall(v+offset, d+Dir::Right);
 			back  = sample.isWall(v+offset, d+Dir::Back);
+			return;
 		} else {
 			offset = v - Vector(MAZE_SIZE/2, MAZE_SIZE/2);
 		}
@@ -167,13 +168,13 @@ TestRobot robot(goal);
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
-	display = true;
 	robot.searchRun();
 	robot.printInfo();
 	// while(!robot.searchRun());
-	// robot.forceGoingToGoal();
+	display = true;
+	robot.forceGoingToGoal();
 	// while(!robot.positionIdentifyRun(Dir::West));
-	// robot.positionIdentifyRun(Dir::West);
+	robot.positionIdentifyRun(Dir::West);
 	// for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; ++x)
 	// for(int y=-MAZE_SIZE/2; y<MAZE_SIZE/2; ++y){
 	// 	offset = Vector(x, y);
@@ -187,12 +188,12 @@ int main(void){
 	// 		display = false;
 	// 	}
 	// }
-	robot.fastRun(true);
+	// robot.fastRun(true);
 	// robot.endFastRunBackingToStartRun();
-	robot.printPath();
-	robot.fastRun(false);
+	// robot.printPath();
+	// robot.fastRun(false);
 	// robot.endFastRunBackingToStartRun();
-	robot.printPath();
+	// robot.printPath();
 	#else
 
 	#endif

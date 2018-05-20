@@ -178,6 +178,7 @@ namespace MazeLib {
 		void positionIdentify(const Dir d = Dir::North){
 			isPositionIdentifying = true;
 			state = IDENTIFYING_POSITION;
+			searchAlgorithm.setIdStartVector(Vector(MAZE_SIZE/2, MAZE_SIZE/2));
 			idWallLogs.clear();
 			idMaze.reset();
 			curVec = searchAlgorithm.getIdStartVector();
