@@ -2,11 +2,11 @@
 * @file RobotBase.h
 * @brief ロボットのベース
 * @author KERI (Github: kerikun11)
+* @url https://kerikeri.top/
 * @date 2017.10.30
 */
 #pragma once
 
-#include "Maze.h"
 #include "Agent.h"
 
 namespace MazeLib {
@@ -109,7 +109,7 @@ namespace MazeLib {
     virtual void startDequeue() {}
     virtual void calibration() {}
     virtual void calcNextDirsPreCallback() {}
-    virtual void calcNextDirsPostCallback(Agent::State prevState, Agent::State newState) {}
+    virtual void calcNextDirsPostCallback(SearchAlgorithm::State prevState, SearchAlgorithm::State newState) {}
     virtual void discrepancyWithKnownWall() {}
 
   private:
@@ -143,9 +143,9 @@ namespace MazeLib {
         const auto& d = getCurDir();
 
         calcNextDirsPreCallback();
-        Agent::State prevState = getState();
+        auto prevState = getState();
         auto status = calcNextDirs(); //< 時間がかかる処理！
-        Agent::State newState = getState();
+        auto newState = getState();
         calcNextDirsPostCallback(prevState, newState);
 
         // 既知区間移動をキューにつめる

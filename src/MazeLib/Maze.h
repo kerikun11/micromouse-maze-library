@@ -2,16 +2,19 @@
 * @file Maze.h
 * @brief マイクロマウスの迷路クラスを定義
 * @author KERI (Github: kerikun11)
+* @url https://kerikeri.top/
 * @date 2017.10.30
 */
 #pragma once
 
-#include <queue>
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <queue>
+
 #include <iostream>
 #include <fstream>
+#include <iomanip> //< for std::setw()
 
 namespace MazeLib {
 	/** @def MAZE_SIZE
@@ -186,8 +189,13 @@ namespace MazeLib {
 	*/
 	class Maze {
 	public:
-		Maze() { reset(); } /**< @brief 空の迷路のコンストラクタ */
-		Maze(const Maze& obj){ *this = obj; } /**< @brief コピーコンストラクタ */
+		Maze() { reset(); } /**< @brief デフォルトのコンストラクタ */
+		Maze(const Maze& obj) { *this = obj; } /**< @brief コピーコンストラクタ */
+		/** @constructor Maze
+		*   @brief ファイル名から迷路をパースするコンストラクタ
+		*   @param filename ファイル名
+		*/
+		Maze(const char* filename) { std::ifstream ifs(filename); parse(ifs); }
 		/** @brief 配列から迷路を読み込むコンストラクタ
 		*   @param data 各区画16進表記の文字列配列
 		*  例：{"abaf", "1234", "abab", "aaff"}
@@ -385,87 +393,69 @@ namespace MazeLib {
 		}
 		/** @function print
 		*   @brief 迷路の表示
-		*   @param v ハイライト区画の座標
+		*   @param of output-stream
 		*/
-		void print(const Vector v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const {
-			printf("\n");
-			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
-				for(uint8_t x=0; x<MAZE_SIZE; x++)
-				printf("+%s" C_RESET, isKnown(x,y,Dir::North) ? (isWall(x,y,Dir::North)?"---":"   ") : C_RED " - ");
-				printf("+\n");
-				for(uint8_t x=0; x<MAZE_SIZE; x++){
-					printf("%s" C_RESET, isKnown(x,y,Dir::West) ? (isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
-					printf(" %s%c " C_RESET, C_YELLOW, v==Vector(x,y)?(">^<vX"[d]):' ');
-				}
-				printf("%s" C_RESET, isKnown(MAZE_SIZE-1,y,Dir::East) ? (isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
-				printf("\n");
-			}
-			for(uint8_t x=0; x<MAZE_SIZE; x++)
-			printf("+%s" C_RESET, isKnown(x,0,Dir::South) ? (isWall(x,0,Dir::South)?"---":"   ") : C_RED " - ");
-			printf("+\n");
+		void print(std::ostream& os = std::cout) const {
+			printPath(os, Vector(0,0), {});
 		}
-		void print(std::ostream& os) const {
+		/** @function printPath
+		*   @brief パス付の迷路の表示
+		*   @param start パスのスタート座標
+		*   @param dirs 移動方向の配列
+		*   @param of output-stream
+		*/
+		void printPath(std::ostream& os, const Vector start, const Dirs& dirs) const {
+			int steps[MAZE_SIZE][MAZE_SIZE]={0};
+			Vector v = start;
+			int counter = 1;
+			for(const auto d: dirs){
+				v = v.next(d);
+				steps[v.y][v.x] = counter++;
+			}
 			for(int8_t y=MAZE_SIZE; y>=0; y--){
 				if(y != MAZE_SIZE){
 					os << '|';
-					for(uint8_t x=0; x<MAZE_SIZE; x++) os << "   " << (isKnown(x,y,Dir::East)?(isWall(x,y,Dir::East)?"|":" "):".");
+					for(uint8_t x=0; x<MAZE_SIZE; x++){
+					 if(steps[y][x]!=0) os << C_YELLOW << std::setw(3) << steps[y][x] << C_RESET;
+					 else               os << "   ";
+					 os << (isKnown(x,y,Dir::East)?(isWall(x,y,Dir::East)?"|":" "):(C_RED "." C_RESET));
+					}
 					os << std::endl;
 				}
-				for(uint8_t x=0; x<MAZE_SIZE; x++) os << "+" << (isKnown(x,y,Dir::South)?(isWall(x,y,Dir::South)?"---":"   "):" . ");
+				for(uint8_t x=0; x<MAZE_SIZE; x++) os << "+" << (isKnown(x,y,Dir::South)?(isWall(x,y,Dir::South)?"---":"   "):(C_RED " . " C_RESET));
 				os << "+" << std::endl;
 			}
 		}
-		bool parse(std::istream& is){
+		void printPath(const Vector start, const Dirs& dirs) const {
+			printPath(std::cout, start, dirs);
+		}
+		/** @function parse
+		*   @brief 迷路の文字列から壁をパースする
+		*   @param is input-stream
+		*/
+		bool parse(std::istream& is) {
 			reset();
 			for(int8_t y=MAZE_SIZE; y>=0; y--){
 				if(y!=MAZE_SIZE){
-					is.ignore(10, '|');
+					is.ignore(10, '|'); //< 次の|が出てくるまでスキップ
 					for(uint8_t x=0; x<MAZE_SIZE; x++) {
-						is.ignore(3); //< "   "
+						is.ignore(3); //< "   " 空欄分をスキップ
 						char c = is.get();
 						if     (c=='|') updateWall(Vector(x, y), Dir::East, true);
 						else if(c==' ') updateWall(Vector(x, y), Dir::East, false);
 					}
 				}
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
-					is.ignore(10, '+');
-					char c = is.get();
-					if     (c=='-') updateWall(Vector(x, y), Dir::South, true);
-					else if(c==' ') updateWall(Vector(x, y), Dir::South, false);
-					is.ignore(2); //< "--"
+					is.ignore(10, '+'); //< 次の+が出てくるまでスキップ
+					std::string s;
+					s += (char)is.get();
+					s += (char)is.get();
+					s += (char)is.get();
+					if     (s=="---") updateWall(Vector(x, y), Dir::South, true);
+					else if(s=="   ") updateWall(Vector(x, y), Dir::South, false);
 				}
 			}
 			return true;
-		}
-		/** @function printPath
-		*   @brief パス付の迷路の表示
-		*   @param start パスのスタート座標
-		*   @param dirs 移動方向の配列
-		*/
-		void printPath(const Vector start, const Dirs& dirs) const {
-			int steps[MAZE_SIZE][MAZE_SIZE]={0};
-			Vector v = start;
-			int counter = 1;
-			for(const auto& d: dirs){
-				v = v.next(d);
-				steps[v.y][v.x] = counter++;
-			}
-			printf("\n");
-			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
-				for(uint8_t x=0; x<MAZE_SIZE; x++)
-				printf("+%s" C_RESET, isKnown(x,y,Dir::North) ? (isWall(x,y,Dir::North)?"---":"   ") : C_RED " - ");
-				printf("+\n");
-				for(uint8_t x=0; x<MAZE_SIZE; x++){
-					printf("%s" C_RESET, isKnown(x,y,Dir::West) ? (isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
-					if(steps[y][x]!=0) printf("%s%3d" C_RESET, C_YELLOW, steps[y][x]);
-					else printf("%s", "   ");
-				}
-				printf("%s" C_RESET, isKnown(MAZE_SIZE-1,y,Dir::East) ? (isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
-				printf("\n");
-			}
-			for(uint8_t x=0; x<MAZE_SIZE; x++)
-			printf("+%s" C_RESET, isKnown(x,0,Dir::South) ? (isWall(x,0,Dir::South)?"---":"   ") : C_RED " - ");
-			printf("+\n");
 		}
 
 	private:

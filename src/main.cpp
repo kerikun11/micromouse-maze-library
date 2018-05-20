@@ -4,9 +4,6 @@
 #include "MazeLib/Agent.h"
 #include "MazeLib/RobotBase.h"
 
-#include <iostream>
-#include <fstream>
-
 #include "mazedata.h"
 
 #include <unistd.h>
@@ -27,7 +24,7 @@ Vectors goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
 // Maze sample(mazeData_maze, false);
 // Maze sample(mazeData_maze3, false);
 // Maze sample(mazeData_maze4, false);
-//Maze sample(mazeData_maze2013fr, false);
+// Maze sample(mazeData_maze2013fr, false);
 // Maze sample(mazeData_maze2013exp, false);
 Maze sample(mazeData_2017_East_MC, true);
 // Maze sample(mazeData_MM2017CXpre, true);
@@ -35,7 +32,7 @@ Maze sample(mazeData_2017_East_MC, true);
 // Maze sample(mazeData_fp2016C);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2017
+#define YEAR 2016
 #if YEAR == 2011
 Vectors goal = {Vector(1,0)};
 Maze sample(mazeData_32);
@@ -87,7 +84,7 @@ private:
 	void findWall(bool& left, bool& front, bool& right, bool& back) override {
 		const auto& v = getCurVec();
 		const auto& d = getCurDir();
-		if (getState() == Agent::IDENTIFYING_POSITION) {
+		if (getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
 			// offset = Vector(12, 12);
 			left  = sample.isWall(v+offset, d+Dir::Left);
 			front = sample.isWall(v+offset, d+Dir::Front);
@@ -105,13 +102,13 @@ private:
 	void calcNextDirsPreCallback() override {
 		start = std::chrono::system_clock::now();
 	}
-	void calcNextDirsPostCallback(Agent::State prevState, Agent::State newState) override {
+	void calcNextDirsPostCallback(SearchAlgorithm::State prevState, SearchAlgorithm::State newState) override {
 		end = std::chrono::system_clock::now();
 		usec = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
 		if(max_usec < usec) max_usec = usec;
 
-		if(newState != prevState && newState == Agent::SEARCHING_ADDITIONALLY){ }
-		if(newState != prevState && newState == Agent::BACKING_TO_START){ }
+		// if(newState != prevState && newState == SearchAlgorithm::SEARCHING_ADDITIONALLY){ }
+		// if(newState != prevState && newState == SearchAlgorithm::BACKING_TO_START){ }
 	}
 	void queueAction(const Action action) override {
 		if(display) printInfo();
@@ -165,12 +162,12 @@ int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
 	robot.searchRun();
+	display = true;
 	robot.printInfo();
 	// while(!robot.searchRun());
-	// robot.forceGoingToGoal();
+	robot.forceGoingToGoal();
 	// while(!robot.positionIdentifyRun(Dir::West));
-	// robot.positionIdentifyRun(Dir::West);
-	display = true;
+	robot.positionIdentifyRun(Dir::West);
 	// for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; ++x)
 	// for(int y=-MAZE_SIZE/2; y<MAZE_SIZE/2; ++y){
 	// 	offset = Vector(x, y);
@@ -184,14 +181,19 @@ int main(void){
 	// 		display = false;
 	// 	}
 	// }
-	// robot.fastRun(true);
+	robot.fastRun(true);
 	// robot.endFastRunBackingToStartRun();
-	// robot.printPath();
-	// robot.fastRun(false);
+	robot.printPath();
+	robot.fastRun(false);
 	// robot.endFastRunBackingToStartRun();
-	// robot.printPath();
+	robot.printPath();
 	#else
-
+	std::ifstream ifs("MM2016HX_ip.maze");
+	// Maze m(ifs);
+	Maze m("MM2016HX_ip.maze");
+	// m.parse(ifs);
+	// m.print(std::cout);
+	m.print();
 	#endif
 	return 0;
 }

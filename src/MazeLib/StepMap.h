@@ -2,12 +2,13 @@
 * @file StepMap.h
 * @brief マイクロマウスの迷路のステップマップを扱うクラス
 * @author KERI (Github: kerikun11)
+* @url https://kerikeri.top/
 * @date 2017.11.05
 */
 #pragma once
 
 #include "Maze.h"
-#include <complex>
+#include <complex> // for std::sqrt()
 
 namespace MazeLib {
 	/** @def MAZE_STEP_MAX
@@ -71,22 +72,23 @@ namespace MazeLib {
 		*  @param v ハイライト区画
 		*/
 		void print(const Maze& maze, const Vector& v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const {
-			printf("\n");
-			for(int8_t y=MAZE_SIZE-1; y>=0; y--){
-				for(uint8_t x=0; x<MAZE_SIZE; x++)
-				printf("+%s" C_RESET, maze.isKnown(x,y,Dir::North) ? (maze.isWall(x,y,Dir::North)?"----":"    ") : C_RED " - -");
-				printf("+\n");
-				for(uint8_t x=0; x<MAZE_SIZE; x++){
-					printf("%s" C_RESET, maze.isKnown(x,y,Dir::West) ? (maze.isWall(x,y,Dir::West)?"|":" ") : C_RED ":");
-					if(v==Vector(x, y)) printf("%s  %c " C_RESET, C_YELLOW, ">^<v "[d]);
-					else printf("%s%4d" C_RESET, C_CYAN, stepMap[y][x]);
+			print(std::cout, maze, v, d);
+		}
+		void print(std::ostream& os, const Maze& maze, const Vector& v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const {
+			os << std::endl;
+			for(int8_t y=MAZE_SIZE; y>=0; y--){
+				if(y != MAZE_SIZE){
+					os << '|';
+					for(uint8_t x=0; x<MAZE_SIZE; x++){
+						if(v==Vector(x, y)) os << " " << C_YELLOW << ">^<v "[d] << C_RESET << " ";
+						else os << C_CYAN << std::setw(3) << std::min(getStep(x, y), (step_t)999) << C_RESET;
+						os << (maze.isKnown(x,y,Dir::East)?(maze.isWall(x,y,Dir::East)?"|":" "):(C_RED "." C_RESET));
+					}
+					os << std::endl;
 				}
-				printf("%s" C_RESET, maze.isKnown(MAZE_SIZE-1,y,Dir::East) ? (maze.isWall(MAZE_SIZE-1,y,Dir::East)?"|":" ") : C_RED ":");
-				printf("\n");
+				for(uint8_t x=0; x<MAZE_SIZE; x++) os << "+" << (maze.isKnown(x,y,Dir::South)?(maze.isWall(x,y,Dir::South)?"---":"   "):(C_RED " . " C_RESET));
+				os << "+" << std::endl;
 			}
-			for(uint8_t x=0; x<MAZE_SIZE; x++)
-			printf("+%s" C_RESET, maze.isKnown(x,0,Dir::South) ? (maze.isWall(x,0,Dir::South)?"----":"    ") : C_RED " - -");
-			printf("+\n");
 		}
 		/** @function update
 		*  @brief ステップマップの更新
