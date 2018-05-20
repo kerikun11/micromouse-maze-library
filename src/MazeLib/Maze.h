@@ -416,9 +416,9 @@ namespace MazeLib {
 				if(y != MAZE_SIZE){
 					os << '|';
 					for(uint8_t x=0; x<MAZE_SIZE; x++){
-					 if(steps[y][x]!=0) os << C_YELLOW << std::setw(3) << steps[y][x] << C_RESET;
-					 else               os << "   ";
-					 os << (isKnown(x,y,Dir::East)?(isWall(x,y,Dir::East)?"|":" "):(C_RED "." C_RESET));
+						if(steps[y][x]!=0) os << C_YELLOW << std::setw(3) << steps[y][x] << C_RESET;
+						else               os << "   ";
+						os << (isKnown(x,y,Dir::East)?(isWall(x,y,Dir::East)?"|":" "):(C_RED "." C_RESET));
 					}
 					os << std::endl;
 				}

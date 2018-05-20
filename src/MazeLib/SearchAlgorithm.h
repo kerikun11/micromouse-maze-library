@@ -25,8 +25,8 @@ namespace MazeLib {
 		*   @param maze 使用する迷路の参照
 		*   @param goal ゴール区画の配列
 		*/
-		SearchAlgorithm(Maze& maze, const Vectors& goal, const Vector& start)
-		: maze(maze), goal(goal), start(start) {}
+		SearchAlgorithm(Maze& maze, const Vectors& goal, const Vector& start, StepMap& stepMap)
+		: maze(maze), goal(goal), start(start), stepMap(stepMap) {}
 		/** @enum Status
 		*   @brief 進むべき方向の計算結果
 		*/
@@ -130,9 +130,9 @@ namespace MazeLib {
 
 	private:
 		Maze& maze; /**< 使用する迷路の参照 */
+		StepMap& stepMap; /**< 使用するステップマップ */
 		const Vectors& goal; /**< ゴール区画を定義 */
 		const Vector& start; /**< スタート区画を定義 */
-		StepMap stepMap; /**< 使用するステップマップ */
 		Vector idStartVector;
 
 		/** @function findShortestCandidates
