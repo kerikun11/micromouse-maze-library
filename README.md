@@ -1,2 +1,1 @@
-# MazeSolver
-MicroMouse
+# MazeLib
