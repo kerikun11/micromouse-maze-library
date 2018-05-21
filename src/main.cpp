@@ -161,13 +161,14 @@ TestRobot robot(goal);
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
+	robot.replaceGoals(goal);
 	robot.searchRun();
 	robot.printInfo();
 	display = true;
 	// while(!robot.searchRun());
-	robot.forceGoingToGoal();
+	// robot.forceGoingToGoal();
 	// while(!robot.positionIdentifyRun(Dir::West));
-	robot.positionIdentifyRun(Dir::West);
+	// robot.positionIdentifyRun(Dir::West);
 	// for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; ++x)
 	// for(int y=-MAZE_SIZE/2; y<MAZE_SIZE/2; ++y){
 	// 	offset = Vector(x, y);

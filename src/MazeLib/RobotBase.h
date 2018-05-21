@@ -12,7 +12,7 @@
 namespace MazeLib {
   class RobotBase : public Agent {
   public:
-    RobotBase(const Vectors& goal) : Agent(goal) { }
+    RobotBase(const Vectors& goals) : Agent(goals) { }
     enum Action : char {
       START_STEP,
       START_INIT,
@@ -25,19 +25,13 @@ namespace MazeLib {
       STRAIGHT_FULL,
       STRAIGHT_HALF,
     };
-    /** @function replaceGoal
-    *   @brief ゴール区画を変更する関数
-    */
-    void replaceGoal(const Vectors& goal) {
-      Agent::replaceGoal(goal);
-    }
     bool searchRun() {
       if(isComplete()) return true;
       queueAction(START_STEP);
       updateCurVecDir(Vector(0, 1), Dir::North);
       calibration();
       startDequeue();
-      auto res = generalSearchRun({start});
+      auto res = generalSearchRun();
       if(!res) {
         stopDequeue();
         return false;
@@ -56,7 +50,7 @@ namespace MazeLib {
       queueAction(STRAIGHT_HALF);
       calibration();
       startDequeue();
-      auto res = generalSearchRun({start});
+      auto res = generalSearchRun();
       if(!res) {
         stopDequeue();
         return false;
@@ -70,7 +64,7 @@ namespace MazeLib {
       return true;
     }
     bool endFastRunBackingToStartRun() {
-      Vector v = start;
+      Vector v = Vector(0, 0);
       for(auto d: getShortestDirs()) v = v.next(d);
       updateCurVecDir(v, getShortestDirs().back());
       updateCurVecDir(getCurVec().next(getCurDir()+Dir::Back), getCurDir()+Dir::Back);
@@ -78,7 +72,7 @@ namespace MazeLib {
       queueAction(STRAIGHT_HALF);
       calibration();
       startDequeue();
-      auto res = generalSearchRun({start});
+      auto res = generalSearchRun();
       if(!res) {
         stopDequeue();
         return false;
@@ -134,7 +128,7 @@ namespace MazeLib {
         updateCurVecDir(nextVec, nextDir);
       }
     }
-    bool generalSearchRun(const Vectors dest){
+    bool generalSearchRun(){
       int cnt=0;
       while(1){
         // if(cnt++ > 300) return false;
