@@ -15,8 +15,7 @@ namespace MazeLib {
   class Agent {
   public:
     Agent(const Vectors& goal)
-    : goal(goal), start(Vector(0,0)), searchAlgorithm(maze, goal, start, stepMap)
-    { start = Vector(0,0); }
+    : goal(goal), start(Vector(0,0)), searchAlgorithm(maze, idMaze, goal, start, stepMap) {}
     /** @function replaceGoal
     *   @brief ゴール区画を変更する関数
     */
@@ -82,7 +81,7 @@ namespace MazeLib {
     *   @return 探索状態
     */
     SearchAlgorithm::Status calcNextDirs() {
-      return searchAlgorithm.calcNextDirs(state, idMaze, idWallLogs, curVec, curDir, nextDirs, nextDirCandidates, isPositionIdentifying, isForceBackToStart, isForceGoingToGoal, matchCount);
+      return searchAlgorithm.calcNextDirs(state, idWallLogs, curVec, curDir, nextDirs, nextDirCandidates, isPositionIdentifying, isForceBackToStart, isForceGoingToGoal, matchCount);
     }
     /** @function calcShortestDirs
     *   @brief 最短経路を導出

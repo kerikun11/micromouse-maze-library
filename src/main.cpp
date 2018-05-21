@@ -32,7 +32,7 @@ Maze sample(mazeData_2017_East_MC, true);
 // Maze sample(mazeData_fp2016C);
 // Maze sample(mazeData_Cheese2017, true);
 #elif MAZE_SIZE == 32
-#define YEAR 2016
+#define YEAR 2015
 #if YEAR == 2011
 Vectors goal = {Vector(1,0)};
 Maze sample(mazeData_32);
@@ -162,8 +162,8 @@ int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
 	robot.searchRun();
-	display = true;
 	robot.printInfo();
+	display = true;
 	// while(!robot.searchRun());
 	robot.forceGoingToGoal();
 	// while(!robot.positionIdentifyRun(Dir::West));

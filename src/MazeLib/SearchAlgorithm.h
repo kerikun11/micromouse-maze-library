@@ -25,8 +25,8 @@ namespace MazeLib {
 		*   @param maze 使用する迷路の参照
 		*   @param goal ゴール区画の配列
 		*/
-		SearchAlgorithm(Maze& maze, const Vectors& goal, const Vector& start, StepMap& stepMap)
-		: maze(maze), goal(goal), start(start), stepMap(stepMap) {}
+		SearchAlgorithm(Maze& maze, Maze& idMaze, const Vectors& goal, const Vector& start, StepMap& stepMap)
+		: maze(maze), idMaze(idMaze), goal(goal), start(start), stepMap(stepMap) {}
 		/** @enum Status
 		*   @brief 進むべき方向の計算結果
 		*/
@@ -72,12 +72,12 @@ namespace MazeLib {
 			findShortestCandidates(candidates);
 			return candidates.empty();
 		}
-		Status calcNextDirs(State& state, Maze& idMaze, WallLogs& idWallLogs, Vector& curVec, const Dir& curDir, Dirs& nextDirs, Dirs& nextDirCandidates, bool& isPositionIdentifying, bool& isForceBackToStart, bool& isForceGoingToGoal, int& matchCount){
+		Status calcNextDirs(State& state, WallLogs& idWallLogs, Vector& curVec, const Dir& curDir, Dirs& nextDirs, Dirs& nextDirCandidates, bool& isPositionIdentifying, bool& isForceBackToStart, bool& isForceGoingToGoal, int& matchCount){
 			state = START;
 			SearchAlgorithm::Status status;
 			if(isPositionIdentifying){
 				state = IDENTIFYING_POSITION;
-				status = calcNextDirsPositionIdentification(idMaze, idWallLogs, curVec, curDir, nextDirs, nextDirCandidates, matchCount);
+				status = calcNextDirsPositionIdentification(idWallLogs, curVec, curDir, nextDirs, nextDirCandidates, matchCount);
 				switch(status){
 					case SearchAlgorithm::Processing: return status;
 					case SearchAlgorithm::Reached: isPositionIdentifying = false; break;
@@ -130,9 +130,11 @@ namespace MazeLib {
 
 	private:
 		Maze& maze; /**< 使用する迷路の参照 */
+		Maze& idMaze; /**< 自己位置同定に使用する迷路 */
 		StepMap& stepMap; /**< 使用するステップマップ */
 		const Vectors& goal; /**< ゴール区画を定義 */
 		const Vector& start; /**< スタート区画を定義 */
+
 		Vector idStartVector;
 
 		/** @function findShortestCandidates
@@ -238,7 +240,7 @@ namespace MazeLib {
 			if(it != goal.end()) return Reached;
 			return nextDirCandidates.empty() ? Error : Processing;
 		}
-		enum Status calcNextDirsPositionIdentification(Maze& idMaze, WallLogs& idWallLogs, Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates, int& matchCount){
+		enum Status calcNextDirsPositionIdentification(WallLogs& idWallLogs, Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates, int& matchCount){
 			Vector ans;
 			int cnt = countIdentityCandidates(idWallLogs, ans);
 			matchCount = cnt;
