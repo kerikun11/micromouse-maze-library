@@ -12,7 +12,8 @@
 namespace MazeLib {
   class RobotBase : public Agent {
   public:
-    RobotBase(const Vectors& goals) : Agent(goals) { }
+    RobotBase(const Vectors& goals)
+    : Agent(goals) { }
     enum Action : char {
       START_STEP,
       START_INIT,
@@ -25,7 +26,8 @@ namespace MazeLib {
       STRAIGHT_FULL,
       STRAIGHT_HALF,
     };
-    bool searchRun() {
+    bool searchRun()
+    {
       if(isComplete()) return true;
       queueAction(START_STEP);
       updateCurVecDir(Vector(0, 1), Dir::North);
@@ -44,7 +46,8 @@ namespace MazeLib {
       backupMazeToFlash();
       return true;
     }
-    bool positionIdentifyRun(const Dir start_d) {
+    bool positionIdentifyRun(const Dir start_d)
+    {
       positionIdentify(start_d+2);
       queueAction(ROTATE_180);
       queueAction(STRAIGHT_HALF);
@@ -63,7 +66,8 @@ namespace MazeLib {
       backupMazeToFlash();
       return true;
     }
-    bool endFastRunBackingToStartRun() {
+    bool endFastRunBackingToStartRun()
+    {
       Vector v = Vector(0, 0);
       for(auto d: getShortestDirs()) v = v.next(d);
       updateCurVecDir(v, getShortestDirs().back());

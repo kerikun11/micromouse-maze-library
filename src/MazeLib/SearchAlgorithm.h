@@ -51,7 +51,8 @@ namespace MazeLib {
 		/** @function stateString
 		*   @brief Stateの表示用文字列を返す関数
 		*/
-		static const char* stateString(const enum State s) {
+		static const char* stateString(const enum State s)
+		{
 			static const char* str[]={
 				"start",
 				"Searching for Goal",
@@ -185,9 +186,56 @@ namespace MazeLib {
 		}
 		bool calcShortestDirs(Dirs& shortestDirs, const bool diagonal = true)
 		{
-			return stepMap.calcShortestDirs(maze, start, goals, shortestDirs, diagonal);
+			stepMap.update(maze, goals, true, diagonal);
+			// update(maze, dest, false, diagonal); //< for debug
+			shortestDirs.clear();
+			auto v = start;
+			Dir dir = Dir::North;
+			auto prev_dir = dir;
+			while(1){
+				step_t min_step = MAZE_STEP_MAX;
+				// const auto& dirs = dir.ordered(prev_dir);
+				// prev_dir = dir;
+				// for(const auto& d: dirs){
+				for(const auto d: Dir::All()) {
+					if(!maze.canGo(v, d)) continue;
+					step_t next_step = stepMap.getStep(v.next(d));
+					if(min_step > next_step) {
+						min_step = next_step;
+						dir = d;
+					}
+				}
+				if(stepMap.getStep(v) <= min_step) return false; //< 失敗
+				shortestDirs.push_back(dir);
+				v = v.next(dir);
+				if(stepMap.getStep(v) == 0) break; //< ゴール区画
+			}
+			// ゴール区画を行けるところまで直進する
+			bool loop = true;
+			while(loop){
+				loop = false;
+				Dirs dirs;
+				switch (Dir(dir-prev_dir)) {
+					case Dir::Left: dirs = {Dir(dir+Dir::Right), dir}; break;
+					case Dir::Right: dirs = {Dir(dir+Dir::Left), dir}; break;
+					case Dir::Front: default: dirs = {dir}; break;
+				}
+				if(!diagonal) dirs = {dir};
+				for(const auto& d: dirs){
+					if(maze.canGo(v, d)){
+						shortestDirs.push_back(d);
+						v = v.next(d);
+						prev_dir = dir;
+						dir = d;
+						loop = true;
+						break;
+					}
+				}
+			}
+			return true;
 		}
-		void printPath(const Dirs& shortestDirs) const {
+		void printPath(const Dirs& shortestDirs) const
+		{
 			maze.printPath(start, shortestDirs);
 		}
 		void printMap(const State state, const Vector vec, const Dir dir) const
@@ -217,7 +265,8 @@ namespace MazeLib {
 		/** @function findShortestCandidates
 		*   @brief ステップマップにより最短経路上になりうる区画を洗い出す
 		*/
-		bool findShortestCandidates(Vectors& candidates) {
+		bool findShortestCandidates(Vectors& candidates)
+		{
 			candidates.clear();
 			// 斜めありなしの双方の最短経路上を候補とする
 			for(const bool diagonal: {true, false}){
@@ -227,9 +276,10 @@ namespace MazeLib {
 				auto prev_dir = dir;
 				while(1){
 					step_t min_step = MAZE_STEP_MAX;
-					const auto& dirs = dir.ordered(prev_dir);
-					prev_dir = dir;
-					for(const auto& d: dirs){
+					// const auto& dirs = dir.ordered(prev_dir);
+					// prev_dir = dir;
+					// for(const auto& d: dirs){
+					for(const auto d: Dir::All()) {
 						if(maze.isWall(v, d)) continue;
 						step_t next_step = stepMap.getStep(v.next(d));
 						if(min_step > next_step) {
@@ -248,8 +298,8 @@ namespace MazeLib {
 					loop = false;
 					Dirs dirs;
 					switch (Dir(dir-prev_dir)) {
-						case Dir::Left: dirs = {dir.getRelative(Dir::Right), dir}; break;
-						case Dir::Right: dirs = {dir.getRelative(Dir::Left), dir}; break;
+						case Dir::Left: dirs = {Dir(dir+Dir::Right), dir}; break;
+						case Dir::Right: dirs = {Dir(dir+Dir::Left), dir}; break;
 						case Dir::Front: default: dirs = {dir}; break;
 					}
 					if(!diagonal) dirs = {dir};
@@ -267,7 +317,8 @@ namespace MazeLib {
 			}
 			return true; //< 成功
 		}
-		int countIdentityCandidates(const WallLogs idWallLogs, Vector& ans) const {
+		int countIdentityCandidates(const WallLogs idWallLogs, Vector& ans) const
+		{
 			int cnt = 0;
 			for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; x++)
 			for(int y=-MAZE_SIZE/2; y<MAZE_SIZE/2; y++) {
@@ -292,32 +343,37 @@ namespace MazeLib {
 			}
 			return cnt;
 		}
-		enum Status calcNextDirsSearchForGoal(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
+		enum Status calcNextDirsSearchForGoal(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates)
+		{
 			Vectors candidates;
 			for(auto v: goals) if(maze.unknownCount(v)) candidates.push_back(v); //< ゴール区画の未知区画を洗い出す
 			if(candidates.empty()) return Reached;
 			stepMap.calcNextDirs(maze, candidates, cv, cd, nextDirsKnown, nextDirCandidates);
 			return nextDirCandidates.empty() ? Error : Processing;
 		}
-		enum Status calcNextDirsSearchAdditionally(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
+		enum Status calcNextDirsSearchAdditionally(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates)
+		{
 			Vectors candidates;
 			findShortestCandidates(candidates); //< 最短になりうる区画の洗い出し
 			if(candidates.empty()) return Reached;
 			stepMap.calcNextDirs(maze, candidates, cv, cd, nextDirsKnown, nextDirCandidates);
 			return nextDirCandidates.empty() ? Error : Processing;
 		}
-		enum Status calcNextDirsBackingToStart(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
+		enum Status calcNextDirsBackingToStart(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates)
+		{
 			const auto v = stepMap.calcNextDirs(maze, {start}, cv, cd, nextDirsKnown, nextDirCandidates);
 			if(v == start) return Reached;
 			return nextDirCandidates.empty() ? Error : Processing;
 		}
-		enum Status calcNextDirsGoingToGoal(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
+		enum Status calcNextDirsGoingToGoal(const Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates)
+		{
 			const auto v = stepMap.calcNextDirs(maze, goals, cv, cd, nextDirsKnown, nextDirCandidates);
 			auto it = std::find_if(goals.begin(), goals.end(), [v](const Vector nv){ return v==nv; });
 			if(it != goals.end()) return Reached;
 			return nextDirCandidates.empty() ? Error : Processing;
 		}
-		enum Status calcNextDirsPositionIdentification(WallLogs& idWallLogs, Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates, int& matchCount){
+		enum Status calcNextDirsPositionIdentification(WallLogs& idWallLogs, Vector& cv, const Dir& cd, Dirs& nextDirsKnown, Dirs& nextDirCandidates, int& matchCount)
+		{
 			Vector ans;
 			int cnt = countIdentityCandidates(idWallLogs, ans);
 			matchCount = cnt;

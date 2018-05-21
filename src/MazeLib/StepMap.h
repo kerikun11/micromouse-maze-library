@@ -7,7 +7,10 @@
 */
 #pragma once
 
+// inc
 #include "Maze.h"
+
+// src
 #include <complex> // for std::sqrt()
 
 namespace MazeLib {
@@ -20,19 +23,21 @@ namespace MazeLib {
 	/** @class StepMap
 	*  @brief 足立法のためのステップマップを管理するクラス
 	*/
-	class StepMap{
+	class StepMap {
 	public:
 		/** @brief コンストラクタ
 		*  @param maze 使用する迷路の参照
 		*/
-		StepMap() {
+		StepMap()
+		{
 			calcStraightStepTable();
 			reset();
 		}
 		/** @function reset
 		*  @brief ステップマップの初期化
 		*/
-		void reset(const step_t step = MAZE_STEP_MAX) {
+		void reset(const step_t step = MAZE_STEP_MAX)
+		{
 			for(int8_t y=0; y<MAZE_SIZE; y++)
 			for(int8_t x=0; x<MAZE_SIZE; x++)
 			setStep(x, y, step); //< ステップをクリア
@@ -43,7 +48,8 @@ namespace MazeLib {
 		*  @return ステップメモリの参照
 		*/
 		const step_t& getStep(const Vector& v) const { return getStep(v.x, v.y); }
-		const step_t& getStep(const int8_t& x, const int8_t& y) const {
+		const step_t& getStep(const int8_t& x, const int8_t& y) const
+		{
 			// (x, y) がフィールド内か確認
 			if(x<0 || y<0 || x>MAZE_SIZE-1 || y>MAZE_SIZE-1){
 				printf("Warning: refered to out of field ------------------------------------------> %2d, %2d\n", x, y);
@@ -59,7 +65,8 @@ namespace MazeLib {
 		*  @return ステップメモリの参照
 		*/
 		bool setStep(const Vector& v, const step_t& step) { return setStep(v.x, v.y, step); }
-		bool setStep(const int8_t& x, const int8_t& y, const step_t& step) {
+		bool setStep(const int8_t& x, const int8_t& y, const step_t& step)
+		{
 			// (x, y) がフィールド内か確認
 			if(x<0 || y<0 || x>=MAZE_SIZE || y>=MAZE_SIZE){
 				printf("Warning: refered to out of field ------------------------------------------> %2d, %2d\n", x, y);
@@ -71,10 +78,12 @@ namespace MazeLib {
 		/** @function print
 		*  @param v ハイライト区画
 		*/
-		void print(const Maze& maze, const Vector& v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const {
+		void print(const Maze& maze, const Vector& v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const
+		{
 			print(std::cout, maze, v, d);
 		}
-		void print(std::ostream& os, const Maze& maze, const Vector& v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const {
+		void print(std::ostream& os, const Maze& maze, const Vector& v = Vector(-1,-1), const Dir& d = Dir::AbsMax) const
+		{
 			os << std::endl;
 			for(int8_t y=MAZE_SIZE; y>=0; y--){
 				if(y != MAZE_SIZE){
@@ -96,7 +105,8 @@ namespace MazeLib {
 		*  @param onlyCanGo true:未知の壁は通過不可能とする，false:未知の壁はないものとする
 		*  @param diagonal true: 斜め直線あり false: 斜めはジグザグ
 		*/
-		void update(const Maze& maze, const Vectors& dest, const bool onlyCanGo = false, const bool diagonal = true) {
+		void update(const Maze& maze, const Vectors& dest, const bool onlyCanGo = false, const bool diagonal = true)
+		{
 			// 全区画のステップを最大値に設定
 			reset();
 			// となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
@@ -162,7 +172,8 @@ namespace MazeLib {
 		*   @param dest ステップを0とする区画の配列(destination)
 		*   @param onlyCanGo true:未知の壁は通過不可能とする，false:未知の壁はないものとする
 		*/
-		void updateSimple(const Maze& maze, const Vectors& dest, const bool onlyCanGo = false) {
+		void updateSimple(const Maze& maze, const Vectors& dest, const bool onlyCanGo = false)
+		{
 			// return update(maze, dest, onlyCanGo, false);
 			// 全区画のステップを最大値に設定
 			reset();
@@ -189,7 +200,8 @@ namespace MazeLib {
 				}
 			}
 		}
-		const Vector calcNextDirs(Maze& maze, const Vectors& dest, const Vector vec, const Dir dir, Dirs& nextDirsKnown, Dirs& nextDirCandidates){
+		const Vector calcNextDirs(Maze& maze, const Vectors& dest, const Vector vec, const Dir dir, Dirs& nextDirsKnown, Dirs& nextDirCandidates)
+		{
 			updateSimple(maze, dest, false);
 			return calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
 
@@ -219,64 +231,20 @@ namespace MazeLib {
 			nextDirCandidates = ndcs;
 			return v;
 		}
-		bool calcShortestDirs(const Maze& maze, const Vector& start, const Vectors& dest, Dirs& shortestDirs, const bool diagonal = true){
-			update(maze, dest, true, diagonal);
-			// update(maze, dest, false, diagonal); //< for debug
-			shortestDirs.clear();
-			auto v = start;
-			Dir dir = Dir::North;
-			auto prev_dir = dir;
-			while(1){
-				step_t min_step = MAZE_STEP_MAX;
-				const auto& dirs = dir.ordered(prev_dir);
-				prev_dir = dir;
-				for(const auto& d: dirs){
-					if(!maze.canGo(v, d)) continue;
-					step_t next_step = getStep(v.next(d));
-					if(min_step > next_step) {
-						min_step = next_step;
-						dir = d;
-					}
-				}
-				if(getStep(v) <= min_step) return false; //< 失敗
-				shortestDirs.push_back(dir);
-				v = v.next(dir);
-				if(getStep(v) == 0) break; //< ゴール区画
-			}
-			// ゴール区画を行けるところまで直進する
-			bool loop = true;
-			while(loop){
-				loop = false;
-				Dirs dirs;
-				switch (Dir(dir-prev_dir)) {
-					case Dir::Left: dirs = {dir.getRelative(Dir::Right), dir}; break;
-					case Dir::Right: dirs = {dir.getRelative(Dir::Left), dir}; break;
-					case Dir::Front: default: dirs = {dir}; break;
-				}
-				if(!diagonal) dirs = {dir};
-				for(const auto& d: dirs){
-					if(maze.canGo(v, d)){
-						shortestDirs.push_back(d);
-						v = v.next(d);
-						prev_dir = dir;
-						dir = d;
-						loop = true;
-						break;
-					}
-				}
-			}
-			return true;
-		}
 
 	private:
 		step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
-		step_t straightStepTable[MAZE_SIZE*2];
+		step_t straightStepTable[MAZE_SIZE*2]; //**< @brief 最短経路導出用の加速を考慮したステップリスト */
 
-		const float a = 9000;
-		const float v0 = 300;
-		const float factor = 1.0f / (sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2)/a) - sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2-1)/a));
-
-		void calcStraightStepTable(){
+		/** @function calcStraightStepTable
+		*   @brief 最短経路導出用の加速を考慮したステップリストを算出する関数
+		*   高速化のため，あらかじめ計算を終えておく．
+		*/
+		void calcStraightStepTable()
+		{
+			const float a = 9000;
+			const float v0 = 300;
+			const float factor = 1.0f / (sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2)/a) - sqrt(pow(v0/a,2) + 90*(MAZE_SIZE*2-1)/a));
 			for(int i=0; i<MAZE_SIZE*2; i++){
 				float x = 90*(i+1);
 				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
@@ -291,7 +259,8 @@ namespace MazeLib {
 		*   @brief ステップマップにより次に行くべき方向列を生成する
 		*   @return true:成功, false:失敗(迷子)
 		*/
-		Vector calcNextDirs(const Maze& maze, const Vector& start_v, const Dir& start_d, Dirs& nextDirsKnown, Dirs& nextDirCandidates) const {
+		Vector calcNextDirs(const Maze& maze, const Vector& start_v, const Dir& start_d, Dirs& nextDirsKnown, Dirs& nextDirCandidates) const
+		{
 			// ステップマップから既知区間進行方向列を生成
 			nextDirsKnown.clear();
 			auto focus_v = start_v;
