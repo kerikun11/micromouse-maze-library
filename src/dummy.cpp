@@ -1,0 +1,3 @@
+#include<cstdio>
+
+void dummy() {}

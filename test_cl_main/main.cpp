@@ -1,8 +1,8 @@
 #include <cstdio>
 #include <cstdint>
-#include "MazeLib/Maze.h"
-#include "MazeLib/Agent.h"
-#include "MazeLib/RobotBase.h"
+#include "Maze.h"
+#include "Agent.h"
+#include "RobotBase.h"
 
 #include "mazedata.h"
 
@@ -161,10 +161,10 @@ TestRobot robot(goal);
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
+	display = true;
 	robot.replaceGoals(goal);
 	robot.searchRun();
 	robot.printInfo();
-	display = true;
 	// while(!robot.searchRun());
 	// robot.forceGoingToGoal();
 	// while(!robot.positionIdentifyRun(Dir::West));

@@ -252,7 +252,6 @@ namespace MazeLib {
 			for(int i=0; i<MAZE_SIZE*2; i++){
 				float x = 90*(i+1);
 				straightStepTable[i] = (sqrt(pow(v0/a,2) + x/a) - v0/a) * factor;
-				step_t step = straightStepTable[i]+straightStepTable[MAZE_SIZE*2-1-i];
 			}
 		}
 		/** @function calcNextDirs
