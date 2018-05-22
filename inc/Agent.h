@@ -15,12 +15,15 @@ namespace MazeLib {
   class Agent {
   public:
     Agent(const Vectors& goals)
-    : searchAlgorithm(goals) {}
-    /** @function replaceGoals
-    *   @brief ゴール区画を変更する関数
+    : maze(goals), searchAlgorithm(maze) {}
+		/** @function replaceGoals
+		*   @brief ゴール区画を変更する関数
+		*/
+		void replaceGoals(const Vectors& goals)
+		{ maze.setGoals(goals); }
+    /** @function isComplete
+    *   @brief 探索が完了しているかどうかを返す関数
     */
-    void replaceGoals(const Vectors& goals)
-    { searchAlgorithm.replaceGoals(goals); }
     bool isComplete()
     { return searchAlgorithm.isComplete(); }
     /** @function updateCurVecDir
@@ -138,11 +141,12 @@ namespace MazeLib {
     */
     void printPath() const
     {
-      searchAlgorithm.printPath(shortestDirs);
+      maze.printPath(maze.getStart(), shortestDirs);
       printf("Shortest Step: %d\n", (int)shortestDirs.size());
     }
 
   protected:
+    Maze maze; /**< 使用する迷路 */
     SearchAlgorithm searchAlgorithm; /**< 探索器 */
     SearchAlgorithm::State state; /**< 現在の探索状態を保持 */
     Vector curVec; /**< 現在の区画座標 */

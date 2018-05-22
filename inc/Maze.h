@@ -101,9 +101,7 @@ namespace MazeLib {
 		*/
 		friend std::ostream& operator<<(std::ostream& os, const Dir& d)
 		{
-			static const char dir_str[] = ">^<v";
-			os << dir_str[d];
-			return os;
+			return os << (char)(">^<v "[d]);
 		}
 	private:
 		enum AbsoluteDir d; /**< @brief 方向の実体 */
@@ -188,21 +186,15 @@ namespace MazeLib {
 	*   バックアップする際の情報量を最小限にするため，
 	*   スタートとゴールの情報は持たず，壁の情報のみを保持する．
 	*/
-	class Maze {
+	class MazeWall {
 	public:
-		Maze() { reset(); } /**< @brief デフォルトのコンストラクタ */
-		Maze(const Maze& obj) { *this = obj; } /**< @brief コピーコンストラクタ */
-		/** @constructor Maze
-		*   @brief ファイル名から迷路をパースするコンストラクタ
-		*   @param filename ファイル名
-		*/
-		Maze(const char* filename) { std::ifstream ifs(filename); parse(ifs); }
+		MazeWall() { reset(); } /**< @brief デフォルトのコンストラクタ */
 		/** @brief 配列から迷路を読み込むコンストラクタ
 		*   @param data 各区画16進表記の文字列配列
 		*  例：{"abaf", "1234", "abab", "aaff"}
 		*   @param east_origin true: 東から反時計回り，false: 北から時計回り に0bitから格納されている
 		*/
-		Maze(const char data[MAZE_SIZE+1][MAZE_SIZE+1], bool east_origin = true)
+		MazeWall(const char data[MAZE_SIZE+1][MAZE_SIZE+1], bool east_origin = true)
 		{
 			for(uint8_t y=0; y<MAZE_SIZE; y++)
 			for(uint8_t x=0; x<MAZE_SIZE; x++){
@@ -223,22 +215,10 @@ namespace MazeLib {
 				}
 			}
 		}
-		/** @brief 代入演算子のオーバーロード，データのコピー
-		*/
-		const Maze& operator=(const Maze& obj)
-		{
-			for(int8_t i=0; i<MAZE_SIZE-1; i++){
-				wall[0][i]=obj.wall[0][i];
-				wall[1][i]=obj.wall[1][i];
-				known[0][i]=obj.known[0][i];
-				known[1][i]=obj.known[1][i];
-			}
-			return *this;
-		}
 		/** @function reset
 		*   @brief 迷路の初期化．壁を削除し，スタート区画を既知に
 		*/
-		void reset()
+		void reset(const bool setStartWall = true)
 		{
 			for(int8_t i=0; i<MAZE_SIZE-1; i++){
 				wall[0][i]=0;
@@ -246,8 +226,10 @@ namespace MazeLib {
 				known[0][i]=0;
 				known[1][i]=0;
 			}
-			updateWall(Vector(0,0), Dir::East, true); //< start cell
-			updateWall(Vector(0,0), Dir::North, false); //< start cell
+			if(setStartWall){
+				updateWall(Vector(0,0), Dir::East, true); //< start cell
+				updateWall(Vector(0,0), Dir::North, false); //< start cell
+			}
 		}
 		/** @function isWall
 		*   @brief 壁の有無を返す
@@ -444,6 +426,71 @@ namespace MazeLib {
 		{
 			printPath(std::cout, start, dirs);
 		}
+
+	private:
+		wall_size_t wall[2][MAZE_SIZE-1]; /**< 壁情報 */
+		wall_size_t known[2][MAZE_SIZE-1]; /**< 既知壁情報 */
+	};
+
+	class Maze : public MazeWall {
+	public:
+		Maze(const Vectors& goals, const Vector start = Vector(0, 0))
+		: MazeWall(), goals(goals), start(start) {}
+		/** @constructor Maze
+		*   @brief ファイル名から迷路をパースするコンストラクタ
+		*   @param filename ファイル名
+		*/
+		Maze(const char* filename)
+		{
+			std::ifstream ifs(filename);
+			parse(ifs);
+		}
+		/** @function reset
+		*   @brief 迷路の初期化
+		*/
+		void reset()
+		{
+			MazeWall::reset();
+			wallLogs.clear();
+		}
+		bool updateWall(const Vector& v, const Dir& d, const bool& b)
+		{
+			wallLogs.push_back(WallLog(v, d, b));
+			if(!MazeWall::updateWall(v, d, b)) return false; //< 既知壁と食い違いがあった
+			return true;
+		}
+		bool resetLastWall(const int num)
+		{
+			for(int i=0;i<num;i++){
+				if(wallLogs.empty()) return true;
+				auto wl = wallLogs.back();
+				setWall(Vector(wl), wl.d, false);
+				setKnown(Vector(wl), wl.d, false);
+				wallLogs.pop_back();
+			}
+		}
+		/** @function print
+		*   @brief 迷路の表示
+		*   @param of output-stream
+		*/
+		void print(std::ostream& os = std::cout) const
+		{
+			for(int8_t y=MAZE_SIZE; y>=0; y--){
+				if(y != MAZE_SIZE){
+					os << '|';
+					for(uint8_t x=0; x<MAZE_SIZE; x++){
+						auto v = Vector(x, y);
+						if(v == start) os << " S ";
+						else if(std::find(goals.begin(), goals.end(), v) != goals.end()) os << " G ";
+						else               os << "   ";
+						os << (isKnown(x,y,Dir::East)?(isWall(x,y,Dir::East)?"|":" "):".");
+					}
+					os << std::endl;
+				}
+				for(uint8_t x=0; x<MAZE_SIZE; x++) os << "+" << (isKnown(x,y,Dir::South)?(isWall(x,y,Dir::South)?"---":"   "):" . ");
+				os << "+" << std::endl;
+			}
+		}
 		/** @function parse
 		*   @brief 迷路の文字列から壁をパースする
 		*   @param is input-stream
@@ -451,14 +498,19 @@ namespace MazeLib {
 		bool parse(std::istream& is)
 		{
 			reset();
+			goals.clear();
 			for(int8_t y=MAZE_SIZE; y>=0; y--){
 				if(y!=MAZE_SIZE){
 					is.ignore(10, '|'); //< 次の|が出てくるまでスキップ
 					for(uint8_t x=0; x<MAZE_SIZE; x++) {
-						is.ignore(3); //< "   " 空欄分をスキップ
+						is.ignore(1); //< " " 空欄分をスキップ
 						char c = is.get();
-						if     (c=='|') updateWall(Vector(x, y), Dir::East, true);
-						else if(c==' ') updateWall(Vector(x, y), Dir::East, false);
+						if     (c=='S') start = Vector(x, y);
+						else if(c=='G') goals.push_back(Vector(x, y));
+						is.ignore(1); //< " " 空欄分をスキップ
+						c = is.get();
+						if     (c=='|') MazeWall::updateWall(Vector(x, y), Dir::East, true);
+						else if(c==' ') MazeWall::updateWall(Vector(x, y), Dir::East, false);
 					}
 				}
 				for(uint8_t x=0; x<MAZE_SIZE; x++){
@@ -467,15 +519,21 @@ namespace MazeLib {
 					s += (char)is.get();
 					s += (char)is.get();
 					s += (char)is.get();
-					if     (s=="---") updateWall(Vector(x, y), Dir::South, true);
-					else if(s=="   ") updateWall(Vector(x, y), Dir::South, false);
+					if     (s=="---") MazeWall::updateWall(Vector(x, y), Dir::South, true);
+					else if(s=="   ") MazeWall::updateWall(Vector(x, y), Dir::South, false);
 				}
 			}
 			return true;
 		}
 
+		void setGoals(const Vectors& goals) { this->goals=goals; }
+		const Vectors& getGoals() const { return goals; }
+		const Vector& getStart() const { return start; }
+		const WallLogs& getWallLogs() const { return wallLogs; }
+
 	private:
-		wall_size_t wall[2][MAZE_SIZE-1]; /**< 壁情報 */
-		wall_size_t known[2][MAZE_SIZE-1]; /**< 既知壁情報 */
+		Vectors goals;
+		Vector start;
+		WallLogs wallLogs;
 	};
 }

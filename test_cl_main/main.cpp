@@ -13,54 +13,31 @@
 using namespace MazeLib;
 
 #if MAZE_SIZE == 8
-// Vectors goal = {Vector(7,7)};
-Vectors goal = {Vector(1,0)};
-// Maze sample(mazeData_fp2016);
-Maze sample(mazeData_a);
+Maze sample("../mazedata/08Test1.maze");
+// Maze sample("../mazedata/08MM2016CF_pre.maze");
 #elif MAZE_SIZE == 16
-Vectors goal = {Vector(7,7),Vector(7,8),Vector(8,8),Vector(8,7)};
-// Vectors goal = {Vector(7,7)};
-// Vectors goal = {Vector(3,3),Vector(3,4),Vector(4,3),Vector(4,4)};
-// Maze sample(mazeData_maze, false);
-// Maze sample(mazeData_maze3, false);
-// Maze sample(mazeData_maze4, false);
-// Maze sample(mazeData_maze2013fr, false);
-// Maze sample(mazeData_maze2013exp, false);
-Maze sample(mazeData_2017_East_MC, true);
-// Maze sample(mazeData_MM2017CXpre, true);
-// Maze sample(mazeData_MM2017CX, true);
-// Maze sample(mazeData_fp2016C);
-// Maze sample(mazeData_Cheese2017, true);
+Maze sample("../mazedata/16MM2017CX.maze");
 #elif MAZE_SIZE == 32
-#define YEAR 2015
-#if YEAR == 2011
-Vectors goal = {Vector(1,0)};
-Maze sample(mazeData_32);
-#elif YEAR == 2012
-Vectors goal = {Vector(22,25)};
-Maze sample(mazeData_MM2012HX);
+#define YEAR 2017
+#if YEAR == 2012
+Maze sample("../mazedata/32MM2012HX.maze");
 #elif YEAR == 2013
-Vectors goal = {Vector(6,5)};
-Maze sample(mazeData_MM2013HX, false);
+Maze sample("../mazedata/32MM2013HX.maze");
 #elif YEAR == 2014
-Vectors goal = {Vector(26,5)};
-Maze sample(mazeData_MM2014HX);
+Maze sample("../mazedata/32MM2014HX.maze");
 #elif YEAR == 2015
-Vectors goal = {Vector(7,24)};
-Maze sample(mazeData_MM2015HX);
+Maze sample("../mazedata/32MM2015HX.maze");
 #elif YEAR == 2016
-Vectors goal = {Vector(1,2), Vector(1,3), Vector(1,4), Vector(2,2), Vector(2,3), Vector(2,4), Vector(3,2), Vector(3,3), Vector(3,4)};
-// Vectors goal = {Vector(1,2)};
-Maze sample(mazeData_MM2016HX);
+Maze sample("../mazedata/32MM2016HX.maze");
 #elif YEAR == 2017
-Vectors goal = {Vector(19,20), Vector(19,21), Vector(19,22), Vector(20,20), Vector(20,21), Vector(20,22), Vector(21,20), Vector(21,21), Vector(21,22)};
-// Vectors goal = {Vector(19,20)};
-Maze sample(mazeData_MM2017HX);
+Maze sample("../mazedata/32MM2017HX.maze");
 #endif
 #endif
 
 bool display = 0;
 Vector offset;
+
+#if 1
 
 class TestRobot : public RobotBase {
 public:
@@ -156,19 +133,19 @@ private:
 	}
 };
 
-TestRobot robot(goal);
+TestRobot robot(sample.getGoals());
+
+#endif
 
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
 	display = true;
-	robot.replaceGoals(goal);
+	robot.replaceGoals(sample.getGoals());
 	robot.searchRun();
 	robot.printInfo();
-	// while(!robot.searchRun());
-	// robot.forceGoingToGoal();
-	// while(!robot.positionIdentifyRun(Dir::West));
-	// robot.positionIdentifyRun(Dir::West);
+	robot.forceGoingToGoal();
+	robot.positionIdentifyRun(Dir::West);
 	// for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; ++x)
 	// for(int y=-MAZE_SIZE/2; y<MAZE_SIZE/2; ++y){
 	// 	offset = Vector(x, y);
@@ -189,12 +166,16 @@ int main(void){
 	// robot.endFastRunBackingToStartRun();
 	robot.printPath();
 	#else
-	std::ifstream ifs("MM2016HX_ip.maze");
+	// std::ifstream ifs("MM2016HX_ip.maze");
 	// Maze m(ifs);
-	Maze m("MM2016HX_ip.maze");
+	// Maze m("MM2016HX_ip.maze");
 	// m.parse(ifs);
 	// m.print(std::cout);
-	m.print();
+
+	// sample.setGoals(goal);
+	// std::ofstream ofs(filename);
+	// sample.print(ofs);
+	// sample.print();
 	#endif
 	return 0;
 }
