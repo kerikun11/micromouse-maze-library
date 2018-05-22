@@ -12,7 +12,7 @@ target_link_libraries(test_cl_main mazelib)
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 add_custom_target(run
-  COMMAND test_cl_main
+  COMMAND clear && ./test_cl_main
   DEPENDS test_cl_main mazelib
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
