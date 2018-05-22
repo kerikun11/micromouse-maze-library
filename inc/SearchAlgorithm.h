@@ -25,7 +25,7 @@ namespace MazeLib {
 		*   @param maze 使用する迷路の参照
 		*   @param goals ゴール区画の配列
 		*/
-		SearchAlgorithm(Maze& maze) : maze(maze), idMaze({}) {}
+		SearchAlgorithm(Maze& maze) : maze(maze) {}
 		/** @enum Status
 		*   @brief 進むべき方向の計算結果
 		*/

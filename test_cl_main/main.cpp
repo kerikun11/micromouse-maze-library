@@ -18,7 +18,7 @@ Maze sample("../mazedata/08Test1.maze");
 #elif MAZE_SIZE == 16
 Maze sample("../mazedata/16MM2017CX.maze");
 #elif MAZE_SIZE == 32
-#define YEAR 2017
+#define YEAR 2016
 #if YEAR == 2012
 Maze sample("../mazedata/32MM2012HX.maze");
 #elif YEAR == 2013
@@ -140,10 +140,10 @@ TestRobot robot(sample.getGoals());
 int main(void){
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	#if 1
-	display = true;
 	robot.replaceGoals(sample.getGoals());
 	robot.searchRun();
 	robot.printInfo();
+	display = true;
 	robot.forceGoingToGoal();
 	robot.positionIdentifyRun(Dir::West);
 	// for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; ++x)
