@@ -112,6 +112,11 @@ namespace MazeLib {
     */
     const Dirs& getShortestDirs() const
     { return shortestDirs; }
+    /** @function getMaze
+    *   @brief 迷路を取得
+    */
+    const Maze& getMaze() const
+    { return maze; }
     /** @function printInfo
     *   @brief 探索状態を表示
     *   @param showMaze true:迷路も表示, false:迷路は非表示

@@ -448,9 +448,9 @@ namespace MazeLib {
 		/** @function reset
 		*   @brief 迷路の初期化
 		*/
-		void reset()
+		void reset(const bool setStartWall = true)
 		{
-			MazeWall::reset();
+			MazeWall::reset(setStartWall);
 			wallLogs.clear();
 		}
 		bool updateWall(const Vector& v, const Dir& d, const bool& b)

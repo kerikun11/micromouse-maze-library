@@ -75,7 +75,7 @@ namespace MazeLib {
 		}
 		void positionIdentifyingInit()
 		{
-			idStartVector = MAZE_SIZE/2, MAZE_SIZE/2);
+			idStartVector = Vector(MAZE_SIZE/2, MAZE_SIZE/2);
 			idMaze.reset(false);
 		}
 		bool updateWall(const State& state, const Vector& v, const Dir& d, const bool left, const bool front, const bool right, const bool back)
