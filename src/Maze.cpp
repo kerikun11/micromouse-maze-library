@@ -115,6 +115,7 @@ namespace MazeLib {
 			setKnown(Vector(wl), wl.d, false);
 			wallLogs.pop_back();
 		}
+		return true;
 	}
 	void Maze::print(std::ostream& os) const
 	{
