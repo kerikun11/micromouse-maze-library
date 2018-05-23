@@ -1,8 +1,8 @@
-#include <cstdio>
-#include <cstdint>
 #include "Maze.h"
 #include "Agent.h"
 #include "RobotBase.h"
+#include <cstdio>
+#include <cstdint>
 
 #include "mazedata.h"
 

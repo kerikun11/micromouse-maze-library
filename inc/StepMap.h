@@ -12,6 +12,8 @@
 
 // src
 #include <complex> // for std::sqrt()
+#include <algorithm>
+#include <queue>
 
 namespace MazeLib {
 	/** @def MAZE_STEP_MAX

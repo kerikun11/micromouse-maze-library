@@ -7,15 +7,12 @@
 */
 #pragma once
 
-// inc
+#include <cstdio>
+#include <cstdint>
 #include <vector>
 #include <array>
 #include <iostream>
 #include <fstream>
-
-// src
-#include <algorithm>
-#include <queue>
 #include <iomanip> //< for std::setw()
 
 namespace MazeLib {
@@ -68,41 +65,19 @@ namespace MazeLib {
 		*/
 		Dir(const enum AbsoluteDir d = East) : d(d) {}
 		Dir(const int8_t d) : d(AbsoluteDir(d&3)) {}
-
 		/** @brief 整数へのキャスト
 		*/
 		operator int8_t() const { return d; }
 		/** @brief 代入演算子のオーバーロード
 		*/
 		const Dir operator=(const Dir& obj) { d=obj.d; return *this; }
-
-		/** @function ordered
-		*   @brief 「正面，左，右，後」の順序の方向配列を生成する関数
-		*/
-		// const std::array<Dir, 4> ordered(const Dir& prev) const
-		// {
-		// 	switch (Dir(d-prev)) {
-		// 		case Front: return std::array<Dir, 4>{d, d+1, d-1, d+2};
-		// 		case Left:  return std::array<Dir, 4>{d-1, d, d+1, d+2};
-		// 		case Right: return std::array<Dir, 4>{d+1, d, d-1, d+2};
-		// 		case Back:  return std::array<Dir, 4>{d, d+1, d-1, d+2};
-		// 		default:    return std::array<Dir, 4>{d, d+1, d-1, d+2};
-		// 	}
-		// }
 		/** @function All
 		*   @brief 全方向の方向配列を生成する静的関数
 		*/
-		static const std::array<Dir, 4>& All()
-		{
-			static const std::array<Dir, 4> all = {East, North, West, South};
-			return all;
-		}
+		static const std::array<Dir, 4>& All();
 		/** @function <<
 		*/
-		friend std::ostream& operator<<(std::ostream& os, const Dir& d)
-		{
-			return os << (char)(">^<v "[d]);
-		}
+		friend std::ostream& operator<<(std::ostream& os, const Dir& d);
 	private:
 		enum AbsoluteDir d; /**< @brief 方向の実体 */
 	};
@@ -135,24 +110,11 @@ namespace MazeLib {
 		*   @param 隣接方向
 		*   @return 隣接座標
 		*/
-		const Vector next(const Dir &dir) const
-		{
-			switch(dir){
-				case Dir::East: return Vector(x+1, y);
-				case Dir::North: return Vector(x, y+1);
-				case Dir::West: return Vector(x-1, y);
-				case Dir::South: return Vector(x, y-1);
-			}
-			printf("Warning: invalid direction\n");
-			return *this;
-		}
+		const Vector next(const Dir &dir) const;
 		/** @function <<
 		*   @brief 表示
 		*/
-		friend std::ostream& operator<<(std::ostream& os, const Vector& v)
-		{
-			return os << "(" << std::setw(2) << (int)v.x << ", " << std::setw(2) << (int)v.y << ")";
-		}
+		friend std::ostream& operator<<(std::ostream& os, const Vector& v);
 	};
 	/** @typedef Vectors
 	*   @brief Vector構造体の動的配列
@@ -170,8 +132,8 @@ namespace MazeLib {
 			uint8_t d : 3;  /**< @brief 方向 */
 			uint8_t b : 1;  /**< @brief 壁の有無 */
 		};
-		WallLog(const Vector& v , const Dir& d, const bool b): x(v.x), y(v.y), d(d), b(b) {}
-		WallLog(const int8_t x, const int8_t y, const Dir& d, const bool b): x(x), y(y), d(d), b(b) {}
+		WallLog(const Vector v , const Dir d, const bool b): x(v.x), y(v.y), d(d), b(b) {}
+		WallLog(const int8_t x, const int8_t y, const Dir d, const bool b): x(x), y(y), d(d), b(b) {}
 		WallLog(const uint16_t all): all(all) {}
 		WallLog() {}
 		operator Vector(){ return Vector(x, y); }
@@ -200,44 +162,11 @@ namespace MazeLib {
 		*  例：{"abaf", "1234", "abab", "aaff"}
 		*   @param east_origin true: 東から反時計回り，false: 北から時計回り に0bitから格納されている
 		*/
-		Maze(const char data[MAZE_SIZE+1][MAZE_SIZE+1], bool east_origin = true)
-		{
-			for(uint8_t y=0; y<MAZE_SIZE; y++)
-			for(uint8_t x=0; x<MAZE_SIZE; x++){
-				char c = data[MAZE_SIZE-y-1][x];
-				uint8_t h = 0;
-				if ('0' <= c && c <= '9') h = c-'0';
-				else if('a'<=c && c<='f') h = c-'a'+10;
-				if(east_origin){
-					updateWall(Vector(x, y), Dir::East,  h&0x01, false);
-					updateWall(Vector(x, y), Dir::North, h&0x02, false);
-					updateWall(Vector(x, y), Dir::West,  h&0x04, false);
-					updateWall(Vector(x, y), Dir::South, h&0x08, false);
-				}else{
-					updateWall(Vector(x, y), Dir::East,  h&0x02, false);
-					updateWall(Vector(x, y), Dir::North, h&0x01, false);
-					updateWall(Vector(x, y), Dir::West,  h&0x08, false);
-					updateWall(Vector(x, y), Dir::South, h&0x04, false);
-				}
-			}
-		}
+		Maze(const char data[MAZE_SIZE+1][MAZE_SIZE+1], bool east_origin = true);
 		/** @function reset
 		*   @brief 迷路の初期化．壁を削除し，スタート区画を既知に
 		*/
-		void reset(const bool setStartWall = true)
-		{
-			for(int8_t i=0; i<MAZE_SIZE-1; i++){
-				wall[0][i]=0;
-				wall[1][i]=0;
-				known[0][i]=0;
-				known[1][i]=0;
-			}
-			if(setStartWall){
-				updateWall(Vector(0,0), Dir::East, true); //< start cell
-				updateWall(Vector(0,0), Dir::North, false); //< start cell
-			}
-			wallLogs.clear();
-		}
+		void reset(const bool setStartWall = true);
 		/** @function isWall
 		*   @brief 壁の有無を返す
 		*   @param v 区画の座標
@@ -284,30 +213,19 @@ namespace MazeLib {
 		*   @param d 壁の方向
 		*   @return true:既知かつ壁なし，false:それ以外
 		*/
-		bool canGo(const Vector& v, const Dir& d) const
-		{
-			return isKnown(v, d) && !isWall(v, d);
-		}
+		bool canGo(const Vector& v, const Dir& d) const;
 		/** @function wallCount
 		*   @brief 引数区画の壁の数を返す
 		*   @param v 区画の座標
 		*   @return 壁の数 0~4
 		*/
-		int8_t wallCount(const Vector& v) const
-		{
-			auto dirs = Dir::All();
-			return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return isWall(v, d);});
-		}
+		int8_t wallCount(const Vector& v) const;
 		/** @function unknownCount
 		*   @brief 引数区画の未知壁の数を返す
 		*   @param v 区画の座標
 		*   @return 既知壁の数 0~4
 		*/
-		int8_t unknownCount(const Vector& v) const
-		{
-			auto dirs = Dir::All();
-			return std::count_if(dirs.begin(), dirs.end(), [&](const Dir& d){return !isKnown(v, d);});
-		}
+		int8_t unknownCount(const Vector& v) const;
 		/** @function updateWall
 		*   @brief 既知の壁と照らしあわせながら，壁を更新する関数
 		*   @param v 区画の座標
@@ -315,119 +233,26 @@ namespace MazeLib {
 		*   @param b 壁の有無
 		*   @return true: 正常に更新された, false: 既知の情報と不一致だった
 		*/
-		bool updateWall(const Vector v, const Dir d, const bool b, const bool pushLog = true)
-		{
-			// ログに追加
-			if(pushLog) wallLogs.push_back(WallLog(v, d, b));
-			// 既知の壁と食い違いがあったら未知壁としてreturn
-			if(isKnown(v, d) && isWall(v, d) != b){
-				setWall(v, d, false);
-				setKnown(v, d, false);
-				return false;
-			}
-			// 未知壁なら壁情報を更新
-			if(!isKnown(v, d)){
-				setWall(v, d, b);
-				setKnown(v, d, true);
-			}
-			return true;
-		}
+		bool updateWall(const Vector v, const Dir d, const bool b, const bool pushLog = true);
 
-		bool resetLastWall(const int num)
-		{
-			for(int i=0;i<num;i++){
-				if(wallLogs.empty()) return true;
-				auto wl = wallLogs.back();
-				setWall(Vector(wl), wl.d, false);
-				setKnown(Vector(wl), wl.d, false);
-				wallLogs.pop_back();
-			}
-		}
+		bool resetLastWall(const int num);
 		/** @function print
 		*   @brief 迷路の表示
 		*   @param of output-stream
 		*/
-		void print(std::ostream& os = std::cout) const
-		{
-			for(int8_t y=MAZE_SIZE; y>=0; y--){
-				if(y != MAZE_SIZE){
-					os << '|';
-					for(uint8_t x=0; x<MAZE_SIZE; x++){
-						auto v = Vector(x, y);
-						if(v == start) os << " S ";
-						else if(std::find(goals.begin(), goals.end(), v) != goals.end()) os << " G ";
-						else               os << "   ";
-						os << (isKnown(x,y,Dir::East)?(isWall(x,y,Dir::East)?"|":" "):".");
-					}
-					os << std::endl;
-				}
-				for(uint8_t x=0; x<MAZE_SIZE; x++) os << "+" << (isKnown(x,y,Dir::South)?(isWall(x,y,Dir::South)?"---":"   "):" . ");
-				os << "+" << std::endl;
-			}
-		}
+		void print(std::ostream& os = std::cout) const;
 		/** @function parse
 		*   @brief 迷路の文字列から壁をパースする
 		*   @param is input-stream
 		*/
-		bool parse(std::istream& is)
-		{
-			reset();
-			goals.clear();
-			for(int8_t y=MAZE_SIZE; y>=0; y--){
-				if(y!=MAZE_SIZE){
-					is.ignore(10, '|'); //< 次の|が出てくるまでスキップ
-					for(uint8_t x=0; x<MAZE_SIZE; x++) {
-						is.ignore(1); //< " " 空欄分をスキップ
-						char c = is.get();
-						if     (c=='S') start = Vector(x, y);
-						else if(c=='G') goals.push_back(Vector(x, y));
-						is.ignore(1); //< " " 空欄分をスキップ
-						c = is.get();
-						if     (c=='|') Maze::updateWall(Vector(x, y), Dir::East, true);
-						else if(c==' ') Maze::updateWall(Vector(x, y), Dir::East, false);
-					}
-				}
-				for(uint8_t x=0; x<MAZE_SIZE; x++){
-					is.ignore(10, '+'); //< 次の+が出てくるまでスキップ
-					std::string s;
-					s += (char)is.get();
-					s += (char)is.get();
-					s += (char)is.get();
-					if     (s=="---") Maze::updateWall(Vector(x, y), Dir::South, true);
-					else if(s=="   ") Maze::updateWall(Vector(x, y), Dir::South, false);
-				}
-			}
-			return true;
-		}
+		bool parse(std::istream& is);
 		/** @function printPath
 		*   @brief パス付の迷路の表示
 		*   @param start パスのスタート座標
 		*   @param dirs 移動方向の配列
 		*   @param of output-stream
 		*/
-		void printPath(std::ostream& os, const Vector start, const Dirs& dirs) const
-		{
-			int steps[MAZE_SIZE][MAZE_SIZE]={0};
-			Vector v = start;
-			int counter = 1;
-			for(const auto d: dirs){
-				v = v.next(d);
-				steps[v.y][v.x] = counter++;
-			}
-			for(int8_t y=MAZE_SIZE; y>=0; y--){
-				if(y != MAZE_SIZE){
-					os << '|';
-					for(uint8_t x=0; x<MAZE_SIZE; x++){
-						if(steps[y][x]!=0) os << C_YELLOW << std::setw(3) << steps[y][x] << C_RESET;
-						else               os << "   ";
-						os << (isKnown(x,y,Dir::East)?(isWall(x,y,Dir::East)?"|":" "):(C_RED "." C_RESET));
-					}
-					os << std::endl;
-				}
-				for(uint8_t x=0; x<MAZE_SIZE; x++) os << "+" << (isKnown(x,y,Dir::South)?(isWall(x,y,Dir::South)?"---":"   "):(C_RED " . " C_RESET));
-				os << "+" << std::endl;
-			}
-		}
+		void printPath(std::ostream& os, const Vector start, const Dirs& dirs) const;
 		void printPath(const Vector start, const Dirs& dirs) const
 		{ printPath(std::cout, start, dirs); }
 
@@ -443,42 +268,18 @@ namespace MazeLib {
 		Vector start;
 		WallLogs wallLogs;
 
-		bool isWall(const wall_size_t wall[2][MAZE_SIZE-1], const int8_t x, const int8_t y, const Dir d) const
-		{
-			switch(d){
-				case Dir::East:
-				if(x<0 || x>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return true; //< 盤面外
-				return wall[0][x] & (1<<y);
-				case Dir::North:
-				if(x<0 || x>MAZE_SIZE-1 || y<0 || y>MAZE_SIZE-2) return true; //< 盤面外
-				return wall[1][y] & (1<<x);
-				case Dir::West:
-				if(x-1<0 || x-1>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return true; //< 盤面外
-				return wall[0][x-1] & (1<<y);
-				case Dir::South:
-				if(x<0 || x>MAZE_SIZE-1 || y-1<0 || y-1>MAZE_SIZE-2) return true; //< 盤面外
-				return wall[1][y-1] & (1<<x);
-			}
-			printf("Warning: invalid direction\n");
-			return true;
-		}
-		void setWall(wall_size_t wall[2][MAZE_SIZE-1], const int8_t x, const int8_t y, const Dir d, const bool b)
-		{
-			switch(d){
-				case Dir::East:
-				if(x<0 || x>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return; //< 盤面外
-				if(b) wall[0][x] |= (1<<y); else wall[0][x] &= ~(1<<y); return;
-				case Dir::North:
-				if(x<0 || x>MAZE_SIZE-1 || y<0 || y>MAZE_SIZE-2) return; //< 盤面外
-				if(b) wall[1][y] |= (1<<x); else wall[1][y] &= ~(1<<x); return;
-				case Dir::West:
-				if(x-1<0 || x-1>MAZE_SIZE-2 || y<0 || y>MAZE_SIZE-1) return; //< 盤面外
-				if(b) wall[0][x-1] |= (1<<y); else wall[0][x-1] &= ~(1<<y); return;
-				case Dir::South:
-				if(x<0 || x>MAZE_SIZE-1 || y-1<0 || y-1>MAZE_SIZE-2) return; //< 盤面外
-				if(b) wall[1][y-1] |= (1<<x); else wall[1][y-1] &= ~(1<<x); return;
-			}
-			printf("Warning: invalid direction\n");
-		}
+		/** function isWall
+		*   @brief 引数の壁情報配列を参照する関数
+		*   @param wall 壁情報の配列ポインタ
+		*   @param x,y,d 区画の座標，方向
+		*/
+		bool isWall(const wall_size_t wall[2][MAZE_SIZE-1], const int8_t x, const int8_t y, const Dir d) const;
+		/** function isWall
+		*   @brief 引数の壁情報配列を更新する関数
+		*   @param wall 壁情報の配列ポインタ
+		*   @param x,y,d 区画の座標，方向
+		*   @param b 壁の有無
+		*/
+		void setWall(wall_size_t wall[2][MAZE_SIZE-1], const int8_t x, const int8_t y, const Dir d, const bool b);
 	};
 }
