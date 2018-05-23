@@ -11,7 +11,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 add_subdirectory(src)
 
-if(0)
+if(CROSS_COMPILING)
+  message("This is cross compiling")
   set(CMAKE_BUILD_TYPE "Release")
 else()
   add_subdirectory(test_cl_main)
