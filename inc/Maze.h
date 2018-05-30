@@ -13,13 +13,12 @@
 #include <array>
 #include <iostream>
 #include <fstream>
-#include <iomanip> //< for std::setw()
 
 namespace MazeLib {
 	/** @def MAZE_SIZE
 	*   @brief 迷路の1辺の区画数
 	*/
-	#define MAZE_SIZE			32
+	constexpr int MAZE_SIZE = 32;
 	/** @typedef
 	*   @brief 迷路のサイズのbit数の整数型
 	*   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
@@ -46,6 +45,7 @@ namespace MazeLib {
 	#define C_CYAN    ""
 	#define C_RESET   ""
 	#endif
+	#define ESC_UP(n) "\x1b["#n"A"
 
 	/** @struct Dir
 	*   @brief 迷路上の方向を定義
@@ -155,8 +155,7 @@ namespace MazeLib {
 		*   @brief ファイル名から迷路をパースするコンストラクタ
 		*   @param filename ファイル名
 		*/
-		Maze(const char* filename)
-		{ std::ifstream ifs(filename); parse(ifs); }
+		Maze(const char* filename) { parse(filename); }
 		/** @brief 配列から迷路を読み込むコンストラクタ
 		*   @param data 各区画16進表記の文字列配列
 		*  例：{"abaf", "1234", "abab", "aaff"}
@@ -246,6 +245,8 @@ namespace MazeLib {
 		*   @param is input-stream
 		*/
 		bool parse(std::istream& is);
+		bool parse(const char* filename)
+		{ std::ifstream ifs(filename); return parse(ifs); }
 		/** @function printPath
 		*   @brief パス付の迷路の表示
 		*   @param start パスのスタート座標

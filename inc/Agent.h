@@ -115,7 +115,7 @@ namespace MazeLib {
     /** @function getMaze
     *   @brief 迷路を取得
     */
-    const Maze& getMaze() const
+    Maze& getMaze()
     { return maze; }
     /** @function printInfo
     *   @brief 探索状態を表示
@@ -127,8 +127,9 @@ namespace MazeLib {
     {
       // 迷路を表示
       if(showMaze) {
-        for(int i=0; i<10; i++) printf("\x1b[A"); //< カーソルを移動
-        for(int i=0; i<MAZE_SIZE*2; i++) printf("\x1b[A");
+        printf(ESC_UP(10)); //< カーソルを移動
+        printf(ESC_UP(32)); //< カーソルを移動
+        printf(ESC_UP(32)); //< カーソルを移動
         searchAlgorithm.printMap(state, vec, dir);
       }
       // 詳細を表示
@@ -152,18 +153,18 @@ namespace MazeLib {
 
   protected:
     Maze maze; /**< 使用する迷路 */
-    SearchAlgorithm searchAlgorithm; /**< 探索器 */
     SearchAlgorithm::State state; /**< 現在の探索状態を保持 */
     Vector curVec; /**< 現在の区画座標 */
     Dir curDir; /**< 現在向いている方向 */
-
-  private:
-    Dirs nextDirsKnown; /**< 次に行く探索方向配列 */
-    Dirs nextDirCandidates; /**< 次に行く方向の候補の優先順 */
-    Dirs shortestDirs; /**< 最短経路の方向配列 */
     bool isForceBackToStart = false;
     bool isForceGoingToGoal = false;
     bool isPositionIdentifying = false;
+
+  private:
+    SearchAlgorithm searchAlgorithm; /**< 探索器 */
+    Dirs nextDirsKnown; /**< 次に行く探索方向配列 */
+    Dirs nextDirCandidates; /**< 次に行く方向の候補の優先順 */
+    Dirs shortestDirs; /**< 最短経路の方向配列 */
     int matchCount = 0;
   };
 }

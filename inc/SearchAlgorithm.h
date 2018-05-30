@@ -10,6 +10,9 @@
 #include "Maze.h"
 #include "StepMap.h"
 
+// src
+#include <algorithm>
+
 namespace MazeLib {
 	/** @def SEARCHING_ADDITIALLY_AT_START
 	*   @brief 追加探索状態で探索を始める(ゴールを急がない)
