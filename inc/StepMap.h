@@ -11,7 +11,7 @@
 
 namespace MazeLib
 {
-/** @def MAZE_STEP_MAX
+/** @constexpr MAZE_STEP_MAX
  *  @brief ステップマップの最大値
  */
 constexpr int MAZE_STEP_MAX = 9999;

@@ -5,7 +5,9 @@
  * @url https://kerikeri.top/
  * @date 2017.10.30
  */
-#include <Maze.h>
+#include "Maze.h"
+
+#include <cstdio>
 #include <algorithm>
 #include <iomanip> //< for std::setw()
 

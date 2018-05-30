@@ -1,10 +1,6 @@
-#include "Maze.h"
-#include "Agent.h"
-#include "RobotBase.h"
 #include <cstdio>
-#include <cstdint>
-
-#include "mazedata.h"
+#include "Maze.h"
+#include "RobotBase.h"
 
 #include <unistd.h>
 #include <time.h>
@@ -31,10 +27,10 @@ void loadMaze()
 	}
 }
 
+#if 1
+
 bool display = 0;
 Vector offset;
-
-#if 1
 
 class TestRobot : public RobotBase
 {
@@ -195,16 +191,16 @@ int main(void)
 	// robot.endFastRunBackingToStartRun();
 	robot.printPath();
 #else
-// std::ifstream ifs("MM2016HX_ip.maze");
-// Maze m(ifs);
-// Maze m("MM2016HX_ip.maze");
-// m.parse(ifs);
-// m.print(std::cout);
+	std::ifstream ifs("MM2016HX_ip.maze");
+	Maze m(ifs);
+	Maze m("MM2016HX_ip.maze");
+	m.parse(ifs);
+	m.print(std::cout);
 
-// sample.setGoals(goal);
-// std::ofstream ofs(filename);
-// sample.print(ofs);
-// sample.print();
+	sample.setGoals(goal);
+	std::ofstream ofs(filename);
+	sample.print(ofs);
+	sample.print();
 #endif
 	return 0;
 }
