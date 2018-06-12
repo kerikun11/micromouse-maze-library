@@ -8,7 +8,6 @@
 #pragma once
 
 #include "Maze.h"
-#include "StepMap.h"
 #include "SearchAlgorithm.h"
 
 namespace MazeLib

@@ -22,7 +22,7 @@ void loadMaze()
 		// Maze sample("../mazedata/16MM2017CX.maze");
 		break;
 	case 32:
-		sample.parse("../mazedata/32MM2012HX.maze");
+		sample.parse("../mazedata/32MM2016HX.maze");
 		break;
 	}
 }
@@ -169,8 +169,8 @@ int main(void)
 	robot.replaceGoals(sample.getGoals());
 	robot.searchRun();
 	robot.printInfo();
-	//robot.forceGoingToGoal();
-	//robot.positionIdentifyRun(Dir::West);
+	// robot.forceGoingToGoal();
+	// robot.positionIdentifyRun(Dir::West);
 	// for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; ++x)
 	// for(int y=-MAZE_SIZE/2; y<MAZE_SIZE/2; ++y){
 	// 	offset = Vector(x, y);
@@ -184,12 +184,12 @@ int main(void)
 	// 		display = false;
 	// 	}
 	// }
-	robot.fastRun(true);
+	// robot.fastRun(true);
 	// robot.endFastRunBackingToStartRun();
-	robot.printPath();
-	robot.fastRun(false);
+	// robot.printPath();
+	// robot.fastRun(false);
 	// robot.endFastRunBackingToStartRun();
-	robot.printPath();
+	// robot.printPath();
 #else
 	std::ifstream ifs("MM2016HX_ip.maze");
 	Maze m(ifs);
