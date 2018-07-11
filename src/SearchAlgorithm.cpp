@@ -62,7 +62,7 @@ bool SearchAlgorithm::updateWall(const State &state, const Vector &v, const Dir 
 bool SearchAlgorithm::resetLastWall(const State &state, const int num)
 {
 	if (state == IDENTIFYING_POSITION)
-		return maze.resetLastWall(num);
+		return idMaze.resetLastWall(num);
 	return maze.resetLastWall(num);
 }
 enum SearchAlgorithm::Status SearchAlgorithm::calcNextDirs(State &state, Vector &curVec, const Dir &curDir, Dirs &nextDirs, Dirs &nextDirCandidates, bool &isPositionIdentifying, bool &isForceBackToStart, bool &isForceGoingToGoal, int &matchCount)
