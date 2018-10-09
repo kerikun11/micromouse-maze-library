@@ -9,15 +9,11 @@
 
 #include "Agent.h"
 
-namespace MazeLib
-{
-class RobotBase : public Agent
-{
+namespace MazeLib {
+class RobotBase : public Agent {
 public:
-  RobotBase(const Vectors &goals)
-      : Agent(goals) {}
-  enum Action : char
-  {
+  RobotBase(const Vectors &goals) : Agent(goals) {}
+  enum Action : char {
     START_STEP,
     START_INIT,
     STOP_HALF,
@@ -29,17 +25,19 @@ public:
     STRAIGHT_FULL,
     STRAIGHT_HALF,
   };
-  bool searchRun()
-  {
+  bool searchRun() {
+    // 探索済みなら正常終了
     if (isComplete())
       return true;
+    // スタートのアクションをキュー
     queueAction(START_STEP);
     updateCurVecDir(Vector(0, 1), Dir::North);
+    // スタート前のキャリブレーション
     calibration();
+    // 走行開始
     startDequeue();
     auto res = generalSearchRun();
-    if (!res)
-    {
+    if (!res) {
       stopDequeue();
       return false;
     }
@@ -51,16 +49,14 @@ public:
     backupMazeToFlash();
     return true;
   }
-  bool positionIdentifyRun(const Dir start_d)
-  {
+  bool positionIdentifyRun(const Dir start_d) {
     positionIdentify(start_d + 2);
     queueAction(ROTATE_180);
     queueAction(STRAIGHT_HALF);
     calibration();
     startDequeue();
     auto res = generalSearchRun();
-    if (!res)
-    {
+    if (!res) {
       stopDequeue();
       return false;
     }
@@ -72,20 +68,19 @@ public:
     backupMazeToFlash();
     return true;
   }
-  bool endFastRunBackingToStartRun()
-  {
+  bool endFastRunBackingToStartRun() {
     Vector v = Vector(0, 0);
     for (auto d : getShortestDirs())
       v = v.next(d);
     updateCurVecDir(v, getShortestDirs().back());
-    updateCurVecDir(getCurVec().next(getCurDir() + Dir::Back), getCurDir() + Dir::Back);
+    updateCurVecDir(getCurVec().next(getCurDir() + Dir::Back),
+                    getCurDir() + Dir::Back);
     queueAction(ROTATE_180);
     queueAction(STRAIGHT_HALF);
     calibration();
     startDequeue();
     auto res = generalSearchRun();
-    if (!res)
-    {
+    if (!res) {
       stopDequeue();
       return false;
     }
@@ -97,10 +92,8 @@ public:
     backupMazeToFlash();
     return true;
   }
-  bool fastRun(const bool diagonal)
-  {
-    if (!calcShortestDirs(diagonal))
-    {
+  bool fastRun(const bool diagonal) {
+    if (!calcShortestDirs(diagonal)) {
       printf("Failed to find shortest path!\n");
       return false;
     }
@@ -117,12 +110,12 @@ protected:
   virtual void startDequeue() {}
   virtual void calibration() {}
   virtual void calcNextDirsPreCallback() {}
-  virtual void calcNextDirsPostCallback(SearchAlgorithm::State prevState, SearchAlgorithm::State newState) {}
+  virtual void calcNextDirsPostCallback(SearchAlgorithm::State prevState,
+                                        SearchAlgorithm::State newState) {}
   virtual void discrepancyWithKnownWall() {}
 
 private:
-  void turnbackSave()
-  {
+  void turnbackSave() {
     queueAction(STOP_HALF);
     waitForEndAction();
     stopDequeue();
@@ -131,13 +124,10 @@ private:
     queueAction(STRAIGHT_HALF);
     startDequeue();
   }
-  void queueNextDirs(const Dirs &nextDirs)
-  {
-    for (const auto nextDir : nextDirs)
-    {
+  void queueNextDirs(const Dirs &nextDirs) {
+    for (const auto nextDir : nextDirs) {
       const auto nextVec = getCurVec().next(nextDir);
-      switch (Dir(nextDir - getCurDir()))
-      {
+      switch (Dir(nextDir - getCurDir())) {
       case Dir::Front:
         queueAction(STRAIGHT_FULL);
         break;
@@ -154,11 +144,9 @@ private:
       updateCurVecDir(nextVec, nextDir);
     }
   }
-  bool generalSearchRun()
-  {
+  bool generalSearchRun() {
     int cnt = 0;
-    while (1)
-    {
+    while (1) {
       // if(cnt++ > 300) return false;
 
       const auto &v = getCurVec();
@@ -183,16 +171,14 @@ private:
       // 壁を確認
       bool left, front, right, back;
       findWall(left, front, right, back);
-      if (!updateWall(v, d, left, front, right, back))
-      {
+      if (!updateWall(v, d, left, front, right, back)) {
         printf("There was a discrepancy with known information.\n");
         discrepancyWithKnownWall();
       }
 
       // 壁のない方向へ1マス移動
       Dir nextDir;
-      if (!findNextDir(v, d, nextDir))
-      {
+      if (!findNextDir(v, d, nextDir)) {
         printInfo();
         printf("I can't go anywhere!\n");
         return false;
