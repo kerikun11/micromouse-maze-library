@@ -27,7 +27,7 @@ public:
   };
   bool searchRun() {
     // 探索済みなら正常終了
-    if (isComplete())
+    if (!isForceGoingToGoal && isComplete())
       return true;
     // スタートのアクションをキュー
     queueAction(START_STEP);

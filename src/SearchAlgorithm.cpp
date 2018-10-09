@@ -304,12 +304,12 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs idWallLogs,
         if (!maze.isKnown(v + offset, d))
           unknown++;
       }
-      // int size = idWallLogs.size();
+      int size = idWallLogs.size();
       if (diffs <= 4) {
-        // if(size<4 || unknown<size/2 || matchs>size/2) {
-        ans = idStartVector + offset;
-        cnt++;
-        // }
+        if (size < 4 || unknown < size / 2 || matchs > size / 2) {
+          ans = idStartVector + offset;
+          cnt++;
+        }
       }
     }
   return cnt;

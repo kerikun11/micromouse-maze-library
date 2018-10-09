@@ -73,8 +73,8 @@ public:
    *  @brief 探索を中止してスタート区画へ強制的に戻る
    *  時間が残りわずかな時などに使う
    */
-  void forceBackToStart() { isForceBackToStart = true; }
-  void forceGoingToGoal() { isForceGoingToGoal = true; }
+  void forceBackToStart(bool yes = true) { isForceBackToStart = yes; }
+  void forceGoingToGoal(bool yes = true) { isForceGoingToGoal = yes; }
   void positionIdentify(const Dir d = Dir::North) {
     searchAlgorithm.positionIdentifyingInit();
     isPositionIdentifying = true;
