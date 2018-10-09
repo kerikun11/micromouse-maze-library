@@ -164,9 +164,7 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
   auto prev_dir = dir;
   while (1) {
     step_t min_step = MAZE_STEP_MAX;
-    // const auto& dirs = dir.ordered(prev_dir);
-    // prev_dir = dir;
-    // for(const auto& d: dirs){
+    prev_dir = dir;
     for (const auto d : Dir::All()) {
       if (!maze.canGo(v, d))
         continue;
