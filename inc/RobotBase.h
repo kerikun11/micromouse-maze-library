@@ -51,8 +51,7 @@ public:
     return true;
   }
   bool positionIdentifyRun(const Dir start_d) {
-    positionIdentify(start_d + 2);
-    queueAction(ROTATE_180);
+    positionIdentify(start_d);
     queueAction(STRAIGHT_HALF);
     calibration();
     startDequeue();
