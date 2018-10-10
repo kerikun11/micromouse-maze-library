@@ -12,7 +12,8 @@
 namespace MazeLib {
 class RobotBase : public Agent {
 public:
-  RobotBase(const Vectors &goals) : Agent(goals) {}
+  RobotBase() : Agent(goals) {}
+  RobotBase(const Vectors goals) : Agent(goals), goals(goals) {}
   enum Action : char {
     START_STEP,
     START_INIT,
@@ -102,6 +103,7 @@ public:
   }
 
 protected:
+  Vectors goals;
   virtual void waitForEndAction() {}
   virtual void queueAction(const Action action) {}
   virtual void findWall(bool &left, bool &front, bool &right, bool &back) {}
@@ -145,10 +147,7 @@ private:
     }
   }
   bool generalSearchRun() {
-    int cnt = 0;
     while (1) {
-      // if(cnt++ > 300) return false;
-
       const auto &v = getCurVec();
       const auto &d = getCurDir();
 

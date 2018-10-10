@@ -178,8 +178,8 @@ const Vector StepMap::calcNextDirs(Maze &maze, const Vectors &dest,
                                    const Vector vec, const Dir dir,
                                    Dirs &nextDirsKnown,
                                    Dirs &nextDirCandidates) {
-//   updateSimple(maze, dest, false);
-//   return calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
+  //   updateSimple(maze, dest, false);
+  //   return calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
 
   updateSimple(maze, dest, false);
   const auto v = calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
