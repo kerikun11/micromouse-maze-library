@@ -287,6 +287,10 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 }
 int SearchAlgorithm::countIdentityCandidates(const WallLogs idWallLogs,
                                              Vector &ans) const {
+  const int many = 1000;
+  const int min_size = 10;
+  if (idWallLogs.size() < min_size)
+    return many;
   int cnt = 0;
   for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; x++)
     for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; y++) {
@@ -303,13 +307,13 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs idWallLogs,
           matchs++;
         if (!maze.isKnown(v + offset, d))
           unknown++;
+        if (diffs > MAZE_SIZE * 2)
+          break;
       }
       int size = idWallLogs.size();
-      if (diffs <= 4) {
-        if (size < 4 || unknown < size / 2 || matchs > size / 2) {
-          ans = idStartVector + offset;
-          cnt++;
-        }
+      if (diffs <= 4 && unknown < MAZE_SIZE) {
+        ans = idStartVector + offset;
+        cnt++;
       }
     }
   return cnt;
