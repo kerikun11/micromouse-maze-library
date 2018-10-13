@@ -127,7 +127,7 @@ public:
       searchAlgorithm.printMap(state, vec, dir);
     }
     // 詳細を表示
-    printf("Cur: ( %2d, %2d,%c), State: %s \n", vec.x, vec.y, ">^<v"[dir],
+    printf("Cur: ( %2d, %2d, %c), State: %s \n", vec.x, vec.y, ">^<v"[dir],
            SearchAlgorithm::stateString(state));
     printf("nextDirsKnown: ");
     for (const auto d : getNextDirs())

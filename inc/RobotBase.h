@@ -170,7 +170,6 @@ private:
       bool left, front, right, back;
       findWall(left, front, right, back);
       if (!updateWall(v, d, left, front, right, back)) {
-        printf("There was a discrepancy with known information.\n");
         discrepancyWithKnownWall();
       }
 

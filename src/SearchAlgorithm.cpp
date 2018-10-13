@@ -17,14 +17,10 @@ namespace MazeLib {
 
 const char *SearchAlgorithm::stateString(const enum State s) {
   static const char *str[] = {
-      "start",
-      "Searching for Goal",
-      "Searching Additionally",
-      "Backing to Start",
-      "Reached Start",
-      "Impossible",
-      "Identifying Position",
-      "Going to Goal",
+      "Start                 ", "Searching for Goal    ",
+      "Searching Additionally", "Backing to Start      ",
+      "Reached Start         ", "Impossible            ",
+      "Identifying Position  ", "Going to Goal         ",
   };
   return str[s];
 }
@@ -63,7 +59,7 @@ bool SearchAlgorithm::resetLastWall(const State &state, const int num) {
   return maze.resetLastWall(num);
 }
 enum SearchAlgorithm::Status SearchAlgorithm::calcNextDirs(
-    State &state, Vector &curVec, const Dir &curDir, Dirs &nextDirs,
+    State &state, Vector &curVec, Dir &curDir, Dirs &nextDirs,
     Dirs &nextDirCandidates, bool &isPositionIdentifying,
     bool &isForceBackToStart, bool &isForceGoingToGoal, int &matchCount) {
   state = START;
@@ -285,37 +281,51 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
   }
   return true; //< 成功
 }
-int SearchAlgorithm::countIdentityCandidates(const WallLogs idWallLogs,
-                                             Vector &ans) const {
+int SearchAlgorithm::countIdentityCandidates(
+    const WallLogs idWallLogs, std::pair<Vector, Dir> &ans) const {
+  int8_t max_x = 0;
+  int8_t max_y = 0;
+  for (const auto wl : getMaze().getWallLogs()) {
+    if (wl.x >= MAZE_SIZE - 1 || wl.y >= MAZE_SIZE - 1)
+      continue;
+    max_x = std::max(max_x, wl.x);
+    max_y = std::max(max_y, wl.y);
+  }
   const int many = 1000;
   const int min_size = 10;
   if (idWallLogs.size() < min_size)
     return many;
   int cnt = 0;
-  for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; x++)
-    for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; y++) {
-      const Vector offset(x, y);
-      int diffs = 0;
-      int matchs = 0;
-      int unknown = 0;
-      for (auto wl : idWallLogs) {
-        Vector v(wl.x, wl.y);
-        Dir d = wl.d;
-        if (maze.isKnown(v + offset, d) && maze.isWall(v + offset, d) != wl.b)
-          diffs++;
-        if (maze.isKnown(v + offset, d) && maze.isWall(v + offset, d) == wl.b)
-          matchs++;
-        if (!maze.isKnown(v + offset, d))
-          unknown++;
-        if (diffs > MAZE_SIZE * 2)
-          break;
+  for (int x = -MAZE_SIZE / 2; x < -MAZE_SIZE / 2 + max_x; x++)
+    for (int y = -MAZE_SIZE / 2; y < -MAZE_SIZE / 2 + max_y; y++)
+      for (auto offset_d : Dir::All()) {
+        const Vector offset(x, y);
+        int diffs = 0;
+        int matchs = 0;
+        int unknown = 0;
+        for (auto wl : idWallLogs) {
+          Vector v(wl.x, wl.y);
+          Dir d = wl.d;
+          if (maze.isKnown(v + offset, d + offset_d) &&
+              maze.isWall(v + offset, d + offset_d) != wl.b)
+            diffs++;
+          if (maze.isKnown(v + offset, d + offset_d) &&
+              maze.isWall(v + offset, d + offset_d) == wl.b)
+            matchs++;
+          if (!maze.isKnown(v + offset, d + offset_d))
+            unknown++;
+          if (diffs > MAZE_SIZE * 2)
+            break;
+        }
+        int size = idWallLogs.size();
+        if (diffs < 5 && unknown < MAZE_SIZE) {
+          //   if (matchs > size / 4) {
+          // if (diffs < 5 && matchs > 5) {
+          ans.first = idStartVector + offset;
+          ans.second = offset_d;
+          cnt++;
+        }
       }
-      int size = idWallLogs.size();
-      if (diffs <= 4 && unknown < MAZE_SIZE) {
-        ans = idStartVector + offset;
-        cnt++;
-      }
-    }
   return cnt;
 }
 enum SearchAlgorithm::Status
@@ -368,15 +378,16 @@ SearchAlgorithm::calcNextDirsGoingToGoal(const Vector &cv, const Dir &cd,
   return nextDirCandidates.empty() ? Error : Processing;
 }
 enum SearchAlgorithm::Status
-SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, const Dir &cd,
+SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
                                                     Dirs &nextDirsKnown,
                                                     Dirs &nextDirCandidates,
                                                     int &matchCount) {
-  Vector ans;
+  std::pair<Vector, Dir> ans;
   int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
   matchCount = cnt;
   if (cnt == 1) {
-    cv = cv - idStartVector + ans;
+    cv = cv - idStartVector + ans.first;
+    cd = cd + ans.second;
     return Reached;
   } else if (cnt == 0) {
     return Error;

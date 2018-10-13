@@ -8,6 +8,9 @@
 
 using namespace MazeLib;
 
+#define CONFIG_SERCHALGORITHM 1
+#define CONFIG_POSITION_IDENTIFICATION 0
+
 Maze sample;
 
 void loadMaze() {
@@ -21,18 +24,21 @@ void loadMaze() {
     break;
   case 32:
     sample.parse("../mazedata/32MM2016HX.maze");
+    // sample.parse("../mazedata/32MM2017CX.maze");
     break;
   }
 }
 
-#if 1
+#if CONFIG_SERCHALGORITHM
 
 bool display = 0;
 Vector offset;
+Dir offset_d;
 
 class TestRobot : public RobotBase {
 public:
   TestRobot(const Vectors &goal) : RobotBase(goal) {}
+  TestRobot() {}
 
   void printInfo(const bool showMaze = true) {
     Agent::printInfo(showMaze);
@@ -40,7 +46,8 @@ public:
            "Right: %3d, Back: %3d\n",
            ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
-    usleep(50000);
+    printf("offset: ( %2d, %2d, %c)\n", offset.x, offset.y, ">^<v"[offset_d]);
+    usleep(25000);
     // char c; scanf("%c", &c);
   }
 
@@ -56,19 +63,18 @@ private:
     const auto &v = getCurVec();
     const auto &d = getCurDir();
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
-      // offset = Vector(12, 12);
-      left = sample.isWall(v + offset, d + Dir::Left);
-      front = sample.isWall(v + offset, d + Dir::Front);
-      right = sample.isWall(v + offset, d + Dir::Right);
-      back = sample.isWall(v + offset, d + Dir::Back);
-      return;
+      auto fake_v = v + offset;
+      auto fake_d = d;
+      left = sample.isWall(fake_v, fake_d + Dir::Left);
+      front = sample.isWall(fake_v, fake_d + Dir::Front);
+      right = sample.isWall(fake_v, fake_d + Dir::Right);
+      back = sample.isWall(fake_v, fake_d + Dir::Back);
     } else {
-      offset = v - Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
+      left = sample.isWall(v, d + Dir::Left);
+      front = sample.isWall(v, d + Dir::Front);
+      right = sample.isWall(v, d + Dir::Right);
+      back = sample.isWall(v, d + Dir::Back);
     }
-    left = sample.isWall(v, d + Dir::Left);
-    front = sample.isWall(v, d + Dir::Front);
-    right = sample.isWall(v, d + Dir::Right);
-    back = sample.isWall(v, d + Dir::Back);
   }
   void calcNextDirsPreCallback() override {
     start = std::chrono::system_clock::now();
@@ -80,10 +86,26 @@ private:
                .count();
     if (max_usec < usec)
       max_usec = usec;
+    if (newState == prevState)
+      return;
 
-    // if(newState != prevState && newState ==
-    // SearchAlgorithm::SEARCHING_ADDITIONALLY){ } if(newState != prevState &&
-    // newState == SearchAlgorithm::BACKING_TO_START){ }
+    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
+    }
+    if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
+    }
+    if (newState == SearchAlgorithm::BACKING_TO_START) {
+    }
+    if (newState == SearchAlgorithm::REACHED_START) {
+#if CONFIG_POSITION_IDENTIFICATION
+      printInfo();
+      sleep(2);
+#endif
+    }
+  }
+  void discrepancyWithKnownWall() override {
+    printInfo();
+    printf("There was a discrepancy with known information!\n");
+    // getc(stdin);
   }
   void queueAction(const Action action) override {
     if (display)
@@ -147,39 +169,41 @@ private:
   }
 };
 
-TestRobot robot(sample.getGoals());
+TestRobot robot;
 
 #endif
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
-#if 1
+#if CONFIG_SERCHALGORITHM
   loadMaze();
-  display = true;
   robot.replaceGoals(sample.getGoals());
+  //   display = 1;
   robot.searchRun();
   robot.printInfo();
-  // robot.forceGoingToGoal();
-  // robot.positionIdentifyRun(Dir::West);
-  // for(int x=-MAZE_SIZE/2; x<MAZE_SIZE/2; ++x)
-  // for(int y=-MAZE_SIZE/2; y<MAZE_SIZE/2; ++y){
-  // 	offset = Vector(x, y);
-  // 	bool res = robot.positionIdentifyRun(Dir::West);
-  // 	if(!res) {
-  // 		robot.printInfo();
-  // 		display = true;
-  // 		robot.positionIdentifyRun(Dir::West);
-  // 		printf("Failed to Identify! (%3d, %3d)\n", x, y);
-  // 		usleep(1000000);
-  // 		display = false;
-  // 	}
-  // }
-  // robot.fastRun(true);
-  // robot.endFastRunBackingToStartRun();
-  // robot.printPath();
-  // robot.fastRun(false);
-  // robot.endFastRunBackingToStartRun();
-  // robot.printPath();
+#if CONFIG_POSITION_IDENTIFICATION
+  for (auto d : Dir::All()) {
+    for (int x = -MAZE_SIZE / 2; x < 0 * MAZE_SIZE / 2; ++x)
+      for (int y = -MAZE_SIZE / 2; y < 0 * MAZE_SIZE / 2; ++y) {
+        offset = Vector(x, y);
+        offset_d = d;
+        bool res = robot.positionIdentifyRun(Dir::West);
+        if (!res) {
+          robot.printInfo();
+          robot.positionIdentifyRun(Dir::West);
+          printf("Failed to Identify! (%3d, %3d)\n", x, y);
+          usleep(1000000);
+          getc(stdin);
+        }
+      }
+  }
+#endif
+  robot.fastRun(true);
+  robot.endFastRunBackingToStartRun();
+  robot.printPath();
+  robot.fastRun(false);
+  robot.endFastRunBackingToStartRun();
+  robot.printPath();
 #else
   std::ifstream ifs("MM2016HX_ip.maze");
   Maze m(ifs);

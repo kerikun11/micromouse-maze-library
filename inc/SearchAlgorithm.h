@@ -57,7 +57,7 @@ public:
   bool updateWall(const State &state, const Vector &v, const Dir &d,
                   const bool &b);
   bool resetLastWall(const State &state, const int num = 1);
-  enum Status calcNextDirs(State &state, Vector &curVec, const Dir &curDir,
+  enum Status calcNextDirs(State &state, Vector &curVec, Dir &curDir,
                            Dirs &nextDirs, Dirs &nextDirCandidates,
                            bool &isPositionIdentifying,
                            bool &isForceBackToStart, bool &isForceGoingToGoal,
@@ -85,7 +85,8 @@ private:
    *  @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
   bool findShortestCandidates(Vectors &candidates);
-  int countIdentityCandidates(const WallLogs idWallLogs, Vector &ans) const;
+  int countIdentityCandidates(const WallLogs idWallLogs,
+                              std::pair<Vector, Dir> &ans) const;
   enum Status calcNextDirsSearchForGoal(const Vector &cv, const Dir &cd,
                                         Dirs &nextDirsKnown,
                                         Dirs &nextDirCandidates);
@@ -98,7 +99,7 @@ private:
   enum Status calcNextDirsGoingToGoal(const Vector &cv, const Dir &cd,
                                       Dirs &nextDirsKnown,
                                       Dirs &nextDirCandidates);
-  enum Status calcNextDirsPositionIdentification(Vector &cv, const Dir &cd,
+  enum Status calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
                                                  Dirs &nextDirsKnown,
                                                  Dirs &nextDirCandidates,
                                                  int &matchCount);
