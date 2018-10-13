@@ -121,13 +121,15 @@ public:
                  const SearchAlgorithm::State state) const {
     // 迷路を表示
     if (showMaze) {
-      printf(ESC_UP(10)); //< カーソルを移動
-      printf(ESC_UP(32)); //< カーソルを移動
-      printf(ESC_UP(32)); //< カーソルを移動
+      //   printf("\e[2J"); //< 画面をクリア
+      printf("\e[0;0H"); //< カーソルを左上に移動
+      //   printf(ESC_UP(12)); //< カーソルを移動
+      //   printf(ESC_UP(32)); //< カーソルを移動
+      //   printf(ESC_UP(32)); //< カーソルを移動
       searchAlgorithm.printMap(state, vec, dir);
     }
     // 詳細を表示
-    printf("Cur: ( %2d, %2d, %c), State: %s \n", vec.x, vec.y, ">^<v"[dir],
+    printf("Cur: ( %2d, %2d, %2c), State: %s \n", vec.x, vec.y, ">^<v"[dir],
            SearchAlgorithm::stateString(state));
     printf("nextDirsKnown: ");
     for (const auto d : getNextDirs())

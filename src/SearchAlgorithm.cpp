@@ -299,29 +299,25 @@ int SearchAlgorithm::countIdentityCandidates(
   for (int x = -MAZE_SIZE / 2; x < -MAZE_SIZE / 2 + max_x; x++)
     for (int y = -MAZE_SIZE / 2; y < -MAZE_SIZE / 2 + max_y; y++)
       for (auto offset_d : Dir::All()) {
-        const Vector offset(x, y);
+        Vector offset = Vector(x, y);
         int diffs = 0;
-        int matchs = 0;
         int unknown = 0;
         for (auto wl : idWallLogs) {
-          Vector v(wl.x, wl.y);
-          Dir d = wl.d;
-          if (maze.isKnown(v + offset, d + offset_d) &&
-              maze.isWall(v + offset, d + offset_d) != wl.b)
+          auto maze_v = Vector(wl).rotate(offset_d, idStartVector) + offset;
+          Dir maze_d = wl.d + offset_d;
+          if (maze.isKnown(maze_v, maze_d) &&
+              maze.isWall(maze_v, maze_d) != wl.b)
             diffs++;
-          if (maze.isKnown(v + offset, d + offset_d) &&
-              maze.isWall(v + offset, d + offset_d) == wl.b)
-            matchs++;
-          if (!maze.isKnown(v + offset, d + offset_d))
+          if (!maze.isKnown(maze_v, maze_d))
             unknown++;
           if (diffs > MAZE_SIZE * 2)
             break;
         }
-        int size = idWallLogs.size();
+        // int size = idWallLogs.size();
+        // int known = size - unknown;
+        // int matchs = known - diffs;
         if (diffs < 5 && unknown < MAZE_SIZE) {
-          //   if (matchs > size / 4) {
-          // if (diffs < 5 && matchs > 5) {
-          ans.first = idStartVector + offset;
+          ans.first = offset;
           ans.second = offset_d;
           cnt++;
         }
@@ -386,7 +382,9 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
   matchCount = cnt;
   if (cnt == 1) {
-    cv = cv - idStartVector + ans.first;
+    printf("Result: (%3d,%3d,%3c)\n", ans.first.x, ans.first.y,
+           ">^<v"[ans.second]);
+    cv = cv.rotate(ans.second, idStartVector) + ans.first;
     cd = cd + ans.second;
     return Reached;
   } else if (cnt == 0) {
