@@ -75,12 +75,12 @@ public:
    */
   void forceBackToStart(bool yes = true) { isForceBackToStart = yes; }
   void forceGoingToGoal(bool yes = true) { isForceGoingToGoal = yes; }
-  void positionIdentify(const Dir d = Dir::North) {
+  void positionIdentify() {
     searchAlgorithm.positionIdentifyingInit();
     isPositionIdentifying = true;
     state = SearchAlgorithm::IDENTIFYING_POSITION;
     curVec = searchAlgorithm.getIdStartVector();
-    curDir = d;
+    curDir = Dir::North;
   }
   /** @function getState
    *  @brief 探索状態の取得

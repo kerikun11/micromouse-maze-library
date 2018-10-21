@@ -50,8 +50,8 @@ public:
     backupMazeToFlash();
     return true;
   }
-  bool positionIdentifyRun(const Dir start_d) {
-    positionIdentify(start_d);
+  bool positionIdentifyRun() {
+    positionIdentify();
     queueAction(STRAIGHT_HALF);
     calibration();
     startDequeue();
