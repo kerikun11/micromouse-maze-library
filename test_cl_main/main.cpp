@@ -23,7 +23,7 @@ void loadMaze() {
     // Maze sample("../mazedata/16MM2017CX.maze");
     break;
   case 32:
-    // sample.parse("../mazedata/32MM2017HX.maze");
+    // sample.parse("../mazedata/32MM2016HX.maze");
     sample.parse("../mazedata/32MM2017CX.maze");
     break;
   }
@@ -47,7 +47,7 @@ public:
            ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
     printf("offset: (%3d,%3d,%3c)\n", offset_v.x, offset_v.y, ">^<v"[offset_d]);
-    usleep(25000);
+    // usleep(25000);
   }
 
 private:
@@ -176,25 +176,55 @@ int main(void) {
 #if CONFIG_SERCHALGORITHM
   loadMaze();
   robot.replaceGoals(sample.getGoals());
-  //   display = 1;
+  // display = 1;
   robot.searchRun();
   robot.printInfo();
+  sleep(2);
+#if 0
+  // Single
+  offset_d = Dir::North;
+  offset_v = Vector(15, 0);
   display = 1;
+  bool res = robot.positionIdentifyRun();
+  if (!res) {
+    robot.printInfo();
+    printf("\nFailed to Identify!\n");
+  }
+  getc(stdin);
+#endif
+
 #if CONFIG_POSITION_IDENTIFICATION
-  for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; ++x)
-    for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; ++y)
-      for (auto d : Dir::All()) {
-        offset_d = d;
-        offset_v = Vector(x, y);
-        display = 1;
-        bool res = robot.positionIdentifyRun(Dir::West);
-        if (!res) {
-          robot.printInfo();
-          printf("Failed to Identify! (%3d, %3d)\n", x, y);
-          usleep(1000000);
-          getc(stdin);
-        }
+  // for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; ++x)
+  //   for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; ++y)
+  //     for (auto d : Dir::All()) {
+  //       offset_d = d;
+  //       offset_v = Vector(x, y);
+  //       display = 1;
+  //       bool res = robot.positionIdentifyRun();
+  //       if (!res) {
+  //         robot.printInfo();
+  //         printf("Failed to Identify! (%3d, %3d)\n", x, y);
+  //         usleep(1000000);
+  //         getc(stdin);
+  //       }
+  //     }
+  robot.calcShortestDirs();
+  auto sdirs = robot.getShortestDirs();
+  auto v = Vector(0, 0);
+  for (const auto &d : sdirs) {
+    v = v.next(d);
+    offset_v = v - Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
+    for (const auto ed : Dir::All()) {
+      offset_d = ed;
+      display = 1;
+      bool res = robot.positionIdentifyRun();
+      if (!res) {
+        robot.printInfo();
+        printf("\nFailed to Identify!\n");
+        getc(stdin);
       }
+    }
+  }
 #endif
   display = 0;
   robot.fastRun(false);

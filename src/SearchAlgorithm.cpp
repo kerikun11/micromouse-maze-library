@@ -283,21 +283,23 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 }
 int SearchAlgorithm::countIdentityCandidates(
     const WallLogs idWallLogs, std::pair<Vector, Dir> &ans) const {
-  int8_t max_x = 0;
-  int8_t max_y = 0;
-  for (const auto wl : getMaze().getWallLogs()) {
-    if (wl.x >= MAZE_SIZE - 1 || wl.y >= MAZE_SIZE - 1)
-      continue;
-    max_x = std::max(max_x, wl.x);
-    max_y = std::max(max_y, wl.y);
-  }
+  // int8_t max_x = 0;
+  // int8_t max_y = 0;
+  // for (const auto wl : getMaze().getWallLogs()) {
+  //   if (wl.x >= MAZE_SIZE - 1 || wl.y >= MAZE_SIZE - 1)
+  //     continue;
+  //   max_x = std::max(max_x, wl.x);
+  //   max_y = std::max(max_y, wl.y);
+  // }
   const int many = 1000;
-  const int min_size = 10;
+  const int min_size = 8;
   if (idWallLogs.size() < min_size)
     return many;
   int cnt = 0;
-  for (int x = -MAZE_SIZE / 2; x < -MAZE_SIZE / 2 + max_x; x++)
-    for (int y = -MAZE_SIZE / 2; y < -MAZE_SIZE / 2 + max_y; y++)
+  // for (int x = -MAZE_SIZE / 2; x < -MAZE_SIZE / 2 + max_x; x++)
+  //   for (int y = -MAZE_SIZE / 2; y < -MAZE_SIZE / 2 + max_y; y++)
+  for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; x++)
+    for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; y++)
       for (auto offset_d : Dir::All()) {
         Vector offset = Vector(x, y);
         int diffs = 0;
@@ -313,10 +315,10 @@ int SearchAlgorithm::countIdentityCandidates(
           if (diffs > MAZE_SIZE * 2)
             break;
         }
-        // int size = idWallLogs.size();
-        // int known = size - unknown;
-        // int matchs = known - diffs;
-        if (diffs < 5 && unknown < MAZE_SIZE) {
+        int size = idWallLogs.size();
+        int known = size - unknown;
+        int matchs = known - diffs;
+        if (diffs < 5 && known > unknown) {
           ans.first = offset;
           ans.second = offset_d;
           cnt++;

@@ -98,19 +98,24 @@ int8_t Maze::unknownCount(const Vector &v) const {
 }
 bool Maze::updateWall(const Vector v, const Dir d, const bool b,
                       const bool pushLog) {
-  // ログに追加
-  if (pushLog)
-    wallLogs.push_back(WallLog(v, d, b));
   // 既知の壁と食い違いがあったら未知壁としてreturn
   if (isKnown(v, d) && isWall(v, d) != b) {
     setWall(v, d, false);
     setKnown(v, d, false);
+    auto wl = std::find_if(wallLogs.begin(), wallLogs.end(), [&](const auto w) {
+      return Vector(w.x, w.y) == v && w.d == d;
+    });
+    if (wl != wallLogs.end())
+      wallLogs.erase(wl);
     return false;
   }
   // 未知壁なら壁情報を更新
   if (!isKnown(v, d)) {
     setWall(v, d, b);
     setKnown(v, d, true);
+    // ログに追加
+    if (pushLog)
+      wallLogs.push_back(WallLog(v, d, b));
   }
   return true;
 }
