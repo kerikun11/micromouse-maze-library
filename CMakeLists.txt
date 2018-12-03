@@ -21,11 +21,23 @@ if(CROSS_COMPILING)
   set(CMAKE_BUILD_TYPE "Release")
 else()
   add_subdirectory(test_cl_main)
+  add_subdirectory(test_solve)
+  add_subdirectory(test_gen_maze)
 
   # custom target
   add_custom_target(run
     COMMAND clear && ${CMAKE_BINARY_DIR}/test_cl_main/test_cl_main
     DEPENDS test_cl_main mazelib
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  add_custom_target(solve
+    COMMAND clear && ${CMAKE_BINARY_DIR}/test_solve/test_solve ${MF}
+    DEPENDS test_solve mazelib
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  add_custom_target(gen
+    COMMAND clear && ${CMAKE_BINARY_DIR}/test_gen_maze/test_gen_maze
+    DEPENDS test_gen_maze mazelib
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
 endif()

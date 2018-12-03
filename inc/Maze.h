@@ -291,6 +291,8 @@ public:
   bool parse(std::istream &is);
   bool parse(const char *filename) {
     std::ifstream ifs(filename);
+    if (ifs.fail())
+      return false;
     return parse(ifs);
   }
   /** @function printPath
