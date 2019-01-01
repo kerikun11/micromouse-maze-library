@@ -44,8 +44,10 @@ private:
   void calcNextDirsPreCallback() override {
     start = std::chrono::system_clock::now();
   }
-  void calcNextDirsPostCallback(SearchAlgorithm::State prevState,
-                                SearchAlgorithm::State newState) override {
+  void calcNextDirsPostCallback(SearchAlgorithm::State prevState
+                                __attribute__((unused)),
+                                SearchAlgorithm::State newState
+                                __attribute__((unused))) override {
     end = std::chrono::system_clock::now();
     usec = std::chrono::duration_cast<std::chrono::microseconds>(end - start)
                .count();
@@ -126,12 +128,12 @@ int main(int argc, char *argv[]) {
     std::cout << "usage: command mazefile.maze" << std::endl;
     return -1;
   }
-  if (!sample.parse(argv[1])){
+  if (!sample.parse(argv[1])) {
     std::cout << "Failed to parse file!" << std::endl;
     return -1;
   }
   robot.replaceGoals(sample.getGoals());
-  display = 1;
+  // display = 1;
   robot.searchRun();
   robot.printInfo();
   robot.fastRun(false);

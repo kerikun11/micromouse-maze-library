@@ -104,15 +104,20 @@ public:
 protected:
   Vectors goals;
   virtual void waitForEndAction() {}
-  virtual void queueAction(const Action action) {}
-  virtual void findWall(bool &left, bool &front, bool &right, bool &back) {}
+  virtual void queueAction(const Action action __attribute__((unused))) {}
+  virtual void findWall(bool &left __attribute__((unused)),
+                        bool &front __attribute__((unused)),
+                        bool &right __attribute__((unused)),
+                        bool &back __attribute__((unused))) {}
   virtual void backupMazeToFlash() {}
   virtual void stopDequeue() {}
   virtual void startDequeue() {}
   virtual void calibration() {}
   virtual void calcNextDirsPreCallback() {}
-  virtual void calcNextDirsPostCallback(SearchAlgorithm::State prevState,
-                                        SearchAlgorithm::State newState) {}
+  virtual void calcNextDirsPostCallback(SearchAlgorithm::State prevState
+                                        __attribute__((unused)),
+                                        SearchAlgorithm::State newState
+                                        __attribute__((unused))) {}
   virtual void discrepancyWithKnownWall() {}
 
 private:

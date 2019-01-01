@@ -79,8 +79,10 @@ private:
   void calcNextDirsPreCallback() override {
     start = std::chrono::system_clock::now();
   }
-  void calcNextDirsPostCallback(SearchAlgorithm::State prevState,
-                                SearchAlgorithm::State newState) override {
+  void calcNextDirsPostCallback(SearchAlgorithm::State prevState
+                                __attribute__((unused)),
+                                SearchAlgorithm::State newState
+                                __attribute__((unused))) override {
     end = std::chrono::system_clock::now();
     usec = std::chrono::duration_cast<std::chrono::microseconds>(end - start)
                .count();
