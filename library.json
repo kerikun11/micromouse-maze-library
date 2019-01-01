@@ -1,0 +1,13 @@
+{
+    "name": "MazeLib",
+    "description": "MazeLib",
+    "keywords": "micromouse",
+    "build": {
+        "flags": [
+            "-I inc"
+        ],
+        "srcFilter": [
+            "+<src>"
+        ]
+    }
+}
