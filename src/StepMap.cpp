@@ -264,9 +264,10 @@ Vector StepMap::calcNextDirs(const Maze &maze, const Vector &start_v,
            getStep(focus_v.next(d2)); //< 低コスト優先
   });
   // 未知壁優先で並べ替え
-  std::sort(dirs.begin(), dirs.end(), [&](const Dir &d1, const Dir &d2) {
-    return !maze.unknownCount(focus_v.next(d2)); //< 未知壁優先
-  });
+  std::sort(dirs.begin(), dirs.end(),
+            [&](const Dir &d1 __attribute__((unused)), const Dir &d2) {
+              return !maze.unknownCount(focus_v.next(d2)); //< 未知壁優先
+            });
   // 結果を代入
   nextDirCandidates = dirs;
   return focus_v;

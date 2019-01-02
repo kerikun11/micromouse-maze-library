@@ -8,48 +8,31 @@
 
 using namespace MazeLib;
 
-Maze sample;
-
-void loadMaze() {
-  switch (MAZE_SIZE) {
-  case 8:
-    sample.parse("../mazedata/08Test1.maze");
-    // Maze sample("../mazedata/08MM2016CF_pre.maze");
-    break;
-  case 16:
-    // Maze sample("../mazedata/16MM2017CX.maze");
-    break;
-  case 32:
-    // sample.parse("../mazedata/32MM2016HX.maze");
-    sample.parse("../mazedata/32MM2017CX.maze");
-    break;
-  }
-}
-
+Maze maze_target;
 bool display = 0;
 Vector offset_v;
 Dir offset_d;
 
-class TestRobot : public RobotBase {
+class CLRobot : public RobotBase {
 public:
-  TestRobot(const Vectors &goal) : RobotBase(goal) {}
-  TestRobot() {}
+  CLRobot() {}
 
   void printInfo(const bool showMaze = true) {
     Agent::printInfo(showMaze);
-    printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
-           "Right: %3d, Back: %3d\n",
-           ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
-    printf("offset: (%3d,%3d,%3c)\n", offset_v.x, offset_v.y, ">^<v"[offset_d]);
-    // usleep(25000);
+    std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
+                "Right: %3d, Back: %3d\n",
+                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
+    std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
+                (int)max_usec);
+    std::printf("offset: (%3d,%3d,%3c)\n", offset_v.x, offset_v.y,
+                ">^<v"[offset_d]);
   }
 
 private:
   int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
   float cost = 0;
   int max_usec = 0;
-  int usec;
+  int usec = 0;
   std::chrono::_V2::system_clock::time_point start;
   std::chrono::_V2::system_clock::time_point end;
 
@@ -60,15 +43,15 @@ private:
       auto ids = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
       auto fake_v = v.rotate(offset_d, ids) + offset_v;
       auto fake_d = d + offset_d;
-      left = sample.isWall(fake_v, fake_d + Dir::Left);
-      front = sample.isWall(fake_v, fake_d + Dir::Front);
-      right = sample.isWall(fake_v, fake_d + Dir::Right);
-      back = sample.isWall(fake_v, fake_d + Dir::Back);
+      left = maze_target.isWall(fake_v, fake_d + Dir::Left);
+      front = maze_target.isWall(fake_v, fake_d + Dir::Front);
+      right = maze_target.isWall(fake_v, fake_d + Dir::Right);
+      back = maze_target.isWall(fake_v, fake_d + Dir::Back);
     } else {
-      left = sample.isWall(v, d + Dir::Left);
-      front = sample.isWall(v, d + Dir::Front);
-      right = sample.isWall(v, d + Dir::Right);
-      back = sample.isWall(v, d + Dir::Back);
+      left = maze_target.isWall(v, d + Dir::Left);
+      front = maze_target.isWall(v, d + Dir::Front);
+      right = maze_target.isWall(v, d + Dir::Right);
+      back = maze_target.isWall(v, d + Dir::Back);
     }
   }
   void calcNextDirsPreCallback() override {
@@ -87,8 +70,7 @@ private:
       return;
 
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      sleep(2);
-      //   getc(stdin);
+      sleep(1);
       display = 0;
     }
     if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
@@ -100,7 +82,7 @@ private:
   }
   void discrepancyWithKnownWall() override {
     printInfo();
-    printf("There was a discrepancy with known information!\n");
+    std::printf("There was a discrepancy with known information!\n");
   }
   void queueAction(const Action action) override {
     if (display)
@@ -164,29 +146,30 @@ private:
   }
 };
 
-int main(void) {
-  setvbuf(stdout, (char *)NULL, _IONBF, 0);
-  loadMaze();
-  TestRobot robot;
-  robot.replaceGoals(sample.getGoals());
-  // display = 1;
+void loadMaze(Maze &maze_target) {
+  switch (MAZE_SIZE) {
+  case 8:
+    // maze_target.parse("../mazedata/08Test1.maze");
+    maze_target.parse("../mazedata/08MM2016CF_pre.maze");
+    break;
+  case 16:
+    maze_target.parse("../mazedata/16MM2017CX.maze");
+    break;
+  case 32:
+    maze_target.parse("../mazedata/32MM2016HX.maze");
+    // maze_target.parse("../mazedata/32MM2017CX.maze");
+    break;
+  }
+}
+
+CLRobot robot;
+
+void test_position_identify() {
+  loadMaze(maze_target);
+  display = 0;
+  robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
   robot.printInfo();
-  sleep(2);
-  // for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; ++x)
-  //   for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; ++y)
-  //     for (auto d : Dir::All()) {
-  //       offset_d = d;
-  //       offset_v = Vector(x, y);
-  //       display = 1;
-  //       bool res = robot.positionIdentifyRun();
-  //       if (!res) {
-  //         robot.printInfo();
-  //         printf("Failed to Identify! (%3d, %3d)\n", x, y);
-  //         usleep(1000000);
-  //         getc(stdin);
-  //       }
-  //     }
   robot.calcShortestDirs();
   auto sdirs = robot.getShortestDirs();
   auto v = Vector(0, 0);
@@ -206,10 +189,15 @@ int main(void) {
   }
   display = 0;
   robot.fastRun(false);
-  robot.endFastRunBackingToStartRun();
+  // robot.endFastRunBackingToStartRun();
   robot.printPath();
   robot.fastRun(true);
-  robot.endFastRunBackingToStartRun();
+  // robot.endFastRunBackingToStartRun();
   robot.printPath();
+}
+
+int main(void) {
+  setvbuf(stdout, (char *)NULL, _IONBF, 0);
+  test_position_identify();
   return 0;
 }
