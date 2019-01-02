@@ -1,6 +1,4 @@
 #include "Maze.h"
-
-#include "Maze.h"
 #include "RobotBase.h"
 #include <cstdio>
 
@@ -10,23 +8,44 @@
 
 using namespace MazeLib;
 
-class CLRobot : public RobotBase {
+Maze sample;
+
+void loadMaze() {
+  switch (MAZE_SIZE) {
+  case 8:
+    sample.parse("../mazedata/08Test1.maze");
+    // Maze sample("../mazedata/08MM2016CF_pre.maze");
+    break;
+  case 16:
+    // Maze sample("../mazedata/16MM2017CX.maze");
+    break;
+  case 32:
+    // sample.parse("../mazedata/32MM2016HX.maze");
+    sample.parse("../mazedata/32MM2017CX.maze");
+    break;
+  }
+}
+
+bool display = 0;
+Vector offset_v;
+Dir offset_d;
+
+class TestRobot : public RobotBase {
 public:
-  CLRobot(const Maze &maze_target, bool &print_maze)
-      : maze_target(maze_target), print_maze(print_maze) {}
+  TestRobot(const Vectors &goal) : RobotBase(goal) {}
+  TestRobot() {}
 
   void printInfo(const bool showMaze = true) {
     Agent::printInfo(showMaze);
-    std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
-                "Right: %3d, Back: %3d\n",
-                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
-                (int)max_usec);
+    printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
+           "Right: %3d, Back: %3d\n",
+           ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
+    printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
+    printf("offset: (%3d,%3d,%3c)\n", offset_v.x, offset_v.y, ">^<v"[offset_d]);
+    // usleep(25000);
   }
 
 private:
-  const Maze &maze_target;
-  bool &print_maze;
   int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
   float cost = 0;
   int max_usec = 0;
@@ -37,10 +56,20 @@ private:
   void findWall(bool &left, bool &front, bool &right, bool &back) override {
     const auto &v = getCurVec();
     const auto &d = getCurDir();
-    left = maze_target.isWall(v, d + Dir::Left);
-    front = maze_target.isWall(v, d + Dir::Front);
-    right = maze_target.isWall(v, d + Dir::Right);
-    back = maze_target.isWall(v, d + Dir::Back);
+    if (getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
+      auto ids = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
+      auto fake_v = v.rotate(offset_d, ids) + offset_v;
+      auto fake_d = d + offset_d;
+      left = sample.isWall(fake_v, fake_d + Dir::Left);
+      front = sample.isWall(fake_v, fake_d + Dir::Front);
+      right = sample.isWall(fake_v, fake_d + Dir::Right);
+      back = sample.isWall(fake_v, fake_d + Dir::Back);
+    } else {
+      left = sample.isWall(v, d + Dir::Left);
+      front = sample.isWall(v, d + Dir::Front);
+      right = sample.isWall(v, d + Dir::Right);
+      back = sample.isWall(v, d + Dir::Back);
+    }
   }
   void calcNextDirsPreCallback() override {
     start = std::chrono::system_clock::now();
@@ -58,6 +87,9 @@ private:
       return;
 
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
+      sleep(2);
+      //   getc(stdin);
+      display = 0;
     }
     if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
     }
@@ -68,10 +100,10 @@ private:
   }
   void discrepancyWithKnownWall() override {
     printInfo();
-    std::printf("There was a discrepancy with known information!\n");
+    printf("There was a discrepancy with known information!\n");
   }
   void queueAction(const Action action) override {
-    if (print_maze)
+    if (display)
       printInfo();
     cost += getTimeCost(action);
     step++;
@@ -132,25 +164,52 @@ private:
   }
 };
 
-void test_dual() {
-  Maze maze_target;
-  maze_target.parse("../mazedata/32MM2016HX.maze");
-  bool print_maze = false;
-  CLRobot robot(maze_target, print_maze);
-  robot.replaceGoals(maze_target.getGoals());
-  robot.searchRun();
-  robot.printInfo();
-  robot.calcShortestDirs();
-  robot.fastRun(false);
-  // robot.endFastRunBackingToStartRun();
-  robot.printPath();
-  robot.fastRun(true);
-  // robot.endFastRunBackingToStartRun();
-  robot.printPath();
-}
-
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
-  test_dual();
+  loadMaze();
+  TestRobot robot;
+  robot.replaceGoals(sample.getGoals());
+  // display = 1;
+  robot.searchRun();
+  robot.printInfo();
+  sleep(2);
+  // for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; ++x)
+  //   for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; ++y)
+  //     for (auto d : Dir::All()) {
+  //       offset_d = d;
+  //       offset_v = Vector(x, y);
+  //       display = 1;
+  //       bool res = robot.positionIdentifyRun();
+  //       if (!res) {
+  //         robot.printInfo();
+  //         printf("Failed to Identify! (%3d, %3d)\n", x, y);
+  //         usleep(1000000);
+  //         getc(stdin);
+  //       }
+  //     }
+  robot.calcShortestDirs();
+  auto sdirs = robot.getShortestDirs();
+  auto v = Vector(0, 0);
+  for (const auto &d : sdirs) {
+    v = v.next(d);
+    offset_v = v - Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
+    for (const auto ed : Dir::All()) {
+      offset_d = ed;
+      display = 1;
+      bool res = robot.positionIdentifyRun();
+      if (!res) {
+        robot.printInfo();
+        printf("\nFailed to Identify!\n");
+        getc(stdin);
+      }
+    }
+  }
+  display = 0;
+  robot.fastRun(false);
+  robot.endFastRunBackingToStartRun();
+  robot.printPath();
+  robot.fastRun(true);
+  robot.endFastRunBackingToStartRun();
+  robot.printPath();
   return 0;
 }

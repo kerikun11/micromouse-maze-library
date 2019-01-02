@@ -138,7 +138,8 @@ bool SearchAlgorithm::findNextDir(const State state, const Vector v,
   return findNextDir(state == IDENTIFYING_POSITION ? idMaze : maze, v, d,
                      nextDirCandidates, nextDir);
 }
-bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v, const Dir d,
+bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
+                                  const Dir d __attribute__((unused)),
                                   const Dirs &nextDirCandidates,
                                   Dir &nextDir) const {
   // 候補の中で行ける方向を探す
@@ -317,7 +318,7 @@ int SearchAlgorithm::countIdentityCandidates(
         }
         int size = idWallLogs.size();
         int known = size - unknown;
-        int matchs = known - diffs;
+        // int matchs = known - diffs;
         if (diffs < 5 && known > unknown) {
           ans.first = offset;
           ans.second = offset_d;
