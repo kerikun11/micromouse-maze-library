@@ -10,6 +10,8 @@ using namespace MazeLib;
 
 Maze maze_target;
 bool display = 0;
+Vector offset_v;
+Dir offset_d;
 Vector real_v;
 Dir real_d;
 
@@ -27,6 +29,8 @@ public:
     std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
                 (int)max_usec);
     std::printf("Real: (%3d,%3d,%3c)\n", real_v.x, real_v.y, ">^<v"[real_d]);
+    std::printf("Offset: (%3d,%3d,%3c)\n", offset_v.x, offset_v.y,
+                ">^<v"[offset_d]);
   }
 
 private:
@@ -72,7 +76,7 @@ private:
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
       // printInfo();
       // sleep(1);
-      display = 0;
+      // display = 0;
     }
     if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
     }
@@ -190,7 +194,7 @@ void loadMaze(Maze &maze_target) {
     maze_target.parse("../mazedata/16MM2017CX.maze");
     break;
   case 32:
-    maze_target.parse("../mazedata/32MM2016HX.maze");
+    maze_target.parse("../mazedata/32MM2017HX.maze");
     // maze_target.parse("../mazedata/32MM2017CX.maze");
     break;
   }
@@ -206,10 +210,9 @@ void test_position_identify() {
   robot.searchRun();
   robot.printInfo();
   /* Position Identification Run */
-  display = 1;
-
-  // real_d = Dir::East;
-  // real_v = Vector(0, 12);
+  // display = 1;
+  // real_d = Dir::West;
+  // real_v = Vector(19, 21);
   // bool res = robot.positionIdentifyRun();
   // if (!res) {
   //   robot.printInfo();
@@ -217,20 +220,24 @@ void test_position_identify() {
   //   getc(stdin);
   // }
 
-  robot.calcShortestDirs();
-  auto sdirs = robot.getShortestDirs();
-  auto v = Vector(0, 0);
-  for (const auto &d : sdirs) {
-    v = v.next(d);
-    real_v = v;
-    for (const auto ed : Dir::All()) {
-      real_d = ed;
-      display = 0;
-      bool res = robot.positionIdentifyRun();
-      if (!res) {
-        robot.printInfo();
-        printf("\nFailed to Identify!\n");
-        getc(stdin);
+  for (auto diag : {true, false}) {
+    robot.calcShortestDirs(diag);
+    auto sdirs = robot.getShortestDirs();
+    auto v = Vector(0, 0);
+    for (const auto &d : sdirs) {
+      v = v.next(d);
+      real_v = v;
+      offset_v = v;
+      for (const auto ed : Dir::All()) {
+        real_d = ed;
+        offset_d = ed;
+        display = 0;
+        bool res = robot.positionIdentifyRun();
+        if (!res) {
+          robot.printInfo();
+          printf("\nFailed to Identify!\n");
+          getc(stdin);
+        }
       }
     }
   }

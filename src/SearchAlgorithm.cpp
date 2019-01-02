@@ -284,25 +284,11 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 }
 int SearchAlgorithm::countIdentityCandidates(
     const WallLogs idWallLogs, std::pair<Vector, Dir> &ans) const {
-  // int8_t max_x = 0;
-  // int8_t max_y = 0;
-  // for (const auto wl : getMaze().getWallLogs()) {
-  //   if (wl.x >= MAZE_SIZE - 1 || wl.y >= MAZE_SIZE - 1)
-  //     continue;
-  //   max_x = std::max(max_x, wl.x);
-  //   max_y = std::max(max_y, wl.y);
-  // }
   const int many = 1000;
   const int min_size = 8;
   if (idWallLogs.size() < min_size)
     return many;
   int cnt = 0;
-  // for (int x = -MAZE_SIZE / 2; x < -MAZE_SIZE / 2 + max_x; x++)
-  //   for (int y = -MAZE_SIZE / 2; y < -MAZE_SIZE / 2 + max_y; y++)
-  // for (int x = -MAZE_SIZE; x < MAZE_SIZE; x++)
-  //   for (int y = -MAZE_SIZE; y < MAZE_SIZE; y++)
-  // for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; x++)
-  //   for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; y++)
   for (int x = 0; x < MAZE_SIZE; x++)
     for (int y = 0; y < MAZE_SIZE; y++)
       for (auto offset_d : Dir::All()) {
@@ -396,20 +382,15 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
       max_x = std::max(wl.x, max_x);
       max_y = std::max(wl.y, max_y);
     }
-    auto center = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
-    // auto mean = Vector((max_x + min_x) / 2, (max_y + min_y) / 2);
-    auto width = Vector((max_x - min_x + 1) / 2, (max_y - min_y + 1) / 2);
-    auto min = Vector(min_x, min_y);
-    // auto max = Vector(max_x, max_y);
-    auto offset_new = idOffset - min + (center - width);
+    auto offset_new = idOffset + Vector((MAZE_SIZE - max_x - min_x - 1) / 2,
+                                        (MAZE_SIZE - max_y - min_y - 1) / 2);
     auto offset_diff = offset_new - idOffset;
     idOffset = offset_new;
     cv = cv + offset_diff;
     WallLogs tmp = idMaze.getWallLogs();
     idMaze.reset(false);
-    for (auto &wl : tmp) {
+    for (auto &wl : tmp)
       idMaze.updateWall(Vector(wl) + offset_diff, wl.d, wl.b);
-    }
   }
 
   std::pair<Vector, Dir> ans;
@@ -420,7 +401,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
     cd = cd + ans.second;
     // printf("Offset: (%3d,%3d,%3c)\n", ans.first.x, ans.first.y,
     //        ">^<v"[ans.second]);
-    // printf("Result: (%3d,%3d,%3c)\n", cv.x, cv.y, ">^<v"[cd]);
+    // printf("Current: (%3d,%3d,%3c)\n", cv.x, cv.y, ">^<v"[cd]);
     return Reached;
   } else if (cnt == 0) {
     return Error;
