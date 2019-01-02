@@ -79,8 +79,8 @@ public:
     searchAlgorithm.positionIdentifyingInit();
     isPositionIdentifying = true;
     state = SearchAlgorithm::IDENTIFYING_POSITION;
-    curVec = searchAlgorithm.getIdStartVector();
-    curDir = Dir::North;
+    curVec = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
+    curDir = Dir::East;
   }
   /** @function getState
    *  @brief 探索状態の取得

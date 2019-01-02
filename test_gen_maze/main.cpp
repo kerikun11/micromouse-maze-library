@@ -21,7 +21,8 @@ const char mazeData_MM2018HX[32 + 1][32 + 1] = {
     "43c948aaaaaaaaaaaa3e8aaaaaa95dd5", "dcaa8aaaaaaaaaaaaa8aaaaaaaaa8aa9",
 };
 
-Maze sample(mazeData_MM2018HX);
+// Maze sample(mazeData_MM2018HX);
+Maze sample;
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);

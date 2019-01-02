@@ -10,22 +10,23 @@ using namespace MazeLib;
 
 Maze maze_target;
 bool display = 0;
-Vector offset_v;
-Dir offset_d;
+Vector real_v;
+Dir real_d;
 
 class CLRobot : public RobotBase {
 public:
   CLRobot() {}
 
   void printInfo(const bool showMaze = true) {
+    // getc(stdin);
+    usleep(10);
     Agent::printInfo(showMaze);
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
                 (int)max_usec);
-    std::printf("offset: (%3d,%3d,%3c)\n", offset_v.x, offset_v.y,
-                ">^<v"[offset_d]);
+    std::printf("Real: (%3d,%3d,%3c)\n", real_v.x, real_v.y, ">^<v"[real_d]);
   }
 
 private:
@@ -37,22 +38,21 @@ private:
   std::chrono::_V2::system_clock::time_point end;
 
   void findWall(bool &left, bool &front, bool &right, bool &back) override {
-    const auto &v = getCurVec();
-    const auto &d = getCurDir();
-    if (getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
-      auto ids = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
-      auto fake_v = v.rotate(offset_d, ids) + offset_v;
-      auto fake_d = d + offset_d;
-      left = maze_target.isWall(fake_v, fake_d + Dir::Left);
-      front = maze_target.isWall(fake_v, fake_d + Dir::Front);
-      right = maze_target.isWall(fake_v, fake_d + Dir::Right);
-      back = maze_target.isWall(fake_v, fake_d + Dir::Back);
-    } else {
-      left = maze_target.isWall(v, d + Dir::Left);
-      front = maze_target.isWall(v, d + Dir::Front);
-      right = maze_target.isWall(v, d + Dir::Right);
-      back = maze_target.isWall(v, d + Dir::Back);
-    }
+    // const auto &v = getCurVec();
+    // const auto &d = getCurDir();
+    // if (getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
+    auto fake_v = real_v;
+    auto fake_d = real_d;
+    left = maze_target.isWall(fake_v, fake_d + Dir::Left);
+    front = maze_target.isWall(fake_v, fake_d + Dir::Front);
+    right = maze_target.isWall(fake_v, fake_d + Dir::Right);
+    back = maze_target.isWall(fake_v, fake_d + Dir::Back);
+    // } else {
+    //   left = maze_target.isWall(v, d + Dir::Left);
+    //   front = maze_target.isWall(v, d + Dir::Front);
+    //   right = maze_target.isWall(v, d + Dir::Right);
+    //   back = maze_target.isWall(v, d + Dir::Back);
+    // }
   }
   void calcNextDirsPreCallback() override {
     start = std::chrono::system_clock::now();
@@ -70,7 +70,8 @@ private:
       return;
 
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      sleep(1);
+      // printInfo();
+      // sleep(1);
       display = 0;
     }
     if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
@@ -91,6 +92,8 @@ private:
     step++;
     switch (action) {
     case RobotBase::START_STEP:
+      real_v = Vector(0, 1);
+      real_d = Dir::North;
       f++;
       break;
     case RobotBase::START_INIT:
@@ -98,9 +101,25 @@ private:
     case RobotBase::STOP_HALF:
       break;
     case RobotBase::TURN_LEFT_90:
+      real_d = real_d + Dir::Left;
+      if (!maze_target.canGo(real_v, real_d)) {
+        printInfo();
+        std::cerr << "The robot crashed into the wall!" << std::endl;
+        while (1) {
+        }
+      }
+      real_v = real_v.next(real_d);
       l++;
       break;
     case RobotBase::TURN_RIGHT_90:
+      real_d = real_d + Dir::Right;
+      if (!maze_target.canGo(real_v, real_d)) {
+        printInfo();
+        std::cerr << "The robot crashed into the wall!" << std::endl;
+        while (1) {
+        }
+      }
+      real_v = real_v.next(real_d);
       r++;
       break;
     case RobotBase::ROTATE_LEFT_90:
@@ -108,9 +127,24 @@ private:
     case RobotBase::ROTATE_RIGHT_90:
       break;
     case RobotBase::ROTATE_180:
+      real_d = real_d + Dir::Back;
+      if (!maze_target.canGo(real_v, real_d)) {
+        printInfo();
+        std::cerr << "The robot crashed into the wall!" << std::endl;
+        while (1) {
+        }
+      }
+      real_v = real_v.next(real_d);
       b++;
       break;
     case RobotBase::STRAIGHT_FULL:
+      if (!maze_target.canGo(real_v, real_d)) {
+        printInfo();
+        std::cerr << "The robot crashed into the wall!" << std::endl;
+        while (1) {
+        }
+      }
+      real_v = real_v.next(real_d);
       f++;
       break;
     case RobotBase::STRAIGHT_HALF:
@@ -166,19 +200,32 @@ CLRobot robot;
 
 void test_position_identify() {
   loadMaze(maze_target);
+  /* Search Run */
   display = 0;
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
   robot.printInfo();
+  /* Position Identification Run */
+  display = 1;
+
+  // real_d = Dir::East;
+  // real_v = Vector(0, 12);
+  // bool res = robot.positionIdentifyRun();
+  // if (!res) {
+  //   robot.printInfo();
+  //   printf("\nFailed to Identify!\n");
+  //   getc(stdin);
+  // }
+
   robot.calcShortestDirs();
   auto sdirs = robot.getShortestDirs();
   auto v = Vector(0, 0);
   for (const auto &d : sdirs) {
     v = v.next(d);
-    offset_v = v - Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
+    real_v = v;
     for (const auto ed : Dir::All()) {
-      offset_d = ed;
-      display = 1;
+      real_d = ed;
+      display = 0;
       bool res = robot.positionIdentifyRun();
       if (!res) {
         robot.printInfo();
@@ -187,13 +234,15 @@ void test_position_identify() {
       }
     }
   }
-  display = 0;
-  robot.fastRun(false);
+
+  /* Fast Run */
+  // display = 0;
+  // robot.fastRun(false);
   // robot.endFastRunBackingToStartRun();
-  robot.printPath();
-  robot.fastRun(true);
+  // robot.printPath();
+  // robot.fastRun(true);
   // robot.endFastRunBackingToStartRun();
-  robot.printPath();
+  // robot.printPath();
 }
 
 int main(void) {

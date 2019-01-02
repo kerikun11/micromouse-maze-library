@@ -70,16 +70,14 @@ public:
   void printMap(const State state, const Vector vec, const Dir dir) const;
   const StepMap &getStepMap() const { return stepMap; }
   const Maze &getMaze() const { return maze; }
-  const Vector &getIdStartVector() const { return idStartVector; }
-  void setIdStartVector(const Vector &v) { idStartVector = v; }
 
 protected:
   Maze &maze;      /**< 使用する迷路の参照 */
   StepMap stepMap; /**< 使用するステップマップ */
 
 private:
-  Maze idMaze; /**< 自己位置同定に使用する迷路 */
-  Vector idStartVector;
+  Maze idMaze;     /**< 自己位置同定に使用する迷路 */
+  Vector idOffset; /**< 自己位置同定迷路の始点位置 */
 
   /** @function findShortestCandidates
    *  @brief ステップマップにより最短経路上になりうる区画を洗い出す

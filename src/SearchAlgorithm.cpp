@@ -33,7 +33,7 @@ bool SearchAlgorithm::isComplete() {
   return candidates.empty();
 }
 void SearchAlgorithm::positionIdentifyingInit() {
-  idStartVector = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
+  idOffset = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
   idMaze.reset(false);
 }
 bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
@@ -299,15 +299,19 @@ int SearchAlgorithm::countIdentityCandidates(
   int cnt = 0;
   // for (int x = -MAZE_SIZE / 2; x < -MAZE_SIZE / 2 + max_x; x++)
   //   for (int y = -MAZE_SIZE / 2; y < -MAZE_SIZE / 2 + max_y; y++)
-  for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; x++)
-    for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; y++)
+  // for (int x = -MAZE_SIZE; x < MAZE_SIZE; x++)
+  //   for (int y = -MAZE_SIZE; y < MAZE_SIZE; y++)
+  // for (int x = -MAZE_SIZE / 2; x < MAZE_SIZE / 2; x++)
+  //   for (int y = -MAZE_SIZE / 2; y < MAZE_SIZE / 2; y++)
+  for (int x = 0; x < MAZE_SIZE; x++)
+    for (int y = 0; y < MAZE_SIZE; y++)
       for (auto offset_d : Dir::All()) {
         Vector offset = Vector(x, y);
         int diffs = 0;
         int unknown = 0;
         for (auto wl : idWallLogs) {
-          auto maze_v = Vector(wl).rotate(offset_d, idStartVector) + offset;
-          Dir maze_d = wl.d + offset_d;
+          auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset;
+          auto maze_d = wl.d + offset_d;
           if (maze.isKnown(maze_v, maze_d) &&
               maze.isWall(maze_v, maze_d) != wl.b)
             diffs++;
@@ -381,14 +385,42 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
                                                     Dirs &nextDirsKnown,
                                                     Dirs &nextDirCandidates,
                                                     int &matchCount) {
+  if (!idMaze.getWallLogs().empty()) {
+    int8_t min_x = MAZE_SIZE - 1;
+    int8_t min_y = MAZE_SIZE - 1;
+    int8_t max_x = 0;
+    int8_t max_y = 0;
+    for (auto &wl : idMaze.getWallLogs()) {
+      min_x = std::min(wl.x, min_x);
+      min_y = std::min(wl.y, min_y);
+      max_x = std::max(wl.x, max_x);
+      max_y = std::max(wl.y, max_y);
+    }
+    auto center = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
+    // auto mean = Vector((max_x + min_x) / 2, (max_y + min_y) / 2);
+    auto width = Vector((max_x - min_x + 1) / 2, (max_y - min_y + 1) / 2);
+    auto min = Vector(min_x, min_y);
+    // auto max = Vector(max_x, max_y);
+    auto offset_new = idOffset - min + (center - width);
+    auto offset_diff = offset_new - idOffset;
+    idOffset = offset_new;
+    cv = cv + offset_diff;
+    WallLogs tmp = idMaze.getWallLogs();
+    idMaze.reset(false);
+    for (auto &wl : tmp) {
+      idMaze.updateWall(Vector(wl) + offset_diff, wl.d, wl.b);
+    }
+  }
+
   std::pair<Vector, Dir> ans;
   int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
   matchCount = cnt;
   if (cnt == 1) {
-    printf("Result: (%3d,%3d,%3c)\n", ans.first.x, ans.first.y,
-           ">^<v"[ans.second]);
-    cv = cv.rotate(ans.second, idStartVector) + ans.first;
+    cv = (cv - idOffset).rotate(ans.second) + ans.first;
     cd = cd + ans.second;
+    // printf("Offset: (%3d,%3d,%3c)\n", ans.first.x, ans.first.y,
+    //        ">^<v"[ans.second]);
+    // printf("Result: (%3d,%3d,%3c)\n", cv.x, cv.y, ">^<v"[cd]);
     return Reached;
   } else if (cnt == 0) {
     return Error;
