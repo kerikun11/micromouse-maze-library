@@ -21,7 +21,6 @@ public:
 
   void printInfo(const bool showMaze = true) {
     // getc(stdin);
-    usleep(10);
     Agent::printInfo(showMaze);
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
@@ -42,21 +41,10 @@ private:
   std::chrono::_V2::system_clock::time_point end;
 
   void findWall(bool &left, bool &front, bool &right, bool &back) override {
-    // const auto &v = getCurVec();
-    // const auto &d = getCurDir();
-    // if (getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
-    auto fake_v = real_v;
-    auto fake_d = real_d;
-    left = maze_target.isWall(fake_v, fake_d + Dir::Left);
-    front = maze_target.isWall(fake_v, fake_d + Dir::Front);
-    right = maze_target.isWall(fake_v, fake_d + Dir::Right);
-    back = maze_target.isWall(fake_v, fake_d + Dir::Back);
-    // } else {
-    //   left = maze_target.isWall(v, d + Dir::Left);
-    //   front = maze_target.isWall(v, d + Dir::Front);
-    //   right = maze_target.isWall(v, d + Dir::Right);
-    //   back = maze_target.isWall(v, d + Dir::Back);
-    // }
+    left = maze_target.isWall(real_v, real_d + Dir::Left);
+    front = maze_target.isWall(real_v, real_d + Dir::Front);
+    right = maze_target.isWall(real_v, real_d + Dir::Right);
+    back = maze_target.isWall(real_v, real_d + Dir::Back);
   }
   void calcNextDirsPreCallback() override {
     start = std::chrono::system_clock::now();
@@ -194,7 +182,7 @@ void loadMaze(Maze &maze_target) {
     maze_target.parse("../mazedata/16MM2017CX.maze");
     break;
   case 32:
-    maze_target.parse("../mazedata/32MM2017HX.maze");
+    maze_target.parse("../mazedata/32MM2016HX.maze");
     // maze_target.parse("../mazedata/32MM2017CX.maze");
     break;
   }
@@ -208,30 +196,29 @@ void test_position_identify() {
   display = 0;
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
-  robot.printInfo();
-  /* Position Identification Run */
-  // display = 1;
-  // real_d = Dir::West;
-  // real_v = Vector(19, 21);
-  // bool res = robot.positionIdentifyRun();
-  // if (!res) {
-  //   robot.printInfo();
-  //   printf("\nFailed to Identify!\n");
-  //   getc(stdin);
-  // }
 
+  /* Position Identification Run */
+  display = 1;
+  offset_d = real_d = Dir::East;
+  offset_v = real_v = Vector(0, 2);
+  bool res = robot.positionIdentifyRun();
+  if (!res) {
+    robot.printInfo();
+    printf("\nFailed to Identify!\n");
+    getc(stdin);
+  }
+
+  /* Starts from each cell on the shortest path */
   for (auto diag : {true, false}) {
     robot.calcShortestDirs(diag);
     auto sdirs = robot.getShortestDirs();
     auto v = Vector(0, 0);
     for (const auto &d : sdirs) {
       v = v.next(d);
-      real_v = v;
-      offset_v = v;
+      real_v = offset_v = v;
       for (const auto ed : Dir::All()) {
-        real_d = ed;
-        offset_d = ed;
-        display = 0;
+        real_d = offset_d = ed;
+        display = 1;
         bool res = robot.positionIdentifyRun();
         if (!res) {
           robot.printInfo();
@@ -243,13 +230,13 @@ void test_position_identify() {
   }
 
   /* Fast Run */
-  // display = 0;
-  // robot.fastRun(false);
-  // robot.endFastRunBackingToStartRun();
-  // robot.printPath();
-  // robot.fastRun(true);
-  // robot.endFastRunBackingToStartRun();
-  // robot.printPath();
+  display = 0;
+  robot.fastRun(false);
+  robot.endFastRunBackingToStartRun();
+  robot.printPath();
+  robot.fastRun(true);
+  robot.endFastRunBackingToStartRun();
+  robot.printPath();
 }
 
 int main(void) {

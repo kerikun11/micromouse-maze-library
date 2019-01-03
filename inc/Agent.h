@@ -121,11 +121,8 @@ public:
                  const SearchAlgorithm::State state) const {
     // 迷路を表示
     if (showMaze) {
-      //   printf("\e[2J"); //< 画面をクリア
       printf("\e[0;0H"); //< カーソルを左上に移動
-      //   printf(ESC_UP(12)); //< カーソルを移動
-      //   printf(ESC_UP(32)); //< カーソルを移動
-      //   printf(ESC_UP(32)); //< カーソルを移動
+      // printf("\e[2J");   //< 画面をクリア (ちらつく)
       searchAlgorithm.printMap(state, vec, dir);
     }
     // 詳細を表示

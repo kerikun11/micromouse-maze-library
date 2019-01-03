@@ -122,7 +122,21 @@ public:
    *  @return 隣接座標
    */
   const Vector next(const Dir &dir) const;
-  /** @function rotate
+  /**
+   * @brief フィールド内かどうかを判定する関数
+   * @return true フィールド内
+   * @return false フィールド外
+   */
+  bool isInsideOfField() const {
+    if (x < 0 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE)
+      return false;
+    return true;
+  }
+  /**
+   * @brief
+   *
+   * @param d
+   * @return const Vector
    */
   const Vector rotate(const Dir d) const {
     switch (d) {

@@ -284,6 +284,18 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 }
 int SearchAlgorithm::countIdentityCandidates(
     const WallLogs idWallLogs, std::pair<Vector, Dir> &ans) const {
+  if (!idWallLogs.empty()) {
+    int8_t min_x = MAZE_SIZE - 1;
+    int8_t min_y = MAZE_SIZE - 1;
+    int8_t max_x = 0;
+    int8_t max_y = 0;
+    for (auto &wl : idWallLogs) {
+      min_x = std::min(wl.x, min_x);
+      min_y = std::min(wl.y, min_y);
+      max_x = std::max(wl.x, max_x);
+      max_y = std::max(wl.y, max_y);
+    }
+  }
   const int many = 1000;
   const int min_size = 8;
   if (idWallLogs.size() < min_size)
@@ -298,6 +310,10 @@ int SearchAlgorithm::countIdentityCandidates(
         for (auto wl : idWallLogs) {
           auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset;
           auto maze_d = wl.d + offset_d;
+          if (!maze_v.isInsideOfField()) {
+            diffs = many;
+            break;
+          }
           if (maze.isKnown(maze_v, maze_d) &&
               maze.isWall(maze_v, maze_d) != wl.b)
             diffs++;
