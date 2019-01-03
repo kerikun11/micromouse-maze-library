@@ -16,11 +16,6 @@ namespace MazeLib {
  */
 class SearchAlgorithm {
 public:
-  /** @brief コンストラクタ
-   *  @param maze 使用する迷路の参照
-   *  @param goals ゴール区画の配列
-   */
-  SearchAlgorithm(Maze &maze) : maze(maze) {}
   /** @enum Status
    *  @brief 進むべき方向の計算結果
    */
@@ -46,17 +41,24 @@ public:
    *  @brief Stateの表示用文字列を返す関数
    */
   static const char *stateString(const enum State s);
+
+public:
+  /** @brief コンストラクタ
+   *  @param maze 使用する迷路の参照
+   *  @param goals ゴール区画の配列
+   */
+  SearchAlgorithm(Maze &maze) : maze(maze) {}
   /** @function isComplete
    *  @brief 最短経路が導出されているか調べる関数
    */
   bool isComplete();
-  void positionIdentifyingInit();
+  void positionIdentifyingInit(Vector *pVector, Dir *pDir);
   bool updateWall(const State &state, const Vector &v, const Dir &d,
                   const bool left, const bool front, const bool right,
                   const bool back);
   bool updateWall(const State &state, const Vector &v, const Dir &d,
                   const bool &b);
-  bool resetLastWall(const State &state, const int num = 1);
+  void resetLastWall(const State &state, const int num = 1);
   enum Status calcNextDirs(State &state, Vector &curVec, Dir &curDir,
                            Dirs &nextDirs, Dirs &nextDirCandidates,
                            bool &isPositionIdentifying,

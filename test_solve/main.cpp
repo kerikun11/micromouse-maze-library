@@ -14,8 +14,7 @@ bool display = 0;
 
 class TestRobot : public RobotBase {
 public:
-  TestRobot(const Vectors &goal) : RobotBase(goal) {}
-  TestRobot() {}
+  TestRobot() : RobotBase(maze) {}
 
   void printInfo(const bool showMaze = true) {
     Agent::printInfo(showMaze);
@@ -26,6 +25,7 @@ public:
   }
 
 private:
+  Maze maze;
   int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
   float cost = 0;
   int max_usec = 0;

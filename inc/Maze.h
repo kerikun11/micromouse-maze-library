@@ -245,10 +245,10 @@ public:
    *  @param d 壁の方向
    *  @return true: 探索済み，false: 未探索
    */
-  bool isKnown(const Vector &v, const Dir &d) const {
+  bool isKnown(const Vector v, const Dir d) const {
     return isWall(known, v.x, v.y, d);
   }
-  bool isKnown(const int8_t &x, const int8_t &y, const Dir &d) const {
+  bool isKnown(const int8_t x, const int8_t y, const Dir d) const {
     return isWall(known, x, y, d);
   }
   /** @function setWall
@@ -257,10 +257,10 @@ public:
    *  @param d 壁の方向
    *  @param b 壁の未知既知 true:既知，false:未知
    */
-  void setKnown(const Vector &v, const Dir &d, const bool &b) {
+  void setKnown(const Vector v, const Dir d, const bool b) {
     return setWall(known, v.x, v.y, d, b);
   }
-  void setKnown(const int8_t &x, const int8_t &y, const Dir &d, const bool &b) {
+  void setKnown(const int8_t x, const int8_t y, const Dir d, const bool b) {
     return setWall(known, x, y, d, b);
   }
   /** @function canGo
@@ -269,19 +269,19 @@ public:
    *  @param d 壁の方向
    *  @return true:既知かつ壁なし，false:それ以外
    */
-  bool canGo(const Vector &v, const Dir &d) const;
+  bool canGo(const Vector v, const Dir d) const;
   /** @function wallCount
    *  @brief 引数区画の壁の数を返す
    *  @param v 区画の座標
    *  @return 壁の数 0~4
    */
-  int8_t wallCount(const Vector &v) const;
+  int8_t wallCount(const Vector v) const;
   /** @function unknownCount
    *  @brief 引数区画の未知壁の数を返す
    *  @param v 区画の座標
    *  @return 既知壁の数 0~4
    */
-  int8_t unknownCount(const Vector &v) const;
+  int8_t unknownCount(const Vector v) const;
   /** @function updateWall
    *  @brief 既知の壁と照らしあわせながら，壁を更新する関数
    *  @param v 区画の座標
@@ -291,8 +291,11 @@ public:
    */
   bool updateWall(const Vector v, const Dir d, const bool b,
                   const bool pushLog = true);
-
-  bool resetLastWall(const int num);
+  /**
+   * @brief 直前に更新した壁を見探索状態にリセットする
+   * @param num リセットする壁の数
+   */
+  void resetLastWall(const int num);
   /** @function print
    *  @brief 迷路の表示
    *  @param of output-stream
@@ -321,6 +324,7 @@ public:
   }
 
   void setGoals(const Vectors &goals) { this->goals = goals; }
+  void setStart(const Vector &start) { this->start = start; }
   const Vectors &getGoals() const { return goals; }
   const Vector &getStart() const { return start; }
   const WallLogs &getWallLogs() const { return wallLogs; }
@@ -328,9 +332,9 @@ public:
 private:
   wall_size_t wall[2][MAZE_SIZE - 1];  /**< 壁情報 */
   wall_size_t known[2][MAZE_SIZE - 1]; /**< 既知壁情報 */
-  Vectors goals;
-  Vector start;
-  WallLogs wallLogs;
+  Vectors goals;                       /**< ゴール区画 */
+  Vector start;                        /**< スタート区画 */
+  WallLogs wallLogs;                   /**< 更新した壁のログ */
 
   /** function isWall
    *  @brief 引数の壁情報配列を参照する関数

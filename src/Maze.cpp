@@ -83,15 +83,15 @@ void Maze::reset(const bool setStartWall) {
   }
   wallLogs.clear();
 }
-bool Maze::canGo(const Vector &v, const Dir &d) const {
+bool Maze::canGo(const Vector v, const Dir d) const {
   return isKnown(v, d) && !isWall(v, d);
 }
-int8_t Maze::wallCount(const Vector &v) const {
+int8_t Maze::wallCount(const Vector v) const {
   auto dirs = Dir::All();
   return std::count_if(dirs.begin(), dirs.end(),
                        [&](const Dir &d) { return isWall(v, d); });
 }
-int8_t Maze::unknownCount(const Vector &v) const {
+int8_t Maze::unknownCount(const Vector v) const {
   auto dirs = Dir::All();
   return std::count_if(dirs.begin(), dirs.end(),
                        [&](const Dir &d) { return !isKnown(v, d); });
@@ -119,16 +119,16 @@ bool Maze::updateWall(const Vector v, const Dir d, const bool b,
   }
   return true;
 }
-bool Maze::resetLastWall(const int num) {
+void Maze::resetLastWall(const int num) {
   for (int i = 0; i < num; i++) {
     if (wallLogs.empty())
-      return true;
+      return;
     auto wl = wallLogs.back();
     setWall(Vector(wl), wl.d, false);
     setKnown(Vector(wl), wl.d, false);
     wallLogs.pop_back();
   }
-  return true;
+  return;
 }
 void Maze::print(std::ostream &os) const {
   for (int8_t y = MAZE_SIZE; y >= 0; y--) {

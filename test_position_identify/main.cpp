@@ -17,7 +17,7 @@ Dir real_d;
 
 class CLRobot : public RobotBase {
 public:
-  CLRobot() {}
+  CLRobot() : RobotBase(maze) {}
 
   void printInfo(const bool showMaze = true) {
     // getc(stdin);
@@ -33,6 +33,7 @@ public:
   }
 
 private:
+  Maze maze;
   int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
   float cost = 0;
   int max_usec = 0;

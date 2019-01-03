@@ -12,8 +12,7 @@
 namespace MazeLib {
 class RobotBase : public Agent {
 public:
-  RobotBase() : Agent(goals) {}
-  RobotBase(const Vectors goals) : Agent(goals), goals(goals) {}
+  RobotBase(Maze &maze) : Agent(maze) {}
   enum Action : char {
     START_STEP,
     START_INIT,
@@ -102,7 +101,6 @@ public:
   }
 
 protected:
-  Vectors goals;
   virtual void waitForEndAction() {}
   virtual void queueAction(const Action action __attribute__((unused))) {}
   virtual void findWall(bool &left __attribute__((unused)),

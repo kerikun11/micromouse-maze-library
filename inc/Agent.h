@@ -13,7 +13,7 @@
 namespace MazeLib {
 class Agent {
 public:
-  Agent(const Vectors &goals) : maze(goals), searchAlgorithm(maze) {}
+  Agent(Maze &maze) : maze(maze), searchAlgorithm(maze) {}
   /** @function replaceGoals
    *  @brief ゴール区画を変更する関数
    */
@@ -47,7 +47,7 @@ public:
                   const bool front, const bool right, const bool back) {
     return searchAlgorithm.updateWall(state, v, d, left, front, right, back);
   }
-  bool resetLastWall(const int num = 1) {
+  void resetLastWall(const int num = 1) {
     return searchAlgorithm.resetLastWall(state, num);
   }
   /** @function calcNextDirs
@@ -74,13 +74,19 @@ public:
    *  時間が残りわずかな時などに使う
    */
   void forceBackToStart(bool yes = true) { isForceBackToStart = yes; }
+  /**
+   * @brief
+   * たとえゴール区画が探索済みでも，一度ゴール区画を訪れるモードに設定する
+   * 最短失敗後の自己位置同定後などに使用する
+   */
   void forceGoingToGoal(bool yes = true) { isForceGoingToGoal = yes; }
+  /**
+   * @brief 自己位置同定モードに設定する
+   */
   void positionIdentify() {
-    searchAlgorithm.positionIdentifyingInit();
-    isPositionIdentifying = true;
+    searchAlgorithm.positionIdentifyingInit(&curVec, &curDir);
     state = SearchAlgorithm::IDENTIFYING_POSITION;
-    curVec = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
-    curDir = Dir::East;
+    isPositionIdentifying = true;
   }
   /** @function getState
    *  @brief 探索状態の取得
@@ -147,19 +153,19 @@ public:
   }
 
 protected:
-  Maze maze;                    /**< 使用する迷路 */
-  SearchAlgorithm::State state; /**< 現在の探索状態を保持 */
-  Vector curVec;                /**< 現在の区画座標 */
-  Dir curDir;                   /**< 現在向いている方向 */
-  bool isForceBackToStart = false;
-  bool isForceGoingToGoal = false;
-  bool isPositionIdentifying = false;
+  Maze &maze;                         /**< 使用する迷路 */
+  SearchAlgorithm::State state;       /**< 現在の探索状態を保持 */
+  Vector curVec;                      /**< 現在の区画座標 */
+  Dir curDir;                         /**< 現在向いている方向 */
+  bool isForceBackToStart = false;    /**< 強制帰還モード */
+  bool isForceGoingToGoal = false;    /**< 強制終点訪問モード */
+  bool isPositionIdentifying = false; /**< 自己位置同定モード */
 
 private:
   SearchAlgorithm searchAlgorithm; /**< 探索器 */
   Dirs nextDirsKnown;              /**< 次に行く探索方向配列 */
   Dirs nextDirCandidates; /**< 次に行く方向の候補の優先順 */
   Dirs shortestDirs;      /**< 最短経路の方向配列 */
-  int matchCount = 0;
+  int matchCount = 0;     /**< 自己位置同定の候補数，表示用 */
 };
 } // namespace MazeLib

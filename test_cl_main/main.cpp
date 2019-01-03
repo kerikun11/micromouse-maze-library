@@ -10,12 +10,10 @@ using namespace MazeLib;
 
 Maze maze_target;
 bool display = 0;
-Vector offset_v;
-Dir offset_d;
 
 class CLRobot : public RobotBase {
 public:
-  CLRobot() {}
+  CLRobot() : RobotBase(maze) {}
 
   void printInfo(const bool showMaze = true) {
     Agent::printInfo(showMaze);
@@ -24,11 +22,10 @@ public:
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
                 (int)max_usec);
-    std::printf("offset: (%3d,%3d,%3c)\n", offset_v.x, offset_v.y,
-                ">^<v"[offset_d]);
   }
 
 private:
+  Maze maze;
   int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
   float cost = 0;
   int max_usec = 0;
@@ -39,20 +36,10 @@ private:
   void findWall(bool &left, bool &front, bool &right, bool &back) override {
     const auto &v = getCurVec();
     const auto &d = getCurDir();
-    if (getState() == SearchAlgorithm::IDENTIFYING_POSITION) {
-      auto ids = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
-      auto fake_v = v.rotate(offset_d, ids) + offset_v;
-      auto fake_d = d + offset_d;
-      left = maze_target.isWall(fake_v, fake_d + Dir::Left);
-      front = maze_target.isWall(fake_v, fake_d + Dir::Front);
-      right = maze_target.isWall(fake_v, fake_d + Dir::Right);
-      back = maze_target.isWall(fake_v, fake_d + Dir::Back);
-    } else {
-      left = maze_target.isWall(v, d + Dir::Left);
-      front = maze_target.isWall(v, d + Dir::Front);
-      right = maze_target.isWall(v, d + Dir::Right);
-      back = maze_target.isWall(v, d + Dir::Back);
-    }
+    left = maze_target.isWall(v, d + Dir::Left);
+    front = maze_target.isWall(v, d + Dir::Front);
+    right = maze_target.isWall(v, d + Dir::Right);
+    back = maze_target.isWall(v, d + Dir::Back);
   }
   void calcNextDirsPreCallback() override {
     start = std::chrono::system_clock::now();
@@ -164,40 +151,17 @@ void loadMaze(Maze &maze_target) {
 
 CLRobot robot;
 
-void test_position_identify() {
+int main(void) {
+  setvbuf(stdout, (char *)NULL, _IONBF, 0);
   loadMaze(maze_target);
-  display = 1;
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
   robot.printInfo();
   robot.calcShortestDirs();
-  auto sdirs = robot.getShortestDirs();
-  auto v = Vector(0, 0);
-  for (const auto &d : sdirs) {
-    v = v.next(d);
-    offset_v = v - Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
-    for (const auto ed : Dir::All()) {
-      offset_d = ed;
-      display = 1;
-      bool res = robot.positionIdentifyRun();
-      if (!res) {
-        robot.printInfo();
-        printf("\nFailed to Identify!\n");
-        getc(stdin);
-      }
-    }
-  }
-  display = 0;
+  display = 1;
   robot.fastRun(false);
-  // robot.endFastRunBackingToStartRun();
-  robot.printPath();
+  robot.endFastRunBackingToStartRun();
   robot.fastRun(true);
-  // robot.endFastRunBackingToStartRun();
-  robot.printPath();
-}
-
-int main(void) {
-  setvbuf(stdout, (char *)NULL, _IONBF, 0);
-  test_position_identify();
+  robot.endFastRunBackingToStartRun();
   return 0;
 }

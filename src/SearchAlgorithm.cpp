@@ -32,8 +32,10 @@ bool SearchAlgorithm::isComplete() {
   findShortestCandidates(candidates);
   return candidates.empty();
 }
-void SearchAlgorithm::positionIdentifyingInit() {
+void SearchAlgorithm::positionIdentifyingInit(Vector *pVector, Dir *pDir) {
   idOffset = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
+  *pVector = idOffset;
+  *pDir = Dir::East;
   idMaze.reset(false);
 }
 bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
@@ -53,7 +55,7 @@ bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
     return idMaze.updateWall(v, d, b);
   return maze.updateWall(v, d, b);
 }
-bool SearchAlgorithm::resetLastWall(const State &state, const int num) {
+void SearchAlgorithm::resetLastWall(const State &state, const int num) {
   if (state == IDENTIFYING_POSITION)
     return idMaze.resetLastWall(num);
   return maze.resetLastWall(num);
