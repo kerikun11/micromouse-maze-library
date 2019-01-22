@@ -76,7 +76,15 @@ private:
   }
   void discrepancyWithKnownWall() override {
     printInfo();
-    std::printf("There was a discrepancy with known information!\n");
+    std::cout << "There was a discrepancy with known information! "
+              << getCurVec() << " " << getCurDir() << std::endl;
+  }
+  void crashed() {
+    printInfo();
+    std::cerr << "The robot crashed into the wall! " << getCurVec() << " "
+              << getCurDir() << std::endl;
+    while (1) {
+    }
   }
   void queueAction(const Action action) override {
     if (display)
@@ -95,23 +103,15 @@ private:
       break;
     case RobotBase::TURN_LEFT_90:
       real_d = real_d + Dir::Left;
-      if (!maze_target.canGo(real_v, real_d)) {
-        printInfo();
-        std::cerr << "The robot crashed into the wall!" << std::endl;
-        while (1) {
-        }
-      }
+      if (!maze_target.canGo(real_v, real_d))
+        crashed();
       real_v = real_v.next(real_d);
       l++;
       break;
     case RobotBase::TURN_RIGHT_90:
       real_d = real_d + Dir::Right;
-      if (!maze_target.canGo(real_v, real_d)) {
-        printInfo();
-        std::cerr << "The robot crashed into the wall!" << std::endl;
-        while (1) {
-        }
-      }
+      if (!maze_target.canGo(real_v, real_d))
+        crashed();
       real_v = real_v.next(real_d);
       r++;
       break;
@@ -121,22 +121,14 @@ private:
       break;
     case RobotBase::ROTATE_180:
       real_d = real_d + Dir::Back;
-      if (!maze_target.canGo(real_v, real_d)) {
-        printInfo();
-        std::cerr << "The robot crashed into the wall!" << std::endl;
-        while (1) {
-        }
-      }
+      if (!maze_target.canGo(real_v, real_d))
+        crashed();
       real_v = real_v.next(real_d);
       b++;
       break;
     case RobotBase::STRAIGHT_FULL:
-      if (!maze_target.canGo(real_v, real_d)) {
-        printInfo();
-        std::cerr << "The robot crashed into the wall!" << std::endl;
-        while (1) {
-        }
-      }
+      if (!maze_target.canGo(real_v, real_d))
+        crashed();
       real_v = real_v.next(real_d);
       f++;
       break;
@@ -183,7 +175,7 @@ void loadMaze(Maze &maze_target) {
     maze_target.parse("../mazedata/16MM2017CX.maze");
     break;
   case 32:
-    maze_target.parse("../mazedata/32MM2016HX.maze");
+    maze_target.parse("../mazedata/32MM2015HX.maze");
     // maze_target.parse("../mazedata/32MM2017CX.maze");
     break;
   }
@@ -199,31 +191,32 @@ void test_position_identify() {
   robot.searchRun();
 
   /* Position Identification Run */
-  display = 1;
-  offset_d = real_d = Dir::East;
-  offset_v = real_v = Vector(0, 2);
+  display = 0;
+  offset_d = real_d = Dir::South;
+  offset_v = real_v = Vector(7, 26);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
-    printf("\nFailed to Identify!\n");
+    std::cout << std::endl << "Failed to Identify!" << std::endl;
     getc(stdin);
   }
 
   /* Starts from each cell on the shortest path */
+  display = 0;
   for (auto diag : {true, false}) {
     robot.calcShortestDirs(diag);
     auto sdirs = robot.getShortestDirs();
     auto v = Vector(0, 0);
-    for (const auto &d : sdirs) {
+    for (const auto d : sdirs) {
       v = v.next(d);
       real_v = offset_v = v;
       for (const auto ed : Dir::All()) {
         real_d = offset_d = ed;
-        display = 1;
+        // display = 1;
         bool res = robot.positionIdentifyRun();
         if (!res) {
           robot.printInfo();
-          printf("\nFailed to Identify!\n");
+          std::cout << std::endl << "Failed to Identify!" << std::endl;
           getc(stdin);
         }
       }
