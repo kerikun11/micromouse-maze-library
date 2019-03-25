@@ -4,10 +4,8 @@
     "keywords": "micromouse",
     "build": {
         "flags": [
-            "-I inc"
-        ],
-        "srcFilter": [
-            "+<src>"
+            "-I inc",
+            "-std=c++14"
         ]
     }
 }
