@@ -300,6 +300,7 @@ int SearchAlgorithm::countIdentityCandidates(
   }
   const int many = 1000;
   const int min_size = 8;
+  const int min_diff = 4;
   if (idWallLogs.size() < min_size)
     return many;
   int cnt = 0;
@@ -321,13 +322,14 @@ int SearchAlgorithm::countIdentityCandidates(
             diffs++;
           if (!maze.isKnown(maze_v, maze_d))
             unknown++;
-          if (diffs > MAZE_SIZE * 2)
+          if (diffs > min_diff)
+            // if (diffs >= MAZE_SIZE * 2)
             break;
         }
         int size = idWallLogs.size();
         int known = size - unknown;
         // int matchs = known - diffs;
-        if (diffs < 5 && known > unknown) {
+        if (diffs <= min_diff && known > unknown) {
           ans.first = offset;
           ans.second = offset_d;
           cnt++;
