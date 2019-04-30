@@ -323,7 +323,6 @@ int SearchAlgorithm::countIdentityCandidates(
           if (!maze.isKnown(maze_v, maze_d))
             unknown++;
           if (diffs > min_diff)
-            // if (diffs >= MAZE_SIZE * 2)
             break;
         }
         int size = idWallLogs.size();
@@ -333,6 +332,8 @@ int SearchAlgorithm::countIdentityCandidates(
           ans.first = offset;
           ans.second = offset_d;
           cnt++;
+          if (cnt > 1)
+            return many;
         }
       }
   return cnt;
