@@ -94,8 +94,8 @@ private:
    *  @brief ステップマップにより次に行くべき方向列を生成する
    *  @return true:成功, false:失敗(迷子)
    */
-  Vector calcNextDirs(const Maze &maze, const Vector &start_v,
-                      const Dir &start_d, Dirs &nextDirsKnown,
-                      Dirs &nextDirCandidates) const;
+  const Vector calcNextDirs(const Maze &maze, const Vector &start_v,
+                            const Dir &start_d, Dirs &nextDirsKnown,
+                            Dirs &nextDirCandidates) const;
 };
 } // namespace MazeLib

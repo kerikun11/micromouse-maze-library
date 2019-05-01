@@ -65,7 +65,7 @@ private:
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
       // printInfo();
       // sleep(1);
-      // display = 0;
+      display = 0;
     }
     if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
     }
@@ -175,7 +175,7 @@ void loadMaze(Maze &maze_target) {
     maze_target.parse("../mazedata/16MM2017CX.maze");
     break;
   case 32:
-    maze_target.parse("../mazedata/32MM2015HX.maze");
+    maze_target.parse("../mazedata/32MM2016HX.maze");
     // maze_target.parse("../mazedata/32MM2017CX.maze");
     break;
   }
@@ -192,8 +192,8 @@ void test_position_identify() {
 
   /* Position Identification Run */
   display = 0;
-  offset_d = real_d = Dir::South;
-  offset_v = real_v = Vector(7, 26);
+  offset_d = real_d = Dir::West;
+  offset_v = real_v = Vector(0, 3);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
@@ -212,25 +212,19 @@ void test_position_identify() {
       real_v = offset_v = v;
       for (const auto ed : Dir::All()) {
         real_d = offset_d = ed;
-        // display = 1;
+        display = 1;
         bool res = robot.positionIdentifyRun();
         if (!res) {
+          bool prev_display = display;
+          display = 1;
           robot.printInfo();
           std::cout << std::endl << "Failed to Identify!" << std::endl;
           getc(stdin);
+          display = prev_display;
         }
       }
     }
   }
-
-  /* Fast Run */
-  display = 0;
-  robot.fastRun(false);
-  robot.endFastRunBackingToStartRun();
-  robot.printPath();
-  robot.fastRun(true);
-  robot.endFastRunBackingToStartRun();
-  robot.printPath();
 }
 
 int main(void) {

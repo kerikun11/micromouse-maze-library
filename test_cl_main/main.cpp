@@ -155,13 +155,14 @@ int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
   loadMaze(maze_target);
   robot.replaceGoals(maze_target.getGoals());
+  display = 1;
   robot.searchRun();
   robot.printInfo();
-  robot.calcShortestDirs();
-  display = 1;
   robot.fastRun(false);
-  robot.endFastRunBackingToStartRun();
+  robot.printPath();
+  // robot.endFastRunBackingToStartRun();
   robot.fastRun(true);
-  robot.endFastRunBackingToStartRun();
+  robot.printPath();
+  // robot.endFastRunBackingToStartRun();
   return 0;
 }

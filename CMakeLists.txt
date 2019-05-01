@@ -26,7 +26,7 @@ else()
   add_subdirectory(test_gen_maze)
 
   # custom target
-  add_custom_target(run
+  add_custom_target(main
     COMMAND clear && ${CMAKE_BINARY_DIR}/test_cl_main/test_cl_main
     DEPENDS test_cl_main mazelib
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

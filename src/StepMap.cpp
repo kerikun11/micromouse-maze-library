@@ -78,6 +78,7 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
     setStep(v, 0);
     q.push(v);
   }
+#define CONFIG_FULL_UPDATE 0
   // ステップの更新がなくなるまで更新処理
   while (!q.empty()) {
     // 注目する区画を取得
@@ -100,8 +101,12 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
         // となりの区画のステップが注目する区画のステップよりも大きければ更新
         next = next.next(d); //< となりの区画のステップを取得
         step_t step = focus_step + straightStepTable[i];
-        if (getStep(next) < step)
+        if (getStep(next) <= step)
+#if CONFIG_FULL_UPDATE
+          continue;
+#else
           break; //< これより先，更新されることはない
+#endif
         setStep(next, step);
         q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
       }
@@ -118,8 +123,12 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
         // となりの区画のステップが注目する区画のステップよりも大きければ更新
         next = next.next(next_d); //< となりの区画のステップを取得
         step_t step = focus_step + straightStepTable[i] + 1;
-        if (getStep(next) < step)
+        if (getStep(next) <= step)
+#if CONFIG_FULL_UPDATE
+          continue;
+#else
           break; //< これより先，更新されることはない
+#endif
         setStep(next, step);
         q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
       }
@@ -134,8 +143,12 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
         // となりの区画のステップが注目する区画のステップよりも大きければ更新
         next = next.next(next_d); //< となりの区画のステップを取得
         step_t step = focus_step + straightStepTable[i] + 1;
-        if (getStep(next) < step)
+        if (getStep(next) <= step)
+#if CONFIG_FULL_UPDATE
+          continue;
+#else
           break; //< これより先，更新されることはない
+#endif
         setStep(next, step);
         q.push(next); //< 再帰的に更新され得るのでキューにプッシュ
       }
@@ -178,12 +191,10 @@ const Vector StepMap::calcNextDirs(Maze &maze, const Vectors &dest,
                                    const Vector vec, const Dir dir,
                                    Dirs &nextDirsKnown,
                                    Dirs &nextDirCandidates) {
-  //   updateSimple(maze, dest, false);
-  //   return calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
-
   updateSimple(maze, dest, false);
+  // 事前に進む候補を決定する
   const auto v = calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
-  Dirs ndcs;
+  Dirs ndcs; //< Next Dir Candidates
   WallLogs cache;
   while (1) {
     if (nextDirCandidates.empty())
@@ -225,9 +236,9 @@ void StepMap::calcStraightStepTable() {
     straightStepTable[i] = (sqrt(pow(v0 / a, 2) + x / a) - v0 / a) * factor;
   }
 }
-Vector StepMap::calcNextDirs(const Maze &maze, const Vector &start_v,
-                             const Dir &start_d, Dirs &nextDirsKnown,
-                             Dirs &nextDirCandidates) const {
+const Vector StepMap::calcNextDirs(const Maze &maze, const Vector &start_v,
+                                   const Dir &start_d, Dirs &nextDirsKnown,
+                                   Dirs &nextDirCandidates) const {
   // ステップマップから既知区間進行方向列を生成
   nextDirsKnown.clear();
   auto focus_v = start_v;
