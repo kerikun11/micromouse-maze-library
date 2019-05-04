@@ -10,10 +10,10 @@
 #include <algorithm>
 
 namespace MazeLib {
-/** @def SEARCHING_ADDITIALLY_AT_START
+/** @def SEARCHING_ADDITIONALLY_AT_START
  *  @brief 追加探索状態で探索を始める(ゴールを急がない)
  */
-#define SEARCHING_ADDITIALLY_AT_START 0
+#define SEARCHING_ADDITIONALLY_AT_START 1
 
 const char *SearchAlgorithm::stateString(const enum State s) {
   static const char *str[] = {
@@ -43,10 +43,10 @@ bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
                                  const bool front, const bool right,
                                  const bool back) {
   bool result = true;
-  result = result & updateWall(state, v, d + 1, left);  // left wall
-  result = result & updateWall(state, v, d + 0, front); // front wall
-  result = result & updateWall(state, v, d - 1, right); // right wall
-  result = result & updateWall(state, v, d + 2, back);  // back wall
+  result = result & updateWall(state, v, d + Dir::Left, left);   // left wall
+  result = result & updateWall(state, v, d + Dir::Front, front); // front wall
+  result = result & updateWall(state, v, d + Dir::Right, right); // right wall
+  result = result & updateWall(state, v, d + Dir::Back, back);   // back wall
   return result;
 }
 bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
@@ -80,7 +80,7 @@ enum SearchAlgorithm::Status SearchAlgorithm::calcNextDirs(
       return status;
     }
   }
-  if (!SEARCHING_ADDITIALLY_AT_START) {
+  if (!SEARCHING_ADDITIONALLY_AT_START) {
     state = SEARCHING_FOR_GOAL;
     status =
         calcNextDirsSearchForGoal(curVec, curDir, nextDirs, nextDirCandidates);
@@ -286,7 +286,7 @@ int SearchAlgorithm::countIdentityCandidates(
     }
   }
   const int many = 1000;
-  const int min_size = 8;
+  const int min_size = 12;
   const int min_diff = 4;
   if (idWallLogs.size() < min_size)
     return many;
@@ -407,9 +407,6 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   if (cnt == 1) {
     cv = (cv - idOffset).rotate(ans.second) + ans.first;
     cd = cd + ans.second;
-    // printf("Offset: (%3d,%3d,%3c)\n", ans.first.x, ans.first.y,
-    //        ">^<v"[ans.second]);
-    // printf("Current: (%3d,%3d,%3c)\n", cv.x, cv.y, ">^<v"[cd]);
     return Reached;
   } else if (cnt == 0) {
     return Error;

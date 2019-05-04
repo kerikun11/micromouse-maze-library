@@ -27,9 +27,9 @@ public:
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
                 (int)max_usec);
-    std::printf("Real: (%3d,%3d,%3c)\n", real_v.x, real_v.y, ">^<v"[real_d]);
+    std::printf("Real: (%3d,%3d,%3c)\n", real_v.x, real_v.y, real_d.toChar());
     std::printf("Offset: (%3d,%3d,%3c)\n", offset_v.x, offset_v.y,
-                ">^<v"[offset_d]);
+                offset_d.toChar());
   }
 
 private:
@@ -175,7 +175,7 @@ void loadMaze(Maze &maze_target) {
     maze_target.parse("../mazedata/16MM2017CX.maze");
     break;
   case 32:
-    maze_target.parse("../mazedata/32MM2016HX.maze");
+    maze_target.parse("../mazedata/32MM2018HX.maze");
     // maze_target.parse("../mazedata/32MM2017CX.maze");
     break;
   }
@@ -212,7 +212,7 @@ void test_position_identify() {
       real_v = offset_v = v;
       for (const auto ed : Dir::All()) {
         real_d = offset_d = ed;
-        display = 1;
+        display = 0;
         bool res = robot.positionIdentifyRun();
         if (!res) {
           bool prev_display = display;

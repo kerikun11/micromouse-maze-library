@@ -49,7 +49,7 @@ void StepMap::print(std::ostream &os, const Maze &maze, const Vector &v,
       os << '|';
       for (uint8_t x = 0; x < MAZE_SIZE; x++) {
         if (v == Vector(x, y))
-          os << " " << C_YELLOW << ">^<v "[d] << C_RESET << " ";
+          os << " " << C_YELLOW << d.toChar() << C_RESET << " ";
         else
           os << C_CYAN << std::setw(3) << std::min(getStep(x, y), (step_t)999)
              << C_RESET;
@@ -115,7 +115,7 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
       // 斜め直線で行けるところまで更新する
       next = focus.next(d);
       for (int i = 1; i < MAZE_SIZE * 2; i++) {
-        const Dir next_d = d + (i & 1);
+        const Dir next_d = d + Dir::Left * (i & 1);
         if (maze.isWall(next, next_d))
           break; //< 壁があったら更新はしない
         if (onlyCanGo && !maze.isKnown(next, next_d))
@@ -135,7 +135,7 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
       // 斜め直線で行けるところまで更新する
       next = focus.next(d);
       for (int i = 1; i < MAZE_SIZE * 2; i++) {
-        const Dir next_d = d - (i & 1);
+        const Dir next_d = d + Dir::Right * (i & 1);
         if (maze.isWall(next, next_d))
           break; //< 壁があったら更新はしない
         if (onlyCanGo && !maze.isKnown(next, next_d))
@@ -248,7 +248,8 @@ const Vector StepMap::calcNextDirs(const Maze &maze, const Vector &start_v,
       break; //< 未知壁があれば，既知区間は終了
     step_t min_step = MAZE_STEP_MAX;
     // 周囲の区画のうち，最小ステップの方向を求める
-    for (const auto d : {focus_d + 0, focus_d + 1, focus_d - 1, focus_d + 2}) {
+    for (const auto d : {focus_d + Dir::Front, focus_d + Dir::Left,
+                         focus_d + Dir::Right, focus_d + Dir::Back}) {
       if (maze.isWall(focus_v, d))
         continue; //< 壁があったら行けない
       step_t next_step = getStep(focus_v.next(d));
@@ -266,7 +267,8 @@ const Vector StepMap::calcNextDirs(const Maze &maze, const Vector &start_v,
   // ステップマップから未知壁方向の優先順位付方向列を生成
   Dirs dirs;
   // 方向の候補を抽出
-  for (const auto d : {focus_d + 0, focus_d + 1, focus_d - 1, focus_d + 2})
+  for (const auto d : {focus_d + Dir::Front, focus_d + Dir::Left,
+                       focus_d + Dir::Right, focus_d + Dir::Back})
     if (!maze.isWall(focus_v, d) && getStep(focus_v.next(d)) != MAZE_STEP_MAX)
       dirs.push_back(d);
   // ステップが小さい順に並べ替え

@@ -54,19 +54,40 @@ public:
   /** @enum Dir::AbsoluteDir
    *  @brief 絶対方向の列挙型
    */
-  enum AbsoluteDir : int8_t { East, North, West, South, AbsMax };
+  enum AbsoluteDir : int8_t {
+    East,
+    NorthEast,
+    North,
+    NorthWest,
+    West,
+    SouthWest,
+    South,
+    SouthEast,
+    AbsMax,
+  };
   /** @enum Dir::RelativeDir
    *  @brief 相対方向の列挙型
    */
-  enum RelativeDir : int8_t { Front, Left, Back, Right, RelMax };
+  enum RelativeDir : int8_t {
+    Front = 0,
+    Left45,
+    Left = 2,
+    Left135,
+    Back = 4,
+    Right135,
+    Right = 6,
+    Right45,
+    RelMax = 8,
+  };
   /** @function Constructor
    *  @param d Absolute Direction
    */
   Dir(const enum AbsoluteDir d = East) : d(d) {}
-  Dir(const int8_t d) : d(AbsoluteDir(d & 3)) {}
+  Dir(const int8_t d) : d(AbsoluteDir(d & 7)) {}
   /** @brief 整数へのキャスト
    */
   operator int8_t() const { return d; }
+  char toChar() const { return "> ^ < v x"[d]; }
   /** @brief 代入演算子のオーバーロード
    */
   const Dir operator=(const Dir &obj) {
@@ -341,15 +362,15 @@ private:
    *  @param wall 壁情報の配列ポインタ
    *  @param x,y,d 区画の座標，方向
    */
-  bool isWall(const wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
-              const int8_t y, const Dir d) const;
+  static bool isWall(const wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
+                     const int8_t y, const Dir d);
   /** function isWall
    *  @brief 引数の壁情報配列を更新する関数
    *  @param wall 壁情報の配列ポインタ
    *  @param x,y,d 区画の座標，方向
    *  @param b 壁の有無
    */
-  void setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
-               const int8_t y, const Dir d, const bool b);
+  static void setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
+                      const int8_t y, const Dir d, const bool b);
 };
 } // namespace MazeLib

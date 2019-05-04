@@ -20,7 +20,7 @@ const std::array<Dir, 4> &Dir::All() {
   return all;
 }
 std::ostream &operator<<(std::ostream &os, const Dir &d) {
-  return os << (char)(">^<v "[d]);
+  return os << d.toChar();
 }
 
 /** @struct Vector
@@ -221,7 +221,7 @@ void Maze::printPath(std::ostream &os, const Vector start,
   }
 }
 bool Maze::isWall(const wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
-                  const int8_t y, const Dir d) const {
+                  const int8_t y, const Dir d) {
   switch (d) {
   case Dir::East:
     if (x < 0 || x > MAZE_SIZE - 2 || y < 0 || y > MAZE_SIZE - 1)

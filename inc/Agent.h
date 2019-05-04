@@ -132,15 +132,15 @@ public:
       searchAlgorithm.printMap(state, vec, dir);
     }
     // 詳細を表示
-    printf("Cur: ( %2d, %2d, %2c), State: %s \n", vec.x, vec.y, ">^<v"[dir],
+    printf("Cur: ( %2d, %2d, %2c), State: %s \n", vec.x, vec.y, dir.toChar(),
            SearchAlgorithm::stateString(state));
     printf("nextDirsKnown: ");
     for (const auto d : getNextDirs())
-      printf("%c", ">^<v"[d]);
+      printf("%c", d.toChar());
     printf(" \n");
     printf("nextDirCandidates: ");
     for (const auto d : getNextDirCandidates())
-      printf("%c", ">^<v"[d]);
+      printf("%c", d.toChar());
     printf("\n");
     printf("Match Count: %d \n", matchCount);
   }
