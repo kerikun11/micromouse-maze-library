@@ -2,6 +2,8 @@
 #include "RobotBase.h"
 #include <cstdio>
 
+#include "ShortestAlgorithm.h"
+
 #include <chrono>
 #include <time.h>
 #include <unistd.h>
@@ -143,7 +145,7 @@ void loadMaze(Maze &maze_target) {
     maze_target.parse("../mazedata/16MM2017CX.maze");
     break;
   case 32:
-    maze_target.parse("../mazedata/32MM2016HX.maze");
+    maze_target.parse("../mazedata/32MM2017HX.maze");
     // maze_target.parse("../mazedata/32MM2017CX.maze");
     break;
   }
@@ -154,15 +156,29 @@ CLRobot robot;
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
   loadMaze(maze_target);
-  robot.replaceGoals(maze_target.getGoals());
-  display = 1;
-  robot.searchRun();
-  robot.printInfo();
-  robot.fastRun(false);
-  robot.printPath();
-  // robot.endFastRunBackingToStartRun();
-  robot.fastRun(true);
-  robot.printPath();
-  // robot.endFastRunBackingToStartRun();
+  // robot.replaceGoals(maze_target.getGoals());
+  // display = 0;
+  // robot.searchRun();
+  // robot.printInfo();
+  // robot.fastRun(false);
+  // robot.printPath();
+  // // robot.endFastRunBackingToStartRun();
+  // robot.fastRun(true);
+  // robot.printPath();
+  // // robot.endFastRunBackingToStartRun();
+
+  // Maze maze(maze_target.getGoals());
+  ShortestAlgorithm sa(maze_target);
+  ShortestAlgorithm::Indexs path;
+  auto t_s = std::chrono::system_clock().now();
+  sa.calcShortestPath(path, false);
+  auto t_e = std::chrono::system_clock().now();
+  auto us = std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+  std::cout << "It took " << us.count() << " [us]" << std::endl;
+  sa.printPath(std::cout, path);
+  // auto i = ShortestAlgorithm::Index(4, 2, Dir::East, Dir::NorthEast);
+  // i.neighbors_for(maze_target, true, [&](const auto ni, const auto ec) {
+  //   std::cout << ni << ": " << ec << std::endl;
+  // });
   return 0;
 }
