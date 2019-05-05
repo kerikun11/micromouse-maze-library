@@ -7,6 +7,8 @@
  */
 #include "SearchAlgorithm.h"
 
+#include "ShortestAlgorithm.h"
+
 #include <algorithm>
 
 namespace MazeLib {
@@ -163,7 +165,7 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
   while (1) {
     step_t min_step = MAZE_STEP_MAX;
     prev_dir = dir;
-    for (const auto d : Dir::All()) {
+    for (const auto d : Dir::ENWS()) {
       if (!maze.canGo(v, d))
         continue;
       step_t next_step = stepMap.getStep(v.next(d));
@@ -225,7 +227,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
     while (1) {
       step_t min_step = MAZE_STEP_MAX;
       // 周囲のマスの中で一番ステップの小さいマスに移動
-      for (const auto d : Dir::All()) {
+      for (const auto d : Dir::ENWS()) {
         if (maze.isWall(v, d))
           continue;
         step_t next_step = stepMap.getStep(v.next(d));
@@ -293,7 +295,7 @@ int SearchAlgorithm::countIdentityCandidates(
   int cnt = 0;
   for (int x = 0; x < MAZE_SIZE; x++)
     for (int y = 0; y < MAZE_SIZE; y++)
-      for (auto offset_d : Dir::All()) {
+      for (auto offset_d : Dir::ENWS()) {
         Vector offset = Vector(x, y);
         int diffs = 0;
         int unknown = 0;

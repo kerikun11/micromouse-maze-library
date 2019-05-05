@@ -86,7 +86,7 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
     q.pop();
     const step_t &focus_step = getStep(focus);
     // 4方向更新がないか調べる
-    for (const auto &d : Dir::All()) {
+    for (const auto &d : Dir::ENWS()) {
       if (maze.isWall(focus, d))
         continue; //< 壁があったら更新はしない
       if (onlyCanGo && !maze.isKnown(focus, d))
@@ -174,7 +174,7 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
     q.pop();
     const step_t &focus_step = getStep(focus);
     // 4方向更新がないか調べる
-    for (const auto &d : Dir::All()) {
+    for (const auto &d : Dir::ENWS()) {
       if (maze.isWall(focus, d))
         continue; //< 壁があったら更新はしない
       if (onlyCanGo && !maze.isKnown(focus, d))

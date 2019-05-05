@@ -8,6 +8,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -17,7 +18,9 @@ namespace MazeLib {
 /** @constexpr MAZE_SIZE
  *  @brief 迷路の1辺の区画数
  */
-constexpr int MAZE_SIZE = 32;
+static constexpr int MAZE_SIZE = 32;
+// static constexpr int MAZE_SIZE_BIT = std::log2(MAZE_SIZE);
+// static constexpr int MAZE_SIZE_BIT = 5;
 /** @typedef
  *  @brief 迷路のサイズのbit数の整数型
  *   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
@@ -82,12 +85,12 @@ public:
   /** @function Constructor
    *  @param d Absolute Direction
    */
-  Dir(const enum AbsoluteDir d = East) : d(d) {}
+  Dir(const enum AbsoluteDir d = East) : d(AbsoluteDir(d & 7)) {}
   Dir(const int8_t d) : d(AbsoluteDir(d & 7)) {}
   /** @brief 整数へのキャスト
    */
   operator int8_t() const { return d; }
-  char toChar() const { return "> ^ < v x"[d]; }
+  char toChar() const { return ">'^`<,v.x"[d]; }
   /** @brief 代入演算子のオーバーロード
    */
   const Dir operator=(const Dir &obj) {
@@ -97,7 +100,7 @@ public:
   /** @function All
    *  @brief 全方向の方向配列を生成する静的関数
    */
-  static const std::array<Dir, 4> &All();
+  static const std::array<Dir, 4> &ENWS();
   /** @function <<
    */
   friend std::ostream &operator<<(std::ostream &os, const Dir &d);

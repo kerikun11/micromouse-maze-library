@@ -15,7 +15,7 @@ namespace MazeLib {
 /** @struct Dir
  *   @brief 迷路上の方向を定義
  */
-const std::array<Dir, 4> &Dir::All() {
+const std::array<Dir, 4> &Dir::ENWS() {
   static const std::array<Dir, 4> all = {East, North, West, South};
   return all;
 }
@@ -87,12 +87,12 @@ bool Maze::canGo(const Vector v, const Dir d) const {
   return isKnown(v, d) && !isWall(v, d);
 }
 int8_t Maze::wallCount(const Vector v) const {
-  auto dirs = Dir::All();
+  auto dirs = Dir::ENWS();
   return std::count_if(dirs.begin(), dirs.end(),
                        [&](const Dir &d) { return isWall(v, d); });
 }
 int8_t Maze::unknownCount(const Vector v) const {
-  auto dirs = Dir::All();
+  auto dirs = Dir::ENWS();
   return std::count_if(dirs.begin(), dirs.end(),
                        [&](const Dir &d) { return !isKnown(v, d); });
 }

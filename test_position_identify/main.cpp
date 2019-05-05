@@ -210,7 +210,7 @@ void test_position_identify() {
     for (const auto d : sdirs) {
       v = v.next(d);
       real_v = offset_v = v;
-      for (const auto ed : Dir::All()) {
+      for (const auto ed : Dir::ENWS()) {
         real_d = offset_d = ed;
         display = 0;
         bool res = robot.positionIdentifyRun();
