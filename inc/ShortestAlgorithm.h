@@ -20,10 +20,12 @@ public:
         for (int x = 0; x < MAZE_SIZE; x++)
           for (int y = 0; y < MAZE_SIZE; y++)
             node_map[Index(x, y, d, nd)] = Node();
+    /* テーブルの計算 */
+    getEdgeCost(ST_ALONG);
   }
 
 public:
-  typedef float cost_t;
+  typedef uint16_t cost_t;
   enum Pattern {
     ST_ALONG,
     ST_DIAG,
@@ -35,23 +37,23 @@ public:
     FS90,
   };
   static cost_t getEdgeCost(const enum Pattern p, const int n = 1) {
-    static std::array<cost_t, MAZE_SIZE> cost_table_along;
+    static std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
     static std::array<cost_t, MAZE_SIZE * 2> cost_table_diag;
     static bool initialized = false;
     if (!initialized) {
       initialized = true;
       /* 台形加速のコストテーブルを事前に用意 */
-      static const float a = 9000.0f;
-      static const float v_s = 300.0f;
-      for (int i = 0; i < MAZE_SIZE; ++i) {
+      static const float a = 1200.0f;
+      static const float v_s = 240.0f;
+      for (int i = 0; i < MAZE_SIZE * 2; ++i) {
         const float x = 90.0f * (i + 1) / 2;
         const float t = (std::sqrt(v_s * v_s + 2 * a * x) - v_s) / a;
-        cost_table_along[i] = 2 * t;
+        cost_table_along[i] = 2 * t * 1000;
       }
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
         const float x = 1.41421356f * 45.0f * (i + 1) / 2;
         const float t = (std::sqrt(v_s * v_s + 2 * a * x) - v_s) / a;
-        cost_table_diag[i] = 2 * t;
+        cost_table_diag[i] = 2 * t * 1000;
       }
     }
     switch (p) {
@@ -60,20 +62,20 @@ public:
     case ST_DIAG:
       return cost_table_diag[n - 1];
     case F45:
-      return 0.323148;
+      return 323;
     case F90:
-      return 0.445484;
+      return 445;
     case F135:
-      return 0.464955;
+      return 464;
     case F180:
-      return 0.592154;
+      return 592;
     case FV90:
-      return 0.450525;
+      return 450;
     case FS90:
-      return 0.279919;
+      return 279;
     }
     std::cerr << "Unknown Pattern" << std::endl;
-    return 1.0e3f;
+    return 0;
   }
   union Index {
   private:
@@ -293,12 +295,13 @@ public:
     cost_t cost = 0;
     enum State : uint8_t { None, Open, Closed } state = None;
   };
-  cost_t getHuristic(const Index i, const Indexs &index_goals) const {
-    return 0;
-    auto v = Vector(i) - Vector(index_goals[0]);
-    auto v_ref = 1200.0f;
-    // return (std::abs(v.x) + std::abs(v.y)) / v_ref;
-    return std::sqrt(v.x * v.x + v.y * v.y) / v_ref;
+  cost_t getHuristic(const Index i, const Vectors &goals) const {
+    // return 0;
+    auto v = Vector(i) - goals[0];
+    float x = std::abs(v.x);
+    float y = std::abs(v.y);
+    float d = x + y;
+    return getEdgeCost(ST_ALONG, d / 90);
   }
   bool calcShortestPath(Indexs &path, bool known_only = true) {
     std::function<bool(const Index &i1, const Index &i2)> greater =
@@ -309,20 +312,13 @@ public:
         greater);
     while (!q.empty())
       q.pop();
+    /* 3. */
     auto start_index = Index(0, 0, Dir::AbsMax, Dir::North);
     auto &start_node = node_map[start_index];
-    Indexs goal_indexs;
-    for (const auto v : maze.getGoals()) {
-      goal_indexs.push_back(Index(v, Dir::AbsMax, Dir::East));
-      goal_indexs.push_back(Index(v, Dir::AbsMax, Dir::North));
-      goal_indexs.push_back(Index(v, Dir::AbsMax, Dir::West));
-      goal_indexs.push_back(Index(v, Dir::AbsMax, Dir::South));
-    }
-    Index goal_index; //< 終点の用意
-    /* 3. */
     start_node.state = Node::Open;
     start_node.cost = 0;
     q.push(start_index);
+    Index goal_index; //< 終点の用意
     while (1) {
       /* 4. */
       // std::cout << "q.size(): " << q.size() << std::endl;
@@ -331,16 +327,20 @@ public:
         return false;
       }
       /* 5. */
-      const Index index = q.top();
+      const auto index = q.top();
       q.pop();
-      std::cout << "top:\t" << index << "\t: " << node_map[index].cost
-                << std::endl; //< print
+      // std::cout << "top:\t" << index << "\t: " << node_map[index].cost
+      //           << std::endl; //< print
       /* 6. */
+      const auto &goals = maze.getGoals();
       const auto it =
-          std::find(goal_indexs.cbegin(), goal_indexs.cend(), index);
-      if (it != goal_indexs.cend()) {
+          std::find_if(goals.cbegin(), goals.cend(), [&](const auto v) {
+            /* 斜めでないかつゴール区画 */
+            return (index.getNodeDir() & 1) == 0 && v == Vector(index);
+          });
+      if (it != goals.cend()) {
         /* GOAL! */
-        goal_index = *it;
+        goal_index = index;
         break;
       }
       node_map[index].state = Node::Closed;
@@ -348,9 +348,8 @@ public:
       index.neighbors_for(maze, known_only,
                           [&](const auto neighbor_index, const auto edge_cost) {
                             Node &neighbor_node = node_map[neighbor_index];
-                            cost_t h_n = getHuristic(index, goal_indexs);
-                            cost_t h_m =
-                                getHuristic(neighbor_index, goal_indexs);
+                            cost_t h_n = getHuristic(index, goals);
+                            cost_t h_m = getHuristic(neighbor_index, goals);
                             cost_t g_n = node_map[index].cost - h_n;
                             cost_t f_m_prime = g_n + edge_cost + h_m;
                             switch (neighbor_node.state) {
@@ -372,9 +371,9 @@ public:
                             default:
                               break;
                             }
-                            std::cout << "  - \t" << neighbor_index
-                                      << "\t: " << neighbor_node.cost
-                                      << std::endl; //< print
+                            // std::cout << "  - \t" << neighbor_index
+                            //           << "\t: " << neighbor_node.cost
+                            //           << std::endl; //< print
                           });
     }
     /* GOAL */
