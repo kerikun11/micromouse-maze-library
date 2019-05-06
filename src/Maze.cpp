@@ -45,6 +45,26 @@ std::ostream &operator<<(std::ostream &os, const Vector &v) {
             << (int)v.y << ")";
 }
 
+/**
+ * @brief 座標を回転変換する
+ * @param d 回転角度
+ * @return const Vector
+ */
+const Vector Vector::rotate(const Dir d) const {
+  switch (d) {
+  case Dir::East:
+    return Vector(x, y);
+  case Dir::North:
+    return Vector(-y, x);
+  case Dir::West:
+    return Vector(-x, -y);
+  case Dir::South:
+    return Vector(y, -x);
+  }
+  printf("Warning: invalid direction\n");
+  return *this;
+}
+
 /** @class Maze
  *   @brief 迷路の壁情報を管理するクラス
  */

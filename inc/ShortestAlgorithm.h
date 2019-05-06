@@ -14,12 +14,12 @@ class ShortestAlgorithm {
 public:
   ShortestAlgorithm(const Maze &maze) : maze(maze) {
     /* メモリの確保 */
-    for (const auto d : {Dir::East, Dir::North})
-      for (const auto nd :
-           {Dir::NorthEast, Dir::NorthWest, Dir::SouthWest, Dir::SouthEast})
-        for (int x = 0; x < MAZE_SIZE; x++)
-          for (int y = 0; y < MAZE_SIZE; y++)
-            node_map[Index(x, y, d, nd)] = Node();
+    // for (const auto d : {Dir::East, Dir::North})
+    //   for (const auto nd :
+    //        {Dir::NorthEast, Dir::NorthWest, Dir::SouthWest, Dir::SouthEast})
+    //     for (int x = 0; x < MAZE_SIZE; x++)
+    //       for (int y = 0; y < MAZE_SIZE; y++)
+    //         node_map[Index(x, y, d, nd)] = Node();
     /* テーブルの計算 */
     getEdgeCost(ST_ALONG);
   }
@@ -77,34 +77,44 @@ public:
     std::cerr << "Unknown Pattern" << std::endl;
     return 0;
   }
+  /**
+   * @brief Graph の Node の Index．
+   * 変数表現は隣接区画で冗長になりうるが，コンストラクタで一意にしているので，メンバ変数は一意．
+   * 各区画中央の4方位，各壁中央の4方位，の位置姿勢を識別する
+   */
   union Index {
   private:
     struct {
       uint8_t x;  //< x
       uint8_t y;  //< y
-      uint8_t d;  //< position assign
-      uint8_t nd; //< dir of node
+      uint8_t d;  //< position assignment in a cell
+      uint8_t nd; //< real dir of node
     };
     uint32_t all;
 
   public:
-    Index(uint8_t x, uint8_t y, Dir d, Dir nd)
+    Index(const uint8_t x, const uint8_t y, const Dir d, const Dir nd)
         : x(x), y(y), d(d & 7), nd(nd & 7) {
       uniquify();
     }
-    Index(Vector v, Dir d, Dir nd) : x(v.x), y(v.y), d(d & 7), nd(nd & 7) {
+    Index(const Vector v, const Dir d, const Dir nd)
+        : x(v.x), y(v.y), d(d & 7), nd(nd & 7) {
       uniquify();
     }
-    Index(const Index &obj) : all(obj.all) {}
     Index(const uint32_t all = 0) : all(all) { uniquify(); }
+    Index(const Index &obj) : all(obj.all) {}
     /**
-     * @brief for unordered_map
+     * @brief needed for unordered_map
+     * uniqueなIDを返す
      */
     struct hash {
       size_t operator()(const Index &obj) const { return obj.all; }
     };
+    /**
+     * @brief 座標の冗長を一意にする．
+     * d を East or North のどちらかにそろえる
+     */
     void uniquify() {
-      /* 冗長表現の座標を一意にする */
       if (d == Dir::West) {
         d = Dir::East;
         x--;
@@ -114,6 +124,9 @@ public:
         y--;
       }
     }
+    /**
+     * @brief oprators
+     */
     const Index &operator=(const Index &obj) { return all = obj.all, *this; }
     bool operator==(const Index &obj) const { return all == obj.all; }
     bool operator!=(const Index &obj) const { return all != obj.all; }
@@ -157,6 +170,18 @@ public:
       std::cerr << "Invalid Index" << std::endl;
       return Vector(x, y);
     }
+    const Dir arrow_cell_45() const {
+      auto nd_45 =
+          ((d == Dir::East && (nd == Dir::NorthEast || nd == Dir::SouthWest)) ||
+           (d == Dir::North && (nd == Dir::NorthWest || nd == Dir::SouthEast)))
+              ? Dir::Left45
+              : Dir::Right45;
+      return nd_45;
+    }
+    /**
+     * @brief NodeDir が向いている方向の隣の Index を返す
+     * @return const Index
+     */
     const Index next() const {
       switch (nd) {
       /* 区画の中央 */
@@ -195,105 +220,94 @@ public:
           return false;
         return true;
       };
-      switch (nd) {
       /* 区画の中央 */
-      case Dir::East:
-      case Dir::North:
-      case Dir::West:
-      case Dir::South: {
+      if (Dir(nd).isAlong()) {
         Vector v = Vector(x, y); //< 仮想位置
         /* 直前の壁 */
         if (!canGo(v, nd)) {
           std::cerr << "Something Wrong" << std::endl;
-          break;
+          return;
         }
         /* 直進で行けるところまで行く */
         auto v_st = v.next(nd);
-        for (int n = 1;; n++) {
+        for (int8_t n = 1;; n++) {
           if (!canGo(v_st, nd))
             break;
           callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           v_st = v_st.next(nd);
         }
-        auto d_f = nd;          //< 前方
-        auto v_f = v.next(d_f); //< 前方の区画
+        /* ターン */
+        const auto d_f = nd;          //< 前方
+        const auto v_f = v.next(d_f); //< 前方の区画
         /* 左右を一般化 */
-        for (const auto nd_45 : {Dir::Left45, Dir::Right45}) {
-          const auto nd_90 = nd_45 * 2;
-          const auto nd_135 = nd_45 * 3;
-          const auto d_l = d_f + nd_90; //< 左方向
+        for (const auto nd_rel_45 : {Dir::Left45, Dir::Right45}) {
+          const auto nd_45 = nd + nd_rel_45;
+          const auto nd_90 = nd + nd_rel_45 * 2;
+          const auto nd_135 = nd + nd_rel_45 * 3;
+          const auto nd_180 = nd + nd_rel_45 * 4;
           /* 横壁 */
-          if (canGo(v_f, d_l)) {       //< 45度方向の壁
-            auto v_fl = v_f.next(d_l); //< 前左の区画
-            if (canGo(v_fl, d_f))      //< 45度先の壁
-              callback(Index(v_f, d_l, nd + nd_45), getEdgeCost(F45));
+          const auto d_l = nd_90;            //< 左方向
+          if (canGo(v_f, d_l)) {             //< 45度方向の壁
+            const auto v_fl = v_f.next(d_l); //< 前左の区画
+            if (canGo(v_fl, d_f))            //< 45度先の壁
+              callback(Index(v_f, d_l, nd_45), getEdgeCost(F45));
             if (canGo(v_fl, d_l)) //< 90度先の壁
-              callback(Index(v_fl, Dir::AbsMax, nd + nd_90), getEdgeCost(F90));
-            auto d_b = d_f + Dir::Back;    //< 後方向
-            if (canGo(v_fl, d_b)) {        //< 135度の壁
-              auto v_fll = v_fl.next(d_b); //< 前左左の区画
-              if (canGo(v_fll, d_l))       //< 135度行先
-                callback(Index(v_fll, d_f, nd + nd_135), getEdgeCost(F135));
+              callback(Index(v_fl, Dir::AbsMax, nd_90), getEdgeCost(F90));
+            const auto d_b = d_f + Dir::Back;    //< 後方向
+            if (canGo(v_fl, d_b)) {              //< 135度の壁
+              const auto v_fll = v_fl.next(d_b); //< 前左左の区画
+              if (canGo(v_fll, d_l))             //< 135度行先
+                callback(Index(v_fll, d_f, nd_135), getEdgeCost(F135));
               if (canGo(v_fll, d_b)) //< 180度行先の壁
-                callback(Index(v_fll, Dir::AbsMax, nd + Dir::Back),
-                         getEdgeCost(F180));
+                callback(Index(v_fll, Dir::AbsMax, nd_180), getEdgeCost(F180));
             }
           }
         }
-      } break;
+      } else {
         /* 壁の中央 */
-      default: {
-        /* 左右を一般化 */
-        auto nd_45 = ((d == Dir::East &&
-                       (nd == Dir::NorthEast || nd == Dir::SouthWest)) ||
-                      (d == Dir::North &&
-                       (nd == Dir::NorthWest || nd == Dir::SouthEast)))
-                         ? Dir::Left45
-                         : Dir::Right45;
-        const auto nd_90 = nd_45 * 2;
-        const auto nd_135 = nd_45 * 3;
-        const auto i_f = this->next();
         /* 直前の壁 */
+        const auto i_f = this->next(); //< i.e. index front
         if (!canGo(Vector(i_f), i_f.d)) {
           std::cerr << "Something Wrong" << std::endl;
-          break;
+          return;
         }
         /* 直進で行けるところまで行く */
-        auto i_st = i_f;
-        for (auto n = 1;; n++) {
-          auto i_ff = i_st.next(); //< 前方の前方
+        auto i_st = i_f; //< i.e. index straight
+        for (int8_t n = 1;; n++) {
+          auto i_ff = i_st.next();
           if (!canGo(Vector(i_ff), i_ff.d))
             break;
-          callback(i_st, getEdgeCost(ST_DIAG, n)); //< ST_DIAG
+          callback(i_st, getEdgeCost(ST_DIAG, n));
           i_st = i_ff;
         }
-        /* 45度方向*/
-        auto d_45 = nd + nd_45;
+        /* 左右を一般化 */
+        auto nd_r45 = arrow_cell_45();
+        auto d_45 = nd + nd_r45;
+        auto nd_90 = nd + nd_r45 * 2;
+        auto d_135 = nd + nd_r45 * 3;
         auto v_45 = i_f.arrow_to();
         if (canGo(v_45, d_45))
-          callback(Index(v_45, Dir::AbsMax, d_45),
-                   getEdgeCost(F45)); //< F45
+          callback(Index(v_45, Dir::AbsMax, d_45), getEdgeCost(F45));
         /* V90方向, 135度方向*/
-        auto d_90 = nd + nd_90;
-        auto d_135 = nd + nd_135;
         if (canGo(v_45, d_135)) {
+          /* V90方向, 135度方向*/
           auto v_135 = v_45.next(d_135); //< 135度方向位置
           if (canGo(v_135, d_45))
-            callback(Index(v_45, d_135, d_90),
-                     getEdgeCost(FV90)); //< FV90
-          if (canGo(v_135, d_135))       //< 135度方向
-            callback(Index(v_135, Dir::AbsMax, d_135),
-                     getEdgeCost(F135)); //< F135
+            callback(Index(v_45, d_135, nd_90), getEdgeCost(FV90));
+          if (canGo(v_135, d_135)) //< 135度方向
+            callback(Index(v_135, Dir::AbsMax, d_135), getEdgeCost(F135));
         }
-      } break;
       }
     }
   };
   typedef std::vector<Index> Indexs;
   struct Node {
+    enum State : uint8_t { None, Open, Closed } state;
+    cost_t cost;
     Index from;
-    cost_t cost = 0;
-    enum State : uint8_t { None, Open, Closed } state = None;
+    Node(const enum State state = None, const cost_t cost = 0,
+         const Index from = Index())
+        : state(state), cost(cost), from(from) {}
   };
   cost_t getHuristic(const Index i, const Vectors &goals) const {
     // return 0;
@@ -304,31 +318,30 @@ public:
     return getEdgeCost(ST_ALONG, d / 90);
   }
   bool calcShortestPath(Indexs &path, bool known_only = true) {
+    /* 1. */
+    std::unordered_map<Index, Node, Index::hash> node_map;
     std::function<bool(const Index &i1, const Index &i2)> greater =
         [&](const auto &i1, const auto &i2) {
           return node_map[i1].cost > node_map[i2].cost;
         };
-    std::priority_queue<Index, std::vector<Index>, decltype(greater)> q(
+    std::priority_queue<Index, std::vector<Index>, decltype(greater)> open_list(
         greater);
-    while (!q.empty())
-      q.pop();
+    /* 2. */
     /* 3. */
-    auto start_index = Index(0, 0, Dir::AbsMax, Dir::North);
-    auto &start_node = node_map[start_index];
-    start_node.state = Node::Open;
-    start_node.cost = 0;
-    q.push(start_index);
+    const auto start_index = Index(0, 0, Dir::AbsMax, Dir::North);
+    node_map[start_index] = Node(Node::Open, 0);
+    open_list.push(start_index);
     Index goal_index; //< 終点の用意
     while (1) {
       /* 4. */
       // std::cout << "q.size(): " << q.size() << std::endl;
-      if (q.empty()) {
+      if (open_list.empty()) {
         std::cerr << "q.empty()" << std::endl;
         return false;
       }
       /* 5. */
-      const auto index = q.top();
-      q.pop();
+      const auto index = open_list.top();
+      open_list.pop();
       // std::cout << "top:\t" << index << "\t: " << node_map[index].cost
       //           << std::endl; //< print
       /* 6. */
@@ -345,96 +358,38 @@ public:
       }
       node_map[index].state = Node::Closed;
       /* 7. */
-      index.neighbors_for(maze, known_only,
-                          [&](const auto neighbor_index, const auto edge_cost) {
-                            Node &neighbor_node = node_map[neighbor_index];
-                            cost_t h_n = getHuristic(index, goals);
-                            cost_t h_m = getHuristic(neighbor_index, goals);
-                            cost_t g_n = node_map[index].cost - h_n;
-                            cost_t f_m_prime = g_n + edge_cost + h_m;
-                            switch (neighbor_node.state) {
-                            case Node::None:
-                              neighbor_node.cost = f_m_prime;
-                              neighbor_node.state = Node::Open;
-                              neighbor_node.from = index;
-                              q.push(neighbor_index);
-                              break;
-                            case Node::Open:
-                            case Node::Closed:
-                              if (f_m_prime < neighbor_node.cost) {
-                                neighbor_node.cost = f_m_prime;
-                                neighbor_node.state = Node::Open;
-                                neighbor_node.from = index;
-                                q.push(neighbor_index);
-                              }
-                              break;
-                            default:
-                              break;
-                            }
-                            // std::cout << "  - \t" << neighbor_index
-                            //           << "\t: " << neighbor_node.cost
-                            //           << std::endl; //< print
-                          });
+      index.neighbors_for(
+          maze, known_only, [&](const auto nibr_index, const auto edge_cost) {
+            Node &neighbor_node = node_map[nibr_index];
+            cost_t h_n = getHuristic(index, goals);
+            cost_t h_m = getHuristic(nibr_index, goals);
+            cost_t g_n = node_map[index].cost - h_n;
+            cost_t f_m_prime = g_n + edge_cost + h_m;
+            if (neighbor_node.state == Node::None ||
+                f_m_prime < neighbor_node.cost) {
+              neighbor_node = Node(Node::Open, f_m_prime, index);
+              open_list.push(nibr_index);
+            }
+            // std::cout << "  - \t" << neighbor_index
+            //           << "\t: " << neighbor_node.cost
+            //           << std::endl; //< print
+          });
     }
-    /* GOAL */
     /* 9. */
+    path.erase(path.begin(), path.end());
     for (auto i = goal_index; i != start_index; i = node_map[i].from) {
       path.push_back(i);
       // std::cout << i << std::endl;
     }
+    path.push_back(start_index);
+    /* END A* */
+    // std::cout << start_index << std::endl;
     std::reverse(path.begin(), path.end());
-    Dirs dirs;
-    for (auto i : path) {
-      auto nd = i.getNodeDir();
-      auto d = i.getDir();
-      switch (nd) {
-      case Dir::East:
-      case Dir::North:
-      case Dir::West:
-      case Dir::South:
-        dirs.push_back(nd);
-        break;
-      case Dir::NorthEast:
-        if (d == Dir::East) {
-          dirs.push_back(Dir::East);
-          dirs.push_back(Dir::North);
-        } else {
-          dirs.push_back(Dir::North);
-          dirs.push_back(Dir::East);
-        }
-        break;
-      case Dir::NorthWest:
-        if (d == Dir::East) {
-          dirs.push_back(Dir::West);
-          dirs.push_back(Dir::North);
-        } else {
-          dirs.push_back(Dir::North);
-          dirs.push_back(Dir::West);
-        }
-        break;
-      case Dir::SouthWest:
-        if (d == Dir::East) {
-          dirs.push_back(Dir::West);
-          dirs.push_back(Dir::South);
-        } else {
-          dirs.push_back(Dir::South);
-          dirs.push_back(Dir::West);
-        }
-        break;
-      case Dir::SouthEast:
-        if (d == Dir::East) {
-          dirs.push_back(Dir::East);
-          dirs.push_back(Dir::South);
-        } else {
-          dirs.push_back(Dir::South);
-          dirs.push_back(Dir::East);
-        }
-        break;
-      }
-    }
+    Dirs dirs = indexs2dirs(path);
+    // maze.printPath(Vector(0, 0), dirs);
     return true;
   }
-  void printPath(std::ostream &os, const std::vector<Index> indexs) const {
+  void printPath(std::ostream &os, const Indexs indexs) const {
     int steps[MAZE_SIZE][MAZE_SIZE] = {0};
     int counter = 1;
     for (const auto i : indexs) {
@@ -463,10 +418,108 @@ public:
       os << "+" << std::endl;
     }
   }
+  static const Dirs indexs2dirs(const Indexs &path) {
+    Dirs dirs;
+    for (int i = 0; i < (int)path.size() - 1; i++) {
+      // auto v = Vector(path[i]);
+      // auto d = path[i].getDir();
+      auto nd = path[i].getNodeDir();
+      auto rel_v = Vector(path[i + 1]) - Vector(path[i]);
+      // auto rel_d = Dir(path[i + 1].getDir() - path[i].getDir());
+      auto rel_nd = Dir(path[i + 1].getNodeDir() - path[i].getNodeDir());
+      switch (rel_nd) {
+      case Dir::Front:
+        if (nd.isAlong()) {
+          for (int j = 0; j < std::abs(rel_v.x) + std::abs(rel_v.y); j++)
+            dirs.push_back(nd);
+        } else {
+          for (auto index = path[i]; index != path[i + 1];
+               index = index.next()) {
+            auto nd_45 = ((index.getDir() == Dir::East &&
+                           (index.getNodeDir() == Dir::NorthEast ||
+                            index.getNodeDir() == Dir::SouthWest)) ||
+                          (index.getDir() == Dir::North &&
+                           (index.getNodeDir() == Dir::NorthWest ||
+                            index.getNodeDir() == Dir::SouthEast)))
+                             ? Dir::Left45
+                             : Dir::Right45;
+            dirs.push_back(index.getNodeDir() + nd_45);
+          }
+        }
+        break;
+      case Dir::Left45:
+        if (nd.isAlong()) {
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Left);
+        } else {
+          dirs.push_back(nd + Dir::Left45);
+        }
+        break;
+      case Dir::Right45:
+        if (nd.isAlong()) {
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Right);
+        } else {
+          dirs.push_back(nd + Dir::Right45);
+        }
+        break;
+      case Dir::Left:
+        if (nd.isAlong()) {
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Left);
+        } else {
+          /* V90 */
+          dirs.push_back(nd + Dir::Left45);
+          dirs.push_back(nd + Dir::Left135);
+        }
+        break;
+      case Dir::Right:
+        if (nd.isAlong()) {
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Right);
+        } else {
+          /* V90 */
+          dirs.push_back(nd + Dir::Right45);
+          dirs.push_back(nd + Dir::Right135);
+        }
+        break;
+      case Dir::Left135:
+        if (nd.isAlong()) {
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Left);
+          dirs.push_back(nd + Dir::Back);
+        } else {
+          dirs.push_back(nd + Dir::Left45);
+          dirs.push_back(nd + Dir::Left135);
+        }
+        break;
+      case Dir::Right135:
+        if (nd.isAlong()) {
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Right);
+          dirs.push_back(nd + Dir::Back);
+        } else {
+          dirs.push_back(nd + Dir::Right45);
+          dirs.push_back(nd + Dir::Right135);
+        }
+        break;
+      case Dir::Back:
+        dirs.push_back(nd);
+        if (rel_v.rotate(-nd).y > 0) {
+          dirs.push_back(nd + Dir::Left);
+          dirs.push_back(nd + Dir::Back);
+        } else {
+          dirs.push_back(nd + Dir::Right);
+          dirs.push_back(nd + Dir::Back);
+        }
+        break;
+      }
+    }
+    return dirs;
+  }
 
 private:
   const Maze &maze;
-  std::unordered_map<Index, Node, Index::hash> node_map;
 };
 
 } // namespace MazeLib

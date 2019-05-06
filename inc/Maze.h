@@ -15,19 +15,17 @@
 #include <vector>
 
 namespace MazeLib {
-/** @constexpr MAZE_SIZE
- *  @brief 迷路の1辺の区画数
+/**
+ *  @brief 迷路の1辺の区画数の定数
  */
 static constexpr int MAZE_SIZE = 32;
-// static constexpr int MAZE_SIZE_BIT = std::log2(MAZE_SIZE);
-// static constexpr int MAZE_SIZE_BIT = 5;
-/** @typedef
- *  @brief 迷路のサイズのbit数の整数型
+/**
+ *  @brief 迷路のサイズのbit数と一致する整数型
  *   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
  */
 typedef uint32_t wall_size_t;
 
-/** @def
+/**
  *  @brief 迷路のカラー表示切替
  */
 #if 1
@@ -47,10 +45,11 @@ typedef uint32_t wall_size_t;
 #define C_CYAN ""
 #define C_RESET ""
 #endif
-#define ESC_UP(n) "\x1b[" #n "A"
+#define ESC_UP(n) "\x1b[" #n "A" //< カーソルの移動；マクロなので定数のみ
 
-/** @struct Dir
- *  @brief 迷路上の方向を定義
+/**
+ * @brief 迷路上の方向を定義
+ * 実体は 8bit の整数
  */
 struct Dir {
 public:
@@ -68,7 +67,7 @@ public:
     SouthEast,
     AbsMax,
   };
-  /** @enum Dir::RelativeDir
+  /**
    *  @brief 相対方向の列挙型
    */
   enum RelativeDir : int8_t {
@@ -82,7 +81,7 @@ public:
     Right45,
     RelMax = 8,
   };
-  /** @function Constructor
+  /**
    *  @param d Absolute Direction
    */
   Dir(const enum AbsoluteDir d = East) : d(AbsoluteDir(d & 7)) {}
@@ -91,30 +90,26 @@ public:
    */
   operator int8_t() const { return d; }
   char toChar() const { return ">'^`<,v.x"[d]; }
-  /** @brief 代入演算子のオーバーロード
-   */
-  const Dir operator=(const Dir &obj) {
-    d = obj.d;
-    return *this;
-  }
-  /** @function All
+  bool isAlong() const { return (d & 1) == 0; }
+  bool isDiag() const { return (d & 1) == 1; }
+  const Dir operator=(const Dir &obj) { return d = obj.d, *this; }
+  /**
    *  @brief 全方向の方向配列を生成する静的関数
    */
   static const std::array<Dir, 4> &ENWS();
-  /** @function <<
-   */
   friend std::ostream &operator<<(std::ostream &os, const Dir &d);
 
 private:
   enum AbsoluteDir d; /**< @brief 方向の実体 */
 };
-/** @typedef Dirs
+/**
  *  @brief Dir構造体の動的配列
  */
 typedef std::vector<Dir> Dirs;
 
-/** @struct Vector
- *  @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
+/**
+ * @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
+ * 実体は 16bit の整数
  */
 union Vector {
 public:
@@ -122,11 +117,11 @@ public:
     int8_t x; /**< @brief 迷路の区画座標 */
     int8_t y; /**< @brief 迷路の区画座標 */
   };
-  uint16_t all; //< まとめて扱うとき用 */
-  Vector(int8_t x = 0, int8_t y = 0)
-      : x(x), y(y) {} /**< @brief コンストラクタ */
-  Vector(const Vector &obj) : all(obj.all) {} /**< @brief コンストラクタ */
-  /** @brief 演算子のオーバーロード
+  uint16_t all; /**< @brief まとめて扱うとき用 */
+  Vector(int8_t x = 0, int8_t y = 0) : x(x), y(y) {}
+  Vector(const Vector &obj) : all(obj.all) {}
+  /**
+   * @brief 演算子のオーバーロード
    */
   const Vector operator+(const Vector &obj) const {
     return Vector(x + obj.x, y + obj.y);
@@ -134,10 +129,7 @@ public:
   const Vector operator-(const Vector &obj) const {
     return Vector(x - obj.x, y - obj.y);
   }
-  const Vector &operator=(const Vector &obj) {
-    all = obj.all;
-    return *this;
-  }
+  const Vector &operator=(const Vector &obj) { return all = obj.all, *this; }
   bool operator==(const Vector &obj) const { return all == obj.all; }
   bool operator!=(const Vector &obj) const { return all != obj.all; }
   /** @function next
@@ -157,64 +149,53 @@ public:
     return true;
   }
   /**
-   * @brief
-   *
-   * @param d
+   * @brief 座標を回転変換する
+   * @param d 回転角度
    * @return const Vector
    */
-  const Vector rotate(const Dir d) const {
-    switch (d) {
-    case Dir::East:
-      return Vector(x, y);
-    case Dir::North:
-      return Vector(-y, x);
-    case Dir::West:
-      return Vector(-x, -y);
-    case Dir::South:
-      return Vector(y, -x);
-    }
-    printf("Warning: invalid direction\n");
-    return *this;
-  }
-  const Vector rotate(const Dir d, const Vector &offset) const {
-    return offset + (*this - offset).rotate(d);
+  const Vector rotate(const Dir d) const;
+  const Vector rotate(const Dir d, const Vector &center) const {
+    return center + (*this - center).rotate(d);
   }
   /** @function <<
    *  @brief 表示
    */
   friend std::ostream &operator<<(std::ostream &os, const Vector &v);
 };
-/** @typedef Vectors
- *  @brief Vector構造体の動的配列
+/**
+ * @brief Vector構造体の動的配列
  */
 typedef std::vector<Vector> Vectors;
 
-/** @union WallLog
- *  @brief 区画位置，方向，壁の有無を保持する構造体
+/**
+ * @brief 区画位置，方向，壁の有無を保持する構造体
+ * 実体は 16bit の整数
  */
 union WallLog {
-  uint16_t all; /**< @brief 全フラグ参照用 */
   struct {
     int8_t x : 6;  /**< @brief 区画のx座標 */
     int8_t y : 6;  /**< @brief 区画のx座標 */
     uint8_t d : 3; /**< @brief 方向 */
     uint8_t b : 1; /**< @brief 壁の有無 */
   };
+  uint16_t all; /**< @brief 全フラグ参照用 */
   WallLog(const Vector v, const Dir d, const bool b)
       : x(v.x), y(v.y), d(d), b(b) {}
   WallLog(const int8_t x, const int8_t y, const Dir d, const bool b)
       : x(x), y(y), d(d), b(b) {}
   WallLog(const uint16_t all) : all(all) {}
+  WallLog(const WallLog &obj) : all(obj.all) {}
   WallLog() {}
   operator Vector() { return Vector(x, y); }
 };
-/** @typedef WallLogs
- *  @brief WallLog構造体の動的配列
+/**
+ * @brief WallLog構造体の動的配列
  */
 typedef std::vector<WallLog> WallLogs;
 
-/** @class Maze
- *  @brief 迷路の壁情報を管理するクラス
+/**
+ * @brief 迷路の壁情報を管理するクラス
+ * 実体は，壁情報とスタート位置とゴール位置s
  */
 class Maze {
 public:
