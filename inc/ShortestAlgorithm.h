@@ -45,8 +45,8 @@ public:
     if (!initialized) {
       initialized = true;
       /* 台形加速のコストテーブルを事前に用意 */
-      static const float a = 1200.0f;
-      static const float v_s = 240.0f;
+      static const float a = 3000.0f;
+      static const float v_s = 300.0f;
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
         const float x = 90.0f * (i + 1) / 2;
         const float t = (std::sqrt(v_s * v_s + 2 * a * x) - v_s) / a;
@@ -311,7 +311,7 @@ public:
   };
   static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
   typedef std::vector<Index> Indexs;
-  struct Node {
+  struct __attribute__((__packed__)) Node {
     enum State : uint8_t { None, Open, Closed } state;
     cost_t cost;
     Index from;
@@ -319,14 +319,16 @@ public:
          const Index from = Index())
         : state(state), cost(cost), from(from) {}
   };
+  static_assert(sizeof(Node) == 5, "Node Size Error"); /**< Size Check */
   cost_t getHuristic(const Index i, const Vectors &goals) const {
     // return 0;
     auto v = Vector(i) - goals[0];
-    // float x = std::abs(v.x);
-    // float y = std::abs(v.y);
-    // float d = x + y;
-    float d = std::sqrt(v.x * v.x + v.y * v.y);
-    return getEdgeCost(ST_ALONG, d);
+    float x = std::abs(v.x);
+    float y = std::abs(v.y);
+    float d = x + y;
+    // float d = std::sqrt(v.x * v.x + v.y * v.y);
+    // float d = v.x * v.x + v.y * v.y;
+    return getEdgeCost(ST_DIAG, d);
   }
   bool calcShortestPath(Indexs &path, bool known_only = true) {
     /* 1. */

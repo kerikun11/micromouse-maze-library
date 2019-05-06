@@ -53,6 +53,8 @@ private:
                .count();
     if (max_usec < usec)
       max_usec = usec;
+    std::ofstream of("out.txt", std::ios::app);
+    of << usec << std::endl;
     if (newState == prevState)
       return;
 
@@ -158,13 +160,14 @@ int main(void) {
   display = 1;
   robot.searchRun();
   robot.printInfo();
-  // robot.fastRun(false);
-  // robot.printPath();
+  robot.fastRun(false);
+  robot.printPath();
   // robot.endFastRunBackingToStartRun();
-  // robot.fastRun(true);
-  // robot.printPath();
+  robot.fastRun(true);
+  robot.printPath();
   // robot.endFastRunBackingToStartRun();
 
+#if 0
   ShortestAlgorithm sa(maze_target);
   ShortestAlgorithm::Indexs path;
   const auto t_s = std::chrono::system_clock().now();
@@ -174,6 +177,7 @@ int main(void) {
       std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
   std::cout << "It took " << us.count() << " [us]" << std::endl;
   sa.printPath(std::cout, path);
+#endif
 
   return 0;
 }

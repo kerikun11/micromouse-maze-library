@@ -158,6 +158,45 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 }
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diagonal) {
+  if (diagonal) {
+    ShortestAlgorithm::Indexs path;
+    if (!shortestAlgorithm.calcShortestPath(path, true))
+      return false; /* 失敗 */
+    shortestDirs = ShortestAlgorithm::indexs2dirs(path);
+    auto v = maze.getStart();
+    for (const auto d : shortestDirs) {
+      v = v.next(d);
+    }
+    auto prev_dir = shortestDirs[shortestDirs.size() - 1 - 1];
+    auto dir = shortestDirs[shortestDirs.size() - 1];
+    // ゴール区画を行けるところまで直進(斜め考慮)する
+    bool loop = true;
+    while (loop) {
+      loop = false;
+      // 斜めを考慮した進行方向を列挙する
+      Dirs dirs;
+      const auto rel_dir = Dir(dir - prev_dir);
+      if (diagonal && rel_dir == Dir::Left)
+        dirs = {Dir(dir + Dir::Right), dir};
+      else if (diagonal && rel_dir == Dir::Right)
+        dirs = {Dir(dir + Dir::Left), dir};
+      else
+        dirs = {dir};
+      // 行ける方向に行く
+      for (const auto &d : dirs) {
+        if (maze.canGo(v, d)) {
+          shortestDirs.push_back(d);
+          v = v.next(d);
+          prev_dir = dir;
+          dir = d;
+          loop = true;
+          break;
+        }
+      }
+    }
+    return true; /* 成功 */
+  }
+  /* old */
   stepMap.update(maze, maze.getGoals(), true, diagonal);
   shortestDirs.clear();
   auto v = maze.getStart();
@@ -218,6 +257,7 @@ void SearchAlgorithm::printMap(const State state, const Vector vec,
 }
 
 bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
+#if 1
   ShortestAlgorithm::Indexs path;
   // const auto t_s = std::chrono::system_clock().now();
   if (!shortestAlgorithm.calcShortestPath(path, false))
@@ -235,6 +275,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
       candidates.push_back(v);
   }
   return true; /* 成功 */
+#endif
   /* old */
   candidates.clear();
   // 斜めありなしの双方の最短経路上を候補とする
