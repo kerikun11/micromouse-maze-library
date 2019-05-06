@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Maze.h"
+#include "ShortestAlgorithm.h"
 #include "StepMap.h"
 
 namespace MazeLib {
@@ -47,7 +48,7 @@ public:
    *  @param maze 使用する迷路の参照
    *  @param goals ゴール区画の配列
    */
-  SearchAlgorithm(Maze &maze) : maze(maze) {}
+  SearchAlgorithm(Maze &maze) : maze(maze), shortestAlgorithm(maze) {}
   /** @function isComplete
    *  @brief 最短経路が導出されているか調べる関数
    */
@@ -74,8 +75,9 @@ public:
   const Maze &getMaze() const { return maze; }
 
 protected:
-  Maze &maze;      /**< 使用する迷路の参照 */
-  StepMap stepMap; /**< 使用するステップマップ */
+  Maze &maze;                          /**< 使用する迷路の参照 */
+  StepMap stepMap;                     /**< 使用するステップマップ */
+  ShortestAlgorithm shortestAlgorithm; /**< 最短経路導出器 */
 
 private:
   Maze idMaze;     /**< 自己位置同定に使用する迷路 */

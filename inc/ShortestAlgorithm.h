@@ -322,10 +322,11 @@ public:
   cost_t getHuristic(const Index i, const Vectors &goals) const {
     // return 0;
     auto v = Vector(i) - goals[0];
-    float x = std::abs(v.x);
-    float y = std::abs(v.y);
-    float d = x + y;
-    return getEdgeCost(ST_ALONG, d / 90);
+    // float x = std::abs(v.x);
+    // float y = std::abs(v.y);
+    // float d = x + y;
+    float d = std::sqrt(v.x * v.x + v.y * v.y);
+    return getEdgeCost(ST_ALONG, d);
   }
   bool calcShortestPath(Indexs &path, bool known_only = true) {
     /* 1. */
@@ -344,9 +345,9 @@ public:
     Index goal_index; //< 終点の用意
     while (1) {
       /* 4. */
-      // std::cout << "q.size(): " << q.size() << std::endl;
+      // std::cout << "open_list.size(): " << open_list.size() << std::endl;
       if (open_list.empty()) {
-        std::cerr << "q.empty()" << std::endl;
+        std::cerr << "open_list.empty()" << std::endl;
         return false;
       }
       /* 5. */
@@ -377,6 +378,7 @@ public:
             cost_t f_m_prime = g_n + edge_cost + h_m;
             if (neighbor_node.state == Node::None ||
                 f_m_prime < neighbor_node.cost) {
+              // std::cout << (int)f_m_prime << std::endl;
               neighbor_node = Node(Node::Open, f_m_prime, index);
               open_list.push(nibr_index);
             }

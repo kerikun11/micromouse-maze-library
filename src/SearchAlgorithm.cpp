@@ -10,6 +10,7 @@
 #include "ShortestAlgorithm.h"
 
 #include <algorithm>
+#include <chrono>
 
 namespace MazeLib {
 /** @def SEARCHING_ADDITIONALLY_AT_START
@@ -217,6 +218,24 @@ void SearchAlgorithm::printMap(const State state, const Vector vec,
 }
 
 bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
+  ShortestAlgorithm::Indexs path;
+  // const auto t_s = std::chrono::system_clock().now();
+  if (!shortestAlgorithm.calcShortestPath(path, false))
+    return false; /* 失敗 */
+  // const auto t_e = std::chrono::system_clock().now();
+  // const auto us =
+  //     std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+  // std::cout << "It took " << us.count() << " [us]" << std::endl;
+  const auto dirs = ShortestAlgorithm::indexs2dirs(path);
+  candidates.clear();
+  auto v = maze.getStart();
+  for (const auto d : dirs) {
+    v = v.next(d);
+    if (maze.unknownCount(v))
+      candidates.push_back(v);
+  }
+  return true; /* 成功 */
+  /* old */
   candidates.clear();
   // 斜めありなしの双方の最短経路上を候補とする
   for (const bool diagonal : {true, false}) {

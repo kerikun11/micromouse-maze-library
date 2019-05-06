@@ -2,8 +2,6 @@
 #include "RobotBase.h"
 #include <cstdio>
 
-#include "ShortestAlgorithm.h"
-
 #include <chrono>
 #include <time.h>
 #include <unistd.h>
@@ -157,9 +155,9 @@ int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
   loadMaze(maze_target);
   robot.replaceGoals(maze_target.getGoals());
-  display = 0;
+  display = 1;
   robot.searchRun();
-  // robot.printInfo();
+  robot.printInfo();
   // robot.fastRun(false);
   // robot.printPath();
   // robot.endFastRunBackingToStartRun();
@@ -169,10 +167,11 @@ int main(void) {
 
   ShortestAlgorithm sa(maze_target);
   ShortestAlgorithm::Indexs path;
-  auto t_s = std::chrono::system_clock().now();
+  const auto t_s = std::chrono::system_clock().now();
   sa.calcShortestPath(path, false);
-  auto t_e = std::chrono::system_clock().now();
-  auto us = std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+  const auto t_e = std::chrono::system_clock().now();
+  const auto us =
+      std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
   std::cout << "It took " << us.count() << " [us]" << std::endl;
   sa.printPath(std::cout, path);
 
