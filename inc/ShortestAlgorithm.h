@@ -84,54 +84,26 @@ public:
    * 変数表現は隣接区画で冗長になりうるが，コンストラクタで一意にしているので，メンバ変数は一意．
    * 各区画中央の4方位，各壁中央の4方位，の位置姿勢を識別する
    */
-  union Index {
+  union __attribute__((__packed__)) Index {
   private:
-    uint32_t all;
-    struct {
-      int8_t x;  //< x
-      int8_t y;  //< y
-      int8_t nd; //< real dir of node
-      uint8_t z; //< position assignment in a cell
+    struct __attribute__((__packed__)) {
+      int x : 6;           //< x
+      int y : 6;           //< y
+      unsigned int nd : 3; //< real dir of node
+      unsigned int z : 1;  //< position assignment in a cell
     };
+    unsigned int all : 16;
 
   public:
-    Index(const int8_t x, const int8_t y, const Dir d, const Dir nd) {
-      // if (x < 0 || x >= MAZE_SIZE)
-      //   std::cout << "x: " << (int)x << std::endl;
-      // if (y < 0 || y >= MAZE_SIZE)
-      //   std::cout << "y: " << (int)y << std::endl;
-      // if (nd < 0 || nd > 7)
-      //   std::cout << "nd: " << (int)nd << std::endl;
-      this->x = x;
-      this->y = y;
-      this->nd = nd;
+    Index(const int8_t x, const int8_t y, const Dir d, const Dir nd)
+        : x(x), y(y), nd(nd) {
       uniquify(d);
     }
-    Index(const Vector v, const Dir d, const Dir nd) {
-      // if (v.x < 0 || v.x >= MAZE_SIZE)
-      //   std::cout << "v. x: " << (int)v.x << std::endl;
-      // if (v.y < 0 || v.y >= MAZE_SIZE)
-      //   std::cout << "v. y: " << (int)v.y << std::endl;
-      // if (nd < 0 || nd > 7)
-      //   std::cout << "nd: " << (int)nd << std::endl;
-      this->x = v.x;
-      this->y = v.y;
-      this->nd = nd;
+    Index(const Vector v, const Dir d, const Dir nd) : x(v.x), y(v.y), nd(nd) {
       uniquify(d);
     }
+    Index(const Index &obj) : all(obj.all) {}
     Index() : all(0) {}
-
-    // Index(const int8_t x, const int8_t y, const Dir d, const Dir nd)
-    //     : x(x), y(y), nd(nd) {
-    //   uniquify(d);
-    // }
-    // Index(const Vector v, const Dir d, const Dir nd) : x(v.x), y(v.y), nd(nd)
-    // {
-    //   uniquify(d);
-    // }
-    // // Index(const uint32_t all) : all(all) {}
-    // // Index(const Index &obj) : all(obj.all) {}
-    // Index() : all(0) {}
     /**
      * @brief needed for unordered_map
      * uniqueなIDを返す
@@ -163,19 +135,10 @@ public:
         std::cerr << "Invalid Direction" << std::endl;
         break;
       }
-      // if (x < 0 || x >= MAZE_SIZE)
-      //   std::cout << "x: " << (int)x << std::endl;
-      // if (y < 0 || y >= MAZE_SIZE)
-      //   std::cout << "y: " << (int)y << std::endl;
-      // if (nd < 0 || nd > 7)
-      //   std::cout << "nd: " << (int)nd << std::endl;
     }
     const Dir getDir() const { return z == 0 ? Dir::East : Dir::North; }
     const Dir getNodeDir() const { return nd; }
-    // const Index &operator=(const Index &obj) { return all = obj.all, *this; }
-    const Index &operator=(const Index &obj) {
-      return x = obj.x, y = obj.y, z = obj.z, nd = obj.nd, *this;
-    }
+    const Index &operator=(const Index &obj) { return all = obj.all, *this; }
     bool operator==(const Index &obj) const { return all == obj.all; }
     bool operator!=(const Index &obj) const { return all != obj.all; }
     operator Vector() const { return Vector(x, y); }
@@ -346,6 +309,7 @@ public:
       }
     }
   };
+  static_assert(sizeof(Index) == 2); /**< Size Check */
   typedef std::vector<Index> Indexs;
   struct Node {
     enum State : uint8_t { None, Open, Closed } state;

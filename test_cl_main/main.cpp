@@ -175,9 +175,6 @@ int main(void) {
   auto us = std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
   std::cout << "It took " << us.count() << " [us]" << std::endl;
   sa.printPath(std::cout, path);
-  // auto i = ShortestAlgorithm::Index(4, 2, Dir::East, Dir::NorthEast);
-  // i.neighbors_for(maze_target, true, [&](const auto ni, const auto ec) {
-  //   std::cout << ni << ": " << ec << std::endl;
-  // });
+
   return 0;
 }

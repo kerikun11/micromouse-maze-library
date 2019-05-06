@@ -281,10 +281,10 @@ int SearchAlgorithm::countIdentityCandidates(
     int8_t max_x = 0;
     int8_t max_y = 0;
     for (const auto wl : idWallLogs) {
-      min_x = std::min(wl.x, min_x);
-      min_y = std::min(wl.y, min_y);
-      max_x = std::max(wl.x, max_x);
-      max_y = std::max(wl.y, max_y);
+      min_x = std::min((int8_t)wl.x, min_x);
+      min_y = std::min((int8_t)wl.y, min_y);
+      max_x = std::max((int8_t)wl.x, max_x);
+      max_y = std::max((int8_t)wl.y, max_y);
     }
   }
   const int many = 1000;
@@ -387,10 +387,10 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
     int8_t max_x = 0;
     int8_t max_y = 0;
     for (const auto wl : idMaze.getWallLogs()) {
-      min_x = std::min(wl.x, min_x);
-      min_y = std::min(wl.y, min_y);
-      max_x = std::max(wl.x, max_x);
-      max_y = std::max(wl.y, max_y);
+      min_x = std::min((int8_t)wl.x, min_x);
+      min_y = std::min((int8_t)wl.y, min_y);
+      max_x = std::max((int8_t)wl.x, max_x);
+      max_y = std::max((int8_t)wl.y, max_y);
     }
     const auto offset_new =
         idOffset + Vector((MAZE_SIZE - max_x - min_x - 1) / 2,

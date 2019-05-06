@@ -172,33 +172,27 @@ typedef std::vector<Vector> Vectors;
  * @brief 区画位置，方向，壁の有無を保持する構造体
  * 実体は 16bit の整数
  */
-union WallLog {
-  uint16_t all; /**< @brief 全フラグ参照用 */
-  struct {
-    int8_t x : 6;  /**< @brief 区画のx座標 */
-    int8_t y : 6;  /**< @brief 区画のx座標 */
-    uint8_t d : 3; /**< @brief 方向 */
-    uint8_t b : 1; /**< @brief 壁の有無 */
+union __attribute__((__packed__)) WallLog {
+  struct __attribute__((__packed__)) {
+    int x : 6;          /**< @brief 区画のx座標 */
+    int y : 6;          /**< @brief 区画のx座標 */
+    unsigned int d : 3; /**< @brief 方向 */
+    unsigned int b : 1; /**< @brief 壁の有無 */
   };
+  unsigned int all : 16; /**< @brief 全フラグ参照用 */
   WallLog() {}
   WallLog(const Vector v, const Dir d, const bool b)
       : x(v.x), y(v.y), d(d), b(b) {}
   WallLog(const int8_t x, const int8_t y, const Dir d, const bool b)
       : x(x), y(y), d(d), b(b) {}
-  // WallLog(const uint16_t all) : all(all) {}
-  // WallLog(const WallLog &obj) : all(obj.all) {}
-  // WallLog(const WallLog &obj) { all = obj.all; }
-  // WallLog(const WallLog &obj) {
-  //   x = obj.x;
-  //   y = obj.y;
-  //   d = obj.d;
-  //   b = obj.b;
-  // }
-  // const WallLog &operator=(const WallLog &obj) { return all = obj.all, *this;
-  // }
   operator Vector() const { return Vector(x, y); }
   operator Dir() const { return d; }
+  friend std::ostream &operator<<(std::ostream &os, const WallLog &obj) {
+    return os << "( " << (int)obj.x << ", " << (int)obj.y << ", "
+              << Dir(obj).toChar() << ", " << (obj.b ? "true" : "false") << ")";
+  }
 };
+static_assert(sizeof(WallLog) == 2); /**< Size Check */
 /**
  * @brief WallLog構造体の動的配列
  */

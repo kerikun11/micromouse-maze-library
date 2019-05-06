@@ -124,7 +124,7 @@ bool Maze::updateWall(const Vector v, const Dir d, const bool b,
     setKnown(v, d, false);
     const auto wl =
         std::find_if(wallLogs.cbegin(), wallLogs.cend(), [&](const auto w) {
-          return Vector(w.x, w.y) == v && w.d == d;
+          return Vector(w) == v && Dir(w) == d;
         });
     if (wl != wallLogs.end())
       wallLogs.erase(wl);
