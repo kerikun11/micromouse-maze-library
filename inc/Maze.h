@@ -192,7 +192,7 @@ union __attribute__((__packed__)) WallLog {
               << Dir(obj).toChar() << ", " << (obj.b ? "true" : "false") << ")";
   }
 };
-static_assert(sizeof(WallLog) == 2); /**< Size Check */
+static_assert(sizeof(WallLog) == 2, "WallLog Size Error"); /**< Size Check */
 /**
  * @brief WallLog構造体の動的配列
  */

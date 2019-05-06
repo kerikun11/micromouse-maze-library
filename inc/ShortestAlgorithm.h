@@ -309,7 +309,7 @@ public:
       }
     }
   };
-  static_assert(sizeof(Index) == 2); /**< Size Check */
+  static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
   typedef std::vector<Index> Indexs;
   struct Node {
     enum State : uint8_t { None, Open, Closed } state;
