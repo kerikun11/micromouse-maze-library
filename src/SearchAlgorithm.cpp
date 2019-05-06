@@ -148,7 +148,7 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
                                   Dir &nextDir) const {
   // 候補の中で行ける方向を探す
   const auto it =
-      std::find_if(nextDirCandidates.begin(), nextDirCandidates.end(),
+      std::find_if(nextDirCandidates.cbegin(), nextDirCandidates.cend(),
                    [&](const Dir &dir) { return maze.canGo(v, dir); });
   if (it == nextDirCandidates.end())
     return false;
@@ -274,13 +274,13 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
   return true; //< 成功
 }
 int SearchAlgorithm::countIdentityCandidates(
-    const WallLogs idWallLogs, std::pair<Vector, Dir> &ans) const {
+    const WallLogs &idWallLogs, std::pair<Vector, Dir> &ans) const {
   if (!idWallLogs.empty()) {
     int8_t min_x = MAZE_SIZE - 1;
     int8_t min_y = MAZE_SIZE - 1;
     int8_t max_x = 0;
     int8_t max_y = 0;
-    for (auto &wl : idWallLogs) {
+    for (const auto wl : idWallLogs) {
       min_x = std::min(wl.x, min_x);
       min_y = std::min(wl.y, min_y);
       max_x = std::max(wl.x, max_x);
@@ -295,13 +295,13 @@ int SearchAlgorithm::countIdentityCandidates(
   int cnt = 0;
   for (int x = 0; x < MAZE_SIZE; x++)
     for (int y = 0; y < MAZE_SIZE; y++)
-      for (auto offset_d : Dir::ENWS()) {
+      for (const auto offset_d : Dir::ENWS()) {
         Vector offset = Vector(x, y);
         int diffs = 0;
         int unknown = 0;
-        for (auto wl : idWallLogs) {
-          auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset;
-          auto maze_d = wl.d + offset_d;
+        for (const auto wl : idWallLogs) {
+          const auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset;
+          const auto maze_d = wl.d + offset_d;
           if (!maze_v.isInsideOfField()) {
             diffs = many;
             break;
@@ -314,8 +314,8 @@ int SearchAlgorithm::countIdentityCandidates(
           if (diffs > min_diff)
             break;
         }
-        int size = idWallLogs.size();
-        int known = size - unknown;
+        const int size = idWallLogs.size();
+        const int known = size - unknown;
         // int matchs = known - diffs;
         if (diffs <= min_diff && known > unknown) {
           ans.first = offset;
@@ -332,7 +332,7 @@ SearchAlgorithm::calcNextDirsSearchForGoal(const Vector &cv, const Dir &cd,
                                            Dirs &nextDirsKnown,
                                            Dirs &nextDirCandidates) {
   Vectors candidates;
-  for (auto v : maze.getGoals())
+  for (const auto v : maze.getGoals())
     if (maze.unknownCount(v))
       candidates.push_back(v); //< ゴール区画の未知区画を洗い出す
   if (candidates.empty())
@@ -370,8 +370,8 @@ SearchAlgorithm::calcNextDirsGoingToGoal(const Vector &cv, const Dir &cd,
   const auto goals = maze.getGoals();
   const auto v = stepMap.calcNextDirs(maze, goals, cv, cd, nextDirsKnown,
                                       nextDirCandidates);
-  auto it = std::find_if(goals.begin(), goals.end(),
-                         [v](const Vector nv) { return v == nv; });
+  const auto it = std::find_if(goals.cbegin(), goals.cend(),
+                               [v](const Vector nv) { return v == nv; });
   if (it != goals.end())
     return Reached;
   return nextDirCandidates.empty() ? Error : Processing;
@@ -386,25 +386,26 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
     int8_t min_y = MAZE_SIZE - 1;
     int8_t max_x = 0;
     int8_t max_y = 0;
-    for (auto &wl : idMaze.getWallLogs()) {
+    for (const auto wl : idMaze.getWallLogs()) {
       min_x = std::min(wl.x, min_x);
       min_y = std::min(wl.y, min_y);
       max_x = std::max(wl.x, max_x);
       max_y = std::max(wl.y, max_y);
     }
-    auto offset_new = idOffset + Vector((MAZE_SIZE - max_x - min_x - 1) / 2,
-                                        (MAZE_SIZE - max_y - min_y - 1) / 2);
-    auto offset_diff = offset_new - idOffset;
+    const auto offset_new =
+        idOffset + Vector((MAZE_SIZE - max_x - min_x - 1) / 2,
+                          (MAZE_SIZE - max_y - min_y - 1) / 2);
+    const auto offset_diff = offset_new - idOffset;
     idOffset = offset_new;
     cv = cv + offset_diff;
     WallLogs tmp = idMaze.getWallLogs();
     idMaze.reset(false);
-    for (auto &wl : tmp)
+    for (const auto wl : tmp)
       idMaze.updateWall(Vector(wl) + offset_diff, wl.d, wl.b);
   }
 
   std::pair<Vector, Dir> ans;
-  int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
+  const int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
   matchCount = cnt;
   if (cnt == 1) {
     cv = (cv - idOffset).rotate(ans.second) + ans.first;

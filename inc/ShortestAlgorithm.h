@@ -14,12 +14,14 @@ class ShortestAlgorithm {
 public:
   ShortestAlgorithm(const Maze &maze) : maze(maze) {
     /* メモリの確保 */
-    // for (const auto d : {Dir::East, Dir::North})
-    //   for (const auto nd :
-    //        {Dir::NorthEast, Dir::NorthWest, Dir::SouthWest, Dir::SouthEast})
-    //     for (int x = 0; x < MAZE_SIZE; x++)
-    //       for (int y = 0; y < MAZE_SIZE; y++)
-    //         node_map[Index(x, y, d, nd)] = Node();
+#if 0
+    for (const auto d : {Dir::East, Dir::North})
+      for (const auto nd :
+           {Dir::NorthEast, Dir::NorthWest, Dir::SouthWest, Dir::SouthEast})
+        for (int x = 0; x < MAZE_SIZE; x++)
+          for (int y = 0; y < MAZE_SIZE; y++)
+            node_map[Index(x, y, d, nd)] = Node();
+#endif
     /* テーブルの計算 */
     getEdgeCost(ST_ALONG);
   }
@@ -84,25 +86,52 @@ public:
    */
   union Index {
   private:
-    struct {
-      uint8_t x;  //< x
-      uint8_t y;  //< y
-      uint8_t d;  //< position assignment in a cell
-      uint8_t nd; //< real dir of node
-    };
     uint32_t all;
+    struct {
+      int8_t x;  //< x
+      int8_t y;  //< y
+      int8_t nd; //< real dir of node
+      uint8_t z; //< position assignment in a cell
+    };
 
   public:
-    Index(const uint8_t x, const uint8_t y, const Dir d, const Dir nd)
-        : x(x), y(y), d(d & 7), nd(nd & 7) {
-      uniquify();
+    Index(const int8_t x, const int8_t y, const Dir d, const Dir nd) {
+      // if (x < 0 || x >= MAZE_SIZE)
+      //   std::cout << "x: " << (int)x << std::endl;
+      // if (y < 0 || y >= MAZE_SIZE)
+      //   std::cout << "y: " << (int)y << std::endl;
+      // if (nd < 0 || nd > 7)
+      //   std::cout << "nd: " << (int)nd << std::endl;
+      this->x = x;
+      this->y = y;
+      this->nd = nd;
+      uniquify(d);
     }
-    Index(const Vector v, const Dir d, const Dir nd)
-        : x(v.x), y(v.y), d(d & 7), nd(nd & 7) {
-      uniquify();
+    Index(const Vector v, const Dir d, const Dir nd) {
+      // if (v.x < 0 || v.x >= MAZE_SIZE)
+      //   std::cout << "v. x: " << (int)v.x << std::endl;
+      // if (v.y < 0 || v.y >= MAZE_SIZE)
+      //   std::cout << "v. y: " << (int)v.y << std::endl;
+      // if (nd < 0 || nd > 7)
+      //   std::cout << "nd: " << (int)nd << std::endl;
+      this->x = v.x;
+      this->y = v.y;
+      this->nd = nd;
+      uniquify(d);
     }
-    Index(const uint32_t all = 0) : all(all) { uniquify(); }
-    Index(const Index &obj) : all(obj.all) {}
+    Index() : all(0) {}
+
+    // Index(const int8_t x, const int8_t y, const Dir d, const Dir nd)
+    //     : x(x), y(y), nd(nd) {
+    //   uniquify(d);
+    // }
+    // Index(const Vector v, const Dir d, const Dir nd) : x(v.x), y(v.y), nd(nd)
+    // {
+    //   uniquify(d);
+    // }
+    // // Index(const uint32_t all) : all(all) {}
+    // // Index(const Index &obj) : all(obj.all) {}
+    // Index() : all(0) {}
     /**
      * @brief needed for unordered_map
      * uniqueなIDを返す
@@ -114,20 +143,39 @@ public:
      * @brief 座標の冗長を一意にする．
      * d を East or North のどちらかにそろえる
      */
-    void uniquify() {
-      if (d == Dir::West) {
-        d = Dir::East;
+    void uniquify(const Dir d) {
+      switch (d) {
+      case Dir::East:
+        z = 0;
+        break;
+      case Dir::North:
+        z = 1;
+        break;
+      case Dir::West:
+        z = 0;
         x--;
-      }
-      if (d == Dir::South) {
-        d = Dir::North;
+        break;
+      case Dir::South:
+        z = 1;
         y--;
+        break;
+      default:
+        std::cerr << "Invalid Direction" << std::endl;
+        break;
       }
+      // if (x < 0 || x >= MAZE_SIZE)
+      //   std::cout << "x: " << (int)x << std::endl;
+      // if (y < 0 || y >= MAZE_SIZE)
+      //   std::cout << "y: " << (int)y << std::endl;
+      // if (nd < 0 || nd > 7)
+      //   std::cout << "nd: " << (int)nd << std::endl;
     }
-    /**
-     * @brief oprators
-     */
-    const Index &operator=(const Index &obj) { return all = obj.all, *this; }
+    const Dir getDir() const { return z == 0 ? Dir::East : Dir::North; }
+    const Dir getNodeDir() const { return nd; }
+    // const Index &operator=(const Index &obj) { return all = obj.all, *this; }
+    const Index &operator=(const Index &obj) {
+      return x = obj.x, y = obj.y, z = obj.z, nd = obj.nd, *this;
+    }
     bool operator==(const Index &obj) const { return all == obj.all; }
     bool operator!=(const Index &obj) const { return all != obj.all; }
     operator Vector() const { return Vector(x, y); }
@@ -136,18 +184,16 @@ public:
                 << (int)i.y << ", " << i.getDir().toChar() << ", "
                 << i.getNodeDir().toChar() << ")";
     }
-    const Dir getDir() const { return d; }
-    const Dir getNodeDir() const { return nd; }
     const Vector arrow_from() const {
       switch (nd) {
       case Dir::NorthEast:
         return Vector(x, y);
       case Dir::NorthWest:
-        return d == Dir::East ? Vector(x + 1, y) : Vector(x, y);
+        return z == 0 ? Vector(x + 1, y) : Vector(x, y);
       case Dir::SouthWest:
-        return d == Dir::East ? Vector(x + 1, y) : Vector(x, y + 1);
+        return z == 0 ? Vector(x + 1, y) : Vector(x, y + 1);
       case Dir::SouthEast:
-        return d == Dir::East ? Vector(x, y) : Vector(x, y + 1);
+        return z == 0 ? Vector(x, y) : Vector(x, y + 1);
       default:
         break;
       }
@@ -157,13 +203,13 @@ public:
     const Vector arrow_to() const {
       switch (nd) {
       case Dir::NorthEast:
-        return d == Dir::East ? Vector(x + 1, y) : Vector(x, y + 1);
+        return z == 0 ? Vector(x + 1, y) : Vector(x, y + 1);
       case Dir::NorthWest:
-        return d == Dir::East ? Vector(x, y) : Vector(x, y + 1);
+        return z == 0 ? Vector(x, y) : Vector(x, y + 1);
       case Dir::SouthWest:
         return Vector(x, y);
       case Dir::SouthEast:
-        return d == Dir::East ? Vector(x + 1, y) : Vector(x, y);
+        return z == 0 ? Vector(x + 1, y) : Vector(x, y);
       default:
         break;
       }
@@ -172,8 +218,8 @@ public:
     }
     const Dir arrow_cell_45() const {
       auto nd_45 =
-          ((d == Dir::East && (nd == Dir::NorthEast || nd == Dir::SouthWest)) ||
-           (d == Dir::North && (nd == Dir::NorthWest || nd == Dir::SouthEast)))
+          ((z == 0 && (nd == Dir::NorthEast || nd == Dir::SouthWest)) ||
+           (z == 1 && (nd == Dir::NorthWest || nd == Dir::SouthEast)))
               ? Dir::Left45
               : Dir::Right45;
       return nd_45;
@@ -192,17 +238,17 @@ public:
         return Index(Vector(x, y).next(nd), Dir::AbsMax, nd);
       /* 壁の中央 */
       case Dir::NorthEast:
-        return d == Dir::East ? Index(Vector(x + 1, y), Dir::North, nd)
-                              : Index(Vector(x, y + 1), Dir::East, nd);
+        return z == 0 ? Index(Vector(x + 1, y), Dir::North, nd)
+                      : Index(Vector(x, y + 1), Dir::East, nd);
       case Dir::NorthWest:
-        return d == Dir::East ? Index(Vector(x, y), Dir::North, nd)
-                              : Index(Vector(x - 1, y + 1), Dir::East, nd);
+        return z == 0 ? Index(Vector(x, y), Dir::North, nd)
+                      : Index(Vector(x - 1, y + 1), Dir::East, nd);
       case Dir::SouthWest:
-        return d == Dir::East ? Index(Vector(x, y - 1), Dir::North, nd)
-                              : Index(Vector(x - 1, y), Dir::East, nd);
+        return z == 0 ? Index(Vector(x, y - 1), Dir::North, nd)
+                      : Index(Vector(x - 1, y), Dir::East, nd);
       case Dir::SouthEast:
-        return d == Dir::East ? Index(Vector(x + 1, y - 1), Dir::North, nd)
-                              : Index(Vector(x, y), Dir::East, nd);
+        return z == 0 ? Index(Vector(x + 1, y - 1), Dir::North, nd)
+                      : Index(Vector(x, y), Dir::East, nd);
       default:
         break;
       }
@@ -237,8 +283,8 @@ public:
           v_st = v_st.next(nd);
         }
         /* ターン */
-        const auto d_f = nd;          //< 前方
-        const auto v_f = v.next(d_f); //< 前方の区画
+        const auto d_f = nd;          //< i.e. dir front
+        const auto v_f = v.next(d_f); //< i.e. vector front
         /* 左右を一般化 */
         for (const auto nd_rel_45 : {Dir::Left45, Dir::Right45}) {
           const auto nd_45 = nd + nd_rel_45;
@@ -267,7 +313,7 @@ public:
         /* 壁の中央 */
         /* 直前の壁 */
         const auto i_f = this->next(); //< i.e. index front
-        if (!canGo(Vector(i_f), i_f.d)) {
+        if (!canGo(Vector(i_f), i_f.getDir())) {
           std::cerr << "Something Wrong" << std::endl;
           return;
         }
@@ -275,7 +321,7 @@ public:
         auto i_st = i_f; //< i.e. index straight
         for (int8_t n = 1;; n++) {
           auto i_ff = i_st.next();
-          if (!canGo(Vector(i_ff), i_ff.d))
+          if (!canGo(Vector(i_ff), i_ff.getDir()))
             break;
           callback(i_st, getEdgeCost(ST_DIAG, n));
           i_st = i_ff;
@@ -291,10 +337,10 @@ public:
         /* V90方向, 135度方向*/
         if (canGo(v_45, d_135)) {
           /* V90方向, 135度方向*/
-          auto v_135 = v_45.next(d_135); //< 135度方向位置
+          auto v_135 = v_45.next(d_135);
           if (canGo(v_135, d_45))
             callback(Index(v_45, d_135, nd_90), getEdgeCost(FV90));
-          if (canGo(v_135, d_135)) //< 135度方向
+          if (canGo(v_135, d_135))
             callback(Index(v_135, Dir::AbsMax, d_135), getEdgeCost(F135));
         }
       }
@@ -399,7 +445,7 @@ public:
     for (int8_t y = MAZE_SIZE; y >= 0; y--) {
       if (y != MAZE_SIZE) {
         os << '|';
-        for (uint8_t x = 0; x < MAZE_SIZE; x++) {
+        for (int8_t x = 0; x < MAZE_SIZE; x++) {
           if (steps[y][x] != 0)
             os << C_YELLOW << std::setw(3) << steps[y][x] << C_RESET;
           else
@@ -410,7 +456,7 @@ public:
         }
         os << std::endl;
       }
-      for (uint8_t x = 0; x < MAZE_SIZE; x++)
+      for (int8_t x = 0; x < MAZE_SIZE; x++)
         os << "+"
            << (maze.isKnown(x, y, Dir::South)
                    ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")

@@ -65,7 +65,7 @@ public:
     SouthWest,
     South,
     SouthEast,
-    AbsMax,
+    // AbsMax,
   };
   /**
    *  @brief 相対方向の列挙型
@@ -79,13 +79,14 @@ public:
     Right135,
     Right = 6,
     Right45,
-    RelMax = 8,
+    // RelMax = 8,
   };
+  static constexpr int8_t AbsMax = 8;
   /**
    *  @param d Absolute Direction
    */
-  Dir(const enum AbsoluteDir d = East) : d(AbsoluteDir(d & 7)) {}
-  Dir(const int8_t d) : d(AbsoluteDir(d & 7)) {}
+  Dir(const enum AbsoluteDir d = East) : d(d & 7) {}
+  Dir(const int8_t d) : d(d & 7) {}
   /** @brief 整数へのキャスト
    */
   operator int8_t() const { return d; }
@@ -100,7 +101,7 @@ public:
   friend std::ostream &operator<<(std::ostream &os, const Dir &d);
 
 private:
-  enum AbsoluteDir d; /**< @brief 方向の実体 */
+  int8_t d; /**< @brief 方向の実体 */
 };
 /**
  *  @brief Dir構造体の動的配列
@@ -172,21 +173,31 @@ typedef std::vector<Vector> Vectors;
  * 実体は 16bit の整数
  */
 union WallLog {
+  uint16_t all; /**< @brief 全フラグ参照用 */
   struct {
     int8_t x : 6;  /**< @brief 区画のx座標 */
     int8_t y : 6;  /**< @brief 区画のx座標 */
     uint8_t d : 3; /**< @brief 方向 */
     uint8_t b : 1; /**< @brief 壁の有無 */
   };
-  uint16_t all; /**< @brief 全フラグ参照用 */
+  WallLog() {}
   WallLog(const Vector v, const Dir d, const bool b)
       : x(v.x), y(v.y), d(d), b(b) {}
   WallLog(const int8_t x, const int8_t y, const Dir d, const bool b)
       : x(x), y(y), d(d), b(b) {}
-  WallLog(const uint16_t all) : all(all) {}
-  WallLog(const WallLog &obj) : all(obj.all) {}
-  WallLog() {}
-  operator Vector() { return Vector(x, y); }
+  // WallLog(const uint16_t all) : all(all) {}
+  // WallLog(const WallLog &obj) : all(obj.all) {}
+  // WallLog(const WallLog &obj) { all = obj.all; }
+  // WallLog(const WallLog &obj) {
+  //   x = obj.x;
+  //   y = obj.y;
+  //   d = obj.d;
+  //   b = obj.b;
+  // }
+  // const WallLog &operator=(const WallLog &obj) { return all = obj.all, *this;
+  // }
+  operator Vector() const { return Vector(x, y); }
+  operator Dir() const { return d; }
 };
 /**
  * @brief WallLog構造体の動的配列

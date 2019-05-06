@@ -159,15 +159,14 @@ int main(void) {
   robot.replaceGoals(maze_target.getGoals());
   display = 0;
   robot.searchRun();
-  robot.printInfo();
-  robot.fastRun(false);
-  robot.printPath();
+  // robot.printInfo();
+  // robot.fastRun(false);
+  // robot.printPath();
   // robot.endFastRunBackingToStartRun();
-  robot.fastRun(true);
-  robot.printPath();
+  // robot.fastRun(true);
+  // robot.printPath();
   // robot.endFastRunBackingToStartRun();
 
-  // Maze maze(maze_target.getGoals());
   ShortestAlgorithm sa(maze_target);
   ShortestAlgorithm::Indexs path;
   auto t_s = std::chrono::system_clock().now();

@@ -175,7 +175,7 @@ void loadMaze(Maze &maze_target) {
     maze_target.parse("../mazedata/16MM2017CX.maze");
     break;
   case 32:
-    maze_target.parse("../mazedata/32MM2018HX.maze");
+    maze_target.parse("../mazedata/32MM2016HX.maze");
     // maze_target.parse("../mazedata/32MM2017CX.maze");
     break;
   }
@@ -212,7 +212,7 @@ void test_position_identify() {
       real_v = offset_v = v;
       for (const auto ed : Dir::ENWS()) {
         real_d = offset_d = ed;
-        display = 0;
+        display = 1;
         bool res = robot.positionIdentifyRun();
         if (!res) {
           bool prev_display = display;

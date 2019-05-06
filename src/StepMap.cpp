@@ -214,7 +214,7 @@ const Vector StepMap::calcNextDirs(Maze &maze, const Vectors &dest,
       nextDirCandidates = tmp_nds; //< 既知区間になった場合
   }
   // キャッシュを復活
-  for (auto wl : cache) {
+  for (const auto wl : cache) {
     maze.setWall(Vector(wl), wl.d, false);
     maze.setKnown(Vector(wl), wl.d, false);
   }
@@ -228,11 +228,11 @@ void StepMap::calcStraightStepTable() {
       1.0f / (sqrt(pow(v0 / a, 2) + 90 * (MAZE_SIZE * 2) / a) -
               sqrt(pow(v0 / a, 2) + 90 * (MAZE_SIZE * 2 - 1) / a));
   for (int i = 0; i < MAZE_SIZE * 2; i++) {
-    float x = 90 * (i + 1);
+    const float x = 90 * (i + 1);
     straightStepTable[i] = (sqrt(pow(v0 / a, 2) + x / a) - v0 / a) * factor;
   }
   for (int i = 0; i < MAZE_SIZE * 2; i++) {
-    float x = 90 * (i + 1);
+    const float x = 90 * (i + 1);
     straightStepTable[i] = (sqrt(pow(v0 / a, 2) + x / a) - v0 / a) * factor;
   }
 }

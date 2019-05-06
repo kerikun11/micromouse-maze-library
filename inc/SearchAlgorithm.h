@@ -85,7 +85,7 @@ private:
    *  @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
   bool findShortestCandidates(Vectors &candidates);
-  int countIdentityCandidates(const WallLogs idWallLogs,
+  int countIdentityCandidates(const WallLogs &idWallLogs,
                               std::pair<Vector, Dir> &ans) const;
   enum Status calcNextDirsSearchForGoal(const Vector &cv, const Dir &cd,
                                         Dirs &nextDirsKnown,

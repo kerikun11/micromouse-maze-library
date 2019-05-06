@@ -1,7 +1,7 @@
 #
 # MazeLib/CMakeLists.txt
 #
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.11)
 
 project("MazeLib" CXX)
 
@@ -10,9 +10,9 @@ project("MazeLib" CXX)
 #
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -Wall -Wextra")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+# set(CMAKE_CXX_FLAGS_DEBUG "-O0 -DDEBUG")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 add_subdirectory(src)
 
