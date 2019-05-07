@@ -125,15 +125,17 @@ TestRobot robot;
 int main(int argc, char *argv[]) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
   if (argc < 2) {
-    std::cout << "usage: command mazefile.maze" << std::endl;
+    std::cout << "Please specify a maze file!" << std::endl;
+    std::cout << "usage: $ test_solve <mazefile.maze>" << std::endl;
     return -1;
   }
-  if (!sample.parse(argv[1])) {
-    std::cout << "Failed to parse file!" << std::endl;
+  const auto filename = argv[1];
+  if (!sample.parse(filename)) {
+    std::cout << "Failed to parse " << filename << " !" << std::endl;
     return -1;
   }
+  std::cout << "Solving " << filename << " ..." << std::endl;
   robot.replaceGoals(sample.getGoals());
-  // display = 1;
   robot.searchRun();
   robot.printInfo();
   robot.fastRun(false);

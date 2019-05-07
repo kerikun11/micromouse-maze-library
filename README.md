@@ -8,7 +8,7 @@
 mkdir build
 cd build
 cmake ..
-make run
+make main
 ```
 
 ### cross compiling
