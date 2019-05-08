@@ -18,10 +18,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -flto")
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
 
-if(CMAKE_GENERATOR MATCHES "MSYS")
-  ## for __attribute__((__packed__)) on MSYS
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mno-ms-bitfields")
-endif()
+## for __attribute__((__packed__)) on MSYS
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mno-ms-bitfields")
 
 ## set build type
 # set(CMAKE_BUILD_TYPE Debug)

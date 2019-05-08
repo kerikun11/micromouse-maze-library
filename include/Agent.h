@@ -124,26 +124,7 @@ public:
     printInfo(showMaze, curVec, curDir, state);
   }
   void printInfo(const bool showMaze, const Vector vec, const Dir dir,
-                 const SearchAlgorithm::State state) const {
-    // 迷路を表示
-    if (showMaze) {
-      printf("\e[0;0H"); //< カーソルを左上に移動
-      // printf("\e[2J");   //< 画面をクリア (ちらつく)
-      searchAlgorithm.printMap(state, vec, dir);
-    }
-    // 詳細を表示
-    printf("Cur: ( %2d, %2d, %2c), State: %s \n", vec.x, vec.y, dir.toChar(),
-           SearchAlgorithm::stateString(state));
-    printf("nextDirsKnown: ");
-    for (const auto d : getNextDirs())
-      printf("%c", d.toChar());
-    printf(" \n");
-    printf("nextDirCandidates: ");
-    for (const auto d : getNextDirCandidates())
-      printf("%c", d.toChar());
-    printf("\n");
-    printf("Match Count: %d \n", matchCount);
-  }
+                 const SearchAlgorithm::State state) const;
   /** @function printPath
    *  @brief 最短経路の表示
    */
@@ -153,8 +134,9 @@ public:
   }
 
 protected:
-  Maze &maze;                         /**< 使用する迷路 */
-  SearchAlgorithm::State state;       /**< 現在の探索状態を保持 */
+  Maze &maze; /**< 使用する迷路 */
+  SearchAlgorithm::State state =
+      SearchAlgorithm::START;         /**< 現在の探索状態を保持 */
   Vector curVec;                      /**< 現在の区画座標 */
   Dir curDir;                         /**< 現在向いている方向 */
   bool isForceBackToStart = false;    /**< 強制帰還モード */

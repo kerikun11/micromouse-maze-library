@@ -1,10 +1,10 @@
 {
     "name": "MazeLib",
-    "description": "MazeLib",
+    "description": "Maze Solver for Micromouse",
     "keywords": "micromouse",
     "build": {
         "flags": [
-            "-I inc",
+            "-I include",
             "-std=c++14"
         ]
     }

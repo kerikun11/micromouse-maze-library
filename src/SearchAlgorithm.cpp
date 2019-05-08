@@ -19,7 +19,7 @@ namespace MazeLib {
 #define SEARCHING_ADDITIONALLY_AT_START 1
 
 const char *SearchAlgorithm::stateString(const enum State s) {
-  static const char *str[] = {
+  static const char *const str[] = {
       "Start                 ", "Searching for Goal    ",
       "Searching Additionally", "Backing to Start      ",
       "Reached Start         ", "Impossible            ",
