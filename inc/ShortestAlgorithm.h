@@ -28,7 +28,7 @@ public:
 
 public:
   typedef uint16_t cost_t;
-  enum Pattern {
+  enum Pattern : int8_t {
     ST_ALONG,
     ST_DIAG,
     F45,
@@ -81,19 +81,17 @@ public:
   }
   /**
    * @brief Graph の Node の Index．
-   * 変数表現は隣接区画で冗長になりうるが，コンストラクタで一意にしているので，メンバ変数は一意．
-   * 各区画中央の4方位，各壁中央の4方位，の位置姿勢を識別する
+   * 「各区画中央の4方位」または「 各壁上の4方位」，の位置姿勢を一意に識別する
    */
   union __attribute__((__packed__)) Index {
   private:
     struct __attribute__((__packed__)) {
-      int x : 6;           //< x
-      int y : 6;           //< y
-      unsigned int nd : 3; //< real dir of node
-      unsigned int z : 1;  //< position assignment in a cell
+      int x : 6;           /**< @brief x coordinate of cell */
+      int y : 6;           /**< @brief y coordinate of cell */
+      unsigned int nd : 3; /**< @brief direction of node */
+      unsigned int z : 1;  /**< @brief position assignment in a cell */
     };
-    unsigned int all : 16;
-
+    unsigned int all : 16; /**< @brief union element for all access */
   public:
     Index(const int8_t x, const int8_t y, const Dir d, const Dir nd)
         : x(x), y(y), nd(nd) {
@@ -311,6 +309,9 @@ public:
   };
   static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
   typedef std::vector<Index> Indexs;
+  /**
+   * @brief Graph の Node
+   */
   struct __attribute__((__packed__)) Node {
     enum State : uint8_t { None, Open, Closed } state;
     cost_t cost;
@@ -320,14 +321,21 @@ public:
         : state(state), cost(cost), from(from) {}
   };
   static_assert(sizeof(Node) == 5, "Node Size Error"); /**< Size Check */
-  cost_t getHuristic(const Index i, const Vectors &goals) const {
+
+  /**
+   * @brief Get the Huristic Value
+   * @param i Index
+   * @return cost_t huristic value
+   */
+  cost_t getHuristic(const Index i) const {
     // return 0;
-    auto v = Vector(i) - goals[0];
-    float x = std::abs(v.x);
-    float y = std::abs(v.y);
-    float d = x + y;
-    // float d = std::sqrt(v.x * v.x + v.y * v.y);
-    // float d = v.x * v.x + v.y * v.y;
+    const auto v = Vector(i) - maze.getGoals()[0];
+    const float x = std::abs(v.x);
+    const float y = std::abs(v.y);
+    const float d = x + y;
+    // const float d = std::sqrt(v.x * v.x + v.y * v.y);
+    // const float d = std::max(x, y);
+    // const float d = v.x * v.x + v.y * v.y;
     return getEdgeCost(ST_DIAG, d);
   }
   bool calcShortestPath(Indexs &path, bool known_only = true) {
@@ -374,18 +382,17 @@ public:
       index.neighbors_for(
           maze, known_only, [&](const auto nibr_index, const auto edge_cost) {
             Node &neighbor_node = node_map[nibr_index];
-            cost_t h_n = getHuristic(index, goals);
-            cost_t h_m = getHuristic(nibr_index, goals);
+            cost_t h_n = getHuristic(index);
+            cost_t h_m = getHuristic(nibr_index);
             cost_t g_n = node_map[index].cost - h_n;
             cost_t f_m_prime = g_n + edge_cost + h_m;
             if (neighbor_node.state == Node::None ||
                 f_m_prime < neighbor_node.cost) {
-              // std::cout << (int)f_m_prime << std::endl;
               neighbor_node = Node(Node::Open, f_m_prime, index);
               open_list.push(nibr_index);
             }
-            // std::cout << "  - \t" << neighbor_index
-            //           << "\t: " << neighbor_node.cost
+            // std::cout << "  - \t" << nibr_index << "\t: " <<
+            // neighbor_node.cost
             //           << std::endl; //< print
           });
     }
@@ -449,14 +456,7 @@ public:
         } else {
           for (auto index = path[i]; index != path[i + 1];
                index = index.next()) {
-            auto nd_45 = ((index.getDir() == Dir::East &&
-                           (index.getNodeDir() == Dir::NorthEast ||
-                            index.getNodeDir() == Dir::SouthWest)) ||
-                          (index.getDir() == Dir::North &&
-                           (index.getNodeDir() == Dir::NorthWest ||
-                            index.getNodeDir() == Dir::SouthEast)))
-                             ? Dir::Left45
-                             : Dir::Right45;
+            const auto nd_45 = index.arrow_cell_45();
             dirs.push_back(index.getNodeDir() + nd_45);
           }
         }

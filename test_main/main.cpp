@@ -8,6 +8,8 @@
 
 using namespace MazeLib;
 
+#if 1
+
 Maze maze_target;
 bool display = 0;
 
@@ -135,6 +137,8 @@ private:
   }
 };
 
+#endif
+
 void loadMaze(Maze &maze_target) {
   switch (MAZE_SIZE) {
   case 8:
@@ -151,11 +155,11 @@ void loadMaze(Maze &maze_target) {
   }
 }
 
-CLRobot robot;
-
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
   loadMaze(maze_target);
+#if 1
+  CLRobot robot;
   robot.replaceGoals(maze_target.getGoals());
   display = 1;
   robot.searchRun();
@@ -166,17 +170,25 @@ int main(void) {
   robot.fastRun(true);
   robot.printPath();
   // robot.endFastRunBackingToStartRun();
+#endif
 
-#if 0
-  ShortestAlgorithm sa(maze_target);
-  ShortestAlgorithm::Indexs path;
-  const auto t_s = std::chrono::system_clock().now();
-  sa.calcShortestPath(path, false);
-  const auto t_e = std::chrono::system_clock().now();
-  const auto us =
-      std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
-  std::cout << "It took " << us.count() << " [us]" << std::endl;
-  sa.printPath(std::cout, path);
+#if 1
+  const int n = 100;
+  std::chrono::microseconds sum{0};
+  for (int i = 0; i < n; ++i) {
+    Maze maze;
+    loadMaze(maze);
+    ShortestAlgorithm sa(maze);
+    ShortestAlgorithm::Indexs path;
+    const auto t_s = std::chrono::system_clock().now();
+    sa.calcShortestPath(path, false);
+    const auto t_e = std::chrono::system_clock().now();
+    const auto us =
+        std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+    sum += us;
+    // sa.printPath(std::cout, path);
+  }
+  std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
 #endif
 
   return 0;
