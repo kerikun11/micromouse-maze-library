@@ -15,13 +15,6 @@ namespace MazeLib {
 /** @struct Dir
  *   @brief 迷路上の方向を定義
  */
-const std::array<Dir, 4> &Dir::ENWS() {
-  static const std::array<Dir, 4> all = {East, North, West, South};
-  return all;
-}
-std::ostream &operator<<(std::ostream &os, const Dir &d) {
-  return os << d.toChar();
-}
 
 /** @struct Vector
  *   @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
@@ -69,24 +62,30 @@ const Vector Vector::rotate(const Dir d) const {
  *   @brief 迷路の壁情報を管理するクラス
  */
 Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1], bool east_origin) {
-  for (uint8_t y = 0; y < MAZE_SIZE; y++)
-    for (uint8_t x = 0; x < MAZE_SIZE; x++) {
-      char c = data[MAZE_SIZE - y - 1][x];
+  for (int8_t y = 0; y < MAZE_SIZE; y++)
+    for (int8_t x = 0; x < MAZE_SIZE; x++) {
+      const char c = data[MAZE_SIZE - y - 1][x];
       uint8_t h = 0;
       if ('0' <= c && c <= '9')
         h = c - '0';
       else if ('a' <= c && c <= 'f')
         h = c - 'a' + 10;
+      else if ('A' <= c && c <= 'F')
+        h = c - 'A' + 10;
       if (east_origin) {
         updateWall(Vector(x, y), Dir::East, h & 0x01, false);
         updateWall(Vector(x, y), Dir::North, h & 0x02, false);
         updateWall(Vector(x, y), Dir::West, h & 0x04, false);
         updateWall(Vector(x, y), Dir::South, h & 0x08, false);
       } else {
+        updateWall(Vector(x, y), Dir::North, h & 0x1, false);
         updateWall(Vector(x, y), Dir::East, h & 0x02, false);
-        updateWall(Vector(x, y), Dir::North, h & 0x01, false);
-        updateWall(Vector(x, y), Dir::West, h & 0x08, false);
-        updateWall(Vector(x, y), Dir::South, h & 0x04, false);
+        updateWall(Vector(x, y), Dir::West, h & 0x04, false);
+        updateWall(Vector(x, y), Dir::South, h & 0x08, false);
+        // updateWall(Vector(y, x), Dir::North, h & 0x1, false);
+        // updateWall(Vector(y, x), Dir::East, h & 0x02, false);
+        // updateWall(Vector(y, x), Dir::West, h & 0x04, false);
+        // updateWall(Vector(y, x), Dir::South, h & 0x08, false);
       }
     }
 }
@@ -245,19 +244,19 @@ bool Maze::isWall(const wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
                   const int8_t y, const Dir d) {
   switch (d) {
   case Dir::East:
-    if (x < 0 || x > MAZE_SIZE - 2 || y < 0 || y > MAZE_SIZE - 1)
+    if (x < 0 || x >= MAZE_SIZE - 1 || y < 0 || y >= MAZE_SIZE)
       return true; //< 盤面外
     return wall[0][x] & (1 << y);
   case Dir::North:
-    if (x < 0 || x > MAZE_SIZE - 1 || y < 0 || y > MAZE_SIZE - 2)
+    if (x < 0 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE - 1)
       return true; //< 盤面外
     return wall[1][y] & (1 << x);
   case Dir::West:
-    if (x - 1 < 0 || x - 1 > MAZE_SIZE - 2 || y < 0 || y > MAZE_SIZE - 1)
+    if (x < 1 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE)
       return true; //< 盤面外
     return wall[0][x - 1] & (1 << y);
   case Dir::South:
-    if (x < 0 || x > MAZE_SIZE - 1 || y - 1 < 0 || y - 1 > MAZE_SIZE - 2)
+    if (x < 0 || x >= MAZE_SIZE || y < 1 || y >= MAZE_SIZE)
       return true; //< 盤面外
     return wall[1][y - 1] & (1 << x);
   }
@@ -268,7 +267,7 @@ void Maze::setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
                    const int8_t y, const Dir d, const bool b) {
   switch (d) {
   case Dir::East:
-    if (x < 0 || x > MAZE_SIZE - 2 || y < 0 || y > MAZE_SIZE - 1)
+    if (x < 0 || x >= MAZE_SIZE - 1 || y < 0 || y >= MAZE_SIZE)
       return; //< 盤面外
     if (b)
       wall[0][x] |= (1 << y);
@@ -276,7 +275,7 @@ void Maze::setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
       wall[0][x] &= ~(1 << y);
     return;
   case Dir::North:
-    if (x < 0 || x > MAZE_SIZE - 1 || y < 0 || y > MAZE_SIZE - 2)
+    if (x < 0 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE - 1)
       return; //< 盤面外
     if (b)
       wall[1][y] |= (1 << x);
@@ -284,7 +283,7 @@ void Maze::setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
       wall[1][y] &= ~(1 << x);
     return;
   case Dir::West:
-    if (x - 1 < 0 || x - 1 > MAZE_SIZE - 2 || y < 0 || y > MAZE_SIZE - 1)
+    if (x < 1 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE)
       return; //< 盤面外
     if (b)
       wall[0][x - 1] |= (1 << y);
@@ -292,7 +291,7 @@ void Maze::setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
       wall[0][x - 1] &= ~(1 << y);
     return;
   case Dir::South:
-    if (x < 0 || x > MAZE_SIZE - 1 || y - 1 < 0 || y - 1 > MAZE_SIZE - 2)
+    if (x < 0 || x >= MAZE_SIZE || y < 1 || y >= MAZE_SIZE)
       return; //< 盤面外
     if (b)
       wall[1][y - 1] |= (1 << x);

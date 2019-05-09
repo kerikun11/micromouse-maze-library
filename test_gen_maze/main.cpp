@@ -21,23 +21,26 @@ const char mazeData_MM2018HX[32 + 1][32 + 1] = {
     "43c948aaaaaaaaaaaa3e8aaaaaa95dd5", "dcaa8aaaaaaaaaaaaa8aaaaaaaaa8aa9",
 };
 
-// Maze sample(mazeData_MM2018HX);
-Maze sample;
+const char mazeData_MM2016CX[16 + 1][16 + 1] = {
+    "a6666663ba627a63", "c666663c01a43c39", "a2623b879847c399",
+    "9c25c05b85e23999", "9a43a5b85e219999", "9c385b85e25d9999",
+    "9e05b85e25a39999", "9a5b85ba1a599999", "99b85b84587c5999",
+    "9c05b85a20666599", "c3db85a5d9bbbb99", "b87847c639800059",
+    "85e466665c5dddb9", "8666666666666645", "c666666666666663",
+    "e666666666666665",
+};
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
+  std::cout << "Maze File Generator" << std::endl;
+  Maze sample(mazeData_MM2018HX, false);
   sample.setGoals({
-      Vector(11, 11),
-      Vector(11, 12),
-      Vector(11, 13),
-      Vector(12, 11),
-      Vector(12, 12),
-      Vector(12, 13),
-      Vector(13, 11),
-      Vector(13, 12),
-      Vector(13, 13),
+      Vector(7, 7),
+      Vector(8, 7),
+      Vector(7, 8),
+      Vector(8, 8),
   });
-  std::ofstream of("32MM2018HX.maze");
+  std::ofstream of("16MM2016CX.maze");
   sample.print(of);
   sample.print();
   return 0;

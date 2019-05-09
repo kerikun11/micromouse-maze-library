@@ -165,26 +165,20 @@ private:
   }
 };
 
-void loadMaze(Maze &maze_target) {
+const Maze loadMaze() {
   switch (MAZE_SIZE) {
   case 8:
-    // maze_target.parse("../mazedata/08Test1.maze");
-    maze_target.parse("../mazedata/08MM2016CF_pre.maze");
-    break;
+    return Maze("../mazedata/08MM2016CF_pre.maze");
   case 16:
-    maze_target.parse("../mazedata/16MM2017CX.maze");
-    break;
+    return Maze("../mazedata/16MM2016CX.maze");
   case 32:
-    maze_target.parse("../mazedata/32MM2016HX.maze");
-    // maze_target.parse("../mazedata/32MM2017CX.maze");
-    break;
+    return Maze("../mazedata/32MM2016HX.maze");
   }
 }
 
 CLRobot robot;
 
 void test_position_identify() {
-  loadMaze(maze_target);
   /* Search Run */
   display = 0;
   robot.replaceGoals(maze_target.getGoals());
@@ -202,7 +196,7 @@ void test_position_identify() {
   }
 
   /* Starts from each cell on the shortest path */
-  display = 0;
+  display = 1;
   for (auto diag : {true, false}) {
     robot.calcShortestDirs(diag);
     auto sdirs = robot.getShortestDirs();
@@ -229,6 +223,7 @@ void test_position_identify() {
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
+  maze_target = loadMaze();
   test_position_identify();
   return 0;
 }

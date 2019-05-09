@@ -24,6 +24,8 @@ static constexpr int MAZE_SIZE = 32;
  *   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
  */
 typedef uint32_t wall_size_t;
+static_assert(sizeof(wall_size_t) * 8 == MAZE_SIZE,
+              "wall_size_t"); /* Size Check */
 
 /**
  *  @brief 迷路のカラー表示切替
@@ -65,40 +67,45 @@ public:
     SouthWest,
     South,
     SouthEast,
-    // AbsMax,
   };
   /**
    *  @brief 相対方向の列挙型
    */
   enum RelativeDir : int8_t {
-    Front = 0,
+    Front,
     Left45,
-    Left = 2,
+    Left,
     Left135,
-    Back = 4,
+    Back,
     Right135,
-    Right = 6,
+    Right,
     Right45,
-    // RelMax = 8,
   };
   static constexpr int8_t AbsMax = 8;
   /**
    *  @param d Absolute Direction
    */
-  Dir(const enum AbsoluteDir d = East) : d(d & 7) {}
-  Dir(const int8_t d) : d(d & 7) {}
-  /** @brief 整数へのキャスト
-   */
+  Dir(const enum AbsoluteDir d = East) : d(d) {}
+  Dir(const int8_t d) : d(d & 7) {} /**< @brief 定義範囲内に直す */
+  /** @brief 整数へのキャスト */
   operator int8_t() const { return d; }
+  const Dir &operator=(const Dir &obj) { return d = obj.d, *this; }
   char toChar() const { return ">'^`<,v.x"[d]; }
   bool isAlong() const { return (d & 1) == 0; }
   bool isDiag() const { return (d & 1) == 1; }
-  const Dir operator=(const Dir &obj) { return d = obj.d, *this; }
   /**
    *  @brief 全方向の方向配列を生成する静的関数
    */
-  static const std::array<Dir, 4> &ENWS();
-  friend std::ostream &operator<<(std::ostream &os, const Dir &d);
+  static const std::array<Dir, 4> &ENWS() {
+    static const std::array<Dir, 4> all = {East, North, West, South};
+    return all;
+  }
+  /**
+   * @brief 表示
+   */
+  friend std::ostream &operator<<(std::ostream &os, const Dir &d) {
+    return os << d.toChar();
+  }
 
 private:
   int8_t d; /**< @brief 方向の実体 */
@@ -163,6 +170,7 @@ public:
    */
   friend std::ostream &operator<<(std::ostream &os, const Vector &v);
 };
+static_assert(sizeof(Vector) == 2, "sizeof(Vector) Error"); /**< Size Check */
 /**
  * @brief Vector構造体の動的配列
  */

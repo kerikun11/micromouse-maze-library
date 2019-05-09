@@ -59,7 +59,7 @@ private:
     of << usec << std::endl;
     if (newState == prevState)
       return;
-
+    /* State Change has occurred */
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
       sleep(1);
       display = 0;
@@ -139,25 +139,20 @@ private:
 
 #endif
 
-void loadMaze(Maze &maze_target) {
+const Maze loadMaze() {
   switch (MAZE_SIZE) {
   case 8:
-    // maze_target.parse("../mazedata/08Test1.maze");
-    maze_target.parse("../mazedata/08MM2016CF_pre.maze");
-    break;
+    return Maze("../mazedata/08MM2016CF_pre.maze");
   case 16:
-    maze_target.parse("../mazedata/16MM2017CX.maze");
-    break;
+    return Maze("../mazedata/16MM2016CX.maze");
   case 32:
-    maze_target.parse("../mazedata/32MM2016HX.maze");
-    // maze_target.parse("../mazedata/32MM2017CX.maze");
-    break;
+    return Maze("../mazedata/32MM2016HX.maze");
   }
 }
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
-  loadMaze(maze_target);
+  maze_target = loadMaze();
 #if 1
   CLRobot robot;
   robot.replaceGoals(maze_target.getGoals());
@@ -176,8 +171,7 @@ int main(void) {
   const int n = 100;
   std::chrono::microseconds sum{0};
   for (int i = 0; i < n; ++i) {
-    Maze maze;
-    loadMaze(maze);
+    Maze maze = loadMaze();
     ShortestAlgorithm sa(maze);
     ShortestAlgorithm::Indexs path;
     const auto t_s = std::chrono::system_clock().now();
