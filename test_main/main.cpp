@@ -12,6 +12,7 @@ using namespace MazeLib;
 
 Maze maze_target;
 bool display = 0;
+std::ofstream of("out.txt");
 
 class CLRobot : public RobotBase {
 public:
@@ -55,8 +56,7 @@ private:
                .count();
     if (max_usec < usec)
       max_usec = usec;
-    std::ofstream of("out.txt", std::ios::app);
-    of << usec << std::endl;
+    of << usec << "\t" << maze.getWallLogs().size() << std::endl;
     if (newState == prevState)
       return;
     /* State Change has occurred */
@@ -152,11 +152,11 @@ const Maze loadMaze() {
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
-  maze_target = loadMaze();
 #if 1
+  maze_target = loadMaze();
   CLRobot robot;
   robot.replaceGoals(maze_target.getGoals());
-  display = 1;
+  display = 0;
   robot.searchRun();
   robot.printInfo();
   robot.fastRun(false);

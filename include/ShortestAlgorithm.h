@@ -28,6 +28,7 @@ public:
 
 public:
   typedef uint16_t cost_t;
+  static constexpr cost_t CostMax = UINT16_MAX;
   enum Pattern : int8_t {
     ST_ALONG,
     ST_DIAG,
@@ -313,14 +314,14 @@ public:
    * @brief Graph の Node
    */
   struct __attribute__((__packed__)) Node {
-    enum State : uint8_t { None, Open, Closed } state;
     cost_t cost;
+    cost_t rhs;
     Index from;
-    Node(const enum State state = None, const cost_t cost = 0,
+    Node(const cost_t cost = CostMax, const cost_t rhs = CostMax,
          const Index from = Index())
-        : state(state), cost(cost), from(from) {}
+        : cost(cost), rhs(rhs), from(from) {}
   };
-  static_assert(sizeof(Node) == 5, "Node Size Error"); /**< Size Check */
+  static_assert(sizeof(Node) == 6, "Node Size Error"); /**< Size Check */
 
   /**
    * @brief Get the Huristic Value
@@ -350,7 +351,7 @@ public:
     /* 2. */
     /* 3. */
     const auto start_index = Index(0, 0, Dir::AbsMax, Dir::North);
-    node_map[start_index] = Node(Node::Open, 0);
+    node_map[start_index] = Node(0);
     open_list.push(start_index);
     Index goal_index; //< 終点の用意
     while (1) {
@@ -377,24 +378,23 @@ public:
         goal_index = index;
         break;
       }
-      node_map[index].state = Node::Closed;
       /* 7. */
-      index.neighbors_for(
-          maze, known_only, [&](const auto nibr_index, const auto edge_cost) {
-            Node &neighbor_node = node_map[nibr_index];
-            cost_t h_n = getHuristic(index);
-            cost_t h_m = getHuristic(nibr_index);
-            cost_t g_n = node_map[index].cost - h_n;
-            cost_t f_m_prime = g_n + edge_cost + h_m;
-            if (neighbor_node.state == Node::None ||
-                f_m_prime < neighbor_node.cost) {
-              neighbor_node = Node(Node::Open, f_m_prime, index);
-              open_list.push(nibr_index);
-            }
-            // std::cout << "  - \t" << nibr_index << "\t: " <<
-            // neighbor_node.cost
-            //           << std::endl; //< print
-          });
+      index.neighbors_for(maze, known_only,
+                          [&](const auto nibr_index, const auto edge_cost) {
+                            Node &neighbor_node = node_map[nibr_index];
+                            cost_t h_n = getHuristic(index);
+                            cost_t h_m = getHuristic(nibr_index);
+                            cost_t g_n = node_map[index].cost - h_n;
+                            cost_t f_m_prime = g_n + edge_cost + h_m;
+                            if (f_m_prime < neighbor_node.cost) {
+                              neighbor_node.cost = f_m_prime;
+                              neighbor_node.from = index;
+                              open_list.push(nibr_index);
+                            }
+                            // std::cout << "  - \t" << nibr_index << "\t: " <<
+                            // neighbor_node.cost
+                            //           << std::endl; //< print
+                          });
     }
     /* 9. */
     path.erase(path.begin(), path.end());

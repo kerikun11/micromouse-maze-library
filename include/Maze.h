@@ -341,10 +341,25 @@ public:
     printPath(std::cout, start, dirs);
   }
 
+  /**
+   * @brief Set the Goals object
+   */
   void setGoals(const Vectors &goals) { this->goals = goals; }
+  /**
+   * @brief Set the Start object
+   */
   void setStart(const Vector &start) { this->start = start; }
+  /**
+   * @brief Get the Goals object
+   */
   const Vectors &getGoals() const { return goals; }
+  /**
+   * @brief Get the Start object
+   */
   const Vector &getStart() const { return start; }
+  /**
+   * @brief Get the Wall Logs object
+   */
   const WallLogs &getWallLogs() const { return wallLogs; }
 
 private:
