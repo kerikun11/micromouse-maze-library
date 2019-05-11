@@ -69,7 +69,7 @@ public:
                    const Dirs &nextDirCandidates, Dir &nextDir) const;
   bool findNextDir(const Maze &maze, const Vector v, const Dir d,
                    const Dirs &nextDirCandidates, Dir &nextDir) const;
-  bool calcShortestDirs(Dirs &shortestDirs, const bool diagonal = true);
+  bool calcShortestDirs(Dirs &shortestDirs, const bool diag_enabled = true);
   void printMap(const State state, const Vector vec, const Dir dir) const;
   const StepMap &getStepMap() const { return stepMap; }
   const Maze &getMaze() const { return maze; }

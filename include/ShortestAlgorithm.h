@@ -1,3 +1,13 @@
+/**
+ * @file ShortestAlgorithm.h
+ * @author Ryotaro Onuki (kerikun11+github@gmail.com)
+ * @brief
+ * @version 0.1
+ * @date 2019-05-11
+ *
+ * @copyright Copyright (c) 2019
+ *
+ */
 #pragma once
 
 #include "Maze.h"
@@ -5,6 +15,7 @@
 #include <algorithm>
 #include <functional>
 #include <iomanip> //< for std::setw()
+#include <limits>
 #include <queue>
 #include <unordered_map>
 
@@ -13,22 +24,13 @@ namespace MazeLib {
 class ShortestAlgorithm {
 public:
   ShortestAlgorithm(const Maze &maze) : maze(maze) {
-    /* メモリの確保 */
-#if 0
-    for (const auto d : {Dir::East, Dir::North})
-      for (const auto nd :
-           {Dir::NorthEast, Dir::NorthWest, Dir::SouthWest, Dir::SouthEast})
-        for (int x = 0; x < MAZE_SIZE; x++)
-          for (int y = 0; y < MAZE_SIZE; y++)
-            node_map[Index(x, y, d, nd)] = Node();
-#endif
     /* テーブルの計算 */
     getEdgeCost(ST_ALONG);
   }
 
 public:
-  typedef uint16_t cost_t;
-  static constexpr cost_t CostMax = UINT16_MAX;
+  using cost_t = uint16_t;
+  static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
   enum Pattern : int8_t {
     ST_ALONG,
     ST_DIAG,
@@ -46,6 +48,12 @@ public:
     if (!initialized) {
       initialized = true;
       /* 台形加速のコストテーブルを事前に用意 */
+      /*  /  ‾‾‾‾  \  */
+      /* t0 t1 t0 */
+      /* t0 = (vm-vs) / am */
+      /* x = (t0+t1+t0+t1)*(vm-vs)/2 */
+      /* t1 = 2*x/(vm-vs) */
+
       static const float a = 3000.0f;
       static const float v_s = 300.0f;
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
@@ -148,6 +156,11 @@ public:
     }
     const Vector arrow_from() const {
       switch (nd) {
+      case Dir::East:
+      case Dir::North:
+      case Dir::West:
+      case Dir::South:
+        return Vector(x, y);
       case Dir::NorthEast:
         return Vector(x, y);
       case Dir::NorthWest:
@@ -164,6 +177,11 @@ public:
     }
     const Vector arrow_to() const {
       switch (nd) {
+      case Dir::East:
+      case Dir::North:
+      case Dir::West:
+      case Dir::South:
+        return Vector(x, y).next(nd);
       case Dir::NorthEast:
         return z == 0 ? Vector(x + 1, y) : Vector(x, y + 1);
       case Dir::NorthWest:
@@ -178,7 +196,7 @@ public:
       std::cerr << "Invalid Index" << std::endl;
       return Vector(x, y);
     }
-    const Dir arrow_cell_45() const {
+    const Dir arrow_diag_to_along_45() const {
       auto nd_45 =
           ((z == 0 && (nd == Dir::NorthEast || nd == Dir::SouthWest)) ||
            (z == 1 && (nd == Dir::NorthWest || nd == Dir::SouthEast)))
@@ -218,7 +236,7 @@ public:
       return Index();
     }
     void neighbors_for(
-        const Maze &maze, const bool known_only,
+        const Maze &maze, const bool known_only, const bool diag_enabled,
         std::function<void(const Index, const cost_t)> callback) const {
       /* known_only を考慮した壁の判定式を用意 */
       auto canGo = [&](const Vector vec, const Dir dir) {
@@ -228,6 +246,23 @@ public:
           return false;
         return true;
       };
+      if (!diag_enabled) {
+        /* 直進で行けるところまで行く */
+        auto v_st = arrow_to(); //< 前方のマス
+        for (int8_t n = 1;; n++) {
+          if (!canGo(v_st, nd))
+            break;
+          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
+          v_st = v_st.next(nd);
+        }
+        /* ここからはターン */
+        const auto v_f = arrow_to(); //< i.e. vector front
+        /* 左右を一般化 */
+        for (const auto d_turn : {Dir::Left, Dir::Right})
+          if (canGo(v_f, nd + d_turn)) //< 90度方向の壁
+            callback(Index(v_f, Dir::AbsMax, nd + d_turn), getEdgeCost(FS90));
+        return;
+      }
       /* 区画の中央 */
       if (Dir(nd).isAlong()) {
         Vector v = Vector(x, y); //< 仮想位置
@@ -244,7 +279,7 @@ public:
           callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           v_st = v_st.next(nd);
         }
-        /* ターン */
+        /* ここからはターン */
         const auto d_f = nd;          //< i.e. dir front
         const auto v_f = v.next(d_f); //< i.e. vector front
         /* 左右を一般化 */
@@ -289,7 +324,7 @@ public:
           i_st = i_ff;
         }
         /* 左右を一般化 */
-        auto nd_r45 = arrow_cell_45();
+        auto nd_r45 = arrow_diag_to_along_45();
         auto d_45 = nd + nd_r45;
         auto nd_90 = nd + nd_r45 * 2;
         auto d_135 = nd + nd_r45 * 3;
@@ -339,7 +374,8 @@ public:
     // const float d = v.x * v.x + v.y * v.y;
     return getEdgeCost(ST_DIAG, d);
   }
-  bool calcShortestPath(Indexs &path, bool known_only = true) {
+  bool calcShortestPath(Indexs &path, bool known_only = true,
+                        bool diag_enabled = true) {
     /* 1. */
     std::unordered_map<Index, Node, Index::hash> node_map;
     std::function<bool(const Index &i1, const Index &i2)> greater =
@@ -354,9 +390,11 @@ public:
     node_map[start_index] = Node(0);
     open_list.push(start_index);
     Index goal_index; //< 終点の用意
+    auto max_size = open_list.size();
     while (1) {
       /* 4. */
       // std::cout << "open_list.size(): " << open_list.size() << std::endl;
+      max_size = std::max(max_size, open_list.size());
       if (open_list.empty()) {
         std::cerr << "open_list.empty()" << std::endl;
         return false;
@@ -367,19 +405,18 @@ public:
       // std::cout << "top:\t" << index << "\t: " << node_map[index].cost
       //           << std::endl; //< print
       /* 6. */
+      /* 斜めでないかつゴール区画 */
       const auto &goals = maze.getGoals();
-      const auto it =
+      if (goals.cend() !=
           std::find_if(goals.cbegin(), goals.cend(), [&](const auto v) {
-            /* 斜めでないかつゴール区画 */
-            return (index.getNodeDir() & 1) == 0 && v == Vector(index);
-          });
-      if (it != goals.cend()) {
+            return index.getNodeDir().isAlong() && v == Vector(index);
+          })) {
         /* GOAL! */
         goal_index = index;
         break;
       }
       /* 7. */
-      index.neighbors_for(maze, known_only,
+      index.neighbors_for(maze, known_only, diag_enabled,
                           [&](const auto nibr_index, const auto edge_cost) {
                             Node &neighbor_node = node_map[nibr_index];
                             cost_t h_n = getHuristic(index);
@@ -391,11 +428,12 @@ public:
                               neighbor_node.from = index;
                               open_list.push(nibr_index);
                             }
-                            // std::cout << "  - \t" << nibr_index << "\t: " <<
-                            // neighbor_node.cost
+                            // std::cout << "  - \t" << nibr_index << "\t: "
+                            // << neighbor_node.cost
                             //           << std::endl; //< print
                           });
     }
+    // std::cout << "max open list size: " << max_size << std::endl;
     /* 9. */
     path.erase(path.begin(), path.end());
     for (auto i = goal_index; i != start_index; i = node_map[i].from) {
@@ -406,7 +444,7 @@ public:
     /* END A* */
     // std::cout << start_index << std::endl;
     std::reverse(path.begin(), path.end());
-    Dirs dirs = indexs2dirs(path);
+    Dirs dirs = indexs2dirs(path, diag_enabled);
     // maze.printPath(Vector(0, 0), dirs);
     return true;
   }
@@ -439,14 +477,21 @@ public:
       os << "+" << std::endl;
     }
   }
-  static const Dirs indexs2dirs(const Indexs &path) {
+  static const Dirs indexs2dirs(const Indexs &path, const bool diag_enabled) {
+    if (!diag_enabled) {
+      Dirs dirs;
+      for (int i = 0; i < (int)path.size() - 1; i++) {
+        const auto nd = path[i].getNodeDir();
+        const auto v = Vector(path[i + 1]) - Vector(path[i]);
+        for (int j = 0; j < std::abs(v.x) + std::abs(v.y); j++)
+          dirs.push_back(nd);
+      }
+      return dirs;
+    }
     Dirs dirs;
     for (int i = 0; i < (int)path.size() - 1; i++) {
-      // auto v = Vector(path[i]);
-      // auto d = path[i].getDir();
       auto nd = path[i].getNodeDir();
       auto rel_v = Vector(path[i + 1]) - Vector(path[i]);
-      // auto rel_d = Dir(path[i + 1].getDir() - path[i].getDir());
       auto rel_nd = Dir(path[i + 1].getNodeDir() - path[i].getNodeDir());
       switch (rel_nd) {
       case Dir::Front:
@@ -456,7 +501,7 @@ public:
         } else {
           for (auto index = path[i]; index != path[i + 1];
                index = index.next()) {
-            const auto nd_45 = index.arrow_cell_45();
+            const auto nd_45 = index.arrow_diag_to_along_45();
             dirs.push_back(index.getNodeDir() + nd_45);
           }
         }
@@ -534,6 +579,6 @@ public:
 
 private:
   const Maze &maze;
-};
+}; // namespace MazeLib
 
 } // namespace MazeLib

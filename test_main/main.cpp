@@ -167,20 +167,20 @@ int main(void) {
   // robot.endFastRunBackingToStartRun();
 #endif
 
-#if 1
-  const int n = 100;
+#if 0
+  const int n = 1;
   std::chrono::microseconds sum{0};
   for (int i = 0; i < n; ++i) {
     Maze maze = loadMaze();
     ShortestAlgorithm sa(maze);
     ShortestAlgorithm::Indexs path;
     const auto t_s = std::chrono::system_clock().now();
-    sa.calcShortestPath(path, false);
+    sa.calcShortestPath(path, false, false);
     const auto t_e = std::chrono::system_clock().now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
     sum += us;
-    // sa.printPath(std::cout, path);
+    sa.printPath(std::cout, path);
   }
   std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
 #endif
