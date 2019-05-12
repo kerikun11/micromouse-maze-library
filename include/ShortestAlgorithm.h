@@ -1,7 +1,7 @@
 /**
  * @file ShortestAlgorithm.h
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
- * @brief
+ * @brief Shortest Algorithm for Micromouse
  * @version 0.1
  * @date 2019-05-11
  *
@@ -43,9 +43,10 @@ public:
   };
   static float calcTrapezoidVelocityTime(const float am, const float vs,
                                          const float vm, const float d) {
+    /* グラフの面積から時間を求める */
     const auto case_thr = (vm * vm - vs * vs) / am;
     if (d < case_thr)
-      return (std::sqrt(vs * vs + am * d) - vs) / am;
+      return 2 * (std::sqrt(vs * vs + am * d) - vs) / am;
     else
       return (am * d + (vm - vs) * (vm - vs)) / (am * vm);
   }
