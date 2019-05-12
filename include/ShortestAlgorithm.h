@@ -41,30 +41,31 @@ public:
     FV90,
     FS90,
   };
+  static float calcTrapezoidVelocityTime(const float am, const float vs,
+                                         const float vm, const float d) {
+    const auto case_thr = (vm * vm - vs * vs) / am;
+    if (d < case_thr)
+      return (std::sqrt(vs * vs + am * d) - vs) / am;
+    else
+      return (am * d + (vm - vs) * (vm - vs)) / (am * vm);
+  }
   static cost_t getEdgeCost(const enum Pattern p, const int n = 1) {
     static std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
     static std::array<cost_t, MAZE_SIZE * 2> cost_table_diag;
-    static bool initialized = false;
+    static bool initialized = false; /*< 初回のみ実行するように設定 */
     if (!initialized) {
       initialized = true;
       /* 台形加速のコストテーブルを事前に用意 */
-      /*  /  ‾‾‾‾  \  */
-      /* t0 t1 t0 */
-      /* t0 = (vm-vs) / am */
-      /* x = (t0+t1+t0+t1)*(vm-vs)/2 */
-      /* t1 = 2*x/(vm-vs) */
-
-      static const float a = 3000.0f;
-      static const float v_s = 300.0f;
+      static const float am = 3000.0f; /*< 最大加速度 [mm/s/s] */
+      static const float vs = 300.0f;  /*< 終始速度 [mm/s] */
+      static const float vm = 1200.0f; /*< 飽和速度 [mm/s] */
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
-        const float x = 90.0f * (i + 1) / 2;
-        const float t = (std::sqrt(v_s * v_s + 2 * a * x) - v_s) / a;
-        cost_table_along[i] = 2 * t * 1000;
-      }
-      for (int i = 0; i < MAZE_SIZE * 2; ++i) {
-        const float x = 1.41421356f * 45.0f * (i + 1) / 2;
-        const float t = (std::sqrt(v_s * v_s + 2 * a * x) - v_s) / a;
-        cost_table_diag[i] = 2 * t * 1000;
+        const float d_along = 90.0f * (i + 1); /*< 走行距離 [mm] */
+        const float d_diag = 1.41421356f * 45.0f * (i + 1); /*< 走行距離 [mm] */
+        cost_table_along[i] =
+            calcTrapezoidVelocityTime(am, vs, vm, d_along) * 1000;
+        cost_table_diag[i] =
+            calcTrapezoidVelocityTime(am, vs, vm, d_diag) * 1000;
       }
     }
     switch (p) {
