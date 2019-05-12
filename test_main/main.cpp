@@ -168,20 +168,21 @@ int main(void) {
 #endif
 
 #if 0
-  const int n = 1;
+  const int n = 100;
+  const bool diag_enabled = 1;
   std::chrono::microseconds sum{0};
+  Maze maze = loadMaze();
+  ShortestAlgorithm sa(maze);
+  ShortestAlgorithm::Indexs path;
   for (int i = 0; i < n; ++i) {
-    Maze maze = loadMaze();
-    ShortestAlgorithm sa(maze);
-    ShortestAlgorithm::Indexs path;
     const auto t_s = std::chrono::system_clock().now();
-    sa.calcShortestPath(path, false, false);
+    sa.calcShortestPath(path, false, diag_enabled);
     const auto t_e = std::chrono::system_clock().now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
     sum += us;
-    sa.printPath(std::cout, path);
   }
+  sa.printPath(std::cout, path);
   std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
 #endif
 

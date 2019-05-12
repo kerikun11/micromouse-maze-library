@@ -58,8 +58,8 @@ public:
       initialized = true;
       /* 台形加速のコストテーブルを事前に用意 */
       static const float am = 3000.0f; /*< 最大加速度 [mm/s/s] */
-      static const float vs = 300.0f;  /*< 終始速度 [mm/s] */
-      static const float vm = 1200.0f; /*< 飽和速度 [mm/s] */
+      static const float vs = 450.0f;  /*< 終始速度 [mm/s] */
+      static const float vm = 1800.0f; /*< 飽和速度 [mm/s] */
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
         const float d_along = 90.0f * (i + 1); /*< 走行距離 [mm] */
         const float d_diag = 1.41421356f * 45.0f * (i + 1); /*< 走行距離 [mm] */
@@ -75,17 +75,17 @@ public:
     case ST_DIAG:
       return cost_table_diag[n - 1];
     case F45:
-      return 323;
+      return 249; /*< 425.272 [mm/s] */
     case F90:
-      return 445;
+      return 375; /*< 422.846 [mm/s] */
     case F135:
-      return 464;
+      return 421; /*< 375.888 [mm/s] */
     case F180:
-      return 592;
+      return 563; /*< 412.408 [mm/s] */
     case FV90:
-      return 450;
+      return 370; /*< 302.004 [mm/s] */
     case FS90:
-      return 279;
+      return 280; /*< 271.797 [mm/s] */
     }
     std::cerr << "Unknown Pattern" << std::endl;
     return 0;
@@ -352,13 +352,10 @@ public:
    */
   struct __attribute__((__packed__)) Node {
     cost_t cost;
-    cost_t rhs;
     Index from;
-    Node(const cost_t cost = CostMax, const cost_t rhs = CostMax,
-         const Index from = Index())
-        : cost(cost), rhs(rhs), from(from) {}
+    Node(const cost_t cost = CostMax) : cost(cost) {}
   };
-  static_assert(sizeof(Node) == 6, "Node Size Error"); /**< Size Check */
+  static_assert(sizeof(Node) == 4, "Node Size Error"); /**< Size Check */
 
   /**
    * @brief Get the Huristic Value
@@ -581,6 +578,6 @@ public:
 
 private:
   const Maze &maze;
-}; // namespace MazeLib
+};
 
 } // namespace MazeLib
