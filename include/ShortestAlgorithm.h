@@ -24,7 +24,7 @@ namespace MazeLib {
 class ShortestAlgorithm {
 public:
   ShortestAlgorithm(const Maze &maze) : maze(maze) {
-    /* テーブルの計算 */
+    /* テーブルの事前計算 */
     getEdgeCost(ST_ALONG);
   }
 
@@ -100,10 +100,14 @@ public:
       int x : 6;           /**< @brief x coordinate of cell */
       int y : 6;           /**< @brief y coordinate of cell */
       unsigned int nd : 3; /**< @brief direction of node */
-      unsigned int z : 1;  /**< @brief position assignment in a cell */
+      unsigned int
+          z : 1; /**< @brief position assignment in a cell, 0: East; 1: North */
     };
     unsigned int all : 16; /**< @brief union element for all access */
   public:
+    /**
+     * @brief Construct a new Index object
+     */
     Index(const int8_t x, const int8_t y, const Dir d, const Dir nd)
         : x(x), y(y), nd(nd) {
       uniquify(d);
@@ -198,13 +202,21 @@ public:
       std::cerr << "Invalid Index" << std::endl;
       return Vector(x, y);
     }
+    /**
+     * @brief 斜め方向に向いているときの区画への相対方向(±45度)を返す
+     * @return const Dir Dir::Left45 or Dir::Right45
+     */
     const Dir arrow_diag_to_along_45() const {
-      auto nd_45 =
-          ((z == 0 && (nd == Dir::NorthEast || nd == Dir::SouthWest)) ||
-           (z == 1 && (nd == Dir::NorthWest || nd == Dir::SouthEast)))
-              ? Dir::Left45
-              : Dir::Right45;
-      return nd_45;
+      switch (nd) {
+      case Dir::NorthEast:
+      case Dir::SouthWest:
+        return z == 0 ? Dir::Left45 : Dir::Right45;
+      case Dir::NorthWest:
+      case Dir::SouthEast:
+        return z == 1 ? Dir::Left45 : Dir::Right45;
+      }
+      std::cerr << "Invalid Node Dir" << std::endl;
+      return Dir::AbsMax;
     }
     /**
      * @brief NodeDir が向いている方向の隣の Index を返す
