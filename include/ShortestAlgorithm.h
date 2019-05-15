@@ -264,6 +264,8 @@ public:
         std::function<void(const Index, const cost_t)> callback) const {
       /* known_only を考慮した壁の判定式を用意 */
       auto canGo = [&](const Vector vec, const Dir dir) {
+        if (vec == Vector(0, 0) && dir == Dir::South)
+          return true;
         if (maze.isWall(vec, dir))
           return false;
         if (known_only && !maze.isKnown(vec, dir))
@@ -272,16 +274,14 @@ public:
       };
       if (!diag_enabled) {
         /* 直前の壁 */
-        if (!canGo(Vector(*this), nd)) {
-          // std::cerr << "Something Wrong" << std::endl;
+        if (!canGo(Vector(*this), nd))
           return;
-        }
         /* 直進で行けるところまで行く */
         auto v_st = arrow_to(); //< 前方のマス
         for (int8_t n = 1;; n++) {
-          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           if (!canGo(v_st, nd))
             break;
+          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           v_st = v_st.next(nd);
         }
         /* ここからはターン */
@@ -303,9 +303,9 @@ public:
         /* 直進で行けるところまで行く */
         auto v_st = v.next(nd);
         for (int8_t n = 1;; n++) {
-          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           if (!canGo(v_st, nd))
             break;
+          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           v_st = v_st.next(nd);
         }
         /* ここからはターン */
@@ -323,15 +323,15 @@ public:
             const auto v_fl = v_f.next(d_l); //< 前左の区画
             if (canGo(v_fl, d_f))            //< 45度先の壁
               callback(Index(v_f, d_l, nd_45), getEdgeCost(F45));
-            // if (canGo(v_fl, d_l)) //< 90度先の壁
-            callback(Index(v_fl, Dir::AbsMax, nd_90), getEdgeCost(F90));
+            if (canGo(v_fl, d_l)) //< 90度先の壁
+              callback(Index(v_fl, Dir::AbsMax, nd_90), getEdgeCost(F90));
             const auto d_b = d_f + Dir::Back;    //< 後方向
             if (canGo(v_fl, d_b)) {              //< 135度の壁
               const auto v_fll = v_fl.next(d_b); //< 前左左の区画
               if (canGo(v_fll, d_l))             //< 135度行先
                 callback(Index(v_fll, d_f, nd_135), getEdgeCost(F135));
-              // if (canGo(v_fll, d_b)) //< 180度行先の壁
-              callback(Index(v_fll, Dir::AbsMax, nd_180), getEdgeCost(F180));
+              if (canGo(v_fll, d_b)) //< 180度行先の壁
+                callback(Index(v_fll, Dir::AbsMax, nd_180), getEdgeCost(F180));
             }
           }
         }
@@ -358,16 +358,16 @@ public:
         auto nd_90 = nd + nd_r45 * 2;
         auto d_135 = nd + nd_r45 * 3;
         auto v_45 = i_f.arrow_to();
-        // if (canGo(v_45, d_45))
-        callback(Index(v_45, Dir::AbsMax, d_45), getEdgeCost(F45));
+        if (canGo(v_45, d_45))
+          callback(Index(v_45, Dir::AbsMax, d_45), getEdgeCost(F45));
         /* V90方向, 135度方向*/
         if (canGo(v_45, d_135)) {
           /* V90方向, 135度方向*/
           auto v_135 = v_45.next(d_135);
           if (canGo(v_135, d_45))
             callback(Index(v_45, d_135, nd_90), getEdgeCost(FV90));
-          // if (canGo(v_135, d_135))
-          callback(Index(v_135, Dir::AbsMax, d_135), getEdgeCost(F135));
+          if (canGo(v_135, d_135))
+            callback(Index(v_135, Dir::AbsMax, d_135), getEdgeCost(F135));
         }
       }
     }
