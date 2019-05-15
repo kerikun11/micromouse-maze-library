@@ -173,7 +173,7 @@ int main(void) {
   std::chrono::microseconds sum{0};
   Maze maze = loadMaze();
   ShortestAlgorithm sa(maze);
-  ShortestAlgorithm::Indexs path;
+  ShortestAlgorithm::Indexes path;
   for (int i = 0; i < n; ++i) {
     const auto t_s = std::chrono::system_clock().now();
     sa.calcShortestPath(path, false, diag_enabled);

@@ -159,10 +159,10 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
   /* new algorithm*/
-  ShortestAlgorithm::Indexs path;
+  ShortestAlgorithm::Indexes path;
   if (!shortestAlgorithm.calcShortestPath(path, true, diag_enabled))
     return false; /* 失敗 */
-  shortestDirs = ShortestAlgorithm::indexs2dirs(path, diag_enabled);
+  shortestDirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
   auto v = maze.getStart();
   for (const auto d : shortestDirs)
     v = v.next(d);
@@ -258,7 +258,7 @@ void SearchAlgorithm::printMap(const State state, const Vector vec,
 }
 
 bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
-#if 1
+#if 0
   /* old */
   candidates.clear();
   // 斜めありなしの双方の最短経路上を候補とする
@@ -320,10 +320,10 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
   /* 新アルゴリズム */
   candidates.clear();
   for (auto diag_enabled : {true, false}) {
-    ShortestAlgorithm::Indexs path;
+    ShortestAlgorithm::Indexes path;
     if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
       return false; /* 失敗 */
-    const auto dirs = ShortestAlgorithm::indexs2dirs(path, diag_enabled);
+    const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
     auto v = maze.getStart();
     for (const auto d : dirs) {
       v = v.next(d);

@@ -271,12 +271,17 @@ public:
         return true;
       };
       if (!diag_enabled) {
+        /* 直前の壁 */
+        if (!canGo(Vector(*this), nd)) {
+          // std::cerr << "Something Wrong" << std::endl;
+          return;
+        }
         /* 直進で行けるところまで行く */
         auto v_st = arrow_to(); //< 前方のマス
         for (int8_t n = 1;; n++) {
+          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           if (!canGo(v_st, nd))
             break;
-          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           v_st = v_st.next(nd);
         }
         /* ここからはターン */
@@ -292,15 +297,15 @@ public:
         Vector v = Vector(x, y); //< 仮想位置
         /* 直前の壁 */
         if (!canGo(v, nd)) {
-          std::cerr << "Something Wrong" << std::endl;
+          // std::cerr << "Something Wrong" << std::endl;
           return;
         }
         /* 直進で行けるところまで行く */
         auto v_st = v.next(nd);
         for (int8_t n = 1;; n++) {
+          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           if (!canGo(v_st, nd))
             break;
-          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
           v_st = v_st.next(nd);
         }
         /* ここからはターン */
@@ -318,15 +323,15 @@ public:
             const auto v_fl = v_f.next(d_l); //< 前左の区画
             if (canGo(v_fl, d_f))            //< 45度先の壁
               callback(Index(v_f, d_l, nd_45), getEdgeCost(F45));
-            if (canGo(v_fl, d_l)) //< 90度先の壁
-              callback(Index(v_fl, Dir::AbsMax, nd_90), getEdgeCost(F90));
+            // if (canGo(v_fl, d_l)) //< 90度先の壁
+            callback(Index(v_fl, Dir::AbsMax, nd_90), getEdgeCost(F90));
             const auto d_b = d_f + Dir::Back;    //< 後方向
             if (canGo(v_fl, d_b)) {              //< 135度の壁
               const auto v_fll = v_fl.next(d_b); //< 前左左の区画
               if (canGo(v_fll, d_l))             //< 135度行先
                 callback(Index(v_fll, d_f, nd_135), getEdgeCost(F135));
-              if (canGo(v_fll, d_b)) //< 180度行先の壁
-                callback(Index(v_fll, Dir::AbsMax, nd_180), getEdgeCost(F180));
+              // if (canGo(v_fll, d_b)) //< 180度行先の壁
+              callback(Index(v_fll, Dir::AbsMax, nd_180), getEdgeCost(F180));
             }
           }
         }
@@ -353,22 +358,33 @@ public:
         auto nd_90 = nd + nd_r45 * 2;
         auto d_135 = nd + nd_r45 * 3;
         auto v_45 = i_f.arrow_to();
-        if (canGo(v_45, d_45))
-          callback(Index(v_45, Dir::AbsMax, d_45), getEdgeCost(F45));
+        // if (canGo(v_45, d_45))
+        callback(Index(v_45, Dir::AbsMax, d_45), getEdgeCost(F45));
         /* V90方向, 135度方向*/
         if (canGo(v_45, d_135)) {
           /* V90方向, 135度方向*/
           auto v_135 = v_45.next(d_135);
           if (canGo(v_135, d_45))
             callback(Index(v_45, d_135, nd_90), getEdgeCost(FV90));
-          if (canGo(v_135, d_135))
-            callback(Index(v_135, Dir::AbsMax, d_135), getEdgeCost(F135));
+          // if (canGo(v_135, d_135))
+          callback(Index(v_135, Dir::AbsMax, d_135), getEdgeCost(F135));
         }
       }
     }
+    void predecessors_for(
+        const Maze &maze, const bool known_only, const bool diag_enabled,
+        std::function<void(const Index, const cost_t)> callback) const {
+      Index(Vector(*this), getDir(), getNodeDir() + Dir::Back)
+          .neighbors_for(maze, known_only, diag_enabled,
+                         [&callback](const Index i_n, const cost_t cost) {
+                           callback(Index(Vector(i_n), i_n.getDir(),
+                                          i_n.getNodeDir() + Dir::Back),
+                                    cost);
+                         });
+    }
   };
   static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
-  typedef std::vector<Index> Indexs;
+  typedef std::vector<Index> Indexes;
   /**
    * @brief Graph の Node
    */
@@ -380,22 +396,31 @@ public:
   static_assert(sizeof(Node) == 4, "Node Size Error"); /**< Size Check */
 
   /**
-   * @brief Get the Huristic Value
+   * @brief Get the Heuristic Value
    * @param i Index
-   * @return cost_t huristic value
+   * @return cost_t heuristic value
    */
-  cost_t getHuristic(const Index i) const {
+  cost_t getHeuristic(const Index i) const {
     // return 0;
-    const auto v = Vector(i) - maze.getGoals()[0];
+    const auto v = Vector(i) - Vector(index_start);
     const float x = std::abs(v.x);
     const float y = std::abs(v.y);
-    const float d = x + y;
+    // const float d = x + y;
     // const float d = std::sqrt(v.x * v.x + v.y * v.y);
-    // const float d = std::max(x, y);
+    const float d = std::max(x, y);
     // const float d = v.x * v.x + v.y * v.y;
     return getEdgeCost(ST_DIAG, d);
   }
-  bool calcShortestPath(Indexs &path, bool known_only = true,
+  /**
+   * @brief 最短経路を求める
+   *
+   * @param path 結果を入れる箱
+   * @param known_only
+   * @param diag_enabled
+   * @return true 成功
+   * @return false 失敗
+   */
+  bool calcShortestPath(Indexes &path, bool known_only = true,
                         bool diag_enabled = true) {
     std::unordered_map<Index, Node, Index::hash> node_map;
     std::function<bool(const Index &i1, const Index &i2)> greater =
@@ -404,10 +429,14 @@ public:
         };
     std::priority_queue<Index, std::vector<Index>, decltype(greater)> open_list(
         greater);
-    const auto start_index = Index(0, 0, Dir::AbsMax, Dir::North);
-    node_map[start_index] = Node(0);
-    open_list.push(start_index);
-    Index goal_index; //< 終点の用意
+    /* push the goal indexes */
+    for (const auto v : maze.getGoals())
+      for (const auto nd : Dir::ENWS()) {
+        const auto i = Index(v, Dir::AbsMax, nd);
+        node_map[i].cost = 0;
+        open_list.push(i);
+      }
+    /* start dequeue */
     while (1) {
       if (open_list.empty()) {
         std::cerr << "open_list.empty()" << std::endl;
@@ -416,20 +445,14 @@ public:
       const auto index = open_list.top();
       open_list.pop();
       // std::cout << "top:\t" << index << "\t: " << node_map[index].cost
-      //           << std::endl; //< print
-      const auto &goals = maze.getGoals();
-      if (index.getNodeDir().isAlong() &&
-          goals.cend() !=
-              std::find_if(goals.cbegin(), goals.cend(),
-                           [&](const auto v) { return v == Vector(index); })) {
-        goal_index = index;
+      //           << std::endl;
+      if (index == index_start)
         break;
-      }
       index.neighbors_for(maze, known_only, diag_enabled,
                           [&](const auto nibr_index, const auto edge_cost) {
                             Node &neighbor_node = node_map[nibr_index];
-                            cost_t h_n = getHuristic(index);
-                            cost_t h_m = getHuristic(nibr_index);
+                            cost_t h_n = getHeuristic(index);
+                            cost_t h_m = getHeuristic(nibr_index);
                             cost_t g_n = node_map[index].cost - h_n;
                             cost_t f_m_prime = g_n + edge_cost + h_m;
                             if (f_m_prime < neighbor_node.cost) {
@@ -437,25 +460,25 @@ public:
                               neighbor_node.from = index;
                               open_list.push(nibr_index);
                             }
-                            // std::cout << "  - \t" << nibr_index << "\t: "
-                            // << neighbor_node.cost
+                            // std::cout << "  - \t" << nibr_index
+                            //           << "\t: " << neighbor_node.cost
                             //           << std::endl; //< print
                           });
     }
+    /* post process */
     path.erase(path.begin(), path.end());
-    for (auto i = goal_index; i != start_index; i = node_map[i].from) {
-      path.push_back(i);
+    for (auto i = index_start; true; i = node_map[i].from) {
       // std::cout << i << std::endl;
+      path.push_back(Index(Vector(i), i.getDir(), i.getNodeDir() + Dir::Back));
+      if (node_map[i].cost == 0)
+        break;
     }
-    path.push_back(start_index);
-    // std::cout << start_index << std::endl;
-    std::reverse(path.begin(), path.end());
     return true;
   }
-  void printPath(std::ostream &os, const Indexs indexs) const {
+  void printPath(std::ostream &os, const Indexes indexes) const {
     int steps[MAZE_SIZE][MAZE_SIZE] = {0};
     int counter = 1;
-    for (const auto i : indexs) {
+    for (const auto i : indexes) {
       auto v = Vector(i);
       steps[v.y][v.x] = counter++;
     }
@@ -481,12 +504,12 @@ public:
       os << "+" << std::endl;
     }
   }
-  static const Dirs indexs2dirs(const Indexs &path, const bool diag_enabled) {
+  static const Dirs indexes2dirs(const Indexes &path, const bool diag_enabled) {
     if (!diag_enabled) {
       Dirs dirs;
-      for (int i = 0; i < (int)path.size() - 1; ++i) {
+      for (int i = 1; i < (int)path.size(); ++i) {
         const auto nd = path[i].getNodeDir();
-        const auto v = Vector(path[i + 1]) - Vector(path[i]);
+        const auto v = Vector(path[i - 1]) - Vector(path[i]);
         for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
           dirs.push_back(nd);
       }
@@ -495,9 +518,9 @@ public:
     }
     Dirs dirs;
     for (int i = 0; i < (int)path.size() - 1; ++i) {
-      auto nd = path[i].getNodeDir();
-      auto rel_v = Vector(path[i + 1]) - Vector(path[i]);
-      auto rel_nd = Dir(path[i + 1].getNodeDir() - path[i].getNodeDir());
+      const auto nd = path[i].getNodeDir();
+      const auto rel_v = Vector(path[i + 1]) - Vector(path[i]);
+      const auto rel_nd = Dir(path[i + 1].getNodeDir() - path[i].getNodeDir());
       switch (rel_nd) {
       case Dir::Front:
         if (nd.isAlong()) {
@@ -584,6 +607,8 @@ public:
 
 private:
   const Maze &maze; /**< @brief 使用する迷路の参照 */
+  const Index index_start =
+      Index(0, 0, Dir::AbsMax, Dir::South); /**< @brief スタート */
 };
 
 } // namespace MazeLib
