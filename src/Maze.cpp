@@ -62,8 +62,8 @@ const Vector Vector::rotate(const Dir d) const {
  *   @brief 迷路の壁情報を管理するクラス
  */
 Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1], bool east_origin) {
-  for (int8_t y = 0; y < MAZE_SIZE; y++)
-    for (int8_t x = 0; x < MAZE_SIZE; x++) {
+  for (int8_t y = 0; y < MAZE_SIZE; ++y)
+    for (int8_t x = 0; x < MAZE_SIZE; ++x) {
       const char c = data[MAZE_SIZE - y - 1][x];
       uint8_t h = 0;
       if ('0' <= c && c <= '9')
@@ -90,7 +90,7 @@ Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1], bool east_origin) {
     }
 }
 void Maze::reset(const bool setStartWall) {
-  for (int8_t i = 0; i < MAZE_SIZE - 1; i++) {
+  for (int8_t i = 0; i < MAZE_SIZE - 1; ++i) {
     wall[0][i] = 0;
     wall[1][i] = 0;
     known[0][i] = 0;
@@ -140,7 +140,7 @@ bool Maze::updateWall(const Vector v, const Dir d, const bool b,
   return true;
 }
 void Maze::resetLastWall(const int num) {
-  for (int i = 0; i < num; i++) {
+  for (int i = 0; i < num; ++i) {
     if (wallLogs.empty())
       return;
     const auto wl = wallLogs.back();
@@ -151,10 +151,10 @@ void Maze::resetLastWall(const int num) {
   return;
 }
 void Maze::print(std::ostream &os) const {
-  for (int8_t y = MAZE_SIZE; y >= 0; y--) {
+  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
-      for (int8_t x = 0; x < MAZE_SIZE; x++) {
+      for (int8_t x = 0; x < MAZE_SIZE; ++x) {
         const auto v = Vector(x, y);
         if (v == start)
           os << " S ";
@@ -167,7 +167,7 @@ void Maze::print(std::ostream &os) const {
       }
       os << std::endl;
     }
-    for (int8_t x = 0; x < MAZE_SIZE; x++)
+    for (int8_t x = 0; x < MAZE_SIZE; ++x)
       os << "+"
          << (isKnown(x, y, Dir::South)
                  ? (isWall(x, y, Dir::South) ? "---" : "   ")
@@ -178,10 +178,10 @@ void Maze::print(std::ostream &os) const {
 bool Maze::parse(std::istream &is) {
   reset();
   goals.clear();
-  for (int8_t y = MAZE_SIZE; y >= 0; y--) {
+  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       is.ignore(10, '|'); //< 次の|が出てくるまでスキップ
-      for (int8_t x = 0; x < MAZE_SIZE; x++) {
+      for (int8_t x = 0; x < MAZE_SIZE; ++x) {
         is.ignore(1); //< " " 空欄分をスキップ
         char c = is.get();
         if (c == 'S')
@@ -196,7 +196,7 @@ bool Maze::parse(std::istream &is) {
           Maze::updateWall(Vector(x, y), Dir::East, false);
       }
     }
-    for (uint8_t x = 0; x < MAZE_SIZE; x++) {
+    for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
       is.ignore(10, '+'); //< 次の+が出てくるまでスキップ
       std::string s;
       s += (char)is.get();
@@ -215,14 +215,14 @@ void Maze::printPath(std::ostream &os, const Vector start,
   int steps[MAZE_SIZE][MAZE_SIZE] = {0};
   Vector v = start;
   int counter = 1;
-  for (const auto d : dirs) {
+  std::for_each(dirs.cbegin(), dirs.cend(), [&](const auto d) {
     v = v.next(d);
     steps[v.y][v.x] = counter++;
-  }
-  for (int8_t y = MAZE_SIZE; y >= 0; y--) {
+  });
+  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
-      for (int8_t x = 0; x < MAZE_SIZE; x++) {
+      for (int8_t x = 0; x < MAZE_SIZE; ++x) {
         if (steps[y][x] != 0)
           os << C_YELLOW << std::setw(3) << steps[y][x] << C_RESET;
         else
@@ -232,7 +232,7 @@ void Maze::printPath(std::ostream &os, const Vector start,
       }
       os << std::endl;
     }
-    for (int8_t x = 0; x < MAZE_SIZE; x++)
+    for (int8_t x = 0; x < MAZE_SIZE; ++x)
       os << "+"
          << (isKnown(x, y, Dir::South)
                  ? (isWall(x, y, Dir::South) ? "---" : "   ")

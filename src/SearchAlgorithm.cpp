@@ -164,9 +164,8 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
     return false; /* 失敗 */
   shortestDirs = ShortestAlgorithm::indexs2dirs(path, diag_enabled);
   auto v = maze.getStart();
-  for (const auto d : shortestDirs) {
+  for (const auto d : shortestDirs)
     v = v.next(d);
-  }
   auto prev_dir = shortestDirs[shortestDirs.size() - 1 - 1];
   auto dir = shortestDirs[shortestDirs.size() - 1];
   // ゴール区画を行けるところまで直進(斜め考慮)する
@@ -183,7 +182,7 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
     else
       dirs = {dir};
     // 行ける方向に行く
-    for (const auto &d : dirs) {
+    for (const auto d : dirs) {
       if (maze.canGo(v, d)) {
         shortestDirs.push_back(d);
         v = v.next(d);
@@ -336,26 +335,14 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 }
 int SearchAlgorithm::countIdentityCandidates(
     const WallLogs &idWallLogs, std::pair<Vector, Dir> &ans) const {
-  if (!idWallLogs.empty()) {
-    int8_t min_x = MAZE_SIZE - 1;
-    int8_t min_y = MAZE_SIZE - 1;
-    int8_t max_x = 0;
-    int8_t max_y = 0;
-    for (const auto wl : idWallLogs) {
-      min_x = std::min((int8_t)wl.x, min_x);
-      min_y = std::min((int8_t)wl.y, min_y);
-      max_x = std::max((int8_t)wl.x, max_x);
-      max_y = std::max((int8_t)wl.y, max_y);
-    }
-  }
   const int many = 1000;
   const int min_size = 12;
   const int min_diff = 4;
   if (idWallLogs.size() < min_size)
     return many;
   int cnt = 0;
-  for (int x = 0; x < MAZE_SIZE; x++)
-    for (int y = 0; y < MAZE_SIZE; y++)
+  for (int x = 0; x < MAZE_SIZE; ++x)
+    for (int y = 0; y < MAZE_SIZE; ++y)
       for (const auto offset_d : Dir::ENWS()) {
         Vector offset = Vector(x, y);
         int diffs = 0;
@@ -464,7 +451,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
     for (const auto wl : tmp)
       idMaze.updateWall(Vector(wl) + offset_diff, wl.d, wl.b);
   }
-
+  /* 自己位置同定 */
   std::pair<Vector, Dir> ans;
   const int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
   matchCount = cnt;

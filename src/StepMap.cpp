@@ -18,8 +18,8 @@ StepMap::StepMap() {
   reset();
 }
 void StepMap::reset(const step_t step) {
-  for (int8_t y = 0; y < MAZE_SIZE; y++)
-    for (int8_t x = 0; x < MAZE_SIZE; x++)
+  for (int8_t y = 0; y < MAZE_SIZE; ++y)
+    for (int8_t x = 0; x < MAZE_SIZE; ++x)
       setStep(x, y, step); //< ステップをクリア
 }
 const step_t &StepMap::getStep(const int8_t &x, const int8_t &y) const {
@@ -44,10 +44,10 @@ bool StepMap::setStep(const int8_t &x, const int8_t &y, const step_t &step) {
 void StepMap::print(std::ostream &os, const Maze &maze, const Vector &v,
                     const Dir &d) const {
   os << std::endl;
-  for (int8_t y = MAZE_SIZE; y >= 0; y--) {
+  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
-      for (uint8_t x = 0; x < MAZE_SIZE; x++) {
+      for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
         if (v == Vector(x, y))
           os << " " << C_YELLOW << d.toChar() << C_RESET << " ";
         else
@@ -59,7 +59,7 @@ void StepMap::print(std::ostream &os, const Maze &maze, const Vector &v,
       }
       os << std::endl;
     }
-    for (uint8_t x = 0; x < MAZE_SIZE; x++)
+    for (uint8_t x = 0; x < MAZE_SIZE; ++x)
       os << "+"
          << (maze.isKnown(x, y, Dir::South)
                  ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
@@ -68,7 +68,7 @@ void StepMap::print(std::ostream &os, const Maze &maze, const Vector &v,
   }
 }
 void StepMap::update(const Maze &maze, const Vectors &dest,
-                     const bool onlyCanGo, const bool diagonal) {
+                     const bool known_only, const bool diagonal) {
   // 全区画のステップを最大値に設定
   reset();
   // となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
@@ -89,14 +89,14 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
     for (const auto &d : Dir::ENWS()) {
       if (maze.isWall(focus, d))
         continue; //< 壁があったら更新はしない
-      if (onlyCanGo && !maze.isKnown(focus, d))
+      if (known_only && !maze.isKnown(focus, d))
         continue; //< onlyCanGoで未知壁なら更新はしない
       // 直線で行けるところまで更新する
       Vector next = focus;
-      for (int i = 0; i < MAZE_SIZE; i++) {
+      for (int i = 0; i < MAZE_SIZE; ++i) {
         if (maze.isWall(next, d))
           break; //< 壁があったら更新はしない
-        if (onlyCanGo && !maze.isKnown(next, d))
+        if (known_only && !maze.isKnown(next, d))
           break; //< onlyCanGoで未知壁なら更新はしない
         // となりの区画のステップが注目する区画のステップよりも大きければ更新
         next = next.next(d); //< となりの区画のステップを取得
@@ -114,11 +114,11 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
         continue; //< 斜めなしの場合
       // 斜め直線で行けるところまで更新する
       next = focus.next(d);
-      for (int i = 1; i < MAZE_SIZE * 2; i++) {
+      for (int i = 1; i < MAZE_SIZE * 2; ++i) {
         const Dir next_d = d + Dir::Left * (i & 1);
         if (maze.isWall(next, next_d))
           break; //< 壁があったら更新はしない
-        if (onlyCanGo && !maze.isKnown(next, next_d))
+        if (known_only && !maze.isKnown(next, next_d))
           break; //< onlyCanGoで未知壁なら更新はしない
         // となりの区画のステップが注目する区画のステップよりも大きければ更新
         next = next.next(next_d); //< となりの区画のステップを取得
@@ -134,11 +134,11 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
       }
       // 斜め直線で行けるところまで更新する
       next = focus.next(d);
-      for (int i = 1; i < MAZE_SIZE * 2; i++) {
+      for (int i = 1; i < MAZE_SIZE * 2; ++i) {
         const Dir next_d = d + Dir::Right * (i & 1);
         if (maze.isWall(next, next_d))
           break; //< 壁があったら更新はしない
-        if (onlyCanGo && !maze.isKnown(next, next_d))
+        if (known_only && !maze.isKnown(next, next_d))
           break; //< onlyCanGoで未知壁なら更新はしない
         // となりの区画のステップが注目する区画のステップよりも大きければ更新
         next = next.next(next_d); //< となりの区画のステップを取得
@@ -156,7 +156,7 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
   }
 }
 void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
-                           const bool onlyCanGo) {
+                           const bool known_only) {
   // return update(maze, dest, onlyCanGo, false);
   // 全区画のステップを最大値に設定
   reset();
@@ -177,7 +177,7 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
     for (const auto &d : Dir::ENWS()) {
       if (maze.isWall(focus, d))
         continue; //< 壁があったら更新はしない
-      if (onlyCanGo && !maze.isKnown(focus, d))
+      if (known_only && !maze.isKnown(focus, d))
         continue; //< onlyCanGoで未知壁なら更新はしない
       Vector next = focus.next(d);
       if (getStep(next) <= focus_step + 1)
@@ -227,11 +227,11 @@ void StepMap::calcStraightStepTable() {
   const float factor =
       1.0f / (sqrt(pow(v0 / a, 2) + 90 * (MAZE_SIZE * 2) / a) -
               sqrt(pow(v0 / a, 2) + 90 * (MAZE_SIZE * 2 - 1) / a));
-  for (int i = 0; i < MAZE_SIZE * 2; i++) {
+  for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     const float x = 90 * (i + 1);
     straightStepTable[i] = (sqrt(pow(v0 / a, 2) + x / a) - v0 / a) * factor;
   }
-  for (int i = 0; i < MAZE_SIZE * 2; i++) {
+  for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     const float x = 90 * (i + 1);
     straightStepTable[i] = (sqrt(pow(v0 / a, 2) + x / a) - v0 / a) * factor;
   }

@@ -58,20 +58,20 @@ public:
   /** @function update
    *  @brief ステップマップの更新
    *  @param dest ステップを0とする区画の配列
-   *  @param onlyCanGo
+   *  @param known_only
    * true:未知の壁は通過不可能とする，false:未知の壁はないものとする
    *  @param diagonal true: 斜め直線あり false: 斜めはジグザグ
    */
   void update(const Maze &maze, const Vectors &dest,
-              const bool onlyCanGo = false, const bool diagonal = true);
+              const bool known_only = false, const bool diagonal = true);
   /** @function updateSimple
    *  @brief シンプルに1マス1ステップのステップマップ更新
    *  @param dest ステップを0とする区画の配列(destination)
-   *  @param onlyCanGo
+   *  @param known_only
    * true:未知の壁は通過不可能とする，false:未知の壁はないものとする
    */
   void updateSimple(const Maze &maze, const Vectors &dest,
-                    const bool onlyCanGo = false);
+                    const bool known_only = false);
   /** @function calcNextDirs
    *  @brief ステップマップから次に行くべき方向を計算
    */

@@ -459,10 +459,10 @@ public:
       auto v = Vector(i);
       steps[v.y][v.x] = counter++;
     }
-    for (int8_t y = MAZE_SIZE; y >= 0; y--) {
+    for (int8_t y = MAZE_SIZE; y >= 0; --y) {
       if (y != MAZE_SIZE) {
         os << '|';
-        for (int8_t x = 0; x < MAZE_SIZE; x++) {
+        for (int8_t x = 0; x < MAZE_SIZE; ++x) {
           if (steps[y][x] != 0)
             os << C_YELLOW << std::setw(3) << steps[y][x] << C_RESET;
           else
@@ -484,24 +484,24 @@ public:
   static const Dirs indexs2dirs(const Indexs &path, const bool diag_enabled) {
     if (!diag_enabled) {
       Dirs dirs;
-      for (int i = 0; i < (int)path.size() - 1; i++) {
+      for (int i = 0; i < (int)path.size() - 1; ++i) {
         const auto nd = path[i].getNodeDir();
         const auto v = Vector(path[i + 1]) - Vector(path[i]);
-        for (int j = 0; j < std::abs(v.x) + std::abs(v.y); j++)
+        for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
           dirs.push_back(nd);
       }
       dirs.push_back(path.back().getNodeDir());
       return dirs;
     }
     Dirs dirs;
-    for (int i = 0; i < (int)path.size() - 1; i++) {
+    for (int i = 0; i < (int)path.size() - 1; ++i) {
       auto nd = path[i].getNodeDir();
       auto rel_v = Vector(path[i + 1]) - Vector(path[i]);
       auto rel_nd = Dir(path[i + 1].getNodeDir() - path[i].getNodeDir());
       switch (rel_nd) {
       case Dir::Front:
         if (nd.isAlong()) {
-          for (int j = 0; j < std::abs(rel_v.x) + std::abs(rel_v.y); j++)
+          for (int j = 0; j < std::abs(rel_v.x) + std::abs(rel_v.y); ++j)
             dirs.push_back(nd);
         } else {
           for (auto index = path[i]; index != path[i + 1];
