@@ -12,10 +12,10 @@
 
 #include "Maze.h"
 
-#include <algorithm>
+#include <algorithm> /*< for find_if, etc. */
 #include <functional>
-#include <iomanip> //< for std::setw()
-#include <limits>
+#include <iomanip> /*< for std::setw() */
+#include <limits>  /*< for std::numeric_limits */
 #include <queue>
 #include <unordered_map>
 
@@ -29,7 +29,7 @@ public:
   }
 
 public:
-  using cost_t = uint16_t;
+  using cost_t = uint16_t; /**< @brief 時間コストの型 [ms] */
   static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
   enum Pattern : int8_t {
     ST_ALONG,
@@ -41,14 +41,24 @@ public:
     FV90,
     FS90,
   };
-  static float calcTrapezoidVelocityTime(const float am, const float vs,
-                                         const float vm, const float d) {
+  /**
+   * @brief 台形加速にかかる時間を算出する関数
+   *
+   * @param am 最大加速度の大きさ [m/s/s]
+   * @param vs 初速および最終速度の大きさ [m/s]
+   * @param vm 飽和速度の大きさ [m/s]
+   * @param d 走行距離 [m]
+   * @return float 走行時間 [s]
+   */
+  static float calcStraightTime(const float am, const float vs, const float vm,
+                                const float d) {
     /* グラフの面積から時間を求める */
-    const auto case_thr = (vm * vm - vs * vs) / am;
-    if (d < case_thr)
-      return 2 * (std::sqrt(vs * vs + am * d) - vs) / am;
+    const auto d_thr =
+        (vm * vm - vs * vs) / am; /*< 最大速度にちょうど達する距離 */
+    if (d < d_thr)
+      return 2 * (std::sqrt(vs * vs + am * d) - vs) / am; /*< 三角加速 */
     else
-      return (am * d + (vm - vs) * (vm - vs)) / (am * vm);
+      return (am * d + (vm - vs) * (vm - vs)) / (am * vm); /*< 台形加速 */
   }
   static cost_t getEdgeCost(const enum Pattern p, const int n = 1) {
     static std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
@@ -64,28 +74,28 @@ public:
         const float d_along = 90.0f * (i + 1); /*< 走行距離 [mm] */
         const float d_diag = 1.41421356f * 45.0f * (i + 1); /*< 走行距離 [mm] */
         cost_table_along[i] =
-            calcTrapezoidVelocityTime(am, vs, vm, d_along) * 1000;
+            calcStraightTime(am, vs, vm, d_along) * 1000; /*< [ms] */
         cost_table_diag[i] =
-            calcTrapezoidVelocityTime(am, vs, vm, d_diag) * 1000;
+            calcStraightTime(am, vs, vm, d_diag) * 1000; /*< [ms] */
       }
     }
     switch (p) {
     case ST_ALONG:
-      return cost_table_along[n - 1];
+      return cost_table_along[n - 1]; /*< [ms] */
     case ST_DIAG:
-      return cost_table_diag[n - 1];
+      return cost_table_diag[n - 1]; /*< [ms] */
     case F45:
-      return 249; /*< 425.272 [mm/s] */
+      return 249; /*< [ms] @ v = 425.272 [mm/s] */
     case F90:
-      return 375; /*< 422.846 [mm/s] */
+      return 375; /*< [ms] @ v = 422.846 [mm/s] */
     case F135:
-      return 421; /*< 375.888 [mm/s] */
+      return 421; /*< [ms] @ v = 375.888 [mm/s] */
     case F180:
-      return 563; /*< 412.408 [mm/s] */
+      return 563; /*< [ms] @ v = 412.408 [mm/s] */
     case FV90:
-      return 370; /*< 302.004 [mm/s] */
+      return 370; /*< [ms] @ v = 302.004 [mm/s] */
     case FS90:
-      return 280; /*< 271.797 [mm/s] */
+      return 280; /*< [ms] @ v = 271.797 [mm/s] */
     }
     std::cerr << "Unknown Pattern" << std::endl;
     return 0;
@@ -97,11 +107,11 @@ public:
   union __attribute__((__packed__)) Index {
   private:
     struct __attribute__((__packed__)) {
-      int x : 6;           /**< @brief x coordinate of cell */
-      int y : 6;           /**< @brief y coordinate of cell */
-      unsigned int nd : 3; /**< @brief direction of node */
+      int x : 6;           /**< @brief x coordinate of the cell */
+      int y : 6;           /**< @brief y coordinate of the cell */
+      unsigned int nd : 3; /**< @brief direction of the node */
       unsigned int
-          z : 1; /**< @brief position assignment in a cell, 0: East; 1: North */
+          z : 1; /**< @brief position assignment in the cell, 0:East; 1:North */
     };
     unsigned int all : 16; /**< @brief union element for all access */
   public:
@@ -387,7 +397,6 @@ public:
   }
   bool calcShortestPath(Indexs &path, bool known_only = true,
                         bool diag_enabled = true) {
-    /* 1. */
     std::unordered_map<Index, Node, Index::hash> node_map;
     std::function<bool(const Index &i1, const Index &i2)> greater =
         [&](const auto &i1, const auto &i2) {
@@ -395,38 +404,27 @@ public:
         };
     std::priority_queue<Index, std::vector<Index>, decltype(greater)> open_list(
         greater);
-    /* 2. */
-    /* 3. */
     const auto start_index = Index(0, 0, Dir::AbsMax, Dir::North);
     node_map[start_index] = Node(0);
     open_list.push(start_index);
     Index goal_index; //< 終点の用意
-    auto max_size = open_list.size();
     while (1) {
-      /* 4. */
-      // std::cout << "open_list.size(): " << open_list.size() << std::endl;
-      max_size = std::max(max_size, open_list.size());
       if (open_list.empty()) {
         std::cerr << "open_list.empty()" << std::endl;
         return false;
       }
-      /* 5. */
       const auto index = open_list.top();
       open_list.pop();
       // std::cout << "top:\t" << index << "\t: " << node_map[index].cost
       //           << std::endl; //< print
-      /* 6. */
-      /* 斜めでないかつゴール区画 */
       const auto &goals = maze.getGoals();
-      if (goals.cend() !=
-          std::find_if(goals.cbegin(), goals.cend(), [&](const auto v) {
-            return index.getNodeDir().isAlong() && v == Vector(index);
-          })) {
-        /* GOAL! */
+      if (index.getNodeDir().isAlong() &&
+          goals.cend() !=
+              std::find_if(goals.cbegin(), goals.cend(),
+                           [&](const auto v) { return v == Vector(index); })) {
         goal_index = index;
         break;
       }
-      /* 7. */
       index.neighbors_for(maze, known_only, diag_enabled,
                           [&](const auto nibr_index, const auto edge_cost) {
                             Node &neighbor_node = node_map[nibr_index];
@@ -444,19 +442,14 @@ public:
                             //           << std::endl; //< print
                           });
     }
-    // std::cout << "max open list size: " << max_size << std::endl;
-    /* 9. */
     path.erase(path.begin(), path.end());
     for (auto i = goal_index; i != start_index; i = node_map[i].from) {
       path.push_back(i);
       // std::cout << i << std::endl;
     }
     path.push_back(start_index);
-    /* END A* */
     // std::cout << start_index << std::endl;
     std::reverse(path.begin(), path.end());
-    Dirs dirs = indexs2dirs(path, diag_enabled);
-    // maze.printPath(Vector(0, 0), dirs);
     return true;
   }
   void printPath(std::ostream &os, const Indexs indexs) const {
@@ -497,6 +490,7 @@ public:
         for (int j = 0; j < std::abs(v.x) + std::abs(v.y); j++)
           dirs.push_back(nd);
       }
+      dirs.push_back(path.back().getNodeDir());
       return dirs;
     }
     Dirs dirs;
@@ -589,7 +583,7 @@ public:
   }
 
 private:
-  const Maze &maze;
+  const Maze &maze; /**< @brief 使用する迷路の参照 */
 };
 
 } // namespace MazeLib
