@@ -126,7 +126,8 @@ public:
     int8_t y; /**< @brief 迷路の区画座標 */
   };
   uint16_t all; /**< @brief まとめて扱うとき用 */
-  Vector(int8_t x = 0, int8_t y = 0) : x(x), y(y) {}
+  Vector(int8_t x, int8_t y) : x(x), y(y) {}
+  Vector() : all(0) {}
   Vector(const Vector &obj) : all(obj.all) {}
   /**
    * @brief 演算子のオーバーロード
