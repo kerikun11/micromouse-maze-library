@@ -417,11 +417,15 @@ public:
    * @brief Graph の Node
    */
   struct __attribute__((__packed__)) Node {
-    cost_t cost;
+    cost_t cost = CostMax;
+    cost_t rhs = CostMax;
     Index from;
-    Node(const cost_t cost = CostMax) : cost(cost) {}
+    Node() {}
+    const Node &operator=(const Node &n) {
+      return cost = n.cost, rhs = n.rhs, from = n.from, *this;
+    }
   };
-  static_assert(sizeof(Node) == 4, "Node Size Error"); /**< Size Check */
+  static_assert(sizeof(Node) == 6, "Node Size Error"); /**< Size Check */
 
   /**
    * @brief Get the Heuristic Value
@@ -429,7 +433,7 @@ public:
    * @return cost_t heuristic value
    */
   cost_t getHeuristic(const Index i) const {
-    // return 0;
+    return 0;
     const auto v = Vector(i) - Vector(index_start);
     // const float d = std::sqrt(v.x * v.x + v.y * v.y);
     const auto d = std::max(std::abs(v.x), std::abs(v.y));
@@ -457,9 +461,35 @@ public:
     for (const auto v : maze.getGoals())
       for (const auto nd : Dir::ENWS()) {
         const auto i = Index(v, Dir::AbsMax, nd);
-        node_map[i].cost = 0;
+        node_map[i].rhs = 0;
         open_list.push(i);
       }
+    /* define UpdateNode() */
+    auto UpdateNode = [&](const auto i) {
+      auto &node = node_map[i];
+      if (node.rhs == 0)
+        return;
+      node.rhs = CostMax;
+      const auto h_n = getHeuristic(i);
+      i.predecessors_for(maze, known_only, diag_enabled,
+                         [&](const auto i_pre, const auto edge_cost) {
+                           //  std::cout << "pre:\t\t\t" << i_pre
+                           //            << "\t: " << node_map[i_pre].cost
+                           //            << std::endl;
+                           const auto &pre = node_map[i_pre];
+                           const auto h_p = getHeuristic(i_pre);
+                           const auto new_cost =
+                               pre.cost - h_p + edge_cost + h_n;
+                           if (new_cost < node.rhs) {
+                             node.rhs = new_cost;
+                             node.from = i_pre;
+                             open_list.push(i);
+                           }
+                         });
+      /* remove omitted*/
+      if (node.cost != node.rhs)
+        open_list.push(i);
+    };
     /* start dequeue */
     while (1) {
       if (open_list.empty()) {
@@ -468,26 +498,28 @@ public:
       }
       const auto index = open_list.top();
       open_list.pop();
+      auto &node = node_map[index];
+      const auto &start = node_map[index_start];
+      if (node.cost >= start.cost && start.rhs != start.cost)
+        break;
       // std::cout << "top:\t" << index << "\t: " << node_map[index].cost
       //           << std::endl;
-      if (index == index_start)
-        break;
-      index.neighbors_for(maze, known_only, diag_enabled,
-                          [&](const auto nibr_index, const auto edge_cost) {
-                            Node &neighbor_node = node_map[nibr_index];
-                            cost_t h_n = getHeuristic(index);
-                            cost_t h_m = getHeuristic(nibr_index);
-                            cost_t g_n = node_map[index].cost - h_n;
-                            cost_t f_m_prime = g_n + edge_cost + h_m;
-                            if (f_m_prime < neighbor_node.cost) {
-                              neighbor_node.cost = f_m_prime;
-                              neighbor_node.from = index;
-                              open_list.push(nibr_index);
-                            }
-                            // std::cout << "  - \t" << nibr_index
-                            //           << "\t: " << neighbor_node.cost
-                            //           << std::endl; //< print
-                          });
+      if (node.cost > node.rhs) {
+        node.cost = node.rhs;
+        index.neighbors_for(maze, known_only, diag_enabled,
+                            [&](const auto i_succ,
+                                const auto edge_cost __attribute__((unused))) {
+                              UpdateNode(i_succ);
+                            });
+      } else if (node.cost < node.rhs) {
+        node.cost = CostMax;
+        UpdateNode(index);
+        index.neighbors_for(maze, known_only, diag_enabled,
+                            [&](const auto i_succ,
+                                const auto edge_cost __attribute__((unused))) {
+                              UpdateNode(i_succ);
+                            });
+      }
     }
     /* post process */
     path.erase(path.begin(), path.end());
