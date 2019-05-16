@@ -186,5 +186,20 @@ int main(void) {
   std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
 #endif
 
+#if 0
+  const bool diag_enabled = 0;
+  const bool known_only = 1;
+  std::chrono::microseconds sum{0};
+  Maze maze = loadMaze();
+  ShortestAlgorithm sa(maze);
+  // const auto i = ShortestAlgorithm::Index(0, 0, Dir::AbsMax, Dir::South);
+  const auto i = ShortestAlgorithm::Index(0, 1, Dir::East, Dir::North);
+  i.predecessors_for(
+      maze, known_only, diag_enabled,
+      [&](const auto nibr, const auto cost __attribute__((unused))) {
+        std::cout << "\t" << nibr << std::endl;
+      });
+#endif
+
   return 0;
 }

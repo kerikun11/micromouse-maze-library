@@ -419,13 +419,12 @@ public:
   struct __attribute__((__packed__)) Node {
     cost_t cost = CostMax;
     cost_t rhs = CostMax;
-    Index from;
     Node() {}
     const Node &operator=(const Node &n) {
-      return cost = n.cost, rhs = n.rhs, from = n.from, *this;
+      return cost = n.cost, rhs = n.rhs, *this;
     }
   };
-  static_assert(sizeof(Node) == 6, "Node Size Error"); /**< Size Check */
+  static_assert(sizeof(Node) == 4, "Node Size Error"); /**< Size Check */
 
   /**
    * @brief Get the Heuristic Value
@@ -433,7 +432,7 @@ public:
    * @return cost_t heuristic value
    */
   cost_t getHeuristic(const Index i) const {
-    return 0;
+    // return 0;
     const auto v = Vector(i) - Vector(index_start);
     // const float d = std::sqrt(v.x * v.x + v.y * v.y);
     const auto d = std::max(std::abs(v.x), std::abs(v.y));
@@ -475,19 +474,13 @@ public:
       const auto h_n = getHeuristic(i);
       i.predecessors_for(maze, known_only, diag_enabled,
                          [&](const auto i_pre, const auto edge_cost) {
-                           //  std::cout << "pre:\t\t\t" << i_pre
-                           //            << "\t: " << node_map[i_pre].cost
-                           //            << std::endl;
                            const auto &pre = node_map[i_pre];
                            const auto h_p = getHeuristic(i_pre);
                            const auto new_cost =
                                pre.cost - h_p + edge_cost + h_n;
-                           if (new_cost < node.rhs) {
+                           if (new_cost < node.rhs)
                              node.rhs = new_cost;
-                             node.from = i_pre;
-                           }
                          });
-      /* remove omitted*/
       if (node.cost != node.rhs)
         open_list.push(i);
     };
@@ -501,10 +494,9 @@ public:
       open_list.pop();
       auto &node = node_map[index];
       const auto &start = node_map[index_start];
+      /* 終了条件 */
       if (!greater(index, index_start) && start.rhs != start.cost)
         break;
-      // std::cout << "top:\t" << index << "\t: " << node_map[index].cost
-      //           << std::endl;
       if (node.cost > node.rhs) {
         node.cost = node.rhs;
         index.neighbors_for(maze, known_only, diag_enabled,
@@ -512,7 +504,6 @@ public:
                                 const auto edge_cost __attribute__((unused))) {
                               UpdateNode(i_succ);
                             });
-        // } else {
       } else if (node.cost < node.rhs) {
         node.cost = CostMax;
         UpdateNode(index);
@@ -537,7 +528,6 @@ public:
       i.predecessors_for(
           maze, known_only, diag_enabled,
           [&](const auto pre, const auto cost __attribute__((unused))) {
-            // std::cout << "\t" << nibr << std::endl;
             const auto cost_p = node_map[pre].cost;
             if (cost_p < min_cost) {
               min_cost = cost_p;
