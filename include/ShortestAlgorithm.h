@@ -259,11 +259,15 @@ public:
       std::cerr << "Invalid Index" << std::endl;
       return Index();
     }
+    const Index opposite() const {
+      return Index(x, y, getDir(), nd + Dir::Back);
+    }
     void neighbors_for(
         const Maze &maze, const bool known_only, const bool diag_enabled,
         std::function<void(const Index, const cost_t)> callback) const {
       /* known_only を考慮した壁の判定式を用意 */
       auto canGo = [&](const Vector vec, const Dir dir) {
+        /* スタートは袋小路なので例外処理 */
         if (vec == Vector(0, 0) && dir == Dir::South)
           return true;
         if (maze.isWall(vec, dir))
@@ -369,6 +373,43 @@ public:
         }
       }
     }
+    void predecessors_for(
+        const Maze &maze, const bool known_only, const bool diag_enabled,
+        std::function<void(const Index, const cost_t)> callback) const {
+      if (!diag_enabled) {
+        /* known_only を考慮した壁の判定式を用意 */
+        auto canGo = [&](const Vector vec, const Dir dir) {
+          if (vec == Vector(0, 0) && dir == Dir::South)
+            return true;
+          if (maze.isWall(vec, dir))
+            return false;
+          if (known_only && !maze.isKnown(vec, dir))
+            return false;
+          return true;
+        };
+        /* 直進で行けるところまで行く */
+        auto v_st = arrow_from(); //< 前方のマス
+        for (int8_t n = 1;; n++) {
+          if (!canGo(v_st, nd + Dir::Back))
+            break;
+          v_st = v_st.next(nd + Dir::Back);
+          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
+        }
+        /* ここからはターン */
+        const auto v_b = arrow_from(); //< i.e. vector front
+        /* 左右を一般化 */
+        for (const auto d_turn : {Dir::Left, Dir::Right})
+          if (canGo(v_b, nd + d_turn)) //< 90度方向の壁
+            callback(Index(v_b.next(nd + d_turn), Dir::AbsMax,
+                           nd + d_turn + Dir::Back),
+                     getEdgeCost(FS90));
+        return;
+      }
+      opposite().neighbors_for(maze, known_only, diag_enabled,
+                               [&callback](const Index i_n, const cost_t cost) {
+                                 callback(i_n.opposite(), cost);
+                               });
+    }
   };
   static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
   typedef std::vector<Index> Indexes;
@@ -390,13 +431,9 @@ public:
   cost_t getHeuristic(const Index i) const {
     // return 0;
     const auto v = Vector(i) - Vector(index_start);
-    const float x = std::abs(v.x);
-    const float y = std::abs(v.y);
-    // const float d = x + y;
     // const float d = std::sqrt(v.x * v.x + v.y * v.y);
-    const float d = std::max(x, y);
-    // const float d = v.x * v.x + v.y * v.y;
-    return getEdgeCost(ST_DIAG, d);
+    const auto d = std::max(std::abs(v.x), std::abs(v.y));
+    return getEdgeCost(ST_ALONG, d);
   }
   /**
    * @brief 最短経路を求める
@@ -456,7 +493,7 @@ public:
     path.erase(path.begin(), path.end());
     for (auto i = index_start; true; i = node_map[i].from) {
       // std::cout << i << std::endl;
-      path.push_back(Index(Vector(i), i.getDir(), i.getNodeDir() + Dir::Back));
+      path.push_back(i.opposite());
       if (node_map[i].cost == 0)
         break;
     }
