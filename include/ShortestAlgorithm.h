@@ -453,7 +453,9 @@ public:
     std::unordered_map<Index, Node, Index::hash> node_map;
     std::function<bool(const Index &i1, const Index &i2)> greater =
         [&](const auto &i1, const auto &i2) {
-          return node_map[i1].cost > node_map[i2].cost;
+          auto m1 = std::min(node_map[i1].cost, node_map[i1].rhs);
+          auto m2 = std::min(node_map[i2].cost, node_map[i2].rhs);
+          return m1 > m2;
         };
     std::priority_queue<Index, std::vector<Index>, decltype(greater)> open_list(
         greater);
@@ -483,14 +485,13 @@ public:
                            if (new_cost < node.rhs) {
                              node.rhs = new_cost;
                              node.from = i_pre;
-                             open_list.push(i);
                            }
                          });
       /* remove omitted*/
       if (node.cost != node.rhs)
         open_list.push(i);
     };
-    /* start dequeue */
+    /* ComputeShortestPath() */
     while (1) {
       if (open_list.empty()) {
         std::cerr << "open_list.empty()" << std::endl;
@@ -500,7 +501,7 @@ public:
       open_list.pop();
       auto &node = node_map[index];
       const auto &start = node_map[index_start];
-      if (node.cost >= start.cost && start.rhs != start.cost)
+      if (!greater(index, index_start) && start.rhs != start.cost)
         break;
       // std::cout << "top:\t" << index << "\t: " << node_map[index].cost
       //           << std::endl;
@@ -511,6 +512,7 @@ public:
                                 const auto edge_cost __attribute__((unused))) {
                               UpdateNode(i_succ);
                             });
+        // } else {
       } else if (node.cost < node.rhs) {
         node.cost = CostMax;
         UpdateNode(index);
@@ -523,11 +525,28 @@ public:
     }
     /* post process */
     path.erase(path.begin(), path.end());
-    for (auto i = index_start; true; i = node_map[i].from) {
+    auto i = index_start;
+    while (1) {
       // std::cout << i << std::endl;
       path.push_back(i.opposite());
       if (node_map[i].cost == 0)
         break;
+      /* 最小コストの方向を探す */
+      auto min_cost = CostMax;
+      auto next = i;
+      i.predecessors_for(
+          maze, known_only, diag_enabled,
+          [&](const auto pre, const auto cost __attribute__((unused))) {
+            // std::cout << "\t" << nibr << std::endl;
+            const auto cost_p = node_map[pre].cost;
+            if (cost_p < min_cost) {
+              min_cost = cost_p;
+              next = pre;
+            }
+          });
+      if (next == i)
+        return false;
+      i = next;
     }
     return true;
   }
