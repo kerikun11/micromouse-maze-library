@@ -67,7 +67,7 @@ public:
     if (!initialized) {
       initialized = true;
       /* 台形加速のコストテーブルを事前に用意 */
-      static const float am = 3000.0f; /*< 最大加速度 [mm/s/s] */
+      static const float am = 6000.0f; /*< 最大加速度 [mm/s/s] */
       static const float vs = 450.0f;  /*< 終始速度 [mm/s] */
       static const float vm = 1800.0f; /*< 飽和速度 [mm/s] */
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
@@ -272,42 +272,39 @@ public:
           return false;
         return true;
       };
+      const auto v = Vector(x, y);
+      /* 斜め禁止 */
       if (!diag_enabled) {
         /* 直前の壁 */
-        if (!canGo(Vector(*this), nd))
+        if (!canGo(v, nd)) {
+          /* ゴール区画だけあり得る */
+          // std::cerr << "Something Wrong" << std::endl;
           return;
-        /* 直進で行けるところまで行く */
-        auto v_st = arrow_to(); //< 前方のマス
-        for (int8_t n = 1;; n++) {
-          if (!canGo(v_st, nd))
-            break;
-          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
-          v_st = v_st.next(nd);
         }
-        /* ここからはターン */
-        const auto v_f = arrow_to(); //< i.e. vector front
-        /* 左右を一般化 */
+        /* 直進で行けるところまで行く */
+        int8_t n = 1;
+        for (auto v_st = v.next(nd); canGo(v_st, nd); v_st = v_st.next(nd), ++n)
+          callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
+        /* 左右ターン */
+        const auto v_f = v.next(nd); //< i.e. vector front
         for (const auto d_turn : {Dir::Left, Dir::Right})
           if (canGo(v_f, nd + d_turn)) //< 90度方向の壁
             callback(Index(v_f, Dir::AbsMax, nd + d_turn), getEdgeCost(FS90));
         return;
       }
-      /* 区画の中央 */
+      /* 斜めあり */
       if (Dir(nd).isAlong()) {
-        Vector v = Vector(x, y); //< 仮想位置
+        /* 区画の中央 */
         /* 直前の壁 */
         if (!canGo(v, nd)) {
+          /* ゴール区画だけあり得る */
           // std::cerr << "Something Wrong" << std::endl;
           return;
         }
         /* 直進で行けるところまで行く */
-        auto v_st = v.next(nd);
-        for (int8_t n = 1;; n++) {
-          if (!canGo(v_st, nd))
-            break;
+        int8_t n = 1;
+        for (auto v_st = v.next(nd); canGo(v_st, nd); v_st = v_st.next(nd), ++n)
           callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
-          v_st = v_st.next(nd);
-        }
         /* ここからはターン */
         const auto d_f = nd;          //< i.e. dir front
         const auto v_f = v.next(d_f); //< i.e. vector front
@@ -345,19 +342,20 @@ public:
         }
         /* 直進で行けるところまで行く */
         auto i_st = i_f; //< i.e. index straight
-        for (int8_t n = 1;; n++) {
-          auto i_ff = i_st.next();
+        for (int8_t n = 1;; ++n) {
+          auto i_ff = i_st.next(); //< 行先の壁
           if (!canGo(Vector(i_ff), i_ff.getDir()))
             break;
           callback(i_st, getEdgeCost(ST_DIAG, n));
           i_st = i_ff;
         }
-        /* 左右を一般化 */
+        /* ターン */
         auto nd_r45 = arrow_diag_to_along_45();
         auto d_45 = nd + nd_r45;
         auto nd_90 = nd + nd_r45 * 2;
         auto d_135 = nd + nd_r45 * 3;
         auto v_45 = i_f.arrow_to();
+        /* 45度方向 */
         if (canGo(v_45, d_45))
           callback(Index(v_45, Dir::AbsMax, d_45), getEdgeCost(F45));
         /* V90方向, 135度方向*/
@@ -370,17 +368,6 @@ public:
             callback(Index(v_135, Dir::AbsMax, d_135), getEdgeCost(F135));
         }
       }
-    }
-    void predecessors_for(
-        const Maze &maze, const bool known_only, const bool diag_enabled,
-        std::function<void(const Index, const cost_t)> callback) const {
-      Index(Vector(*this), getDir(), getNodeDir() + Dir::Back)
-          .neighbors_for(maze, known_only, diag_enabled,
-                         [&callback](const Index i_n, const cost_t cost) {
-                           callback(Index(Vector(i_n), i_n.getDir(),
-                                          i_n.getNodeDir() + Dir::Back),
-                                    cost);
-                         });
     }
   };
   static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
@@ -521,85 +508,83 @@ public:
       const auto nd = path[i].getNodeDir();
       const auto rel_v = Vector(path[i + 1]) - Vector(path[i]);
       const auto rel_nd = Dir(path[i + 1].getNodeDir() - path[i].getNodeDir());
-      switch (rel_nd) {
-      case Dir::Front:
-        if (nd.isAlong()) {
+      if (nd.isAlong()) {
+        switch (rel_nd) {
+        case Dir::Front:
           for (int j = 0; j < std::abs(rel_v.x) + std::abs(rel_v.y); ++j)
             dirs.push_back(nd);
-        } else {
+          break;
+        case Dir::Left45:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Left);
+          break;
+        case Dir::Right45:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Right);
+          break;
+        case Dir::Left:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Left);
+          break;
+        case Dir::Right:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Right);
+          break;
+        case Dir::Left135:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Left);
+          dirs.push_back(nd + Dir::Back);
+          break;
+        case Dir::Right135:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Right);
+          dirs.push_back(nd + Dir::Back);
+          break;
+        case Dir::Back:
+          dirs.push_back(nd);
+          if (rel_v.rotate(-nd).y > 0) {
+            dirs.push_back(nd + Dir::Left);
+            dirs.push_back(nd + Dir::Back);
+          } else {
+            dirs.push_back(nd + Dir::Right);
+            dirs.push_back(nd + Dir::Back);
+          }
+          break;
+        }
+      } else {
+        switch (rel_nd) {
+        case Dir::Front:
           for (auto index = path[i]; index != path[i + 1];
                index = index.next()) {
             const auto nd_45 = index.arrow_diag_to_along_45();
             dirs.push_back(index.getNodeDir() + nd_45);
           }
-        }
-        break;
-      case Dir::Left45:
-        if (nd.isAlong()) {
-          dirs.push_back(nd);
-          dirs.push_back(nd + Dir::Left);
-        } else {
+          break;
+        case Dir::Left45:
           dirs.push_back(nd + Dir::Left45);
-        }
-        break;
-      case Dir::Right45:
-        if (nd.isAlong()) {
-          dirs.push_back(nd);
-          dirs.push_back(nd + Dir::Right);
-        } else {
+          break;
+        case Dir::Right45:
           dirs.push_back(nd + Dir::Right45);
-        }
-        break;
-      case Dir::Left:
-        if (nd.isAlong()) {
-          dirs.push_back(nd);
-          dirs.push_back(nd + Dir::Left);
-        } else {
+          break;
+        case Dir::Left:
           /* V90 */
           dirs.push_back(nd + Dir::Left45);
           dirs.push_back(nd + Dir::Left135);
-        }
-        break;
-      case Dir::Right:
-        if (nd.isAlong()) {
-          dirs.push_back(nd);
-          dirs.push_back(nd + Dir::Right);
-        } else {
+          break;
+        case Dir::Right:
           /* V90 */
           dirs.push_back(nd + Dir::Right45);
           dirs.push_back(nd + Dir::Right135);
-        }
-        break;
-      case Dir::Left135:
-        if (nd.isAlong()) {
-          dirs.push_back(nd);
-          dirs.push_back(nd + Dir::Left);
-          dirs.push_back(nd + Dir::Back);
-        } else {
+          break;
+        case Dir::Left135:
           dirs.push_back(nd + Dir::Left45);
           dirs.push_back(nd + Dir::Left135);
-        }
-        break;
-      case Dir::Right135:
-        if (nd.isAlong()) {
-          dirs.push_back(nd);
-          dirs.push_back(nd + Dir::Right);
-          dirs.push_back(nd + Dir::Back);
-        } else {
+          break;
+        case Dir::Right135:
           dirs.push_back(nd + Dir::Right45);
           dirs.push_back(nd + Dir::Right135);
+          break;
         }
-        break;
-      case Dir::Back:
-        dirs.push_back(nd);
-        if (rel_v.rotate(-nd).y > 0) {
-          dirs.push_back(nd + Dir::Left);
-          dirs.push_back(nd + Dir::Back);
-        } else {
-          dirs.push_back(nd + Dir::Right);
-          dirs.push_back(nd + Dir::Back);
-        }
-        break;
       }
     }
     return dirs;
