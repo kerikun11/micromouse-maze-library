@@ -420,9 +420,6 @@ public:
     cost_t cost = CostMax;
     cost_t rhs = CostMax;
     Node() {}
-    const Node &operator=(const Node &n) {
-      return cost = n.cost, rhs = n.rhs, *this;
-    }
   };
   static_assert(sizeof(Node) == 4, "Node Size Error"); /**< Size Check */
 
@@ -447,8 +444,7 @@ public:
    * @return true 成功
    * @return false 失敗
    */
-  bool calcShortestPath(Indexes &path, bool known_only = true,
-                        bool diag_enabled = true) {
+  bool calcShortestPath(Indexes &path, bool known_only, bool diag_enabled) {
     std::unordered_map<Index, Node, Index::hash> node_map;
     std::function<bool(const Index &i1, const Index &i2)> greater =
         [&](const auto &i1, const auto &i2) {
@@ -468,9 +464,11 @@ public:
     /* define UpdateNode() */
     auto UpdateNode = [&](const auto i) {
       auto &node = node_map[i];
+      // std::cout << "update\t" << i << "\t" << node.rhs << "\t" << node.cost
+      //           << std::endl;
       if (node.rhs == 0)
         return;
-      node.rhs = CostMax;
+      node.rhs = CostMax; /* update */
       const auto h_n = getHeuristic(i);
       i.predecessors_for(maze, known_only, diag_enabled,
                          [&](const auto i_pre, const auto edge_cost) {
@@ -481,37 +479,57 @@ public:
                            if (new_cost < node.rhs)
                              node.rhs = new_cost;
                          });
-      if (node.cost != node.rhs)
+      if (node.cost != node.rhs) {
         open_list.push(i);
+        // std::cout << "push\t" << i << "\t" << node.rhs << "\t" << node.cost
+        //           << std::endl;
+      } else {
+        // std::cout << "no push\t" << i << "\t" << node.rhs << "\t" <<
+        // node.cost
+        //           << std::endl;
+      }
     };
+    /* util */
+    const auto &start = node_map[index_start];
     /* ComputeShortestPath() */
     while (1) {
+      // for (int k = 0; k < 100; ++k) {
       if (open_list.empty()) {
         std::cerr << "open_list.empty()" << std::endl;
         return false;
       }
+      // std::cout << "size():\t" << open_list.size() << std::endl;
       const auto index = open_list.top();
       open_list.pop();
       auto &node = node_map[index];
-      const auto &start = node_map[index_start];
       /* 終了条件 */
-      if (!greater(index, index_start) && start.rhs != start.cost)
+      if (!(greater(index_start, index) || start.cost != start.rhs))
         break;
       if (node.cost > node.rhs) {
-        node.cost = node.rhs;
+        // std::cout << "g < r\t" << index << "\t" << node.rhs << "\t" <<
+        // node.cost
+        //           << std::endl;
+        node.cost = node.rhs; /* update */
         index.neighbors_for(maze, known_only, diag_enabled,
                             [&](const auto i_succ,
                                 const auto edge_cost __attribute__((unused))) {
-                              UpdateNode(i_succ);
+                              UpdateNode(i_succ); /* update */
                             });
       } else if (node.cost < node.rhs) {
-        node.cost = CostMax;
-        UpdateNode(index);
+        // } else {
+        // std::cout << "g > r\t" << index << "\t" << node.rhs << "\t" <<
+        // node.cost
+        //           << std::endl;
+        node.cost = CostMax; /* update */
+        UpdateNode(index);   /* update */
         index.neighbors_for(maze, known_only, diag_enabled,
                             [&](const auto i_succ,
                                 const auto edge_cost __attribute__((unused))) {
-                              UpdateNode(i_succ);
+                              UpdateNode(i_succ); /* update */
                             });
+      } else {
+        // std::cout << "g == r\t" << index << "\t" << node.rhs << "\t"
+        //           << node.cost << std::endl;
       }
     }
     /* post process */
