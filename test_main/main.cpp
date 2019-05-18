@@ -152,7 +152,7 @@ const Maze loadMaze() {
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
-#if 1
+#if 0
   maze_target = loadMaze();
   CLRobot robot;
   robot.replaceGoals(maze_target.getGoals());
@@ -167,16 +167,16 @@ int main(void) {
   // robot.endFastRunBackingToStartRun();
 #endif
 
-#if 0
+#if 1
   const int n = 100;
   const bool diag_enabled = 1;
   std::chrono::microseconds sum{0};
   Maze maze = loadMaze();
-  ShortestAlgorithm sa(maze);
+  ShortestAlgorithm sa(maze, diag_enabled);
   ShortestAlgorithm::Indexes path;
   for (int i = 0; i < n; ++i) {
     const auto t_s = std::chrono::system_clock().now();
-    sa.calcShortestPath(path, false, diag_enabled);
+    sa.calcShortestPath(path, false);
     const auto t_e = std::chrono::system_clock().now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);

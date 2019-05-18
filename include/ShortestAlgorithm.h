@@ -23,9 +23,19 @@ namespace MazeLib {
 
 class ShortestAlgorithm {
 public:
-  ShortestAlgorithm(const Maze &maze) : maze(maze) {
+  ShortestAlgorithm(const Maze &maze, const bool diag_enabled)
+      : maze(maze), diag_enabled(diag_enabled),
+        greater([&](const auto &i1, const auto &i2) {
+          auto m1 = std::min(node_map[i1].cost, node_map[i1].rhs);
+          auto m2 = std::min(node_map[i2].cost, node_map[i2].rhs);
+          return m1 > m2;
+        }),
+        open_list(greater) {
     /* テーブルの事前計算 */
     getEdgeCost(ST_ALONG);
+    Initialize();
+    Indexes path;
+    calcShortestPath(path, false);
   }
 
 public:
@@ -435,6 +445,46 @@ public:
     const auto d = std::max(std::abs(v.x), std::abs(v.y));
     return getEdgeCost(ST_ALONG, d);
   }
+  void Initialize() {
+    /* clear open_list */
+    while (!open_list.empty())
+      open_list.pop();
+    /* clear node map */
+    node_map.clear();
+    /* push the goal indexes */
+    for (const auto v : maze.getGoals())
+      for (const auto nd : Dir::ENWS()) {
+        const auto i = Index(v, Dir::AbsMax, nd);
+        node_map[i].rhs = 0;
+        open_list.push(i);
+      }
+  }
+  void UpdateNode(const Index i, const bool known_only) {
+    auto &node = node_map[i];
+    // std::cout << "update\t" << i << "\t" << node.rhs << "\t" << node.cost
+    //           << std::endl;
+    if (node.rhs == 0)
+      return;
+    node.rhs = CostMax; /* update */
+    const auto h_n = getHeuristic(i);
+    i.predecessors_for(maze, known_only, diag_enabled,
+                       [&](const auto i_pre, const auto edge_cost) {
+                         const auto &pre = node_map[i_pre];
+                         const auto h_p = getHeuristic(i_pre);
+                         const auto new_cost = pre.cost - h_p + edge_cost + h_n;
+                         if (new_cost < node.rhs)
+                           node.rhs = new_cost;
+                       });
+    if (node.cost != node.rhs) {
+      open_list.push(i);
+      // std::cout << "push\t" << i << "\t" << node.rhs << "\t" << node.cost
+      //           << std::endl;
+    } else {
+      // std::cout << "no push\t" << i << "\t" << node.rhs << "\t" <<
+      // node.cost
+      //           << std::endl;
+    }
+  }
   /**
    * @brief 最短経路を求める
    *
@@ -444,51 +494,7 @@ public:
    * @return true 成功
    * @return false 失敗
    */
-  bool calcShortestPath(Indexes &path, bool known_only, bool diag_enabled) {
-    std::unordered_map<Index, Node, Index::hash> node_map;
-    std::function<bool(const Index &i1, const Index &i2)> greater =
-        [&](const auto &i1, const auto &i2) {
-          auto m1 = std::min(node_map[i1].cost, node_map[i1].rhs);
-          auto m2 = std::min(node_map[i2].cost, node_map[i2].rhs);
-          return m1 > m2;
-        };
-    std::priority_queue<Index, std::vector<Index>, decltype(greater)> open_list(
-        greater);
-    /* push the goal indexes */
-    for (const auto v : maze.getGoals())
-      for (const auto nd : Dir::ENWS()) {
-        const auto i = Index(v, Dir::AbsMax, nd);
-        node_map[i].rhs = 0;
-        open_list.push(i);
-      }
-    /* define UpdateNode() */
-    auto UpdateNode = [&](const auto i) {
-      auto &node = node_map[i];
-      // std::cout << "update\t" << i << "\t" << node.rhs << "\t" << node.cost
-      //           << std::endl;
-      if (node.rhs == 0)
-        return;
-      node.rhs = CostMax; /* update */
-      const auto h_n = getHeuristic(i);
-      i.predecessors_for(maze, known_only, diag_enabled,
-                         [&](const auto i_pre, const auto edge_cost) {
-                           const auto &pre = node_map[i_pre];
-                           const auto h_p = getHeuristic(i_pre);
-                           const auto new_cost =
-                               pre.cost - h_p + edge_cost + h_n;
-                           if (new_cost < node.rhs)
-                             node.rhs = new_cost;
-                         });
-      if (node.cost != node.rhs) {
-        open_list.push(i);
-        // std::cout << "push\t" << i << "\t" << node.rhs << "\t" << node.cost
-        //           << std::endl;
-      } else {
-        // std::cout << "no push\t" << i << "\t" << node.rhs << "\t" <<
-        // node.cost
-        //           << std::endl;
-      }
-    };
+  bool calcShortestPath(Indexes &path, bool known_only) {
     /* util */
     const auto &start = node_map[index_start];
     /* ComputeShortestPath() */
@@ -496,10 +502,11 @@ public:
       // for (int k = 0; k < 100; ++k) {
       if (open_list.empty()) {
         std::cerr << "open_list.empty()" << std::endl;
-        return false;
       }
       // std::cout << "size():\t" << open_list.size() << std::endl;
-      const auto index = open_list.top();
+      const auto index = open_list.empty()
+                             ? Index(-1, -1, Dir::AbsMax, Dir::AbsMax)
+                             : open_list.top();
       open_list.pop();
       auto &node = node_map[index];
       /* 終了条件 */
@@ -513,19 +520,19 @@ public:
         index.neighbors_for(maze, known_only, diag_enabled,
                             [&](const auto i_succ,
                                 const auto edge_cost __attribute__((unused))) {
-                              UpdateNode(i_succ); /* update */
+                              UpdateNode(i_succ, known_only); /* update */
                             });
       } else if (node.cost < node.rhs) {
         // } else {
         // std::cout << "g > r\t" << index << "\t" << node.rhs << "\t" <<
         // node.cost
         //           << std::endl;
-        node.cost = CostMax; /* update */
-        UpdateNode(index);   /* update */
+        node.cost = CostMax;           /* update */
+        UpdateNode(index, known_only); /* update */
         index.neighbors_for(maze, known_only, diag_enabled,
                             [&](const auto i_succ,
                                 const auto edge_cost __attribute__((unused))) {
-                              UpdateNode(i_succ); /* update */
+                              UpdateNode(i_succ, known_only); /* update */
                             });
       } else {
         // std::cout << "g == r\t" << index << "\t" << node.rhs << "\t"
@@ -688,8 +695,12 @@ public:
 
 private:
   const Maze &maze; /**< @brief 使用する迷路の参照 */
+  const bool diag_enabled;
   const Index index_start =
       Index(0, 0, Dir::AbsMax, Dir::South); /**< @brief スタート */
+  std::unordered_map<Index, Node, Index::hash> node_map;
+  std::function<bool(const Index &i1, const Index &i2)> greater;
+  std::priority_queue<Index, std::vector<Index>, decltype(greater)> open_list;
 };
 
 } // namespace MazeLib

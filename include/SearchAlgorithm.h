@@ -48,7 +48,7 @@ public:
    *  @param maze 使用する迷路の参照
    *  @param goals ゴール区画の配列
    */
-  SearchAlgorithm(Maze &maze) : maze(maze), shortestAlgorithm(maze) {}
+  SearchAlgorithm(Maze &maze) : maze(maze), shortestAlgorithm(maze, true) {}
   /** @function isComplete
    *  @brief 最短経路が導出されているか調べる関数
    */

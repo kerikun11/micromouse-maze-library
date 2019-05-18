@@ -160,7 +160,7 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
   /* new algorithm*/
   ShortestAlgorithm::Indexes path;
-  if (!shortestAlgorithm.calcShortestPath(path, true, diag_enabled))
+  if (!shortestAlgorithm.calcShortestPath(path, true))
     return false; /* 失敗 */
   shortestDirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
   auto v = maze.getStart();
@@ -321,7 +321,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
   candidates.clear();
   for (auto diag_enabled : {true, false}) {
     ShortestAlgorithm::Indexes path;
-    if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
+    if (!shortestAlgorithm.calcShortestPath(path, false))
       return false; /* 失敗 */
     const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
     auto v = maze.getStart();
