@@ -12,6 +12,8 @@
 
 #include "Maze.h"
 
+#include "log.h"
+
 #include <algorithm> /*< for find_if, etc. */
 #include <functional>
 #include <iomanip> /*< for std::setw() */
@@ -33,9 +35,7 @@ public:
         open_list(greater) {
     /* テーブルの事前計算 */
     getEdgeCost(ST_ALONG);
-    Initialize();
-    Indexes path;
-    calcShortestPath(path, false);
+    // Initialize();
   }
 
 public:
@@ -77,7 +77,7 @@ public:
     if (!initialized) {
       initialized = true;
       /* 台形加速のコストテーブルを事前に用意 */
-      static const float am = 6000.0f; /*< 最大加速度 [mm/s/s] */
+      static const float am = 3000.0f; /*< 最大加速度 [mm/s/s] */
       static const float vs = 450.0f;  /*< 終始速度 [mm/s] */
       static const float vm = 1800.0f; /*< 飽和速度 [mm/s] */
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
@@ -165,7 +165,7 @@ public:
         y--;
         break;
       default:
-        std::cerr << "Invalid Direction" << std::endl;
+        logw << "Invalid Direction" << std::endl;
         break;
       }
     }
@@ -198,7 +198,7 @@ public:
       default:
         break;
       }
-      std::cerr << "Invalid Index" << std::endl;
+      logw << "Invalid Index" << std::endl;
       return Vector(x, y);
     }
     const Vector arrow_to() const {
@@ -219,7 +219,7 @@ public:
       default:
         break;
       }
-      std::cerr << "Invalid Index" << std::endl;
+      logw << "Invalid Index" << std::endl;
       return Vector(x, y);
     }
     /**
@@ -235,7 +235,7 @@ public:
       case Dir::SouthEast:
         return z == 1 ? Dir::Left45 : Dir::Right45;
       }
-      std::cerr << "Invalid Node Dir" << std::endl;
+      logw << "Invalid Node Dir" << std::endl;
       return Dir::AbsMax;
     }
     /**
@@ -266,13 +266,13 @@ public:
       default:
         break;
       }
-      std::cerr << "Invalid Index" << std::endl;
+      logw << "Invalid Index" << std::endl;
       return Index();
     }
     const Index opposite() const {
       return Index(x, y, getDir(), nd + Dir::Back);
     }
-    void neighbors_for(
+    void successors_for(
         const Maze &maze, const bool known_only, const bool diag_enabled,
         std::function<void(const Index, const cost_t)> callback) const {
       /* known_only を考慮した壁の判定式を用意 */
@@ -351,7 +351,7 @@ public:
         /* 直前の壁 */
         const auto i_f = this->next(); //< i.e. index front
         if (!canGo(Vector(i_f), i_f.getDir())) {
-          std::cerr << "Something Wrong" << std::endl;
+          // logw << "Something Wrong" << std::endl;
           return;
         }
         /* 直進で行けるところまで行く */
@@ -415,10 +415,11 @@ public:
                      getEdgeCost(FS90));
         return;
       }
-      opposite().neighbors_for(maze, known_only, diag_enabled,
-                               [&callback](const Index i_n, const cost_t cost) {
-                                 callback(i_n.opposite(), cost);
-                               });
+      opposite().successors_for(
+          maze, known_only, diag_enabled,
+          [&callback](const Index i_n, const cost_t cost) {
+            callback(i_n.opposite(), cost);
+          });
     }
   };
   static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
@@ -446,6 +447,8 @@ public:
     return getEdgeCost(ST_ALONG, d);
   }
   void Initialize() {
+    /* init */
+    wall_log_count = 0;
     /* clear open_list */
     while (!open_list.empty())
       open_list.pop();
@@ -458,6 +461,8 @@ public:
         node_map[i].rhs = 0;
         open_list.push(i);
       }
+    // Indexes path;
+    // calcShortestPath(path, diag_enabled);
   }
   void UpdateNode(const Index i, const bool known_only) {
     auto &node = node_map[i];
@@ -485,23 +490,62 @@ public:
       //           << std::endl;
     }
   }
+  void UpdateChangedEdge(const bool known_only) {
+    /* wall log */
+    const int maze_wall_log_size = maze.getWallLogs().size();
+    if (maze_wall_log_size <= wall_log_count)
+      return;
+    /* 各WallLogに対して */
+    while (wall_log_count < maze_wall_log_size) {
+      const auto wl = maze.getWallLogs()[wall_log_count++];
+      const auto w_v = Vector(wl);
+      const auto w_d = Dir(wl);
+      /* 壁があった場合のみ処理 */
+      if (wl.b) {
+        if (diag_enabled) {
+          for (const auto nd : Dir::Diag4()) {
+            auto i = Index(wl.x, wl.y, wl.d, nd);
+            UpdateNode(i, known_only); /* update */
+            i.successors_for(maze, known_only, diag_enabled,
+                             [&](const auto i_succ,
+                                 const auto edge_cost __attribute__((unused))) {
+                               UpdateNode(i_succ, known_only); /* update */
+                             });
+          }
+        }
+        /* 壁ができたので更新されないバグがある */
+        for (const auto i :
+             {Index(w_v, Dir::AbsMax, w_d),
+              Index(w_v.next(w_d), Dir::AbsMax, w_d + Dir::Back)}) {
+          UpdateNode(i, known_only); /* update */
+          i.successors_for(maze, known_only, diag_enabled,
+                           [&](const auto i_succ,
+                               const auto edge_cost __attribute__((unused))) {
+                             UpdateNode(i_succ, known_only); /* update */
+                           });
+        }
+      }
+    }
+  }
   /**
    * @brief 最短経路を求める
    *
    * @param path 結果を入れる箱
    * @param known_only
-   * @param diag_enabled
    * @return true 成功
    * @return false 失敗
    */
-  bool calcShortestPath(Indexes &path, bool known_only) {
+  bool calcShortestPath(Indexes &path, const bool known_only) {
+    // Initialize();
+    /* changed */
+    UpdateChangedEdge(known_only);
     /* util */
     const auto &start = node_map[index_start];
     /* ComputeShortestPath() */
     while (1) {
-      // for (int k = 0; k < 100; ++k) {
       if (open_list.empty()) {
         std::cerr << "open_list.empty()" << std::endl;
+        return false;
       }
       // std::cout << "size():\t" << open_list.size() << std::endl;
       const auto index = open_list.empty()
@@ -517,11 +561,11 @@ public:
         // node.cost
         //           << std::endl;
         node.cost = node.rhs; /* update */
-        index.neighbors_for(maze, known_only, diag_enabled,
-                            [&](const auto i_succ,
-                                const auto edge_cost __attribute__((unused))) {
-                              UpdateNode(i_succ, known_only); /* update */
-                            });
+        index.successors_for(maze, known_only, diag_enabled,
+                             [&](const auto i_succ,
+                                 const auto edge_cost __attribute__((unused))) {
+                               UpdateNode(i_succ, known_only); /* update */
+                             });
       } else if (node.cost < node.rhs) {
         // } else {
         // std::cout << "g > r\t" << index << "\t" << node.rhs << "\t" <<
@@ -529,11 +573,11 @@ public:
         //           << std::endl;
         node.cost = CostMax;           /* update */
         UpdateNode(index, known_only); /* update */
-        index.neighbors_for(maze, known_only, diag_enabled,
-                            [&](const auto i_succ,
-                                const auto edge_cost __attribute__((unused))) {
-                              UpdateNode(i_succ, known_only); /* update */
-                            });
+        index.successors_for(maze, known_only, diag_enabled,
+                             [&](const auto i_succ,
+                                 const auto edge_cost __attribute__((unused))) {
+                               UpdateNode(i_succ, known_only); /* update */
+                             });
       } else {
         // std::cout << "g == r\t" << index << "\t" << node.rhs << "\t"
         //           << node.cost << std::endl;
@@ -701,6 +745,7 @@ private:
   std::unordered_map<Index, Node, Index::hash> node_map;
   std::function<bool(const Index &i1, const Index &i2)> greater;
   std::priority_queue<Index, std::vector<Index>, decltype(greater)> open_list;
+  int wall_log_count = 0;
 };
 
 } // namespace MazeLib

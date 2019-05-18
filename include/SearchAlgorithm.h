@@ -48,11 +48,21 @@ public:
    *  @param maze 使用する迷路の参照
    *  @param goals ゴール区画の配列
    */
-  SearchAlgorithm(Maze &maze) : maze(maze), shortestAlgorithm(maze, true) {}
+  SearchAlgorithm(Maze &maze)
+      : maze(maze), shortestAlgorithmDiag(maze, true),
+        shortestAlgorithmAlong(maze, false) {}
   /** @function isComplete
    *  @brief 最短経路が導出されているか調べる関数
    */
   bool isComplete();
+  void reset() {
+    for (const auto diag_enabled : {true, false}) {
+      /* diag or not */
+      auto &shortestAlgorithm =
+          diag_enabled ? shortestAlgorithmDiag : shortestAlgorithmAlong;
+      shortestAlgorithm.Initialize();
+    }
+  }
   void positionIdentifyingInit(Vector *pVector, Dir *pDir);
   bool updateWall(const State &state, const Vector &v, const Dir &d,
                   const bool left, const bool front, const bool right,
@@ -75,9 +85,10 @@ public:
   const Maze &getMaze() const { return maze; }
 
 protected:
-  Maze &maze;                          /**< 使用する迷路の参照 */
-  StepMap stepMap;                     /**< 使用するステップマップ */
-  ShortestAlgorithm shortestAlgorithm; /**< 最短経路導出器 */
+  Maze &maze;      /**< 使用する迷路の参照 */
+  StepMap stepMap; /**< 使用するステップマップ */
+  ShortestAlgorithm shortestAlgorithmDiag;  /**< 最短経路導出器 */
+  ShortestAlgorithm shortestAlgorithmAlong; /**< 最短経路導出器 */
 
 private:
   Maze idMaze;     /**< 自己位置同定に使用する迷路 */

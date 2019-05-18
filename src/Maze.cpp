@@ -30,7 +30,8 @@ const Vector Vector::next(const Dir &dir) const {
   case Dir::South:
     return Vector(x, y - 1);
   }
-  printf("Warning: invalid direction\n");
+  std::cerr << __FILE__ << ":" << __LINE__ << " "
+            << "invalid direction" << std::endl;
   return *this;
 }
 std::ostream &operator<<(std::ostream &os, const Vector &v) {
@@ -54,7 +55,8 @@ const Vector Vector::rotate(const Dir d) const {
   case Dir::South:
     return Vector(y, -x);
   }
-  printf("Warning: invalid direction\n");
+  std::cerr << __FILE__ << ":" << __LINE__ << " "
+            << "invalid direction" << std::endl;
   return *this;
 }
 
@@ -260,7 +262,8 @@ bool Maze::isWall(const wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
       return true; //< 盤面外
     return wall[1][y - 1] & (1 << x);
   }
-  printf("Warning: invalid direction\n");
+  std::cerr << __FILE__ << ":" << __LINE__ << " "
+            << "invalid direction" << std::endl;
   return true; //< とりあえず壁ありとする
 }
 void Maze::setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
@@ -299,6 +302,8 @@ void Maze::setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
       wall[1][y - 1] &= ~(1 << x);
     return;
   }
-  printf("Warning: invalid direction\n");
+  std::cerr << __FILE__ << ":" << __LINE__ << " "
+            << "invalid direction" << std::endl;
 }
+
 } // namespace MazeLib

@@ -17,7 +17,10 @@ public:
   /** @function replaceGoals
    *  @brief ゴール区画を変更する関数
    */
-  void replaceGoals(const Vectors &goals) { maze.setGoals(goals); }
+  void replaceGoals(const Vectors &goals) {
+    maze.setGoals(goals);
+    searchAlgorithm.reset();
+  }
   /** @function isComplete
    *  @brief 探索が完了しているかどうかを返す関数
    */
@@ -134,7 +137,7 @@ public:
   }
 
 protected:
-  Maze &maze; /**< 使用する迷路 */
+  Maze &maze; /**< 使用する迷路の参照 */
   SearchAlgorithm::State state =
       SearchAlgorithm::START;         /**< 現在の探索状態を保持 */
   Vector curVec;                      /**< 現在の区画座標 */

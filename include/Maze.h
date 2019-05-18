@@ -100,6 +100,11 @@ public:
     static const std::array<Dir, 4> all = {East, North, West, South};
     return all;
   }
+  static const std::array<Dir, 4> &Diag4() {
+    static const std::array<Dir, 4> all = {NorthEast, NorthWest, SouthWest,
+                                           SouthEast};
+    return all;
+  }
   /**
    * @brief 表示
    */
@@ -213,7 +218,7 @@ typedef std::vector<WallLog> WallLogs;
  */
 class Maze {
 public:
-  Maze() { reset(); }
+  Maze(const Vector start = Vector(0, 0)) : start(start) { reset(); }
   Maze(const Vectors &goals, const Vector start = Vector(0, 0))
       : goals(goals), start(start) {
     reset();
