@@ -48,7 +48,7 @@ else()
 
   ## custom target
   add_custom_target(main
-    COMMAND ${CMAKE_BINARY_DIR}/test_main/test_main
+    COMMAND clear && ${CMAKE_BINARY_DIR}/test_main/test_main
     DEPENDS test_main mazelib
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )

@@ -166,11 +166,13 @@ int main(void) {
 #endif
 
 #if 0
-  const int n = 100;
+  const int n = 1;
   const bool diag_enabled = 1;
   std::chrono::microseconds sum{0};
-  Maze maze = loadMaze();
+  // Maze maze = loadMaze();
+  Maze maze(loadMaze().getGoals());
   ShortestAlgorithm sa(maze, diag_enabled);
+  sa.Initialize();
   ShortestAlgorithm::Indexes path;
   for (int i = 0; i < n; ++i) {
     const auto t_s = std::chrono::system_clock().now();
@@ -185,13 +187,13 @@ int main(void) {
 #endif
 
 #if 0
-  const bool diag_enabled = 0;
+  const bool diag_enabled = 1;
   const bool known_only = 1;
   std::chrono::microseconds sum{0};
   Maze maze = loadMaze();
-  ShortestAlgorithm sa(maze);
+  ShortestAlgorithm sa(maze, diag_enabled);
   // const auto i = ShortestAlgorithm::Index(0, 0, Dir::AbsMax, Dir::South);
-  const auto i = ShortestAlgorithm::Index(0, 1, Dir::East, Dir::North);
+  const auto i = ShortestAlgorithm::Index(10, 5, Dir::North, Dir::NorthWest);
   i.predecessors_for(
       maze, known_only, diag_enabled,
       [&](const auto nibr, const auto cost __attribute__((unused))) {
