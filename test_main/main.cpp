@@ -156,27 +156,27 @@ int main(void) {
   maze_target = loadMaze();
   CLRobot robot;
   robot.replaceGoals(maze_target.getGoals());
-  display = 1;
+  display = 0;
   robot.searchRun();
-  // robot.printInfo();
-  // robot.fastRun(false);
-  // robot.printPath();
-  // robot.fastRun(true);
-  // robot.printPath();
+  robot.printInfo();
+  robot.fastRun(false);
+  robot.printPath();
+  robot.fastRun(true);
+  robot.printPath();
 #endif
 
-#if 0
-  const int n = 1;
+#if 1
+  const int n = 1000;
   const bool diag_enabled = 1;
+  const bool known_only = 0;
   std::chrono::microseconds sum{0};
-  // Maze maze = loadMaze();
-  Maze maze(loadMaze().getGoals());
-  ShortestAlgorithm sa(maze, diag_enabled);
-  sa.Initialize();
+  Maze maze = loadMaze();
+  // Maze maze(loadMaze().getGoals());
+  ShortestAlgorithm sa(maze);
   ShortestAlgorithm::Indexes path;
   for (int i = 0; i < n; ++i) {
     const auto t_s = std::chrono::system_clock().now();
-    sa.calcShortestPath(path, false);
+    sa.calcShortestPath(path, known_only, diag_enabled);
     const auto t_e = std::chrono::system_clock().now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);

@@ -20,14 +20,14 @@ void ShortestAlgorithm::Index::uniquify(const Dir d) {
     y--;
     break;
   default:
-    logw << "Invalid Direction" << std::endl;
+    std::cerr << __FILE__ << ":" << __LINE__ << " "
+              << "invalid direction" << std::endl;
     break;
   }
 }
 void ShortestAlgorithm::Index::successors_for(
     const Maze &maze, const bool known_only, const bool diag_enabled,
-    std::function<void(const Index, const cost_t)> callback,
-    const bool ignore_front_wall) const {
+    std::function<void(const Index, const cost_t)> callback) const {
   /* known_only を考慮した壁の判定式を用意 */
   auto canGo = [&](const Vector vec, const Dir dir) {
     /* スタートは袋小路なので例外処理 */
@@ -43,7 +43,7 @@ void ShortestAlgorithm::Index::successors_for(
   /* 斜め禁止 */
   if (!diag_enabled) {
     /* 直前の壁 */
-    if (!ignore_front_wall && !canGo(v, nd)) {
+    if (!canGo(v, nd)) {
       /* ゴール区画だけあり得る */
       // std::cerr << "Something Wrong" << std::endl;
       return;
@@ -63,7 +63,7 @@ void ShortestAlgorithm::Index::successors_for(
   if (Dir(nd).isAlong()) {
     /* 区画の中央 */
     /* 直前の壁 */
-    if (!ignore_front_wall && !canGo(v, nd)) {
+    if (!canGo(v, nd)) {
       /* ゴール区画だけあり得る */
       // std::cerr << "Something Wrong" << std::endl;
       return;
@@ -303,4 +303,5 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
   }
   return dirs;
 }
+
 } // namespace MazeLib
