@@ -3,6 +3,7 @@
 namespace MazeLib {
 
 /* Index */
+
 void ShortestAlgorithm::Index::uniquify(const Dir d) {
   switch (d) {
   case Dir::East:
@@ -25,6 +26,7 @@ void ShortestAlgorithm::Index::uniquify(const Dir d) {
     break;
   }
 }
+
 void ShortestAlgorithm::Index::successors_for(
     const Maze &maze, const bool known_only, const bool diag_enabled,
     std::function<void(const Index, const cost_t)> callback) const {
@@ -40,71 +42,63 @@ void ShortestAlgorithm::Index::successors_for(
     return true;
   };
   const auto v = Vector(x, y);
-  /* 斜め禁止 */
-  if (!diag_enabled) {
-    /* 直前の壁 */
-    if (!canGo(v, nd)) {
-      /* ゴール区画だけあり得る */
-      // std::cerr << "Something Wrong" << std::endl;
-      return;
-    }
-    /* 直進で行けるところまで行く */
-    int8_t n = 1;
-    for (auto v_st = v.next(nd); canGo(v_st, nd); v_st = v_st.next(nd), ++n)
-      callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
-    /* 左右ターン */
-    const auto v_f = v.next(nd); //< i.e. vector front
-    for (const auto d_turn : {Dir::Left, Dir::Right})
-      if (canGo(v_f, nd + d_turn)) //< 90度方向の壁
-        callback(Index(v_f, Dir::AbsMax, nd + d_turn), getEdgeCost(FS90));
-    return;
-  }
-  /* 斜めあり */
-  if (Dir(nd).isAlong()) {
+  if (getNodeDir().isAlong()) {
     /* 区画の中央 */
     /* 直前の壁 */
     if (!canGo(v, nd)) {
       /* ゴール区画だけあり得る */
-      // std::cerr << "Something Wrong" << std::endl;
+#if 0
+      std::cerr << __FILE__ << ":" << __LINE__ << " "
+                << "something wrong" << std::endl;
+#endif
       return;
     }
     /* 直進で行けるところまで行く */
     int8_t n = 1;
     for (auto v_st = v.next(nd); canGo(v_st, nd); v_st = v_st.next(nd), ++n)
       callback(Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n));
-    /* ここからはターン */
-    const auto d_f = nd;          //< i.e. dir front
-    const auto v_f = v.next(d_f); //< i.e. vector front
-    /* 左右を一般化 */
-    for (const auto nd_rel_45 : {Dir::Left45, Dir::Right45}) {
-      const auto nd_45 = nd + nd_rel_45;
-      const auto nd_90 = nd + nd_rel_45 * 2;
-      const auto nd_135 = nd + nd_rel_45 * 3;
-      const auto nd_180 = nd + nd_rel_45 * 4;
-      /* 横壁 */
-      const auto d_l = nd_90;            //< 左方向
-      if (canGo(v_f, d_l)) {             //< 45度方向の壁
-        const auto v_fl = v_f.next(d_l); //< 前左の区画
-        if (canGo(v_fl, d_f))            //< 45度先の壁
-          callback(Index(v_f, d_l, nd_45), getEdgeCost(F45));
-        if (canGo(v_fl, d_l)) //< 90度先の壁
-          callback(Index(v_fl, Dir::AbsMax, nd_90), getEdgeCost(F90));
-        const auto d_b = d_f + Dir::Back;    //< 後方向
-        if (canGo(v_fl, d_b)) {              //< 135度の壁
-          const auto v_fll = v_fl.next(d_b); //< 前左左の区画
-          if (canGo(v_fll, d_l))             //< 135度行先
-            callback(Index(v_fll, d_f, nd_135), getEdgeCost(F135));
-          if (canGo(v_fll, d_b)) //< 180度行先の壁
-            callback(Index(v_fll, Dir::AbsMax, nd_180), getEdgeCost(F180));
+    if (diag_enabled) {
+      /* 斜めありのターン */
+      const auto d_f = nd;          //< i.e. dir front
+      const auto v_f = v.next(d_f); //< i.e. vector front
+      /* 左右を一般化 */
+      for (const auto nd_rel_45 : {Dir::Left45, Dir::Right45}) {
+        const auto nd_45 = nd + nd_rel_45;
+        const auto nd_90 = nd + nd_rel_45 * 2;
+        const auto nd_135 = nd + nd_rel_45 * 3;
+        const auto nd_180 = nd + nd_rel_45 * 4;
+        /* 横壁 */
+        const auto d_l = nd_90;            //< 左方向
+        if (canGo(v_f, d_l)) {             //< 45度方向の壁
+          const auto v_fl = v_f.next(d_l); //< 前左の区画
+          if (canGo(v_fl, d_f))            //< 45度先の壁
+            callback(Index(v_f, d_l, nd_45), getEdgeCost(F45));
+          if (canGo(v_fl, d_l)) //< 90度先の壁
+            callback(Index(v_fl, Dir::AbsMax, nd_90), getEdgeCost(F90));
+          const auto d_b = d_f + Dir::Back;    //< 後方向
+          if (canGo(v_fl, d_b)) {              //< 135度の壁
+            const auto v_fll = v_fl.next(d_b); //< 前左左の区画
+            if (canGo(v_fll, d_l))             //< 135度行先
+              callback(Index(v_fll, d_f, nd_135), getEdgeCost(F135));
+            if (canGo(v_fll, d_b)) //< 180度行先の壁
+              callback(Index(v_fll, Dir::AbsMax, nd_180), getEdgeCost(F180));
+          }
         }
       }
+    } else {
+      /* 斜めなしのターン */
+      const auto v_f = v.next(nd); //< i.e. vector front
+      for (const auto d_turn : {Dir::Left, Dir::Right})
+        if (canGo(v_f, nd + d_turn)) //< 90度方向の壁
+          callback(Index(v_f, Dir::AbsMax, nd + d_turn), getEdgeCost(FS90));
     }
   } else {
-    /* 壁の中央 */
+    /* 壁の中央（斜めありの場合しかありえない） */
     /* 直前の壁 */
     const auto i_f = this->next(); //< i.e. index front
     if (!canGo(Vector(i_f), i_f.getDir())) {
-      // logw << "Something Wrong" << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << " "
+                << "something wrong" << std::endl;
       return;
     }
     /* 直進で行けるところまで行く */
@@ -139,6 +133,7 @@ void ShortestAlgorithm::Index::successors_for(
 void ShortestAlgorithm::Index::predecessors_for(
     const Maze &maze, const bool known_only, const bool diag_enabled,
     std::function<void(const Index, const cost_t)> callback) const {
+  /* 斜めなしの predecessor は，successor の逆にはならないので例外処理 */
   if (!diag_enabled) {
     /* known_only を考慮した壁の判定式を用意 */
     auto canGo = [&](const Vector vec, const Dir dir) {
@@ -166,12 +161,93 @@ void ShortestAlgorithm::Index::predecessors_for(
         callback(
             Index(v_b.next(nd + d_turn), Dir::AbsMax, nd + d_turn + Dir::Back),
             getEdgeCost(FS90));
-    return;
+    return; /* 終了 */
   }
   opposite().successors_for(maze, known_only, diag_enabled,
                             [&callback](const Index i_n, const cost_t cost) {
                               callback(i_n.opposite(), cost);
                             });
+}
+
+/* ShortestAlgorithm */
+
+bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
+                                         const bool diag_enabled) {
+  std::unordered_map<Index, Node, Index::hash> node_map;
+  std::function<bool(const Index &i1, const Index &i2)> greater =
+      [&](const auto &i1, const auto &i2) {
+        return node_map[i1].cost > node_map[i2].cost;
+      };
+  std::vector<Index> open_list;
+  /* clear open_list */
+  open_list.clear();
+  std::make_heap(open_list.begin(), open_list.end(), greater);
+  /* clear node map */
+  node_map.clear();
+  /* push the goal indexes */
+  for (const auto v : maze.getGoals())
+    for (const auto nd : Dir::ENWS()) {
+      const auto i = Index(v, Dir::AbsMax, nd);
+      node_map[i].cost = 0;
+      open_list.push_back(i);
+      std::push_heap(open_list.begin(), open_list.end(), greater);
+    }
+  /* ComputeShortestPath() */
+  while (1) {
+    // std::cout << "size():\t" << open_list.size() << std::endl;
+    if (open_list.empty()) {
+      std::cerr << "open_list.empty()" << std::endl;
+      return false;
+    }
+    /* place the element with a min cost to back */
+    std::pop_heap(open_list.begin(), open_list.end(), greater);
+    const auto index = open_list.empty()
+                           ? Index(-1, -1, Dir::AbsMax, Dir::AbsMax)
+                           : open_list.back();
+    open_list.pop_back();
+    /* 終了条件 */
+    if (index == index_start)
+      break;
+    index.successors_for(
+        maze, known_only, diag_enabled,
+        [&](const auto i_succ, const auto edge_cost __attribute__((unused))) {
+          Node &succ = node_map[i_succ];
+          cost_t h_n = getHeuristic(index);
+          cost_t h_m = getHeuristic(i_succ);
+          cost_t g_n = node_map[index].cost - h_n;
+          cost_t f_m_prime = g_n + edge_cost + h_m;
+          if (f_m_prime < succ.cost) {
+            succ.cost = f_m_prime;
+            open_list.push_back(i_succ);
+            std::push_heap(open_list.begin(), open_list.end(), greater);
+          }
+        });
+  }
+  /* post process */
+  path.erase(path.begin(), path.end());
+  auto i = index_start;
+  while (1) {
+    // std::cout << i << std::endl;
+    path.push_back(i.opposite());
+    if (node_map[i].cost == 0)
+      break;
+    /* 最小コストの方向を探す */
+    auto min_cost = CostMax;
+    auto next = i;
+    i.predecessors_for(
+        maze, known_only, diag_enabled,
+        [&](const auto pre, const auto cost __attribute__((unused))) {
+          const auto cost_p = node_map[pre].cost;
+          if (cost_p < min_cost) {
+            min_cost = cost_p;
+            next = pre;
+          }
+        });
+    if (next == i)
+      return false;
+    i = next;
+  }
+  return true;
 }
 
 void ShortestAlgorithm::printPath(std::ostream &os,

@@ -156,7 +156,7 @@ int main(void) {
   maze_target = loadMaze();
   CLRobot robot;
   robot.replaceGoals(maze_target.getGoals());
-  display = 0;
+  display = 1;
   robot.searchRun();
   robot.printInfo();
   robot.fastRun(false);
@@ -165,13 +165,13 @@ int main(void) {
   robot.printPath();
 #endif
 
-#if 1
-  const int n = 1000;
+#if 0
+  const int n = 1;
   const bool diag_enabled = 1;
   const bool known_only = 0;
   std::chrono::microseconds sum{0};
-  Maze maze = loadMaze();
-  // Maze maze(loadMaze().getGoals());
+  // Maze maze = loadMaze();
+  Maze maze(loadMaze().getGoals());
   ShortestAlgorithm sa(maze);
   ShortestAlgorithm::Indexes path;
   for (int i = 0; i < n; ++i) {
@@ -182,7 +182,7 @@ int main(void) {
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
     sum += us;
   }
-  sa.printPath(std::cout, path);
+  // sa.printPath(std::cout, path);
   std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
 #endif
 
