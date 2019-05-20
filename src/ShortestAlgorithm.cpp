@@ -2,6 +2,77 @@
 
 namespace MazeLib {
 
+/**
+ * @brief 台形加速にかかる時間を算出する関数
+ *
+ * @param am 最大加速度の大きさ [m/s/s]
+ * @param vs 初速および最終速度の大きさ [m/s]
+ * @param vm 飽和速度の大きさ [m/s]
+ * @param d 走行距離 [m]
+ * @return float 走行時間 [s]
+ */
+static float calcStraightTime(const float am, const float vs, const float vm,
+                              const float d) {
+  /* グラフの面積から時間を求める */
+  const auto d_thr =
+      (vm * vm - vs * vs) / am; /*< 最大速度にちょうど達する距離 */
+  if (d < d_thr)
+    return 2 * (std::sqrt(vs * vs + am * d) - vs) / am; /*< 三角加速 */
+  else
+    return (am * d + (vm - vs) * (vm - vs)) / (am * vm); /*< 台形加速 */
+}
+
+ShortestAlgorithm::cost_t
+ShortestAlgorithm::getEdgeCost(const enum ShortestAlgorithm::Pattern p,
+                               const int n) {
+  static std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
+  static std::array<cost_t, MAZE_SIZE * 2> cost_table_diag;
+  static bool initialized = false; /*< 初回のみ実行するように設定 */
+  if (!initialized) {
+    initialized = true;
+    /* 台形加速のコストテーブルを事前に用意 */
+    static const float am = 3000.0f; /*< 最大加速度 [mm/s/s] */
+    static const float vs = 450.0f;  /*< 終始速度 [mm/s] */
+    static const float vm = 2400.0f; /*< 飽和速度 [mm/s] */
+    for (int i = 0; i < MAZE_SIZE * 2; ++i) {
+      const float d_along = 90.0f * (i + 1); /*< 走行距離 [mm] */
+      const float d_diag = 1.41421356f * 45.0f * (i + 1); /*< 走行距離 [mm] */
+      cost_table_along[i] =
+          calcStraightTime(am, vs, vm, d_along) * 1000; /*< [ms] */
+      cost_table_diag[i] =
+          calcStraightTime(am, vs, vm, d_diag) * 1000; /*< [ms] */
+      // std::cout << i + 1 << "\t" << cost_table_along[i] << "\t"
+      //           << cost_table_diag[i] << std::endl;
+    }
+    /* n along diag @ am = 3000, vs = 450, vm = 1800.
+     * 1  158   118
+     * 2  274   209
+     * 3  370   286
+     * 4  454   355
+     */
+  }
+  switch (p) {
+  case ST_ALONG:
+    return cost_table_along[n - 1]; /*< [ms] */
+  case ST_DIAG:
+    return cost_table_diag[n - 1]; /*< [ms] */
+  case F45:
+    return 249; /*< [ms] @ v = 425.272 [mm/s] */
+  case F90:
+    return 375; /*< [ms] @ v = 422.846 [mm/s] */
+  case F135:
+    return 421; /*< [ms] @ v = 375.888 [mm/s] */
+  case F180:
+    return 563; /*< [ms] @ v = 412.408 [mm/s] */
+  case FV90:
+    return 370; /*< [ms] @ v = 302.004 [mm/s] */
+  case FS90:
+    return 280; /*< [ms] @ v = 271.797 [mm/s] */
+  }
+  std::cerr << "Unknown Pattern" << std::endl;
+  return 0;
+}
+
 /* Index */
 
 void ShortestAlgorithm::Index::uniquify(const Dir d) {
