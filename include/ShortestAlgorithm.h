@@ -114,11 +114,11 @@ public:
   union __attribute__((__packed__)) Index {
   private:
     struct __attribute__((__packed__)) {
-      int x : 6;           /**< @brief x coordinate of the cell */
-      int y : 6;           /**< @brief y coordinate of the cell */
-      unsigned int nd : 3; /**< @brief direction of the node */
+      int x : 6; /**< @brief x coordinate of the cell */
+      int y : 6; /**< @brief y coordinate of the cell */
       unsigned int
           z : 1; /**< @brief position assignment in the cell, 0:East; 1:North */
+      unsigned int nd : 3; /**< @brief direction of the node */
     };
     unsigned int all : 16; /**< @brief union element for all access */
   public:
@@ -140,6 +140,11 @@ public:
     struct hash {
       size_t operator()(const Index &obj) const { return obj.all; }
     };
+    operator uint16_t() const {
+      return (nd << 11) | (z << 10) | (y << 5) | x; /*< M * M * 16 */
+      // return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
+      //        y; /*< M * M * 12 */
+    }
     /**
      * @brief 座標の冗長を一意にする．
      * d を East or North のどちらかにそろえる

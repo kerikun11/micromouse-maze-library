@@ -20,6 +20,9 @@ void ShortestAlgorithm::Index::uniquify(const Dir d) {
     z = 1;
     y--;
     break;
+  case Dir::AbsMax:
+    z = 0;
+    break;
   default:
     std::cerr << __FILE__ << ":" << __LINE__ << " "
               << "invalid direction" << std::endl;
@@ -174,7 +177,8 @@ void ShortestAlgorithm::Index::predecessors_for(
 
 bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
                                          const bool diag_enabled) {
-  std::unordered_map<Index, Node, Index::hash> node_map;
+  // std::unordered_map<Index, Node, Index::hash> node_map;
+  std::array<Node, MAZE_SIZE * MAZE_SIZE * 16> node_map;
   std::function<bool(const Index &i1, const Index &i2)> greater =
       [&](const auto &i1, const auto &i2) {
         return node_map[i1].cost > node_map[i2].cost;
@@ -184,7 +188,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   open_list.clear();
   std::make_heap(open_list.begin(), open_list.end(), greater);
   /* clear node map */
-  node_map.clear();
+  // node_map.clear();
   /* push the goal indexes */
   for (const auto v : maze.getGoals())
     for (const auto nd : Dir::ENWS()) {
