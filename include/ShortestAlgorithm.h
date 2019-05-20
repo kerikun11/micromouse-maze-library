@@ -145,6 +145,7 @@ public:
       // return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
       //        y; /*< M * M * 12 */
     }
+    static constexpr int Max = MAZE_SIZE * MAZE_SIZE * 16;
     /**
      * @brief 座標の冗長を一意にする．
      * d を East or North のどちらかにそろえる
@@ -266,15 +267,6 @@ public:
   };
   static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
   typedef std::vector<Index> Indexes;
-
-  /**
-   * @brief Graph の Node
-   */
-  struct __attribute__((__packed__)) Node {
-    cost_t cost = CostMax;
-    Node() {}
-  };
-  static_assert(sizeof(Node) == 2, "Node Size Error"); /**< Size Check */
 
   /**
    * @brief Get the Heuristic Value

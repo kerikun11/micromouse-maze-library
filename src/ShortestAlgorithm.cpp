@@ -187,23 +187,25 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
 
 bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
                                          const bool diag_enabled) {
-  // std::unordered_map<Index, Node, Index::hash> node_map;
-  std::array<Node, MAZE_SIZE * MAZE_SIZE * 16> node_map;
+  // const auto p_cost_map = new std::array<cost_t, Index::Max>();
+  // auto &cost_map = *p_cost_map;
+  static std::array<cost_t, Index::Max> cost_map;
   std::function<bool(const Index &i1, const Index &i2)> greater =
       [&](const auto &i1, const auto &i2) {
-        return node_map[i1].cost > node_map[i2].cost;
+        return cost_map[i1] > cost_map[i2];
       };
   std::vector<Index> open_list;
   /* clear open_list */
   open_list.clear();
   std::make_heap(open_list.begin(), open_list.end(), greater);
   /* clear node map */
-  // node_map.clear();
+  for (auto &node : cost_map)
+    node = CostMax;
   /* push the goal indexes */
   for (const auto v : maze.getGoals())
     for (const auto nd : Dir::ENWS()) {
       const auto i = Index(v, Dir::AbsMax, nd);
-      node_map[i].cost = 0;
+      cost_map[i] = 0;
       open_list.push_back(i);
       std::push_heap(open_list.begin(), open_list.end(), greater);
     }
@@ -223,13 +225,13 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
       break;
     const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
     for (const auto &s : succs) {
-      Node &succ = node_map[s.first];
+      auto &succ_cost = cost_map[s.first];
       cost_t h_n = getHeuristic(index);
       cost_t h_m = getHeuristic(s.first);
-      cost_t g_n = node_map[index].cost - h_n;
+      cost_t g_n = cost_map[index] - h_n;
       cost_t f_m_prime = g_n + s.second + h_m;
-      if (f_m_prime < succ.cost) {
-        succ.cost = f_m_prime;
+      if (f_m_prime < succ_cost) {
+        succ_cost = f_m_prime;
         open_list.push_back(s.first);
         std::push_heap(open_list.begin(), open_list.end(), greater);
       }
@@ -249,14 +251,14 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   auto i = index_start;
   while (1) {
     path.push_back(i.opposite());
-    if (node_map[i].cost == 0)
+    if (cost_map[i] == 0)
       break;
     /* find the index with the min cost */
     auto min_cost = CostMax;
     auto next = i;
     const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
     for (const auto &p : preds) {
-      const auto cost_p = node_map[p.first].cost;
+      const auto cost_p = cost_map[p.first];
       if (cost_p < min_cost) {
         min_cost = cost_p;
         next = p.first;
