@@ -257,12 +257,12 @@ public:
     const Index opposite() const {
       return Index(x, y, getDir(), nd + Dir::Back);
     }
-    void successors_for(
-        const Maze &maze, const bool known_only, const bool diag_enabled,
-        std::function<void(const Index, const cost_t)> callback) const;
-    void predecessors_for(
-        const Maze &maze, const bool known_only, const bool diag_enabled,
-        std::function<void(const Index, const cost_t)> callback) const;
+    const std::vector<std::pair<Index, cost_t>>
+    getSuccessors(const Maze &maze, const bool known_only,
+                  const bool diag_enabled) const;
+    const std::vector<std::pair<Index, cost_t>>
+    getPredecessors(const Maze &maze, const bool known_only,
+                    const bool diag_enabled) const;
   };
   static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
   typedef std::vector<Index> Indexes;
