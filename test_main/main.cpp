@@ -182,7 +182,7 @@ int main(void) {
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
     sum += us;
   }
-  // sa.printPath(std::cout, path);
+  sa.printPath(std::cout, path);
   std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
 #endif
 

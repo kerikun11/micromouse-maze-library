@@ -16,22 +16,21 @@ void Agent::printInfo(const bool showMaze, const Vector vec, const Dir dir,
                       const SearchAlgorithm::State state) const {
   // 迷路を表示
   if (showMaze) {
-    printf("\e[0;0H"); //< カーソルを左上に移動
-    // printf("\e[2J");   //< 画面をクリア (ちらつく)
+    std::cout << "\e[0;0H"; //< カーソルを左上に移動
     searchAlgorithm.printMap(state, vec, dir);
   }
   // 詳細を表示
-  printf("Cur: ( %2d, %2d, %2c), State: %s \n", vec.x, vec.y, dir.toChar(),
-         SearchAlgorithm::stateString(state));
-  printf("nextDirsKnown: ");
+  std::printf("Cur: ( %2d, %2d, %2c), State: %s \n", vec.x, vec.y, dir.toChar(),
+              SearchAlgorithm::stateString(state));
+  std::printf("nextDirsKnown: ");
   for (const auto d : getNextDirs())
-    printf("%c", d.toChar());
-  printf(" \n");
-  printf("nextDirCandidates: ");
+    std::printf("%c", d.toChar());
+  std::printf(" \n");
+  std::printf("nextDirCandidates: ");
   for (const auto d : getNextDirCandidates())
-    printf("%c", d.toChar());
-  printf("\n");
-  printf("Match Count: %d \n", matchCount);
+    std::printf("%c", d.toChar());
+  std::printf("\n");
+  std::printf("Match Count: %d \n", matchCount);
 }
 
 } // namespace MazeLib

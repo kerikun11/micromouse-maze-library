@@ -23,11 +23,14 @@ void StepMap::reset(const step_t step) {
       setStep(x, y, step); //< ステップをクリア
 }
 const step_t &StepMap::getStep(const int8_t &x, const int8_t &y) const {
-  // (x, y) がフィールド内か確認
+  /* (x, y) がフィールド内か確認 */
   if (x < 0 || y < 0 || x > MAZE_SIZE - 1 || y > MAZE_SIZE - 1) {
-    printf("Warning: refered to out of field: %2d, %2d\n", x, y);
-    static step_t outside; //< フィールド外のときの戻りメモリ
-    outside = MAZE_STEP_MAX; //< フィールド外なら最大ステップとする
+    std::cerr << __FILE__ << ":" << __LINE__ << " "
+              << "Warning: refered to out of field: ( " << x << ", " << y << ")"
+              << std::endl;
+    static step_t
+        outside; //< フィールド外のときの戻りメモリ(参照なので仕方なく用意)
+    outside = MAZE_STEP_MAX; //< フィールド外なので最大ステップとする
     return outside;
   }
   return stepMap[y][x];
@@ -35,7 +38,9 @@ const step_t &StepMap::getStep(const int8_t &x, const int8_t &y) const {
 bool StepMap::setStep(const int8_t &x, const int8_t &y, const step_t &step) {
   // (x, y) がフィールド内か確認
   if (x < 0 || y < 0 || x >= MAZE_SIZE || y >= MAZE_SIZE) {
-    printf("Warning: refered to out of field: %2d, %2d\n", x, y);
+    std::cerr << __FILE__ << ":" << __LINE__ << " "
+              << "Warning: refered to out of field: ( " << x << ", " << y << ")"
+              << std::endl;
     return false;
   }
   stepMap[y][x] = step;

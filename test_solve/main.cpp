@@ -18,10 +18,11 @@ public:
 
   void printInfo(const bool showMaze = true) {
     Agent::printInfo(showMaze);
-    printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
-           "Right: %3d, Back: %3d\n",
-           ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    printf("It took %5d [us], the max is %5d [us]\n", (int)usec, (int)max_usec);
+    std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
+                "Right: %3d, Back: %3d\n",
+                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
+    std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
+                (int)max_usec);
   }
 
 private:
@@ -56,7 +57,7 @@ private:
   }
   void discrepancyWithKnownWall() override {
     printInfo();
-    printf("There was a discrepancy with known information!\n");
+    std::cout << "There was a discrepancy with known information!" << std::endl;
   }
   void queueAction(const Action action) override {
     if (display)

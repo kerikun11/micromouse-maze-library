@@ -76,7 +76,15 @@ public:
             calcStraightTime(am, vs, vm, d_along) * 1000; /*< [ms] */
         cost_table_diag[i] =
             calcStraightTime(am, vs, vm, d_diag) * 1000; /*< [ms] */
+        // std::cout << i + 1 << "\t" << cost_table_along[i] << "\t"
+        //           << cost_table_diag[i] << std::endl;
       }
+      /* n along diag @ am = 3000, vs = 450, vm = 1800.
+       * 1  158   118
+       * 2  274   209
+       * 3  370   286
+       * 4  454   355
+       */
     }
     switch (p) {
     case ST_ALONG:
@@ -271,7 +279,7 @@ public:
   cost_t getHeuristic(const Index i) const {
     return 0;
     const auto v = Vector(i) - Vector(index_start);
-    // const float d = std::sqrt(v.x * v.x + v.y * v.y);
+    // const auto d = std::sqrt(v.x * v.x + v.y * v.y);
     const auto d = std::max(std::abs(v.x), std::abs(v.y));
     return getEdgeCost(ST_ALONG, d);
   }

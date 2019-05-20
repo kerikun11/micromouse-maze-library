@@ -41,8 +41,9 @@ void ShortestAlgorithm::Index::successors_for(
       return false;
     return true;
   };
+  const auto nd = getNodeDir();
   const auto v = Vector(x, y);
-  if (getNodeDir().isAlong()) {
+  if (nd.isAlong()) {
     /* 区画の中央 */
     /* 直前の壁 */
     if (!canGo(v, nd)) {
@@ -133,7 +134,7 @@ void ShortestAlgorithm::Index::successors_for(
 void ShortestAlgorithm::Index::predecessors_for(
     const Maze &maze, const bool known_only, const bool diag_enabled,
     std::function<void(const Index, const cost_t)> callback) const {
-  /* 斜めなしの predecessor は，successor の逆にはならないので例外処理 */
+  /* 斜めなしの predecessor は，単純な successor の逆にはならないので例外処理 */
   if (!diag_enabled) {
     /* known_only を考慮した壁の判定式を用意 */
     auto canGo = [&](const Vector vec, const Dir dir) {
@@ -146,8 +147,8 @@ void ShortestAlgorithm::Index::predecessors_for(
       return true;
     };
     /* 直進で行けるところまで行く */
-    auto v_st = arrow_from(); //< 前方のマス
-    for (int8_t n = 1;; n++) {
+    auto v_st = arrow_from(); //< i.e. vector straight
+    for (int8_t n = 1;; ++n) {
       if (!canGo(v_st, nd + Dir::Back))
         break;
       v_st = v_st.next(nd + Dir::Back);
@@ -199,13 +200,11 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
       std::cerr << "open_list.empty()" << std::endl;
       return false;
     }
-    /* place the element with a min cost to back */
+    /* place the element with the min cost to back */
     std::pop_heap(open_list.begin(), open_list.end(), greater);
-    const auto index = open_list.empty()
-                           ? Index(-1, -1, Dir::AbsMax, Dir::AbsMax)
-                           : open_list.back();
+    const auto index = open_list.back();
     open_list.pop_back();
-    /* 終了条件 */
+    /* breaking condition */
     if (index == index_start)
       break;
     index.successors_for(
@@ -223,15 +222,23 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
           }
         });
   }
+#if 0
+  std::cout << "node_map.size():\t" << node_map.size() << std::endl;
+  for (const auto i : node_map) {
+    if (!Vector(i.first).isInsideOfField())
+      std::cout << i.first << std::endl;
+    if (i.second.cost == CostMax)
+      std::cout << i.first << std::endl;
+  }
+#endif
   /* post process */
   path.erase(path.begin(), path.end());
   auto i = index_start;
   while (1) {
-    // std::cout << i << std::endl;
     path.push_back(i.opposite());
     if (node_map[i].cost == 0)
       break;
-    /* 最小コストの方向を探す */
+    /* find the index with the min cost */
     auto min_cost = CostMax;
     auto next = i;
     i.predecessors_for(
@@ -272,7 +279,7 @@ void ShortestAlgorithm::printPath(std::ostream &os,
       }
       os << std::endl;
     }
-    for (int8_t x = 0; x < MAZE_SIZE; x++)
+    for (int8_t x = 0; x < MAZE_SIZE; ++x)
       os << "+"
          << (maze.isKnown(x, y, Dir::South)
                  ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")

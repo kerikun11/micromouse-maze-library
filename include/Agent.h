@@ -130,7 +130,7 @@ public:
    */
   void printPath() const {
     maze.printPath(maze.getStart(), shortestDirs);
-    printf("Shortest Step: %d\n", (int)shortestDirs.size());
+    std::cout << "Shortest Step: " << shortestDirs.size() << std::endl;
   }
 
 protected:
