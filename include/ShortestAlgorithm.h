@@ -196,7 +196,7 @@ public:
     }
     const std::vector<std::pair<Index, cost_t>>
     getSuccessors(const Maze &maze, const bool known_only,
-                  const bool diag_enabled) const;
+                  const bool diag_enabled, const bool ignore_front) const;
     const std::vector<std::pair<Index, cost_t>>
     getPredecessors(const Maze &maze, const bool known_only,
                     const bool diag_enabled) const;

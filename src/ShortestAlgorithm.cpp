@@ -103,7 +103,8 @@ void ShortestAlgorithm::Index::uniquify(const Dir d) {
 const std::vector<
     std::pair<ShortestAlgorithm::Index, ShortestAlgorithm::cost_t>>
 ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
-                                        const bool diag_enabled) const {
+                                        const bool diag_enabled,
+                                        const bool ignore_front) const {
   /* 戻り値を用意 */
   std::vector<std::pair<Index, cost_t>> succs;
   /* known_only を考慮した壁の判定式を用意 */
@@ -122,10 +123,12 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
   if (nd.isAlong()) {
     /* 区画の中央 */
     /* 直前の壁 */
-    if (!canGo(v, nd)) {
+    if (!ignore_front && !canGo(v, nd)) {
       /* ゴール区画だけあり得る */
       // std::cerr << __FILE__ << ":" << __LINE__ << " "
       //           << "something wrong" << std::endl;
+      return succs;
+    } else if (!v.isInsideOfField()) {
       return succs;
     }
     /* 直進で行けるところまで行く */
@@ -248,7 +251,7 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
     return preds; /* 終了 */
   }
   /* それ以外 */
-  auto preds = opposite().getSuccessors(maze, known_only, diag_enabled);
+  auto preds = opposite().getSuccessors(maze, known_only, diag_enabled, false);
   for (auto &p : preds)
     p.first = p.first.opposite();
   return preds;
@@ -258,28 +261,50 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
 
 bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
                                          const bool diag_enabled) {
-  // const auto p_cost_map = new std::array<cost_t, Index::Max>();
-  // auto &cost_map = *p_cost_map;
-  static std::array<cost_t, Index::Max> cost_map;
+  std::array<cost_t, Index::Max> g_map;
+  std::array<cost_t, Index::Max> rhs_map;
+  std::vector<Index> open_list;
   std::function<bool(const Index &i1, const Index &i2)> greater =
       [&](const auto &i1, const auto &i2) {
-        return cost_map[i1] > cost_map[i2];
+        const auto h1 = std::min(g_map[i1], rhs_map[i1]) + getHeuristic(i1);
+        const auto h2 = std::min(g_map[i2], rhs_map[i2]) + getHeuristic(i2);
+        if (h1 != h2)
+          return h1 > h2;
+        const auto m1 = std::min(g_map[i1], rhs_map[i1]);
+        const auto m2 = std::min(g_map[i2], rhs_map[i2]);
+        return m1 > m2;
       };
-  std::vector<Index> open_list;
   /* clear open_list */
   open_list.clear();
   std::make_heap(open_list.begin(), open_list.end(), greater);
   /* clear node map */
-  for (auto &node : cost_map)
+  for (auto &node : g_map)
+    node = CostMax;
+  for (auto &node : rhs_map)
     node = CostMax;
   /* push the goal indexes */
   for (const auto v : maze.getGoals())
     for (const auto nd : Dir::ENWS()) {
       const auto i = Index(v, Dir::AbsMax, nd);
-      cost_map[i] = 0;
+      rhs_map[i] = 0;
       open_list.push_back(i);
       std::push_heap(open_list.begin(), open_list.end(), greater);
     }
+  /* update */
+  const auto UpdateNode = [&](const Index i) {
+    if (rhs_map[i] == 0)
+      return;
+    rhs_map[i] = CostMax;
+    const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
+    for (const auto &p : preds) {
+      if (g_map[p.first] != CostMax)
+        rhs_map[i] = std::min(rhs_map[i], (cost_t)(g_map[p.first] + p.second));
+    }
+    if (g_map[i] != rhs_map[i]) {
+      open_list.push_back(i);
+      std::push_heap(open_list.begin(), open_list.end(), greater);
+    }
+  };
   /* ComputeShortestPath() */
   while (1) {
     // std::cout << "size():\t" << open_list.size() << std::endl;
@@ -292,44 +317,40 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     const auto index = open_list.back();
     open_list.pop_back();
     /* breaking condition */
-    if (index == index_start)
+    if (!(greater(index_start, index) ||
+          rhs_map[index_start] != g_map[index_start]))
       break;
-    const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
-    for (const auto &s : succs) {
-      auto &succ_cost = cost_map[s.first];
-      cost_t h_n = getHeuristic(index);
-      cost_t h_m = getHeuristic(s.first);
-      cost_t g_n = cost_map[index] - h_n;
-      cost_t f_m_prime = g_n + s.second + h_m;
-      if (f_m_prime < succ_cost) {
-        succ_cost = f_m_prime;
-        open_list.push_back(s.first);
-        std::push_heap(open_list.begin(), open_list.end(), greater);
+    if (g_map[index] > rhs_map[index]) {
+      g_map[index] = rhs_map[index];
+      const auto succs =
+          index.getSuccessors(maze, known_only, diag_enabled, false);
+      for (const auto &s : succs) {
+        UpdateNode(s.first);
       }
+    } else if (g_map[index] < rhs_map[index]) {
+      // } else {
+      g_map[index] = CostMax;
+      UpdateNode(index);
+      const auto succs =
+          index.getSuccessors(maze, known_only, diag_enabled, false);
+      for (const auto &s : succs)
+        UpdateNode(s.first);
+      // } else {
     }
   }
-#if 0
-  std::cout << "node_map.size():\t" << node_map.size() << std::endl;
-  for (const auto i : node_map) {
-    if (!Vector(i.first).isInsideOfField())
-      std::cout << i.first << std::endl;
-    if (i.second.cost == CostMax)
-      std::cout << i.first << std::endl;
-  }
-#endif
   /* post process */
   path.erase(path.begin(), path.end());
   auto i = index_start;
   while (1) {
     path.push_back(i.opposite());
-    if (cost_map[i] == 0)
+    if (g_map[i] == 0)
       break;
     /* find the index with the min cost */
     auto min_cost = CostMax;
     auto next = i;
     const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
     for (const auto &p : preds) {
-      const auto cost_p = cost_map[p.first];
+      const auto cost_p = g_map[p.first];
       if (cost_p < min_cost) {
         min_cost = cost_p;
         next = p.first;

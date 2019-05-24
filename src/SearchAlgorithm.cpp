@@ -46,10 +46,14 @@ bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
                                  const bool front, const bool right,
                                  const bool back) {
   bool result = true;
-  result = result & updateWall(state, v, d + Dir::Left, left);   // left wall
+  result = result & updateWall(state, v, d + Dir::Left, left); // left wall
+  Vectors tmp;
+  findShortestCandidates(tmp);
   result = result & updateWall(state, v, d + Dir::Front, front); // front wall
+  findShortestCandidates(tmp);
   result = result & updateWall(state, v, d + Dir::Right, right); // right wall
-  result = result & updateWall(state, v, d + Dir::Back, back);   // back wall
+  findShortestCandidates(tmp);
+  result = result & updateWall(state, v, d + Dir::Back, back); // back wall
   return result;
 }
 bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
