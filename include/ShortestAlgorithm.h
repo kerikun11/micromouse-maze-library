@@ -30,16 +30,16 @@ public:
 public:
   using cost_t = uint16_t; /**< @brief 時間コストの型 [ms] */
   static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
-  enum Pattern : int8_t {
-    ST_ALONG,
-    ST_DIAG,
-    F45,
-    F90,
-    F135,
-    F180,
-    FV90,
-    FS90,
-  };
+  /**
+   * @brief 最短走行パターン
+   */
+  enum Pattern : int8_t { ST_ALONG, ST_DIAG, F45, F90, F135, F180, FV90, FS90 };
+  /**
+   * @brief Get the Edge Cost
+   * @param p パターン
+   * @param n 直線の場合，区画数
+   * @return cost_t コスト
+   */
   static cost_t getEdgeCost(const enum Pattern p, const int n = 1);
   /**
    * @brief Graph の Node の Index．
@@ -55,6 +55,10 @@ public:
       unsigned int nd : 3; /**< @brief direction of the node */
     };
     unsigned int all : 16; /**< @brief union element for all access */
+
+  public:
+    static constexpr int Max = MAZE_SIZE * MAZE_SIZE * 16;
+
   public:
     /**
      * @brief Construct a new Index object
@@ -69,7 +73,7 @@ public:
     Index() : all(0) {}
     /**
      * @brief needed for unordered_map
-     * uniqueなIDを返す
+     * unique な ID を返す
      */
     struct hash {
       size_t operator()(const Index &obj) const { return obj.all; }
@@ -79,7 +83,6 @@ public:
       // return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
       //        y; /*< M * M * 12 */
     }
-    static constexpr int Max = MAZE_SIZE * MAZE_SIZE * 16;
     /**
      * @brief 座標の冗長を一意にする．
      * d を East or North のどちらかにそろえる
@@ -87,7 +90,6 @@ public:
     void uniquify(const Dir d);
     const Dir getDir() const { return z == 0 ? Dir::East : Dir::North; }
     const Dir getNodeDir() const { return nd; }
-    const Index &operator=(const Index &obj) { return all = obj.all, *this; }
     bool operator==(const Index &obj) const { return all == obj.all; }
     bool operator!=(const Index &obj) const { return all != obj.all; }
     operator Vector() const { return Vector(x, y); }
