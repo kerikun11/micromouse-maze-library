@@ -256,78 +256,64 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
 
 /* ShortestAlgorithm */
 
-void ShortestAlgorithm::UpdateChangedEdge(const bool known_only,
-                                          const bool diag_enabled) {
-  /* wall log */
-  const int maze_wall_log_size = maze.getWallLogs().size();
-  /* 各WallLogに対して */
-  while (wall_log_count < maze_wall_log_size) {
-    const auto wl = maze.getWallLogs()[wall_log_count++];
-    const auto w_v = Vector(wl);
-    const auto w_d = Dir(wl);
-    /* 壁があった場合のみ処理 */
-    if (wl.b) {
-      // std::cout << "find: " << wl << std::endl;
-      if (diag_enabled) {
-        for (const auto nd : Dir::Diag4()) {
-          const auto i = Index(wl.x, wl.y, wl.d, nd);
-          UpdateNode(i, known_only, diag_enabled);
-          for (const auto s : i.getSuccessors(maze, known_only, diag_enabled)) {
-            if (!Vector(s.first).isInsideOfField())
-              std::cerr << __FILE__ << ":" << __LINE__ << " "
-                        << "Warning! " << s.first << std::endl;
-            UpdateNode(s.first, known_only, diag_enabled);
-            UpdateNode(s.first.opposite(), known_only, diag_enabled);
-          }
-          for (const auto s :
-               i.next().getSuccessors(maze, known_only, diag_enabled)) {
-            if (!Vector(s.first).isInsideOfField())
-              std::cerr << __FILE__ << ":" << __LINE__ << " "
-                        << "Warning! " << s.first << std::endl;
-            UpdateNode(s.first, known_only, diag_enabled);
-            UpdateNode(s.first.opposite(), known_only, diag_enabled);
-          }
-        }
-      }
-      for (const auto i : {
-               Index(w_v, Dir::AbsMax, w_d + Dir::Back),
-               Index(w_v.next(w_d), Dir::AbsMax, w_d),
-           }) {
-        UpdateNode(i, known_only, diag_enabled);
-        UpdateNode(i.opposite(), known_only, diag_enabled);
-        for (const auto s : i.getSuccessors(maze, known_only, diag_enabled)) {
-          if (!Vector(s.first).isInsideOfField())
-            std::cerr << __FILE__ << ":" << __LINE__ << " "
-                      << "Warning! " << s.first << std::endl;
-          UpdateNode(s.first, known_only, diag_enabled);
-          UpdateNode(s.first.opposite(), known_only, diag_enabled);
-        }
+bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
+                                         const bool diag_enabled) {
+  /* clear open_list */
+  open_list.clear();
+  std::make_heap(open_list.begin(), open_list.end(), greater);
+  /* clear node map */
+  for (auto &node : f_map)
+    node = CostMax;
+  /* push the goal indexes */
+  for (const auto v : maze.getGoals())
+    for (const auto nd : Dir::ENWS()) {
+      const auto i = Index(v, Dir::AbsMax, nd);
+      f_map[i] = 0;
+      open_list.push_back(i);
+      std::push_heap(open_list.begin(), open_list.end(), greater);
+    }
+  while (1) {
+    // std::cout << "size():\t" << open_list.size() << std::endl;
+    if (open_list.empty()) {
+      std::cerr << __FILE__ << ":" << __LINE__ << " "
+                << "open_list is empty " << std::endl;
+      return false;
+    }
+    /* place the element with the min cost to back */
+    std::pop_heap(open_list.begin(), open_list.end(), greater);
+    const auto index = open_list.back();
+    open_list.pop_back();
+    /* breaking condition */
+    if (index == index_start)
+      break;
+    const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
+    for (const auto &s : succs) {
+      if (!Vector(s.first).isInsideOfField())
+        std::cerr << __FILE__ << ":" << __LINE__ << " "
+                  << "Warning! " << s.first << std::endl;
+      if (f_map[s.first] > f_map[index] + s.second) {
+        f_map[s.first] = f_map[index] + s.second;
+        open_list.push_back(s.first);
+        std::push_heap(open_list.begin(), open_list.end(), greater);
       }
     }
   }
-}
-
-bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
-                                         const bool diag_enabled) {
-  // Initialize(known_only, diag_enabled);
-  UpdateChangedEdge(known_only, diag_enabled);
-  ComputeShortestPath(known_only, diag_enabled);
   /* post process */
   path.erase(path.begin(), path.end());
   auto i = index_start;
   while (1) {
     path.push_back(i.opposite());
-    if (g_map[i] == 0)
+    if (f_map[i] == 0)
       break;
     /* find the index with the min cost */
-    auto min_cost = g_map[i];
+    auto min_cost = f_map[i];
     auto next = i;
     const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
     for (const auto p : preds) {
       if (!Vector(p.first).isInsideOfField())
         std::cerr << __FILE__ << ":" << __LINE__ << " "
                   << "Warning! " << p.first << std::endl;
-      const auto cost_p = g_map[p.first];
+      const auto cost_p = f_map[p.first];
       if (cost_p < min_cost) {
         min_cost = cost_p;
         next = p.first;
@@ -342,7 +328,6 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     }
     i = next;
   }
-  std::cout << "cost: " << g_map[index_start] << std::endl;
   return true;
 }
 

@@ -53,10 +53,6 @@ public:
    *  @brief 最短経路が導出されているか調べる関数
    */
   bool isComplete();
-  void reset() {
-    for (const auto diag_enabled : {true})
-      shortestAlgorithm.Initialize(false, diag_enabled);
-  }
   void positionIdentifyingInit(Vector *pVector, Dir *pDir);
   bool updateWall(const State &state, const Vector &v, const Dir &d,
                   const bool left, const bool front, const bool right,

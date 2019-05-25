@@ -17,11 +17,7 @@ public:
   /** @function replaceGoals
    *  @brief ゴール区画を変更する関数
    */
-  void replaceGoals(const Vectors &goals) {
-    maze.setGoals(goals);
-    reset();
-  }
-  void reset() { searchAlgorithm.reset(); }
+  void replaceGoals(const Vectors &goals) { maze.setGoals(goals); }
   /** @function isComplete
    *  @brief 探索が完了しているかどうかを返す関数
    */

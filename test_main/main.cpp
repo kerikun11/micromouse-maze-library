@@ -146,7 +146,7 @@ const Maze loadMaze() {
   case 16:
     return Maze("../mazedata/16MM2016CX.maze");
   case 32:
-    return Maze("../mazedata/32MM2017HX.maze");
+    return Maze("../mazedata/32MM2015HX.maze");
   }
 }
 
@@ -156,16 +156,16 @@ int main(void) {
   maze_target = loadMaze();
   CLRobot robot;
   robot.replaceGoals(maze_target.getGoals());
-  display = 0;
+  display = 1;
   robot.searchRun();
   robot.printInfo();
-  // robot.fastRun(false);
-  // robot.printPath();
+  robot.fastRun(false);
+  robot.printPath();
   robot.fastRun(true);
   robot.printPath();
 #endif
 
-#if 0
+#if 1
   const int n = 1;
   const bool diag_enabled = 1;
   const bool known_only = 0;
@@ -173,7 +173,6 @@ int main(void) {
   Maze maze = loadMaze();
   // Maze maze(loadMaze().getGoals());
   ShortestAlgorithm sa(maze);
-  sa.Initialize(known_only, diag_enabled);
   ShortestAlgorithm::Indexes path;
   for (int i = 0; i < n; ++i) {
     const auto t_s = std::chrono::system_clock().now();

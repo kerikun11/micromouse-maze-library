@@ -46,25 +46,10 @@ bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
                                  const bool front, const bool right,
                                  const bool back) {
   bool result = true;
-  const bool diag_enabled = true;
-  const bool known_only = false;
-  Vectors tmp;
-  result = result & updateWall(state, v, d + Dir::Left, left); // left wall
-  findShortestCandidates(tmp);
-  // shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
-  // shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled);
+  result = result & updateWall(state, v, d + Dir::Left, left);   // left wall
   result = result & updateWall(state, v, d + Dir::Front, front); // front wall
-  findShortestCandidates(tmp);
-  // shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
-  // shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled);
   result = result & updateWall(state, v, d + Dir::Right, right); // right wall
-  findShortestCandidates(tmp);
-  // shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
-  // shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled);
-  result = result & updateWall(state, v, d + Dir::Back, back); // back wall
-  findShortestCandidates(tmp);
-  // shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
-  // shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled);
+  result = result & updateWall(state, v, d + Dir::Back, back);   // back wall
   return result;
 }
 bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
@@ -174,7 +159,6 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
   /* new algorithm*/
-  shortestAlgorithm.Initialize(true, diag_enabled);
   ShortestAlgorithm::Indexes path;
   if (!shortestAlgorithm.calcShortestPath(path, true, diag_enabled))
     return false; /* 失敗 */
@@ -335,8 +319,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 #endif
   /* 新アルゴリズム */
   candidates.clear();
-  // for (const auto diag_enabled : {true, false}) {
-  for (const auto diag_enabled : {true}) {
+  for (const auto diag_enabled : {true, false}) {
     ShortestAlgorithm::Indexes path;
     if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
       return false; /* 失敗 */
