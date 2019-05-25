@@ -324,7 +324,8 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 #endif
   /* 新アルゴリズム */
   candidates.clear();
-  for (const auto diag_enabled : {true, false}) {
+  // for (const auto diag_enabled : {true, false}) {
+  for (const auto diag_enabled : {true}) {
     ShortestAlgorithm::Indexes path;
     if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
       return false; /* 失敗 */
@@ -476,4 +477,5 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
                        nextDirCandidates);
   return nextDirCandidates.empty() ? Error : Processing;
 }
+
 } // namespace MazeLib

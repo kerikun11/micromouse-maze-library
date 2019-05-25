@@ -22,7 +22,16 @@ namespace MazeLib {
 
 class ShortestAlgorithm {
 public:
-  ShortestAlgorithm(const Maze &maze) : maze(maze) {
+  ShortestAlgorithm(const Maze &maze)
+      : maze(maze), greater([&](const auto &i1, const auto &i2) {
+          const auto h1 = std::min(g_map[i1], rhs_map[i1]) + getHeuristic(i1);
+          const auto h2 = std::min(g_map[i2], rhs_map[i2]) + getHeuristic(i2);
+          if (h1 != h2)
+            return h1 > h2;
+          const auto m1 = std::min(g_map[i1], rhs_map[i1]);
+          const auto m2 = std::min(g_map[i2], rhs_map[i2]);
+          return m1 > m2;
+        }) {
     /* テーブルの事前計算 */
     getEdgeCost(ST_ALONG);
   }
@@ -196,7 +205,7 @@ public:
     }
     const std::vector<std::pair<Index, cost_t>>
     getSuccessors(const Maze &maze, const bool known_only,
-                  const bool diag_enabled, const bool ignore_front) const;
+                  const bool diag_enabled) const;
     const std::vector<std::pair<Index, cost_t>>
     getPredecessors(const Maze &maze, const bool known_only,
                     const bool diag_enabled) const;
@@ -224,6 +233,82 @@ public:
    * @return true 成功
    * @return false 失敗
    */
+
+  void UpdateNode(const Index i, const bool known_only,
+                  const bool diag_enabled) {
+    if (rhs_map[i] == 0)
+      return;
+    rhs_map[i] = CostMax;
+    const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
+    for (const auto &p : preds) {
+      if (!Vector(p.first).isInsideOfField())
+        std::cerr << __FILE__ << ":" << __LINE__ << " "
+                  << "Warning! " << p.first << std::endl;
+      if (g_map[p.first] != CostMax)
+        rhs_map[i] = std::min(rhs_map[i], (cost_t)(g_map[p.first] + p.second));
+    }
+    if (g_map[i] != rhs_map[i]) {
+      open_list.push_back(i);
+      std::push_heap(open_list.begin(), open_list.end(), greater);
+    }
+  };
+  void UpdateChangedEdge(const bool known_only, const bool diag_enabled);
+  void Initialize() {
+    /* clear open_list */
+    open_list.clear();
+    std::make_heap(open_list.begin(), open_list.end(), greater);
+    /* clear node map */
+    for (auto &node : g_map)
+      node = CostMax;
+    for (auto &node : rhs_map)
+      node = CostMax;
+    /* push the goal indexes */
+    for (const auto v : maze.getGoals())
+      for (const auto nd : Dir::ENWS()) {
+        const auto i = Index(v, Dir::AbsMax, nd);
+        rhs_map[i] = 0;
+        open_list.push_back(i);
+        std::push_heap(open_list.begin(), open_list.end(), greater);
+      }
+  }
+  bool ComputeShortestPath(const bool known_only, const bool diag_enabled) {
+    while (1) {
+      // std::cout << "size():\t" << open_list.size() << std::endl;
+      if (open_list.empty()) {
+        std::cerr << "open_list.empty()" << std::endl;
+        return false;
+      }
+      /* place the element with the min cost to back */
+      std::pop_heap(open_list.begin(), open_list.end(), greater);
+      const auto index = open_list.back();
+      open_list.pop_back();
+      /* breaking condition */
+      if (!(greater(index_start, index) ||
+            rhs_map[index_start] != g_map[index_start]))
+        break;
+      if (g_map[index] > rhs_map[index]) {
+        g_map[index] = rhs_map[index];
+        const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
+        for (const auto &s : succs) {
+          if (!Vector(s.first).isInsideOfField())
+            std::cerr << __FILE__ << ":" << __LINE__ << " "
+                      << "Warning! " << s.first << std::endl;
+          UpdateNode(s.first, known_only, diag_enabled);
+        }
+      } else if (g_map[index] < rhs_map[index]) {
+        g_map[index] = CostMax;
+        UpdateNode(index, known_only, diag_enabled);
+        const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
+        for (const auto &s : succs) {
+          if (!Vector(s.first).isInsideOfField())
+            std::cerr << __FILE__ << ":" << __LINE__ << " "
+                      << "Warning! " << s.first << std::endl;
+          UpdateNode(s.first, known_only, diag_enabled);
+        }
+      }
+    }
+    return true;
+  }
   bool calcShortestPath(Indexes &path, const bool known_only,
                         const bool diag_enabled);
   void printPath(std::ostream &os, const Indexes indexes) const;
@@ -233,6 +318,11 @@ private:
   const Maze &maze; /**< @brief 使用する迷路の参照 */
   const Index index_start =
       Index(0, 0, Dir::AbsMax, Dir::South); /**< @brief スタート */
+  std::array<cost_t, Index::Max> g_map;
+  std::array<cost_t, Index::Max> rhs_map;
+  std::vector<Index> open_list;
+  int wall_log_count = 0;
+  std::function<bool(const Index &i1, const Index &i2)> greater;
 };
 
 } // namespace MazeLib

@@ -103,8 +103,7 @@ void ShortestAlgorithm::Index::uniquify(const Dir d) {
 const std::vector<
     std::pair<ShortestAlgorithm::Index, ShortestAlgorithm::cost_t>>
 ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
-                                        const bool diag_enabled,
-                                        const bool ignore_front) const {
+                                        const bool diag_enabled) const {
   /* 戻り値を用意 */
   std::vector<std::pair<Index, cost_t>> succs;
   /* known_only を考慮した壁の判定式を用意 */
@@ -123,12 +122,10 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
   if (nd.isAlong()) {
     /* 区画の中央 */
     /* 直前の壁 */
-    if (!ignore_front && !canGo(v, nd)) {
+    if (!canGo(v, nd)) {
       /* ゴール区画だけあり得る */
       // std::cerr << __FILE__ << ":" << __LINE__ << " "
-      //           << "something wrong" << std::endl;
-      return succs;
-    } else if (!v.isInsideOfField()) {
+      //           << "FWE: " << *this << std::endl;
       return succs;
     }
     /* 直進で行けるところまで行く */
@@ -178,8 +175,8 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
     /* 直前の壁 */
     const auto i_f = next(); //< i.e. index front
     if (!canGo(Vector(i_f), i_f.getDir())) {
-      std::cerr << __FILE__ << ":" << __LINE__ << " "
-                << "something wrong" << std::endl;
+      // std::cerr << __FILE__ << ":" << __LINE__ << " "
+      //           << "FWE: " << *this << std::endl;
       return succs;
     }
     /* 直進で行けるところまで行く */
@@ -224,8 +221,8 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
     std::vector<std::pair<Index, cost_t>> preds;
     /* known_only を考慮した壁の判定式を用意 */
     const auto canGo = [&](const Vector vec, const Dir dir) {
-      if (vec == Vector(0, 0) && dir == Dir::South)
-        return true;
+      // if (vec == Vector(0, 0) && dir == Dir::South)
+      //   return true;
       if (maze.isWall(vec, dir))
         return false;
       if (known_only && !maze.isKnown(vec, dir))
@@ -235,9 +232,9 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
     /* 直進で行けるところまで行く */
     auto v_st = arrow_from(); //< i.e. vector straight
     for (int8_t n = 1;; ++n) {
-      if (!canGo(v_st, nd + Dir::Back))
-        break;
       v_st = v_st.next(nd + Dir::Back);
+      if (!canGo(v_st, nd))
+        break;
       preds.push_back({Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n)});
     }
     /* ここからはターン */
@@ -251,7 +248,7 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
     return preds; /* 終了 */
   }
   /* それ以外 */
-  auto preds = opposite().getSuccessors(maze, known_only, diag_enabled, false);
+  auto preds = opposite().getSuccessors(maze, known_only, diag_enabled);
   for (auto &p : preds)
     p.first = p.first.opposite();
   return preds;
@@ -259,85 +256,61 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
 
 /* ShortestAlgorithm */
 
-bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
-                                         const bool diag_enabled) {
-  std::array<cost_t, Index::Max> g_map;
-  std::array<cost_t, Index::Max> rhs_map;
-  std::vector<Index> open_list;
-  std::function<bool(const Index &i1, const Index &i2)> greater =
-      [&](const auto &i1, const auto &i2) {
-        const auto h1 = std::min(g_map[i1], rhs_map[i1]) + getHeuristic(i1);
-        const auto h2 = std::min(g_map[i2], rhs_map[i2]) + getHeuristic(i2);
-        if (h1 != h2)
-          return h1 > h2;
-        const auto m1 = std::min(g_map[i1], rhs_map[i1]);
-        const auto m2 = std::min(g_map[i2], rhs_map[i2]);
-        return m1 > m2;
-      };
-  /* clear open_list */
-  open_list.clear();
-  std::make_heap(open_list.begin(), open_list.end(), greater);
-  /* clear node map */
-  for (auto &node : g_map)
-    node = CostMax;
-  for (auto &node : rhs_map)
-    node = CostMax;
-  /* push the goal indexes */
-  for (const auto v : maze.getGoals())
-    for (const auto nd : Dir::ENWS()) {
-      const auto i = Index(v, Dir::AbsMax, nd);
-      rhs_map[i] = 0;
-      open_list.push_back(i);
-      std::push_heap(open_list.begin(), open_list.end(), greater);
-    }
-  /* update */
-  const auto UpdateNode = [&](const Index i) {
-    if (rhs_map[i] == 0)
-      return;
-    rhs_map[i] = CostMax;
-    const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
-    for (const auto &p : preds) {
-      if (g_map[p.first] != CostMax)
-        rhs_map[i] = std::min(rhs_map[i], (cost_t)(g_map[p.first] + p.second));
-    }
-    if (g_map[i] != rhs_map[i]) {
-      open_list.push_back(i);
-      std::push_heap(open_list.begin(), open_list.end(), greater);
-    }
-  };
-  /* ComputeShortestPath() */
-  while (1) {
-    // std::cout << "size():\t" << open_list.size() << std::endl;
-    if (open_list.empty()) {
-      std::cerr << "open_list.empty()" << std::endl;
-      return false;
-    }
-    /* place the element with the min cost to back */
-    std::pop_heap(open_list.begin(), open_list.end(), greater);
-    const auto index = open_list.back();
-    open_list.pop_back();
-    /* breaking condition */
-    if (!(greater(index_start, index) ||
-          rhs_map[index_start] != g_map[index_start]))
-      break;
-    if (g_map[index] > rhs_map[index]) {
-      g_map[index] = rhs_map[index];
-      const auto succs =
-          index.getSuccessors(maze, known_only, diag_enabled, false);
-      for (const auto &s : succs) {
-        UpdateNode(s.first);
+void ShortestAlgorithm::UpdateChangedEdge(const bool known_only,
+                                          const bool diag_enabled) {
+  /* wall log */
+  const int maze_wall_log_size = maze.getWallLogs().size();
+  if (wall_log_count >= maze_wall_log_size)
+    return;
+  /* 各WallLogに対して */
+  while (wall_log_count < maze_wall_log_size) {
+    const auto wl = maze.getWallLogs()[wall_log_count++];
+    const auto w_v = Vector(wl);
+    const auto w_d = Dir(wl);
+    /* 壁があった場合のみ処理 */
+    if (wl.b) {
+      std::cout << "find:\t" << wl << std::endl;
+      if (diag_enabled) {
+        for (const auto nd : Dir::Diag4()) {
+          const auto i = Index(wl.x, wl.y, wl.d, nd);
+          UpdateNode(i, known_only, diag_enabled); /* update */
+          for (const auto s : i.getSuccessors(maze, known_only, diag_enabled)) {
+            if (!Vector(s.first).isInsideOfField())
+              std::cerr << __FILE__ << ":" << __LINE__ << " "
+                        << "Warning! " << s.first << std::endl;
+            UpdateNode(s.first, known_only, diag_enabled);
+          }
+          for (const auto s :
+               i.next().getSuccessors(maze, known_only, diag_enabled)) {
+            if (!Vector(s.first).isInsideOfField())
+              std::cerr << __FILE__ << ":" << __LINE__ << " "
+                        << "Warning! " << s.first << std::endl;
+            UpdateNode(s.first, known_only, diag_enabled);
+          }
+        }
       }
-    } else if (g_map[index] < rhs_map[index]) {
-      // } else {
-      g_map[index] = CostMax;
-      UpdateNode(index);
-      const auto succs =
-          index.getSuccessors(maze, known_only, diag_enabled, false);
-      for (const auto &s : succs)
-        UpdateNode(s.first);
-      // } else {
+      for (const auto i : {
+               Index(w_v, Dir::AbsMax, w_d + Dir::Back),
+               Index(w_v.next(w_d), Dir::AbsMax, w_d),
+           }) {
+        UpdateNode(i, known_only, diag_enabled); /* update */
+        for (const auto s :
+             i.next().getSuccessors(maze, known_only, diag_enabled)) {
+          if (!Vector(s.first).isInsideOfField())
+            std::cerr << __FILE__ << ":" << __LINE__ << " "
+                      << "Warning! " << s.first << std::endl;
+          UpdateNode(s.first, known_only, diag_enabled);
+        }
+      }
     }
   }
+}
+
+bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
+                                         const bool diag_enabled) {
+  // Initialize();
+  UpdateChangedEdge(known_only, diag_enabled);
+  ComputeShortestPath(known_only, diag_enabled);
   /* post process */
   path.erase(path.begin(), path.end());
   auto i = index_start;
