@@ -1,56 +1,50 @@
 #include "ShortestAlgorithm.h"
 
+#include <utility>
+
 namespace MazeLib {
 
-/**
- * @brief 台形加速にかかる時間を算出する関数
- *
- * @param am 最大加速度の大きさ [m/s/s]
- * @param vs 初速および最終速度の大きさ [m/s]
- * @param vm 飽和速度の大きさ [m/s]
- * @param d 走行距離 [m]
- * @return float 走行時間 [s]
- */
-static float calcStraightTime(const float am, const float vs, const float vm,
-                              const float d) {
+constexpr ShortestAlgorithm::cost_t get_cost_impl(const int i, const float am,
+                                                  const float vs,
+                                                  const float vm,
+                                                  const float unit_length) {
+  const auto d = unit_length * (i + 1); /*< 走行距離 [mm] */
   /* グラフの面積から時間を求める */
   const auto d_thr =
       (vm * vm - vs * vs) / am; /*< 最大速度にちょうど達する距離 */
   if (d < d_thr)
-    return 2 * (std::sqrt(vs * vs + am * d) - vs) / am; /*< 三角加速 */
+    return 2 * (std::sqrt(vs * vs + am * d) - vs) / am * 1000; /*< 三角加速 */
   else
-    return (am * d + (vm - vs) * (vm - vs)) / (am * vm); /*< 台形加速 */
+    return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 1000; /*< 台形加速 */
+}
+template <class T, T... vals>
+constexpr auto get_cost_table(std::integer_sequence<T, vals...>, const float am,
+                              const float vs, const float vm,
+                              const float unit_length) {
+  return std::array<ShortestAlgorithm::cost_t, sizeof...(vals)>{
+      {get_cost_impl(vals, am, vs, vm, unit_length)...}};
 }
 
 ShortestAlgorithm::cost_t
 ShortestAlgorithm::getEdgeCost(const enum ShortestAlgorithm::Pattern p,
                                const int n) {
-  static std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
-  static std::array<cost_t, MAZE_SIZE * 2> cost_table_diag;
-  static bool initialized = false; /*< 初回のみ実行するように設定 */
-  if (!initialized) {
-    initialized = true;
-    /* 台形加速のコストテーブルを事前に用意 */
-    static const float am = 3000.0f; /*< 最大加速度 [mm/s/s] */
-    static const float vs = 450.0f;  /*< 終始速度 [mm/s] */
-    static const float vm = 2400.0f; /*< 飽和速度 [mm/s] */
-    for (int i = 0; i < MAZE_SIZE * 2; ++i) {
-      const float d_along = 90.0f * (i + 1); /*< 走行距離 [mm] */
-      const float d_diag = 1.41421356f * 45.0f * (i + 1); /*< 走行距離 [mm] */
-      cost_table_along[i] =
-          calcStraightTime(am, vs, vm, d_along) * 1000; /*< [ms] */
-      cost_table_diag[i] =
-          calcStraightTime(am, vs, vm, d_diag) * 1000; /*< [ms] */
-      // std::cout << i + 1 << "\t" << cost_table_along[i] << "\t"
-      //           << cost_table_diag[i] << std::endl;
-    }
-    /* n along diag @ am = 3000, vs = 450, vm = 1800.
-     * 1  158   118
-     * 2  274   209
-     * 3  370   286
-     * 4  454   355
-     */
-  }
+  static constexpr auto am = 3000.0f;       /*< 最大加速度 [mm/s/s] */
+  static constexpr auto vs = 450.0f;        /*< 終始速度 [mm/s] */
+  static constexpr auto vm = 2400.0f;       /*< 飽和速度 [mm/s] */
+  static constexpr auto unit_along = 90.0f; /*< 1区画の長さ [mm] */
+  static constexpr auto unit_diag =
+      45.0f * std::sqrt(2); /*< 1区画の長さ [mm] */
+  /* コストテーブルをコンパイル時生成 */
+  static constexpr auto cost_table_along = get_cost_table(
+      std::make_integer_sequence<int, MAZE_SIZE * 2>(), am, vs, vm, unit_along);
+  static constexpr auto cost_table_diag = get_cost_table(
+      std::make_integer_sequence<int, MAZE_SIZE * 2>(), am, vs, vm, unit_diag);
+  /* n along diag @ am = 3000, vs = 450, vm = 1800.
+   * 1  158   118
+   * 2  274   209
+   * 3  370   286
+   * 4  454   355
+   */
   switch (p) {
   case ST_ALONG:
     return cost_table_along[n - 1]; /*< [ms] */
@@ -106,6 +100,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
                                         const bool diag_enabled) const {
   /* 戻り値を用意 */
   std::vector<std::pair<Index, cost_t>> succs;
+  succs.reserve(MAZE_SIZE * 2);
   /* known_only を考慮した壁の判定式を用意 */
   const auto canGo = [&](const Vector vec, const Dir dir) {
     /* スタートは袋小路なので例外処理 */
