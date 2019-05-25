@@ -286,8 +286,10 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
       if (!Vector(s.first).isInsideOfField())
         std::cerr << __FILE__ << ":" << __LINE__ << " "
                   << "Warning! " << s.first << std::endl;
-      if (f_map[s.first] > f_map[index] + s.second) {
-        f_map[s.first] = f_map[index] + s.second;
+      const auto f_p_new =
+          f_map[index] - getHeuristic(index) + getHeuristic(s.first) + s.second;
+      if (f_map[s.first] > f_p_new) {
+        f_map[s.first] = f_p_new;
         open_list.push_back(s.first);
         std::push_heap(open_list.begin(), open_list.end(), greater);
       }
@@ -301,24 +303,22 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     if (f_map[i] == 0)
       break;
     /* find the index with the min cost */
-    auto min_cost = f_map[i];
+    auto g_min = f_map[i] - getHeuristic(i);
     auto next = i;
     const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
     for (const auto p : preds) {
       if (!Vector(p.first).isInsideOfField())
         std::cerr << __FILE__ << ":" << __LINE__ << " "
                   << "Warning! " << p.first << std::endl;
-      const auto cost_p = f_map[p.first];
-      if (cost_p < min_cost) {
-        min_cost = cost_p;
+      const auto g_p = f_map[p.first] - getHeuristic(p.first);
+      if (g_min > g_p) {
+        g_min = g_p;
         next = p.first;
       }
     }
     if (next == i) {
       std::cerr << __FILE__ << ":" << __LINE__ << " "
                 << "No Path! " << i << std::endl;
-      while (1)
-        ;
       return false;
     }
     i = next;

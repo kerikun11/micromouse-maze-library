@@ -25,7 +25,7 @@ class ShortestAlgorithm {
 public:
   ShortestAlgorithm(const Maze &maze)
       : maze(maze), greater([&](const auto &i1, const auto &i2) {
-          return f_map[i1] + getHeuristic(i1) > f_map[i2] + getHeuristic(i2);
+          return f_map[i1] > f_map[i2];
         }) {
     /* テーブルの事前計算 */
     getEdgeCost(ST_ALONG);
