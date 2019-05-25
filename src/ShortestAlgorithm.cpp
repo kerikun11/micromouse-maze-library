@@ -260,8 +260,6 @@ void ShortestAlgorithm::UpdateChangedEdge(const bool known_only,
                                           const bool diag_enabled) {
   /* wall log */
   const int maze_wall_log_size = maze.getWallLogs().size();
-  if (wall_log_count >= maze_wall_log_size)
-    return;
   /* 各WallLogに対して */
   while (wall_log_count < maze_wall_log_size) {
     const auto wl = maze.getWallLogs()[wall_log_count++];
@@ -269,16 +267,17 @@ void ShortestAlgorithm::UpdateChangedEdge(const bool known_only,
     const auto w_d = Dir(wl);
     /* 壁があった場合のみ処理 */
     if (wl.b) {
-      std::cout << "find:\t" << wl << std::endl;
+      // std::cout << "find: " << wl << std::endl;
       if (diag_enabled) {
         for (const auto nd : Dir::Diag4()) {
           const auto i = Index(wl.x, wl.y, wl.d, nd);
-          UpdateNode(i, known_only, diag_enabled); /* update */
+          UpdateNode(i, known_only, diag_enabled);
           for (const auto s : i.getSuccessors(maze, known_only, diag_enabled)) {
             if (!Vector(s.first).isInsideOfField())
               std::cerr << __FILE__ << ":" << __LINE__ << " "
                         << "Warning! " << s.first << std::endl;
             UpdateNode(s.first, known_only, diag_enabled);
+            UpdateNode(s.first.opposite(), known_only, diag_enabled);
           }
           for (const auto s :
                i.next().getSuccessors(maze, known_only, diag_enabled)) {
@@ -286,6 +285,7 @@ void ShortestAlgorithm::UpdateChangedEdge(const bool known_only,
               std::cerr << __FILE__ << ":" << __LINE__ << " "
                         << "Warning! " << s.first << std::endl;
             UpdateNode(s.first, known_only, diag_enabled);
+            UpdateNode(s.first.opposite(), known_only, diag_enabled);
           }
         }
       }
@@ -293,13 +293,14 @@ void ShortestAlgorithm::UpdateChangedEdge(const bool known_only,
                Index(w_v, Dir::AbsMax, w_d + Dir::Back),
                Index(w_v.next(w_d), Dir::AbsMax, w_d),
            }) {
-        UpdateNode(i, known_only, diag_enabled); /* update */
-        for (const auto s :
-             i.next().getSuccessors(maze, known_only, diag_enabled)) {
+        UpdateNode(i, known_only, diag_enabled);
+        UpdateNode(i.opposite(), known_only, diag_enabled);
+        for (const auto s : i.getSuccessors(maze, known_only, diag_enabled)) {
           if (!Vector(s.first).isInsideOfField())
             std::cerr << __FILE__ << ":" << __LINE__ << " "
                       << "Warning! " << s.first << std::endl;
           UpdateNode(s.first, known_only, diag_enabled);
+          UpdateNode(s.first.opposite(), known_only, diag_enabled);
         }
       }
     }
@@ -308,7 +309,7 @@ void ShortestAlgorithm::UpdateChangedEdge(const bool known_only,
 
 bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
                                          const bool diag_enabled) {
-  // Initialize();
+  // Initialize(known_only, diag_enabled);
   UpdateChangedEdge(known_only, diag_enabled);
   ComputeShortestPath(known_only, diag_enabled);
   /* post process */
@@ -319,20 +320,29 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     if (g_map[i] == 0)
       break;
     /* find the index with the min cost */
-    auto min_cost = CostMax;
+    auto min_cost = g_map[i];
     auto next = i;
     const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
-    for (const auto &p : preds) {
+    for (const auto p : preds) {
+      if (!Vector(p.first).isInsideOfField())
+        std::cerr << __FILE__ << ":" << __LINE__ << " "
+                  << "Warning! " << p.first << std::endl;
       const auto cost_p = g_map[p.first];
       if (cost_p < min_cost) {
         min_cost = cost_p;
         next = p.first;
       }
     }
-    if (next == i)
+    if (next == i) {
+      std::cerr << __FILE__ << ":" << __LINE__ << " "
+                << "No Path! " << i << std::endl;
+      while (1)
+        ;
       return false;
+    }
     i = next;
   }
+  std::cout << "cost: " << g_map[index_start] << std::endl;
   return true;
 }
 

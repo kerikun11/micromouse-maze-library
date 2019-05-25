@@ -70,8 +70,8 @@ public:
    *  @param diagonal true: 斜めあり, false: 斜めなし
    *  @return true: 成功, false: 失敗
    */
-  bool calcShortestDirs(const bool diagonal = true) {
-    return searchAlgorithm.calcShortestDirs(shortestDirs, diagonal);
+  bool calcShortestDirs(const bool diag_enabled) {
+    return searchAlgorithm.calcShortestDirs(shortestDirs, diag_enabled);
   }
   /** @function forceBackToStart
    *  @brief 探索を中止してスタート区画へ強制的に戻る

@@ -69,8 +69,8 @@ bool RobotBase::endFastRunBackingToStartRun() {
   backupMazeToFlash();
   return true;
 }
-bool RobotBase::fastRun(const bool diagonal) {
-  if (!calcShortestDirs(diagonal)) {
+bool RobotBase::fastRun(const bool diag_enabled) {
+  if (!calcShortestDirs(diag_enabled)) {
     std::cerr << "Failed to find shortest path!" << std::endl;
     return false;
   }
