@@ -165,7 +165,9 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
   // となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
   // std::queue<Vector> q;
   std::function<bool(const Vector v1, const Vector v2)> greater =
-      [&](const auto v1, const auto v2) { return getStep(v1) > getStep(v2); };
+      [&](const Vector v1, const Vector v2) {
+        return getStep(v1) > getStep(v2);
+      };
   std::priority_queue<Vector, std::vector<Vector>, decltype(greater)> q(
       greater);
   // destに含まれる区画のステップを0とする

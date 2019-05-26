@@ -1,18 +1,15 @@
 #include "Maze.h"
 #include "RobotBase.h"
-#include <cstdio>
-
 #include <chrono>
-#include <time.h>
-#include <unistd.h>
+#include <cstdio>
 
 using namespace MazeLib;
 
 #if 1
 
-Maze maze_target;
-bool display = 0;
-std::ofstream of("out.txt");
+static Maze maze_target;
+static bool display = 0;
+static std::ofstream of("out.txt");
 
 class CLRobot : public RobotBase {
 public:
@@ -33,8 +30,8 @@ private:
   float cost = 0;
   int max_usec = 0;
   int usec = 0;
-  std::chrono::_V2::system_clock::time_point start;
-  std::chrono::_V2::system_clock::time_point end;
+  std::chrono::system_clock::time_point start;
+  std::chrono::system_clock::time_point end;
 
   void findWall(bool &left, bool &front, bool &right, bool &back) override {
     const auto &v = getCurVec();

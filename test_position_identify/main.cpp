@@ -1,19 +1,16 @@
 #include "Maze.h"
 #include "RobotBase.h"
-#include <cstdio>
-
 #include <chrono>
-#include <time.h>
-#include <unistd.h>
+#include <cstdio>
 
 using namespace MazeLib;
 
-Maze maze_target;
-bool display = 0;
-Vector offset_v;
-Dir offset_d;
-Vector real_v;
-Dir real_d;
+static Maze maze_target;
+static bool display = 0;
+static Vector offset_v;
+static Dir offset_d;
+static Vector real_v;
+static Dir real_d;
 
 class CLRobot : public RobotBase {
 public:
@@ -38,8 +35,8 @@ private:
   float cost = 0;
   int max_usec = 0;
   int usec = 0;
-  std::chrono::_V2::system_clock::time_point start;
-  std::chrono::_V2::system_clock::time_point end;
+  std::chrono::system_clock::time_point start;
+  std::chrono::system_clock::time_point end;
 
   void findWall(bool &left, bool &front, bool &right, bool &back) override {
     left = maze_target.isWall(real_v, real_d + Dir::Left);
@@ -165,7 +162,7 @@ private:
   }
 };
 
-const Maze loadMaze() {
+static const Maze loadMaze() {
   switch (MAZE_SIZE) {
   case 8:
     return Maze("../mazedata/08MM2016CF_pre.maze");
@@ -176,12 +173,15 @@ const Maze loadMaze() {
   }
 }
 
-CLRobot robot;
+int main(void) {
+  setvbuf(stdout, (char *)NULL, _IONBF, 0);
+  /* Preparation */
+  CLRobot robot;
+  maze_target = loadMaze();
+  robot.replaceGoals(maze_target.getGoals());
 
-void test_position_identify() {
   /* Search Run */
   display = 0;
-  robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
 
   /* Position Identification Run */
@@ -219,11 +219,5 @@ void test_position_identify() {
       }
     }
   }
-}
-
-int main(void) {
-  setvbuf(stdout, (char *)NULL, _IONBF, 0);
-  maze_target = loadMaze();
-  test_position_identify();
   return 0;
 }

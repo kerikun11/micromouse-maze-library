@@ -5,7 +5,8 @@
     "build": {
         "flags": [
             "-I include",
-            "-std=c++14"
+            "-std=c++14",
+            "-O2"
         ]
     }
 }

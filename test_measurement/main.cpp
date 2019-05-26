@@ -1,6 +1,5 @@
 #include "Maze.h"
 #include "RobotBase.h"
-
 #include <chrono>
 #include <cstdio>
 
@@ -8,7 +7,7 @@ using namespace MazeLib;
 
 #if 1
 
-Maze maze_target;
+static Maze maze_target;
 
 class CLRobot : public RobotBase {
 public:
@@ -131,22 +130,23 @@ private:
 #endif
 
 int main(void) {
+  const std::string mazedata_dir = "../mazedata/";
   for (const auto filename : {
-           "../mazedata/32MM2012HX.maze",
-           "../mazedata/32MM2013HX.maze",
-           "../mazedata/32MM2014HX.maze",
-           "../mazedata/32MM2015HX.maze",
-           "../mazedata/32MM2016HX.maze",
-           "../mazedata/32MM2017HX.maze",
-           "../mazedata/32MM2018HX.maze",
-           "../mazedata/32MM2017CX.maze",
+           mazedata_dir + "32MM2012HX.maze",
+           mazedata_dir + "32MM2013HX.maze",
+           mazedata_dir + "32MM2014HX.maze",
+           mazedata_dir + "32MM2015HX.maze",
+           mazedata_dir + "32MM2016HX.maze",
+           mazedata_dir + "32MM2017HX.maze",
+           mazedata_dir + "32MM2018HX.maze",
+           mazedata_dir + "32MM2017CX.maze",
        }) {
     std::cout << std::endl;
     std::cout << "Maze File: \t" << filename << std::endl;
 #if 1
     /* Search Run */
     CLRobot robot;
-    maze_target = Maze(filename);
+    maze_target = Maze(filename.c_str());
     robot.replaceGoals(maze_target.getGoals());
     std::chrono::microseconds sum{0};
     const int n = 1;
@@ -166,7 +166,7 @@ int main(void) {
     /* Shortest Algorithm */
     for (const auto diag_enabled : {true, false}) {
       const bool known_only = 0;
-      Maze maze(filename);
+      Maze maze(filename.c_str());
       // Maze maze(loadMaze().getGoals());
       ShortestAlgorithm sa(maze);
       ShortestAlgorithm::Indexes path;

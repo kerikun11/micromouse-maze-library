@@ -1,16 +1,12 @@
 #include "Maze.h"
 #include "RobotBase.h"
-#include <cstdio>
-
 #include <chrono>
-#include <time.h>
-#include <unistd.h>
+#include <cstdio>
 
 using namespace MazeLib;
 
-Maze sample;
-
-bool display = 0;
+static Maze target_maze;
+static bool display = 0;
 
 class TestRobot : public RobotBase {
 public:
@@ -31,16 +27,16 @@ private:
   float cost = 0;
   int max_usec = 0;
   int usec;
-  std::chrono::_V2::system_clock::time_point start;
-  std::chrono::_V2::system_clock::time_point end;
+  std::chrono::system_clock::time_point start;
+  std::chrono::system_clock::time_point end;
 
   void findWall(bool &left, bool &front, bool &right, bool &back) override {
     const auto &v = getCurVec();
     const auto &d = getCurDir();
-    left = sample.isWall(v, d + Dir::Left);
-    front = sample.isWall(v, d + Dir::Front);
-    right = sample.isWall(v, d + Dir::Right);
-    back = sample.isWall(v, d + Dir::Back);
+    left = target_maze.isWall(v, d + Dir::Left);
+    front = target_maze.isWall(v, d + Dir::Front);
+    right = target_maze.isWall(v, d + Dir::Right);
+    back = target_maze.isWall(v, d + Dir::Back);
   }
   void calcNextDirsPreCallback() override {
     start = std::chrono::system_clock::now();
@@ -131,12 +127,12 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   const auto filename = argv[1];
-  if (!sample.parse(filename)) {
+  if (!target_maze.parse(filename)) {
     std::cout << "Failed to parse " << filename << " !" << std::endl;
     return -1;
   }
   std::cout << "Solving " << filename << " ..." << std::endl;
-  robot.replaceGoals(sample.getGoals());
+  robot.replaceGoals(target_maze.getGoals());
   robot.searchRun();
   robot.printInfo();
   robot.fastRun(false);
