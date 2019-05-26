@@ -16,24 +16,6 @@ namespace MazeLib {
  *   @brief 迷路上の方向を定義
  */
 
-/** @struct Vector
- *   @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
- */
-const Vector Vector::next(const Dir &dir) const {
-  switch (dir) {
-  case Dir::East:
-    return Vector(x + 1, y);
-  case Dir::North:
-    return Vector(x, y + 1);
-  case Dir::West:
-    return Vector(x - 1, y);
-  case Dir::South:
-    return Vector(x, y - 1);
-  }
-  std::cerr << __FILE__ << ":" << __LINE__ << " "
-            << "invalid direction" << std::endl;
-  return *this;
-}
 std::ostream &operator<<(std::ostream &os, const Vector &v) {
   return os << "(" << std::setw(2) << (int)v.x << ", " << std::setw(2)
             << (int)v.y << ")";
@@ -55,8 +37,7 @@ const Vector Vector::rotate(const Dir d) const {
   case Dir::South:
     return Vector(y, -x);
   }
-  std::cerr << __FILE__ << ":" << __LINE__ << " "
-            << "invalid direction" << std::endl;
+  loge << "invalid direction" << std::endl;
   return *this;
 }
 
@@ -252,8 +233,7 @@ bool Maze::isWall(const wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
       return true; //< 盤面外
     return wall[1][y - 1] & (1 << x);
   }
-  std::cerr << __FILE__ << ":" << __LINE__ << " "
-            << "invalid direction" << std::endl;
+  loge << "invalid direction" << std::endl;
   return true; //< とりあえず壁ありとする
 }
 void Maze::setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
@@ -292,8 +272,7 @@ void Maze::setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
       wall[1][y - 1] &= ~(1 << x);
     return;
   }
-  std::cerr << __FILE__ << ":" << __LINE__ << " "
-            << "invalid direction" << std::endl;
+  loge << "invalid direction" << std::endl;
 }
 
 } // namespace MazeLib

@@ -50,6 +50,19 @@ static_assert(sizeof(wall_size_t) * 8 == MAZE_SIZE,
 #define ESC_UP(n) "\x1b[" #n "A" //< カーソルの移動；マクロなので定数のみ
 
 /**
+ * @brief ログ
+ */
+#ifndef loge
+#define loge (std::cerr << "E " << __FILE__ << ":" << __LINE__ << " ")
+#endif
+#ifndef logw
+#define logw (std::cerr << "W " << __FILE__ << ":" << __LINE__ << " ")
+#endif
+#ifndef logi
+#define logi (std::cout << "I " << __FILE__ << ":" << __LINE__ << " ")
+#endif
+
+/**
  * @brief 迷路上の方向を定義
  * 実体は 8bit の整数
  */
@@ -152,7 +165,20 @@ public:
    *  @param 隣接方向
    *  @return 隣接座標
    */
-  const Vector next(const Dir &dir) const;
+  const Vector next(const Dir &dir) const {
+    switch (dir) {
+    case Dir::East:
+      return Vector(x + 1, y);
+    case Dir::North:
+      return Vector(x, y + 1);
+    case Dir::West:
+      return Vector(x - 1, y);
+    case Dir::South:
+      return Vector(x, y - 1);
+    }
+    loge << "invalid direction" << std::endl;
+    return *this;
+  }
   /**
    * @brief フィールド内かどうかを判定する関数
    * @return true フィールド内

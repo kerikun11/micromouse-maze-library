@@ -1,25 +1,20 @@
 #include "Maze.h"
 #include "RobotBase.h"
-#include <cstdio>
 
 #include <chrono>
-#include <time.h>
-#include <unistd.h>
+#include <cstdio>
 
 using namespace MazeLib;
 
 #if 1
 
 Maze maze_target;
-bool display = 0;
-std::ofstream of("out.txt");
 
 class CLRobot : public RobotBase {
 public:
   CLRobot() : RobotBase(maze) {}
 
-  void printInfo(const bool showMaze = true) {
-    Agent::printInfo(showMaze);
+  void printInfo() {
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
@@ -33,8 +28,8 @@ private:
   float cost = 0;
   int max_usec = 0;
   int usec = 0;
-  std::chrono::_V2::system_clock::time_point start;
-  std::chrono::_V2::system_clock::time_point end;
+  std::chrono::system_clock::time_point start;
+  std::chrono::system_clock::time_point end;
 
   void findWall(bool &left, bool &front, bool &right, bool &back) override {
     const auto &v = getCurVec();
@@ -56,7 +51,17 @@ private:
                .count();
     if (max_usec < usec)
       max_usec = usec;
-    of << usec << "\t" << maze.getWallLogs().size() << std::endl;
+    if (newState == prevState)
+      return;
+    /* State Change has occurred */
+    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
+    }
+    if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
+    }
+    if (newState == SearchAlgorithm::BACKING_TO_START) {
+    }
+    if (newState == SearchAlgorithm::REACHED_START) {
+    }
   }
   void discrepancyWithKnownWall() override {
     printInfo();
@@ -64,8 +69,6 @@ private:
               << getCurVec() << " " << getCurDir() << std::endl;
   }
   void queueAction(const Action action) override {
-    if (display)
-      printInfo();
     cost += getTimeCost(action);
     step++;
     switch (action) {
@@ -127,52 +130,61 @@ private:
 
 #endif
 
-const Maze loadMaze() {
-  switch (MAZE_SIZE) {
-  case 8:
-    return Maze("../mazedata/08MM2016CF_pre.maze");
-  case 16:
-    return Maze("../mazedata/16MM2016CX.maze");
-  case 32:
-    return Maze("../mazedata/32MM2017HX.maze");
-  }
-}
-
 int main(void) {
-  setvbuf(stdout, (char *)NULL, _IONBF, 0);
+  for (const auto filename : {
+           "../mazedata/32MM2012HX.maze",
+           "../mazedata/32MM2013HX.maze",
+           "../mazedata/32MM2014HX.maze",
+           "../mazedata/32MM2015HX.maze",
+           "../mazedata/32MM2016HX.maze",
+           "../mazedata/32MM2017HX.maze",
+           "../mazedata/32MM2018HX.maze",
+           "../mazedata/32MM2017CX.maze",
+       }) {
+    std::cout << std::endl;
+    std::cout << "Maze File: \t" << filename << std::endl;
 #if 1
-  maze_target = loadMaze();
-  CLRobot robot;
-  robot.replaceGoals(maze_target.getGoals());
-  display = 1;
-  robot.searchRun();
-  robot.printInfo();
-  robot.fastRun(false);
-  robot.printPath();
-  robot.fastRun(true);
-  robot.printPath();
+    /* Search Run */
+    CLRobot robot;
+    maze_target = Maze(filename);
+    robot.replaceGoals(maze_target.getGoals());
+    std::chrono::microseconds sum{0};
+    const int n = 1;
+    for (int i = 0; i < n; ++i) {
+      const auto t_s = std::chrono::system_clock().now();
+      robot.searchRun();
+      const auto t_e = std::chrono::system_clock().now();
+      const auto us =
+          std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+      sum += us;
+    }
+    robot.printInfo();
+    std::cout << "Search:\t" << sum.count() / n << " [us]" << std::endl;
 #endif
 
-#if 0
-  const int n = 100;
-  const bool diag_enabled = 1;
-  const bool known_only = 0;
-  std::chrono::microseconds sum{0};
-  Maze maze = loadMaze();
-  // Maze maze(loadMaze().getGoals());
-  ShortestAlgorithm sa(maze);
-  ShortestAlgorithm::Indexes path;
-  for (int i = 0; i < n; ++i) {
-    const auto t_s = std::chrono::system_clock().now();
-    sa.calcShortestPath(path, known_only, diag_enabled);
-    const auto t_e = std::chrono::system_clock().now();
-    const auto us =
-        std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
-    sum += us;
+#if 1
+    /* Shortest Algorithm */
+    for (const auto diag_enabled : {true, false}) {
+      const bool known_only = 0;
+      Maze maze(filename);
+      // Maze maze(loadMaze().getGoals());
+      ShortestAlgorithm sa(maze);
+      ShortestAlgorithm::Indexes path;
+      const int n = 100;
+      std::chrono::microseconds sum{0};
+      for (int i = 0; i < n; ++i) {
+        const auto t_s = std::chrono::system_clock().now();
+        sa.calcShortestPath(path, known_only, diag_enabled);
+        const auto t_e = std::chrono::system_clock().now();
+        const auto us =
+            std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+        sum += us;
+      }
+      std::cout << "Shortest " << (diag_enabled ? "diag" : "along") << ":\t"
+                << sum.count() / n << " [us]" << std::endl;
+      // sa.printPath(std::cout, path);
+    }
+#endif
   }
-  sa.printPath(std::cout, path);
-  std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
-#endif
-
   return 0;
 }

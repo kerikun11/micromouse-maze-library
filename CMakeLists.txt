@@ -39,6 +39,7 @@ if(CROSS_COMPILING)
   message("This is cross compiling")
 else()
   add_subdirectory(test_main)
+  add_subdirectory(test_measurement)
   add_subdirectory(test_solve)
   add_subdirectory(test_position_identify)
   add_subdirectory(test_gen_maze)
@@ -47,6 +48,11 @@ else()
   add_custom_target(main
     COMMAND clear && ${CMAKE_BINARY_DIR}/test_main/test_main
     DEPENDS test_main mazelib
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  add_custom_target(meas
+    COMMAND clear && ${CMAKE_BINARY_DIR}/test_measurement/test_measurement
+    DEPENDS test_measurement mazelib
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
   add_custom_target(pi

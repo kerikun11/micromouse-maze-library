@@ -116,8 +116,7 @@ public:
       default:
         break;
       }
-      std::cerr << __FILE__ << ":" << __LINE__ << " "
-                << "invalid direction" << std::endl;
+      loge << "invalid direction" << std::endl;
       return Vector(x, y);
     }
     const Vector arrow_to() const {
@@ -138,8 +137,7 @@ public:
       default:
         break;
       }
-      std::cerr << __FILE__ << ":" << __LINE__ << " "
-                << "invalid direction" << std::endl;
+      loge << "invalid direction" << std::endl;
       return Vector(x, y);
     }
     /**
@@ -155,8 +153,7 @@ public:
       case Dir::SouthEast:
         return z == 1 ? Dir::Left45 : Dir::Right45;
       }
-      std::cerr << __FILE__ << ":" << __LINE__ << " "
-                << "invalid direction" << std::endl;
+      loge << "invalid direction" << std::endl;
       return Dir::AbsMax;
     }
     /**

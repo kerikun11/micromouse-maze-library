@@ -97,8 +97,7 @@ void ShortestAlgorithm::Index::uniquify(const Dir d) {
     z = 0;
     break;
   default:
-    std::cerr << __FILE__ << ":" << __LINE__ << " "
-              << "invalid direction" << std::endl;
+    loge << "invalid direction" << std::endl;
     break;
   }
 }
@@ -127,8 +126,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
     /* 直前の壁 */
     if (!canGo(v, nd)) {
       /* ゴール区画だけあり得る */
-      // std::cerr << __FILE__ << ":" << __LINE__ << " "
-      //           << "FWE: " << *this << std::endl;
+      // loge << "FWE: " << *this << std::endl;
       return succs;
     }
     /* 直進で行けるところまで行く */
@@ -178,8 +176,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
     /* 直前の壁 */
     const auto i_f = next(); //< i.e. index front
     if (!canGo(Vector(i_f), i_f.getDir())) {
-      // std::cerr << __FILE__ << ":" << __LINE__ << " "
-      //           << "FWE: " << *this << std::endl;
+      loge << "FWE: " << *this << std::endl;
       return succs;
     }
     /* 直進で行けるところまで行く */
@@ -280,8 +277,7 @@ const ShortestAlgorithm::Index ShortestAlgorithm::Index::next() const {
   default:
     break;
   }
-  std::cerr << __FILE__ << ":" << __LINE__ << " "
-            << "invalid direction" << std::endl;
+  loge << "invalid direction" << std::endl;
   return Index();
 }
 
@@ -306,8 +302,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   while (1) {
     // std::cout << "size():\t" << open_list.size() << std::endl;
     if (open_list.empty()) {
-      std::cerr << __FILE__ << ":" << __LINE__ << " "
-                << "open_list is empty " << std::endl;
+      logw << "open_list is empty " << std::endl;
       return false;
     }
     /* place the element with the min cost to back */
@@ -320,8 +315,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
     for (const auto &s : succs) {
       if (!Vector(s.first).isInsideOfField())
-        std::cerr << __FILE__ << ":" << __LINE__ << " "
-                  << "Warning! " << s.first << std::endl;
+        loge << "Out of Range! " << s.first << std::endl;
       const auto f_p_new =
           f_map[index] - getHeuristic(index) + getHeuristic(s.first) + s.second;
       if (f_map[s.first] > f_p_new) {
@@ -344,8 +338,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
     for (const auto p : preds) {
       if (!Vector(p.first).isInsideOfField())
-        std::cerr << __FILE__ << ":" << __LINE__ << " "
-                  << "Warning! " << p.first << std::endl;
+        loge << "Out of Range! " << p.first << std::endl;
       const auto g_p = f_map[p.first] - getHeuristic(p.first);
       if (g_min > g_p) {
         g_min = g_p;
@@ -353,8 +346,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
       }
     }
     if (next == i) {
-      std::cerr << __FILE__ << ":" << __LINE__ << " "
-                << "No Path! " << i << std::endl;
+      logw << "No Path! " << i << std::endl;
       return false;
     }
     i = next;
