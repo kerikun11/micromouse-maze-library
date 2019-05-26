@@ -324,7 +324,11 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     /* breaking condition */
     if (index == index_start)
       break;
-    const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
+    auto succs = index.getSuccessors(maze, known_only, diag_enabled);
+    const auto succs_opposite =
+        index.opposite().getSuccessors(maze, known_only, diag_enabled);
+    succs.reserve(succs_opposite.size());
+    succs.insert(succs.cend(), succs_opposite.cbegin(), succs_opposite.cend());
     for (const auto &s : succs) {
       if (!Vector(s.first).isInsideOfField())
         loge << "Out of Range! " << s.first << std::endl;

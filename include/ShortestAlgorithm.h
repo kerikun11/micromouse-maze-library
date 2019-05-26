@@ -79,7 +79,7 @@ public:
      * @brief unique な ID を返す
      */
     operator uint16_t() const {
-      return (nd << 11) | (z << 10) | (y << 5) | x; /*< M * M * 16 */
+      return ((nd & 3) << 11) | (z << 10) | (y << 5) | x; /*< M * M * 16 */
       // return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
       //        y; /*< M * M * 12 */
     }
