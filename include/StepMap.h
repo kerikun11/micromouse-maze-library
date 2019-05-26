@@ -10,6 +10,7 @@
 #include "Maze.h"
 
 namespace MazeLib {
+
 typedef uint16_t step_t;               /**< @brief ステップマップの型*/
 constexpr step_t MAZE_STEP_MAX = 9999; /**< @brief 最大ステップ値 */
 
@@ -95,4 +96,5 @@ private:
                             const Dir start_d, Dirs &nextDirsKnown,
                             Dirs &nextDirCandidates) const;
 };
+
 } // namespace MazeLib

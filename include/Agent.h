@@ -11,18 +11,22 @@
 #include "SearchAlgorithm.h"
 
 namespace MazeLib {
+
+/**
+ * @brief 自己位置を管理するクラス
+ */
 class Agent {
 public:
   Agent(Maze &maze) : maze(maze), searchAlgorithm(maze) {}
-  /** @function replaceGoals
+  /**
    *  @brief ゴール区画を変更する関数
    */
   void replaceGoals(const Vectors &goals) { maze.setGoals(goals); }
-  /** @function isComplete
+  /**
    *  @brief 探索が完了しているかどうかを返す関数
    */
   bool isComplete() { return searchAlgorithm.isComplete(); }
-  /** @function updateCurVecDir
+  /**
    *  @brief 現在地を更新
    *  @param v 区画座標
    *  @param d 絶対方向
@@ -31,13 +35,13 @@ public:
     curVec = v;
     curDir = d;
   }
-  /** @function findNextDir
+  /**
    *  @brief 次に行くべき方向を取得する
    */
   bool findNextDir(const Vector v, const Dir d, Dir &nextDir) const {
     return searchAlgorithm.findNextDir(state, v, d, nextDirCandidates, nextDir);
   }
-  /** @function updateWall
+  /**
    *  @brief 絶対座標絶対方向で壁の1枚更新
    *  @param v 区画座標
    *  @param d 絶対方向
@@ -50,7 +54,7 @@ public:
   void resetLastWall(const int num = 1) {
     return searchAlgorithm.resetLastWall(state, num);
   }
-  /** @function calcNextDirs
+  /**
    *  @brief 次に行くべき方向配列を計算
    *  注意: 処理に時間がかかる場合あり
    *  @return 探索状態
@@ -61,7 +65,7 @@ public:
         isPositionIdentifying, isForceBackToStart, isForceGoingToGoal,
         matchCount);
   }
-  /** @function calcShortestDirs
+  /**
    *  @brief 最短経路を導出
    *  @param diagonal true: 斜めあり, false: 斜めなし
    *  @return true: 成功, false: 失敗
@@ -69,7 +73,7 @@ public:
   bool calcShortestDirs(const bool diag_enabled) {
     return searchAlgorithm.calcShortestDirs(shortestDirs, diag_enabled);
   }
-  /** @function forceBackToStart
+  /**
    *  @brief 探索を中止してスタート区画へ強制的に戻る
    *  時間が残りわずかな時などに使う
    */
@@ -88,35 +92,39 @@ public:
     state = SearchAlgorithm::IDENTIFYING_POSITION;
     isPositionIdentifying = true;
   }
-  /** @function getState
+  /**
    *  @brief 探索状態の取得
    */
   const SearchAlgorithm::State &getState() const { return state; }
-  /** @function getNextDirs
+  /**
    *  @brief 次に行くべき方向配列の計算結果を取得
    */
   const Dirs &getNextDirs() const { return nextDirsKnown; }
-  /** @function getNextDirs
+  /**
    *  @brief 次に行くべき方向配列の計算結果を取得
    */
   const Dirs &getNextDirCandidates() const { return nextDirCandidates; }
-  /** @function getCurVec
+  /**
    *  @brief 現在区画を取得
    */
   const Vector &getCurVec() const { return curVec; }
-  /** @function getCurDir
+  /**
    *  @brief 現在の方向を取得
    */
   const Dir &getCurDir() const { return curDir; }
-  /** @function getNextDirs
+  /**
    *  @brief 最短経路の方向配列の計算結果を取得
    */
   const Dirs &getShortestDirs() const { return shortestDirs; }
-  /** @function getMaze
+  /**
    *  @brief 迷路を取得
    */
   Maze &getMaze() { return maze; }
-  /** @function printInfo
+  /**
+   * @brief Get the Search Algorithm object
+   */
+  const SearchAlgorithm &getSearchAlgorithm() const { return searchAlgorithm; }
+  /**
    *  @brief 探索状態を表示
    *  @param showMaze true:迷路も表示, false:迷路は非表示
    */
@@ -125,7 +133,7 @@ public:
   }
   void printInfo(const bool showMaze, const Vector vec, const Dir dir,
                  const SearchAlgorithm::State state) const;
-  /** @function printPath
+  /**
    *  @brief 最短経路の表示
    */
   void printPath() const {
@@ -150,4 +158,5 @@ private:
   Dirs shortestDirs;      /**< 最短経路の方向配列 */
   int matchCount = 0;     /**< 自己位置同定の候補数，表示用 */
 };
+
 } // namespace MazeLib

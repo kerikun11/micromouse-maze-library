@@ -11,6 +11,9 @@
 
 namespace MazeLib {
 
+/**
+ * @brief 迷路を探索ロボットの基底クラス．継承して仮想関数内を埋めて使用する．
+ */
 class RobotBase : public Agent {
 public:
   RobotBase(Maze &maze) : Agent(maze) {}

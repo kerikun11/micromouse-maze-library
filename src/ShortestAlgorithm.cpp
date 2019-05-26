@@ -1,3 +1,13 @@
+/**
+ * @file ShortestAlgorithm.cpp
+ * @author Ryotaro Onuki (kerikun11+github@gmail.com)
+ * @brief Shortest Algorithm for Micromouse
+ * @version 0.1
+ * @date 2019-05-26
+ *
+ * @copyright Copyright (c) 2019
+ *
+ */
 #include "ShortestAlgorithm.h"
 
 #include <algorithm> /*< for std::find_if, etc. */
@@ -299,8 +309,10 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
       open_list.push_back(i);
       std::push_heap(open_list.begin(), open_list.end(), greater);
     }
-  while (1) {
+  for (int j = 0;; max_iteration_size = std::max(max_iteration_size, ++j)) {
     // std::cout << "size():\t" << open_list.size() << std::endl;
+    if (max_open_list_size < (int)open_list.size())
+      max_open_list_size = open_list.size();
     if (open_list.empty()) {
       logw << "open_list is empty " << std::endl;
       return false;

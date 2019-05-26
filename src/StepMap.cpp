@@ -13,6 +13,7 @@
 #include <queue>
 
 namespace MazeLib {
+
 StepMap::StepMap() {
   calcStraightStepTable();
   reset();
@@ -294,4 +295,5 @@ const Vector StepMap::calcNextDirs(const Maze &maze, const Vector start_v,
   nextDirCandidates = dirs;
   return focus_v;
 }
+
 } // namespace MazeLib

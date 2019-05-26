@@ -7,11 +7,10 @@ using namespace MazeLib;
 
 #if 1
 
-static Maze maze_target;
-
 class CLRobot : public RobotBase {
 public:
-  CLRobot() : RobotBase(maze) {}
+  CLRobot(const Maze &maze_target)
+      : RobotBase(maze), maze_target(maze_target) {}
 
   void printInfo() {
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
@@ -19,9 +18,16 @@ public:
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
                 (int)max_usec);
+    std::cout << "Max List:\t"
+              << getSearchAlgorithm().getShortestAlgorithm().max_open_list_size
+              << std::endl;
+    std::cout << "Max Iteration:\t"
+              << getSearchAlgorithm().getShortestAlgorithm().max_iteration_size
+              << std::endl;
   }
 
 private:
+  const Maze &maze_target;
   Maze maze;
   int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
   float cost = 0;
@@ -145,8 +151,8 @@ int main(void) {
     std::cout << "Maze File: \t" << filename << std::endl;
 #if 1
     /* Search Run */
-    CLRobot robot;
-    maze_target = Maze(filename.c_str());
+    Maze maze_target = Maze(filename.c_str());
+    CLRobot robot(maze_target);
     robot.replaceGoals(maze_target.getGoals());
     std::chrono::microseconds sum{0};
     const int n = 1;
@@ -186,5 +192,6 @@ int main(void) {
     }
 #endif
   }
+  std::cout << std::endl;
   return 0;
 }

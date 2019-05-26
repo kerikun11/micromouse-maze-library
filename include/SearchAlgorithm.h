@@ -12,46 +12,39 @@
 #include "StepMap.h"
 
 namespace MazeLib {
-/** @class SearchAlgorithm
+/**
  *  @brief 迷路探索アルゴリズムを司るクラス
  */
 class SearchAlgorithm {
 public:
-  /** @enum Status
+  /**
    *  @brief 進むべき方向の計算結果
    */
   enum Status {
-    Processing,
-    Reached,
-    Error,
+    Processing, /**< 現探索状態を継続 */
+    Reached,    /**< 現探索状態が完了 */
+    Error,      /**< エラー */
   };
-  /** @enum State
+  /**
    *  @brief 探索状態を列挙
    */
   enum State {
-    START,                  //< 初期位置，初期姿勢
-    SEARCHING_FOR_GOAL,     //< ゴール区画を探索中
-    SEARCHING_ADDITIONALLY, //< 追加探索中
-    BACKING_TO_START,       //< スタートに戻っている
-    REACHED_START,          //< スタートに戻ってきた
-    IMPOSSIBLE, //< ゴールにだどりつくことができないと判明した
-    IDENTIFYING_POSITION, //< 自己位置同定中
-    GOING_TO_GOAL,        //< ゴールへ向かっている
+    START,                  /**< 初期位置，初期姿勢 */
+    SEARCHING_FOR_GOAL,     /**< ゴール区画を探索中 */
+    SEARCHING_ADDITIONALLY, /**< 追加探索中 */
+    BACKING_TO_START,       /**< スタートに戻っている */
+    REACHED_START,          /**< スタートに戻ってきた */
+    IMPOSSIBLE, /**< ゴールにだどりつくことができないと判明した */
+    IDENTIFYING_POSITION, /**< 自己位置同定中 */
+    GOING_TO_GOAL,        /**< ゴールへ向かっている */
   };
-  /** @function stateString
+  /**
    *  @brief Stateの表示用文字列を返す関数
    */
   static const char *stateString(const enum State s);
 
 public:
-  /** @brief コンストラクタ
-   *  @param maze 使用する迷路の参照
-   *  @param goals ゴール区画の配列
-   */
   SearchAlgorithm(Maze &maze) : maze(maze), shortestAlgorithm(maze) {}
-  /** @function isComplete
-   *  @brief 最短経路が導出されているか調べる関数
-   */
   bool isComplete();
   void positionIdentifyingInit(Vector *pVector, Dir *pDir);
   bool updateWall(const State &state, const Vector &v, const Dir &d,
@@ -73,6 +66,9 @@ public:
   void printMap(const State state, const Vector vec, const Dir dir) const;
   const StepMap &getStepMap() const { return stepMap; }
   const Maze &getMaze() const { return maze; }
+  const ShortestAlgorithm &getShortestAlgorithm() const {
+    return shortestAlgorithm;
+  }
 
 protected:
   Maze &maze;                          /**< 使用する迷路の参照 */
@@ -83,12 +79,15 @@ private:
   Maze idMaze;     /**< 自己位置同定に使用する迷路 */
   Vector idOffset; /**< 自己位置同定迷路の始点位置 */
 
-  /** @function findShortestCandidates
+  /**
    *  @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
   bool findShortestCandidates(Vectors &candidates);
   int countIdentityCandidates(const WallLogs &idWallLogs,
                               std::pair<Vector, Dir> &ans) const;
+  /**
+   * @brief 各状態での進行方向列導出関数
+   */
   enum Status calcNextDirsSearchForGoal(const Vector &cv, const Dir &cd,
                                         Dirs &nextDirsKnown,
                                         Dirs &nextDirCandidates);
@@ -106,4 +105,5 @@ private:
                                                  Dirs &nextDirCandidates,
                                                  int &matchCount);
 };
+
 } // namespace MazeLib

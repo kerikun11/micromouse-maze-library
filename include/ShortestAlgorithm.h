@@ -219,6 +219,10 @@ private:
   std::array<cost_t, Index::Max> f_map;
   std::vector<Index> open_list;
   std::function<bool(const Index &i1, const Index &i2)> greater;
+
+public:
+  int max_open_list_size = 0;
+  int max_iteration_size = 0;
 };
 
 } // namespace MazeLib

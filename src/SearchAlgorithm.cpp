@@ -13,6 +13,7 @@
 #include <chrono>
 
 namespace MazeLib {
+
 /** @def SEARCHING_ADDITIONALLY_AT_START
  *  @brief 追加探索状態で探索を始める(ゴールを急がない)
  */

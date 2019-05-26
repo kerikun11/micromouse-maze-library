@@ -171,5 +171,28 @@ int main(void) {
   std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
 #endif
 
+#if 0
+  Maze maze = loadMaze();
+  std::cout << "uint8_t mazedata = {" << std::endl;
+  for (int8_t x = 0; x < MAZE_SIZE; ++x) {
+    std::cout << "{";
+    for (int8_t y = 0; y < MAZE_SIZE; ++y) {
+      int w = 0;
+      if (maze.isWall(x, y, Dir::North))
+        w |= 0x01;
+      if (maze.isWall(x, y, Dir::East))
+        w |= 0x02;
+      if (maze.isWall(x, y, Dir::West))
+        w |= 0x04;
+      if (maze.isWall(x, y, Dir::South))
+        w |= 0x08;
+      std::cout << w << ",";
+    }
+    // std::cout << "}," << std::endl;
+    std::cout << "},";
+  }
+  std::cout << "};" << std::endl;
+#endif
+
   return 0;
 }
