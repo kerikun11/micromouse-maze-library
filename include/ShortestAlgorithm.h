@@ -12,15 +12,15 @@
 
 #include "Maze.h"
 
-#include <algorithm> /*< for find_if, etc. */
-#include <bitset>
 #include <functional>
 #include <iomanip> /*< for std::setw() */
 #include <limits>  /*< for std::numeric_limits */
-#include <unordered_map>
 
 namespace MazeLib {
 
+/**
+ * @brief 最短経路導出アルゴリズム
+ */
 class ShortestAlgorithm {
 public:
   ShortestAlgorithm(const Maze &maze)
@@ -76,12 +76,8 @@ public:
     }
     Index() : all(0) {}
     /**
-     * @brief needed for unordered_map
-     * unique な ID を返す
+     * @brief unique な ID を返す
      */
-    struct hash {
-      size_t operator()(const Index &obj) const { return obj.all; }
-    };
     operator uint16_t() const {
       return (nd << 11) | (z << 10) | (y << 5) | x; /*< M * M * 16 */
       // return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
@@ -167,34 +163,7 @@ public:
      * @brief NodeDir が向いている方向の隣の Index を返す
      * @return const Index
      */
-    const Index next() const {
-      switch (nd) {
-      /* 区画の中央 */
-      case Dir::East:
-      case Dir::North:
-      case Dir::West:
-      case Dir::South:
-        return Index(Vector(x, y).next(nd), Dir::AbsMax, nd);
-      /* 壁の中央 */
-      case Dir::NorthEast:
-        return z == 0 ? Index(Vector(x + 1, y), Dir::North, nd)
-                      : Index(Vector(x, y + 1), Dir::East, nd);
-      case Dir::NorthWest:
-        return z == 0 ? Index(Vector(x, y), Dir::North, nd)
-                      : Index(Vector(x - 1, y + 1), Dir::East, nd);
-      case Dir::SouthWest:
-        return z == 0 ? Index(Vector(x, y - 1), Dir::North, nd)
-                      : Index(Vector(x - 1, y), Dir::East, nd);
-      case Dir::SouthEast:
-        return z == 0 ? Index(Vector(x + 1, y - 1), Dir::North, nd)
-                      : Index(Vector(x, y), Dir::East, nd);
-      default:
-        break;
-      }
-      std::cerr << __FILE__ << ":" << __LINE__ << " "
-                << "invalid direction" << std::endl;
-      return Index();
-    }
+    const Index next() const;
     const Index opposite() const {
       return Index(x, y, getDir(), nd + Dir::Back);
     }
@@ -230,7 +199,20 @@ public:
    */
   bool calcShortestPath(Indexes &path, const bool known_only,
                         const bool diag_enabled);
+  /**
+   * @brief print the path on the maze
+   *
+   * @param os out stream
+   * @param indexes path
+   */
   void printPath(std::ostream &os, const Indexes indexes) const;
+  /**
+   * @brief convert from indexes to dirs
+   *
+   * @param path
+   * @param diag_enabled
+   * @return const Dirs
+   */
   static const Dirs indexes2dirs(const Indexes &path, const bool diag_enabled);
 
 private:

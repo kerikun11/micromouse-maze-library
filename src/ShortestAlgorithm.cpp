@@ -1,49 +1,57 @@
 #include "ShortestAlgorithm.h"
 
-#include <utility>
+#include <algorithm> /*< for std::find_if, etc. */
+#include <utility>   /*< for std::index_sequence */
 
 namespace MazeLib {
 
-constexpr ShortestAlgorithm::cost_t get_cost_impl(const int i, const float am,
+/**
+ * @brief the cost implementation function
+ *
+ * @param i num of unit length straight [mm]
+ * @param am accel max [mm/s/s]
+ * @param vs velocity start [mm/s]
+ * @param vm velocity max [mm/s]
+ * @param isAlong true: along; false: diag
+ * @return constexpr ShortestAlgorithm::cost_t time [ms]
+ */
+constexpr ShortestAlgorithm::cost_t gen_cost_impl(const int i, const float am,
                                                   const float vs,
                                                   const float vm,
-                                                  const float unit_length) {
-  const auto d = unit_length * (i + 1); /*< 走行距離 [mm] */
+                                                  const bool isAlong) {
+  const auto d = (isAlong ? 90.0f : 45.0f * std::sqrt(2.0f)) *
+                 (i + 1); /*< (i+1) 区画分の走行距離 */
   /* グラフの面積から時間を求める */
-  const auto d_thr =
-      (vm * vm - vs * vs) / am; /*< 最大速度にちょうど達する距離 */
+  const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
   if (d < d_thr)
     return 2 * (std::sqrt(vs * vs + am * d) - vs) / am * 1000; /*< 三角加速 */
   else
     return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 1000; /*< 台形加速 */
 }
-template <class T, T... vals>
-constexpr auto get_cost_table(std::integer_sequence<T, vals...>, const float am,
+template <std::size_t... vals>
+constexpr auto gen_cost_table(std::index_sequence<vals...>, const float am,
                               const float vs, const float vm,
-                              const float unit_length) {
+                              const bool isAlong) {
   return std::array<ShortestAlgorithm::cost_t, sizeof...(vals)>{
-      {get_cost_impl(vals, am, vs, vm, unit_length)...}};
+      {gen_cost_impl(vals, am, vs, vm, isAlong)...}};
 }
 
 ShortestAlgorithm::cost_t
 ShortestAlgorithm::getEdgeCost(const enum ShortestAlgorithm::Pattern p,
                                const int n) {
-  static constexpr auto am = 3000.0f;       /*< 最大加速度 [mm/s/s] */
-  static constexpr auto vs = 450.0f;        /*< 終始速度 [mm/s] */
-  static constexpr auto vm = 2400.0f;       /*< 飽和速度 [mm/s] */
-  static constexpr auto unit_along = 90.0f; /*< 1区画の長さ [mm] */
-  static constexpr auto unit_diag =
-      45.0f * std::sqrt(2); /*< 1区画の長さ [mm] */
+  static constexpr auto am = 3000.0f; /*< 最大加速度 [mm/s/s] */
+  static constexpr auto vs = 450.0f;  /*< 終始速度 [mm/s] */
+  static constexpr auto vm = 2400.0f; /*< 飽和速度 [mm/s] */
   /* コストテーブルをコンパイル時生成 */
-  static constexpr auto cost_table_along = get_cost_table(
-      std::make_integer_sequence<int, MAZE_SIZE * 2>(), am, vs, vm, unit_along);
-  static constexpr auto cost_table_diag = get_cost_table(
-      std::make_integer_sequence<int, MAZE_SIZE * 2>(), am, vs, vm, unit_diag);
+  static constexpr auto cost_table_along = gen_cost_table(
+      std::make_index_sequence<MAZE_SIZE * 2>(), am, vs, vm, true);
+  static constexpr auto cost_table_diag = gen_cost_table(
+      std::make_index_sequence<MAZE_SIZE * 2>(), am, vs, vm, false);
   /* n along diag @ am = 3000, vs = 450, vm = 1800.
-   * 1  158   118
-   * 2  274   209
-   * 3  370   286
-   * 4  454   355
+   * 1   158  118
+   * 2   274  209
+   * 3   370  286
+   * 4   454  355
    */
   switch (p) {
   case ST_ALONG:
@@ -67,7 +75,7 @@ ShortestAlgorithm::getEdgeCost(const enum ShortestAlgorithm::Pattern p,
   return 0;
 }
 
-/* Index */
+/* union Index */
 
 void ShortestAlgorithm::Index::uniquify(const Dir d) {
   switch (d) {
@@ -247,6 +255,34 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
   for (auto &p : preds)
     p.first = p.first.opposite();
   return preds;
+}
+const ShortestAlgorithm::Index ShortestAlgorithm::Index::next() const {
+  switch (nd) {
+  /* 区画の中央 */
+  case Dir::East:
+  case Dir::North:
+  case Dir::West:
+  case Dir::South:
+    return Index(Vector(x, y).next(nd), Dir::AbsMax, nd);
+  /* 壁の中央 */
+  case Dir::NorthEast:
+    return z == 0 ? Index(Vector(x + 1, y), Dir::North, nd)
+                  : Index(Vector(x, y + 1), Dir::East, nd);
+  case Dir::NorthWest:
+    return z == 0 ? Index(Vector(x, y), Dir::North, nd)
+                  : Index(Vector(x - 1, y + 1), Dir::East, nd);
+  case Dir::SouthWest:
+    return z == 0 ? Index(Vector(x, y - 1), Dir::North, nd)
+                  : Index(Vector(x - 1, y), Dir::East, nd);
+  case Dir::SouthEast:
+    return z == 0 ? Index(Vector(x + 1, y - 1), Dir::North, nd)
+                  : Index(Vector(x, y), Dir::East, nd);
+  default:
+    break;
+  }
+  std::cerr << __FILE__ << ":" << __LINE__ << " "
+            << "invalid direction" << std::endl;
+  return Index();
 }
 
 /* ShortestAlgorithm */

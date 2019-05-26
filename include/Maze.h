@@ -115,6 +115,7 @@ public:
 private:
   int8_t d; /**< @brief 方向の実体 */
 };
+static_assert(sizeof(Dir) == 1, "sizeof(Dir) Error"); /**< Size Check */
 /**
  *  @brief Dir構造体の動的配列
  */
@@ -223,23 +224,24 @@ public:
       : goals(goals), start(start) {
     reset();
   }
-  /** @constructor Maze
+  /**
    *  @brief ファイル名から迷路をパースするコンストラクタ
    *  @param filename ファイル名
    */
   Maze(const char *filename) { parse(filename); }
-  /** @brief 配列から迷路を読み込むコンストラクタ
+  /**
+   *  @brief 配列から迷路を読み込むコンストラクタ
    *  @param data 各区画16進表記の文字列配列
    *  例：{"abaf", "1234", "abab", "aaff"}
-   *  @param east_origin true: 東から反時計回り，false: 北から時計回り
-   * に0bitから格納されている
    */
-  Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1], bool east_origin = true);
+  Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
+       const std::array<Dir, 4> bit_to_dir_map = {Dir::East, Dir::North,
+                                                  Dir::West, Dir::South});
   /** @function reset
    *  @brief 迷路の初期化．壁を削除し，スタート区画を既知に
    */
   void reset(const bool setStartWall = true);
-  /** @function isWall
+  /**
    *  @brief 壁の有無を返す
    *  @param v 区画の座標
    *  @param d 壁の方向
@@ -251,7 +253,7 @@ public:
   bool isWall(const int8_t x, const int8_t y, const Dir d) const {
     return isWall(wall, x, y, d);
   }
-  /** @function setWall
+  /**
    *  @brief 壁を更新をする
    *  @param v 区画の座標
    *  @param d 壁の方向
@@ -263,7 +265,7 @@ public:
   void setWall(const int8_t x, const int8_t y, const Dir d, const bool b) {
     return setWall(wall, x, y, d, b);
   }
-  /** @function isKnown
+  /**
    *  @brief 壁が探索済みかを返す
    *  @param v 区画の座標
    *  @param d 壁の方向
@@ -275,7 +277,7 @@ public:
   bool isKnown(const int8_t x, const int8_t y, const Dir d) const {
     return isWall(known, x, y, d);
   }
-  /** @function setWall
+  /**
    *  @brief 壁の既知を更新する
    *  @param v 区画の座標
    *  @param d 壁の方向
@@ -287,26 +289,26 @@ public:
   void setKnown(const int8_t x, const int8_t y, const Dir d, const bool b) {
     return setWall(known, x, y, d, b);
   }
-  /** @function canGo
+  /**
    *  @brief 通過可能かどうかを返す
    *  @param v 区画の座標
    *  @param d 壁の方向
    *  @return true:既知かつ壁なし，false:それ以外
    */
   bool canGo(const Vector v, const Dir d) const;
-  /** @function wallCount
+  /**
    *  @brief 引数区画の壁の数を返す
    *  @param v 区画の座標
    *  @return 壁の数 0~4
    */
   int8_t wallCount(const Vector v) const;
-  /** @function unknownCount
+  /**
    *  @brief 引数区画の未知壁の数を返す
    *  @param v 区画の座標
    *  @return 既知壁の数 0~4
    */
   int8_t unknownCount(const Vector v) const;
-  /** @function updateWall
+  /**
    *  @brief 既知の壁と照らしあわせながら，壁を更新する関数
    *  @param v 区画の座標
    *  @param d 壁の方向
@@ -320,12 +322,12 @@ public:
    * @param num リセットする壁の数
    */
   void resetLastWall(const int num);
-  /** @function print
+  /**
    *  @brief 迷路の表示
    *  @param of output-stream
    */
   void print(std::ostream &os = std::cout) const;
-  /** @function parse
+  /**
    *  @brief 迷路の文字列から壁をパースする
    *  @param is input-stream
    */
@@ -336,7 +338,7 @@ public:
       return false;
     return parse(ifs);
   }
-  /** @function printPath
+  /**
    *  @brief パス付の迷路の表示
    *  @param start パスのスタート座標
    *  @param dirs 移動方向の配列

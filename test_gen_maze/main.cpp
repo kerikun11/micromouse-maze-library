@@ -31,16 +31,26 @@ const char mazeData_MM2016CX[16 + 1][16 + 1] = {
 };
 
 int main(void) {
-  setvbuf(stdout, (char *)NULL, _IONBF, 0);
   std::cout << "Maze File Generator" << std::endl;
-  Maze sample(mazeData_MM2018HX, false);
-  sample.setGoals({
+  /* parameter */
+  const auto maze_data = mazeData_MM2018HX;
+  const std::string output_filename = "output.maze";
+#define BIT_ORDER 0
+#if BIT_ORDER == 0
+  std::array<Dir, 4> bit_order = {Dir::East, Dir::North, Dir::West, Dir::South};
+#elif BIT_ORDER == 1
+  std::array<Dir, 4> bit_order = {Dir::North, Dir::East, Dir::South, Dir::West};
+#endif
+  const Vectors goals = {
       Vector(7, 7),
       Vector(8, 7),
       Vector(7, 8),
       Vector(8, 8),
-  });
-  std::ofstream of("16MM2016CX.maze");
+  };
+  /* process */
+  Maze sample(maze_data, bit_order);
+  sample.setGoals(goals);
+  std::ofstream of(output_filename);
   sample.print(of);
   sample.print();
   return 0;

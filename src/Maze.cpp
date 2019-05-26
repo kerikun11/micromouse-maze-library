@@ -63,7 +63,8 @@ const Vector Vector::rotate(const Dir d) const {
 /** @class Maze
  *   @brief 迷路の壁情報を管理するクラス
  */
-Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1], bool east_origin) {
+Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
+           const std::array<Dir, 4> bit_to_dir_map) {
   for (int8_t y = 0; y < MAZE_SIZE; ++y)
     for (int8_t x = 0; x < MAZE_SIZE; ++x) {
       const char c = data[MAZE_SIZE - y - 1][x];
@@ -74,21 +75,10 @@ Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1], bool east_origin) {
         h = c - 'a' + 10;
       else if ('A' <= c && c <= 'F')
         h = c - 'A' + 10;
-      if (east_origin) {
-        updateWall(Vector(x, y), Dir::East, h & 0x01, false);
-        updateWall(Vector(x, y), Dir::North, h & 0x02, false);
-        updateWall(Vector(x, y), Dir::West, h & 0x04, false);
-        updateWall(Vector(x, y), Dir::South, h & 0x08, false);
-      } else {
-        updateWall(Vector(x, y), Dir::North, h & 0x1, false);
-        updateWall(Vector(x, y), Dir::East, h & 0x02, false);
-        updateWall(Vector(x, y), Dir::West, h & 0x04, false);
-        updateWall(Vector(x, y), Dir::South, h & 0x08, false);
-        // updateWall(Vector(y, x), Dir::North, h & 0x1, false);
-        // updateWall(Vector(y, x), Dir::East, h & 0x02, false);
-        // updateWall(Vector(y, x), Dir::West, h & 0x04, false);
-        // updateWall(Vector(y, x), Dir::South, h & 0x08, false);
-      }
+      updateWall(Vector(x, y), bit_to_dir_map[0], h & 0x01, false);
+      updateWall(Vector(x, y), bit_to_dir_map[1], h & 0x02, false);
+      updateWall(Vector(x, y), bit_to_dir_map[2], h & 0x04, false);
+      updateWall(Vector(x, y), bit_to_dir_map[3], h & 0x08, false);
     }
 }
 void Maze::reset(const bool setStartWall) {
