@@ -189,7 +189,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
     /* 直前の壁 */
     const auto i_f = next(); //< i.e. index front
     if (!canGo(Vector(i_f), i_f.getDir())) {
-      loge << "FWE: " << *this << std::endl;
+      // loge << "FWE: " << *this << std::endl;
       return succs;
     }
     /* 直進で行けるところまで行く */

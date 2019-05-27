@@ -32,6 +32,7 @@ const char *SearchAlgorithm::stateString(const enum State s) {
  *  @brief 最短経路が導出されているか調べる関数
  */
 bool SearchAlgorithm::isComplete() {
+  shortestAlgorithm.Initialize();
   Vectors candidates;
   findShortestCandidates(candidates);
   return candidates.empty();
@@ -47,10 +48,14 @@ bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
                                  const bool front, const bool right,
                                  const bool back) {
   bool result = true;
-  result = result & updateWall(state, v, d + Dir::Left, left);   // left wall
+  result = result & updateWall(state, v, d + Dir::Left, left); // left wall
+  shortestAlgorithm.UpdateChangedEdge(false, true);
   result = result & updateWall(state, v, d + Dir::Front, front); // front wall
+  shortestAlgorithm.UpdateChangedEdge(false, true);
   result = result & updateWall(state, v, d + Dir::Right, right); // right wall
-  result = result & updateWall(state, v, d + Dir::Back, back);   // back wall
+  shortestAlgorithm.UpdateChangedEdge(false, true);
+  result = result & updateWall(state, v, d + Dir::Back, back); // back wall
+  shortestAlgorithm.UpdateChangedEdge(false, true);
   return result;
 }
 bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
@@ -161,7 +166,10 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
   /* new algorithm*/
   ShortestAlgorithm::Indexes path;
-  if (!shortestAlgorithm.calcShortestPath(path, true, diag_enabled))
+  shortestAlgorithm.Initialize();
+  if (!shortestAlgorithm.ComputeShortestPath(true, diag_enabled))
+    return false; /* 失敗 */
+  if (!shortestAlgorithm.FollowShortestPath(path, true, diag_enabled))
     return false; /* 失敗 */
   shortestDirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
   auto v = maze.getStart();
@@ -320,9 +328,13 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 #endif
   /* 新アルゴリズム */
   candidates.clear();
-  for (const auto diag_enabled : {true, false}) {
+  // for (const auto diag_enabled : {true, false}) {
+  for (const auto diag_enabled : {true}) {
     ShortestAlgorithm::Indexes path;
-    if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
+    // if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
+    if (!shortestAlgorithm.ComputeShortestPath(false, diag_enabled))
+      return false; /* 失敗 */
+    if (!shortestAlgorithm.FollowShortestPath(path, false, diag_enabled))
       return false; /* 失敗 */
     const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
     auto v = maze.getStart();
