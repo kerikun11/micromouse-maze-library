@@ -63,6 +63,10 @@ ShortestAlgorithm::getEdgeCost(const enum ShortestAlgorithm::Pattern p,
    * 3   370  286
    * 4   454  355
    */
+  // for (int i = 0; i < MAZE_SIZE * 2; ++i) {
+  //   std::cout << i + 1 << "\t" << cost_table_along[i] << "\t"
+  //             << cost_table_diag[i] << std::endl;
+  // }
   switch (p) {
   case ST_ALONG:
     return cost_table_along[n - 1]; /*< [ms] */
@@ -324,11 +328,8 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     /* breaking condition */
     if (index == index_start)
       break;
-    auto succs = index.getSuccessors(maze, known_only, diag_enabled);
-    const auto succs_opposite =
-        index.opposite().getSuccessors(maze, known_only, diag_enabled);
-    succs.reserve(succs_opposite.size());
-    succs.insert(succs.cend(), succs_opposite.cbegin(), succs_opposite.cend());
+    /* successors */
+    const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
     for (const auto &s : succs) {
       if (!Vector(s.first).isInsideOfField())
         loge << "Out of Range! " << s.first << std::endl;
@@ -336,6 +337,21 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
           f_map[index] - getHeuristic(index) + getHeuristic(s.first) + s.second;
       if (f_map[s.first] > f_p_new) {
         f_map[s.first] = f_p_new;
+        from_map[s.first] = index;
+        open_list.push_back(s.first);
+        std::push_heap(open_list.begin(), open_list.end(), greater);
+      }
+    }
+    const auto succs_opposite =
+        index.opposite().getSuccessors(maze, known_only, diag_enabled);
+    for (const auto &s : succs_opposite) {
+      if (!Vector(s.first).isInsideOfField())
+        loge << "Out of Range! " << s.first << std::endl;
+      const auto f_p_new =
+          f_map[index] - getHeuristic(index) + getHeuristic(s.first) + s.second;
+      if (f_map[s.first] > f_p_new) {
+        f_map[s.first] = f_p_new;
+        from_map[s.first] = index.opposite();
         open_list.push_back(s.first);
         std::push_heap(open_list.begin(), open_list.end(), greater);
       }
@@ -348,24 +364,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     path.push_back(i.opposite());
     if (f_map[i] == 0)
       break;
-    /* find the index with the min cost */
-    auto g_min = f_map[i] - getHeuristic(i);
-    auto next = i;
-    const auto preds = i.getPredecessors(maze, known_only, diag_enabled);
-    for (const auto p : preds) {
-      if (!Vector(p.first).isInsideOfField())
-        loge << "Out of Range! " << p.first << std::endl;
-      const auto g_p = f_map[p.first] - getHeuristic(p.first);
-      if (g_min > g_p) {
-        g_min = g_p;
-        next = p.first;
-      }
-    }
-    if (next == i) {
-      logw << "No Path! " << i << std::endl;
-      return false;
-    }
-    i = next;
+    i = from_map[i];
   }
   return true;
 }

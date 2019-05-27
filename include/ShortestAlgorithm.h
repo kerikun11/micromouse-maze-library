@@ -26,10 +26,7 @@ public:
   ShortestAlgorithm(const Maze &maze)
       : maze(maze), greater([&](const auto &i1, const auto &i2) {
           return f_map[i1] > f_map[i2];
-        }) {
-    /* テーブルの事前計算 */
-    getEdgeCost(ST_ALONG);
-  }
+        }) {}
 
 public:
   using cost_t = uint16_t; /**< @brief 時間コストの型 [ms] */
@@ -217,6 +214,7 @@ private:
   const Index index_start =
       Index(0, 0, Dir::AbsMax, Dir::South); /**< @brief スタート */
   std::array<cost_t, Index::Max> f_map;
+  std::array<Index, Index::Max> from_map;
   std::vector<Index> open_list;
   std::function<bool(const Index &i1, const Index &i2)> greater;
 
