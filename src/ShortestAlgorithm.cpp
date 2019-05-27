@@ -325,6 +325,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
       return false;
     }
     /* place the element with the min cost to back */
+    // std::make_heap(open_list.begin(), open_list.end(), greater);
     std::pop_heap(open_list.begin(), open_list.end(), greater);
     const auto index = open_list.back();
     open_list.pop_back();
@@ -345,9 +346,11 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
       if (f_map[s.first] > f_p_new) {
         f_map[s.first] = f_p_new;
         from_map[s.first] = index;
+        if (!in_map[s.first]) {
+          open_list.push_back(s.first);
+          std::push_heap(open_list.begin(), open_list.end(), greater);
+        }
         in_map[s.first] = true;
-        open_list.push_back(s.first);
-        std::push_heap(open_list.begin(), open_list.end(), greater);
       }
     }
     const auto succs_opposite =
@@ -359,10 +362,12 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
           f_map[index] - getHeuristic(index) + getHeuristic(s.first) + s.second;
       if (f_map[s.first] > f_p_new) {
         f_map[s.first] = f_p_new;
-        in_map[s.first] = true;
         from_map[s.first] = index.opposite();
-        open_list.push_back(s.first);
-        std::push_heap(open_list.begin(), open_list.end(), greater);
+        if (!in_map[s.first]) {
+          open_list.push_back(s.first);
+          std::push_heap(open_list.begin(), open_list.end(), greater);
+        }
+        in_map[s.first] = true;
       }
     }
   }

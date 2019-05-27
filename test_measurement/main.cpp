@@ -165,12 +165,12 @@ int main(void) {
       sum += us;
     }
     robot.printInfo();
-    std::cout << "Search:\t" << sum.count() / n << " [us]" << std::endl;
+    std::cout << "Total Search:\t" << sum.count() / n << " [us]" << std::endl;
 #endif
 
 #if 1
     /* Shortest Algorithm */
-    for (const auto diag_enabled : {true, false}) {
+    for (const auto diag_enabled : {false, true}) {
       const bool known_only = 0;
       Maze maze(filename.c_str());
       // Maze maze(loadMaze().getGoals());
