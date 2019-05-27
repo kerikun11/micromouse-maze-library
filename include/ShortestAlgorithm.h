@@ -12,6 +12,7 @@
 
 #include "Maze.h"
 
+#include <bitset>
 #include <functional>
 #include <iomanip> /*< for std::setw() */
 #include <limits>  /*< for std::numeric_limits */
@@ -215,6 +216,7 @@ private:
       Index(0, 0, Dir::AbsMax, Dir::South); /**< @brief スタート */
   std::array<cost_t, Index::Max> f_map;
   std::array<Index, Index::Max> from_map;
+  std::bitset<Index::Max> in_map;
   std::vector<Index> open_list;
   std::function<bool(const Index &i1, const Index &i2)> greater;
 
