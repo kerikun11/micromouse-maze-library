@@ -182,7 +182,7 @@ public:
     return getHeuristic(i, index_start);
   }
   cost_t getHeuristic(const Index i, const Index s) const {
-    return 0;
+    // return 0;
     const auto v = Vector(i) - Vector(s);
     // const auto d = std::sqrt(v.x * v.x + v.y * v.y);
     const auto d = std::max(std::abs(v.x), std::abs(v.y));
@@ -201,6 +201,7 @@ public:
   }
   void Initialize() {
     U.clear();
+    std::make_heap(U.begin(), U.end(), KeyCompare());
     k_m = 0;
     for (int i = 0; i < Index::Max; ++i)
       r_map[i] = g_map[i] = CostMax;
@@ -309,12 +310,6 @@ public:
       }
       const auto k_old = top.second;
       const auto u = top.first;
-      /* log */
-      // std::cout << "\e[0;0H"; //< カーソルを左上に移動
-      // printPath(std::cout, {u});
-      logi << j << ": " << u << "\tg:" << g_map[u] << "\tr: " << r_map[u]
-           << std::endl;
-      /* log */
       U.pop_back();
       in_map[u] = false;
       if (k_old < CalculateKey(u)) {
@@ -343,8 +338,6 @@ public:
           UpdateVertex(s.first, known_only, diag_enabled);
         }
       }
-      logi << j << ": " << u << "\tg:" << g_map[u] << "\tr: " << r_map[u]
-           << std::endl;
     }
     return true;
   }
@@ -354,16 +347,15 @@ public:
     path.erase(path.begin(), path.end());
     auto i = index_start;
     while (1) {
-      std::cout << i << "\t" << g_map[i] << std::endl;
-      path.push_back(i.opposite());
+      // std::cout << i << "\t" << g_map[i] << std::endl;
+      path.push_back(i);
       if (g_map[i] == 0)
         break;
       /* find the index with the min cost */
       auto g_min = CostMax;
       auto next = i;
-      const auto predecessors =
-          i.getPredecessors(maze, known_only, diag_enabled);
-      for (const auto &p : predecessors) {
+      const auto successors = i.getSuccessors(maze, known_only, diag_enabled);
+      for (const auto &p : successors) {
         if (!Vector(p.first).isInsideOfField())
           loge << "Out of Range! " << p.first << std::endl;
         const auto g_p = g_map[p.first] + p.second;
@@ -371,14 +363,14 @@ public:
           g_min = g_p;
           next = p.first;
         }
-        std::cout << "\t" << p.first << "\t" << g_map[p.first] << " + "
-                  << p.second << " = " << g_p << std::endl;
       }
       if (next == i) {
         logw << "No Path! " << i << std::endl;
         return false;
       }
       i = next;
+      /* alternative */
+      // i = from_map[i];
     }
     return true;
   }
@@ -444,7 +436,7 @@ public:
 private:
   const Maze &maze; /**< @brief 使用する迷路の参照 */
   const Index index_start =
-      Index(0, 0, Dir::AbsMax, Dir::South); /**< @brief スタート */
+      Index(0, 0, Dir::AbsMax, Dir::North); /**< @brief スタート */
 
   std::vector<std::pair<Index, Key>> U;
   std::array<cost_t, Index::Max> g_map;

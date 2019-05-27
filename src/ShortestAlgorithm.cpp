@@ -10,7 +10,7 @@
  */
 #include "ShortestAlgorithm.h"
 
-#include <utility>   /*< for std::index_sequence */
+#include <utility> /*< for std::index_sequence */
 
 namespace MazeLib {
 
@@ -374,11 +374,13 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   path.erase(path.begin(), path.end());
   auto i = index_start;
   while (1) {
+    std::cout << f_map[i] - getHeuristic(i) << std::endl;
     path.push_back(i.opposite());
     if (f_map[i] == 0)
       break;
     i = from_map[i];
   }
+  // logi << f_map[index_start] - getHeuristic(index_start) << std::endl;
   return true;
 }
 
