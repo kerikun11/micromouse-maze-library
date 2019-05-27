@@ -10,7 +10,6 @@
  */
 #include "ShortestAlgorithm.h"
 
-#include <algorithm> /*< for std::find_if, etc. */
 #include <utility>   /*< for std::index_sequence */
 
 namespace MazeLib {

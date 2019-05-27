@@ -12,6 +12,7 @@
 
 #include "Maze.h"
 
+#include <algorithm> /*< for std::find_if, etc. */
 #include <bitset>
 #include <functional>
 #include <iomanip> /*< for std::setw() */
@@ -31,7 +32,7 @@ public:
 
 public:
   using cost_t = uint16_t; /**< @brief 時間コストの型 [ms] */
-  static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
+  static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max() - 4096;
   /**
    * @brief 最短走行パターン
    */
@@ -77,7 +78,7 @@ public:
      * @brief unique な ID を返す
      */
     operator uint16_t() const {
-      return ((nd & 3) << 11) | (z << 10) | (y << 5) | x; /*< M * M * 16 */
+      return (nd << 11) | (z << 10) | (y << 5) | x; /*< M * M * 16 */
       // return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
       //        y; /*< M * M * 12 */
     }
@@ -178,12 +179,242 @@ public:
    * @return cost_t heuristic value
    */
   cost_t getHeuristic(const Index i) const {
-    // return 0;
-    const auto v = Vector(i) - Vector(index_start);
+    return getHeuristic(i, index_start);
+  }
+  cost_t getHeuristic(const Index i, const Index s) const {
+    return 0;
+    const auto v = Vector(i) - Vector(s);
     // const auto d = std::sqrt(v.x * v.x + v.y * v.y);
     const auto d = std::max(std::abs(v.x), std::abs(v.y));
     return getEdgeCost(ST_ALONG, d);
   }
+  using Key = std::pair<cost_t, cost_t>;
+  struct KeyCompare {
+    bool operator()(const std::pair<Index, Key> &k1,
+                    const std::pair<Index, Key> &k2) const {
+      return k1.second > k2.second;
+    }
+  };
+  const Key CalculateKey(const Index s) const {
+    const auto m = std::min(g_map[s], r_map[s]);
+    return {m + getHeuristic(s) + k_m, m};
+  }
+  void Initialize() {
+    U.clear();
+    k_m = 0;
+    for (int i = 0; i < Index::Max; ++i)
+      r_map[i] = g_map[i] = CostMax;
+    for (const auto v : maze.getGoals())
+      for (const auto nd : Dir::ENWS()) {
+        const auto i = Index(v, Dir::AbsMax, nd);
+        r_map[i] = 0;
+        U.push_back({i, CalculateKey(i)});
+        std::push_heap(U.begin(), U.end(), KeyCompare());
+        in_map[i] = true;
+      }
+    wall_log_count = 0;
+  }
+  void UpdateVertex(const Index u, const bool known_only,
+                    const bool diag_enabled) {
+    if (r_map[u] != 0) {
+      const auto successors = u.getSuccessors(maze, known_only, diag_enabled);
+      /* min_element */
+      auto min_g = CostMax;
+      for (const auto &s_prime : successors) {
+        if (!Vector(s_prime.first).isInsideOfField())
+          std::cerr << __FILE__ << ":" << __LINE__ << " "
+                    << "Warning! " << s_prime.first << std::endl;
+        const auto new_g = s_prime.second + g_map[s_prime.first];
+        if (min_g > new_g) {
+          min_g = new_g;
+          from_map[u] = s_prime.first;
+        }
+      }
+      r_map[u] = min_g;
+    }
+    if (in_map[u]) {
+      U.erase(std::find_if(U.cbegin(), U.cend(),
+                           [u](const auto &e) { return e.first == u; }));
+      in_map[u] = false;
+    }
+    if (g_map[u] != r_map[u]) {
+      U.push_back({u, CalculateKey(u)});
+      std::push_heap(U.begin(), U.end(), KeyCompare());
+      in_map[u] = true;
+    }
+  }
+  void UpdateChangedEdge(const bool known_only, const bool diag_enabled) {
+    /* wall log */
+    const int maze_wall_log_size = maze.getWallLogs().size();
+    /* 各WallLogに対して */
+    while (wall_log_count < maze_wall_log_size) {
+      const auto wl = maze.getWallLogs()[wall_log_count++];
+      const auto w_v = Vector(wl);
+      const auto w_d = Dir(wl);
+      /* 壁があった場合のみ処理 */
+      if (wl.b) {
+        // std::cout << "find: " << wl << std::endl;
+        if (diag_enabled) {
+          for (const auto nd : Dir::Diag4()) {
+            const auto i = Index(wl.x, wl.y, wl.d, nd);
+            UpdateVertex(i, known_only, diag_enabled);
+            for (const auto s :
+                 i.getSuccessors(maze, known_only, diag_enabled)) {
+              if (!Vector(s.first).isInsideOfField())
+                std::cerr << __FILE__ << ":" << __LINE__ << " "
+                          << "Warning! " << s.first << std::endl;
+              UpdateVertex(s.first, known_only, diag_enabled);
+              UpdateVertex(s.first.opposite(), known_only, diag_enabled);
+            }
+            for (const auto s :
+                 i.next().getSuccessors(maze, known_only, diag_enabled)) {
+              if (!Vector(s.first).isInsideOfField())
+                std::cerr << __FILE__ << ":" << __LINE__ << " "
+                          << "Warning! " << s.first << std::endl;
+              UpdateVertex(s.first, known_only, diag_enabled);
+              UpdateVertex(s.first.opposite(), known_only, diag_enabled);
+            }
+          }
+        }
+        for (const auto i : {
+                 Index(w_v, Dir::AbsMax, w_d + Dir::Back),
+                 Index(w_v.next(w_d), Dir::AbsMax, w_d),
+             }) {
+          UpdateVertex(i, known_only, diag_enabled);
+          UpdateVertex(i.opposite(), known_only, diag_enabled);
+          for (const auto s : i.getSuccessors(maze, known_only, diag_enabled)) {
+            if (!Vector(s.first).isInsideOfField())
+              std::cerr << __FILE__ << ":" << __LINE__ << " "
+                        << "Warning! " << s.first << std::endl;
+            UpdateVertex(s.first, known_only, diag_enabled);
+            UpdateVertex(s.first.opposite(), known_only, diag_enabled);
+          }
+        }
+      }
+    }
+  }
+  bool ComputeShortestPath(const bool known_only, const bool diag_enabled) {
+    for (int j = 0;; ++j) {
+      std::make_heap(U.begin(), U.end(), KeyCompare());
+      std::pop_heap(U.begin(), U.end(), KeyCompare());
+      auto top = U.back();
+      if (U.empty())
+        top.second = std::pair<cost_t, cost_t>{CostMax, CostMax};
+      if (!(top.second < CalculateKey(index_start) ||
+            r_map[index_start] != g_map[index_start]))
+        break;
+      if (U.empty()) {
+        logw << "U.empty()" << std::endl;
+        break;
+      }
+      const auto k_old = top.second;
+      const auto u = top.first;
+      /* log */
+      // std::cout << "\e[0;0H"; //< カーソルを左上に移動
+      // printPath(std::cout, {u});
+      logi << j << ": " << u << "\tg:" << g_map[u] << "\tr: " << r_map[u]
+           << std::endl;
+      /* log */
+      U.pop_back();
+      in_map[u] = false;
+      if (k_old < CalculateKey(u)) {
+        U.push_back({u, CalculateKey(u)});
+        std::push_heap(U.begin(), U.end(), KeyCompare());
+        in_map[u] = true;
+      } else if (g_map[u] > r_map[u]) {
+        g_map[u] = r_map[u];
+        const auto predecessors =
+            u.getPredecessors(maze, known_only, diag_enabled);
+        for (const auto &s : predecessors) {
+          if (!Vector(s.first).isInsideOfField())
+            std::cerr << __FILE__ << ":" << __LINE__ << " "
+                      << "Warning! " << s.first << std::endl;
+          UpdateVertex(s.first, known_only, diag_enabled);
+        }
+      } else {
+        g_map[u] = CostMax;
+        UpdateVertex(u, known_only, diag_enabled);
+        const auto predecessors =
+            u.getPredecessors(maze, known_only, diag_enabled);
+        for (const auto &s : predecessors) {
+          if (!Vector(s.first).isInsideOfField())
+            std::cerr << __FILE__ << ":" << __LINE__ << " "
+                      << "Warning! " << s.first << std::endl;
+          UpdateVertex(s.first, known_only, diag_enabled);
+        }
+      }
+      logi << j << ": " << u << "\tg:" << g_map[u] << "\tr: " << r_map[u]
+           << std::endl;
+    }
+    return true;
+  }
+  bool FollowShortestPath(Indexes &path, const bool known_only,
+                          const bool diag_enabled) const {
+    /* post process */
+    path.erase(path.begin(), path.end());
+    auto i = index_start;
+    while (1) {
+      std::cout << i << "\t" << g_map[i] << std::endl;
+      path.push_back(i.opposite());
+      if (g_map[i] == 0)
+        break;
+      /* find the index with the min cost */
+      auto g_min = CostMax;
+      auto next = i;
+      const auto predecessors =
+          i.getPredecessors(maze, known_only, diag_enabled);
+      for (const auto &p : predecessors) {
+        if (!Vector(p.first).isInsideOfField())
+          loge << "Out of Range! " << p.first << std::endl;
+        const auto g_p = g_map[p.first] + p.second;
+        if (g_min > g_p) {
+          g_min = g_p;
+          next = p.first;
+        }
+        std::cout << "\t" << p.first << "\t" << g_map[p.first] << " + "
+                  << p.second << " = " << g_p << std::endl;
+      }
+      if (next == i) {
+        logw << "No Path! " << i << std::endl;
+        return false;
+      }
+      i = next;
+    }
+    return true;
+  }
+  // bool main(const bool known_only, const bool diag_enabled) {
+  //   auto s_start = index_start;
+  //   auto s_last = s_start;
+  //   Initialize();
+  //   ComputeShortestPath(known_only, diag_enabled);
+  //   while (r_map[s_start] != 0) {
+  //     if (g_map[index_start] == CostMax)
+  //       return false;
+  //     std::cout << "\e[0;0H"; //< カーソルを左上に移動
+  //     printPath(std::cout, {s_start});
+  //     /* 行ける方向を探す */
+  //     const auto successors =
+  //         s_start.getSuccessors(maze, known_only, diag_enabled);
+  //     auto min_g = CostMax;
+  //     for (const auto &s_prime : successors) {
+  //       if (!Vector(s_prime.first).isInsideOfField())
+  //         loge << "Out of Range! " << s_prime.first << std::endl;
+  //       const auto new_g = s_prime.second + g_map[s_prime.first];
+  //       if (min_g > new_g) {
+  //         min_g = new_g;
+  //         s_start = s_prime.first;
+  //       }
+  //     }
+  //     /* Move to s_start */
+  //     if (1) {
+  //       k_m = k_m + getHeuristic(s_last, s_start);
+  //       s_last = s_start;
+  //       UpdateChangedEdge(known_only, diag_enabled);
+  //       ComputeShortestPath(known_only, diag_enabled);
+  //     }
+  //   }
+  //   return true;
+  // }
   /**
    * @brief 最短経路を求める
    *
@@ -214,11 +445,18 @@ private:
   const Maze &maze; /**< @brief 使用する迷路の参照 */
   const Index index_start =
       Index(0, 0, Dir::AbsMax, Dir::South); /**< @brief スタート */
-  std::array<cost_t, Index::Max> f_map;
-  std::array<Index, Index::Max> from_map;
+
+  std::vector<std::pair<Index, Key>> U;
+  std::array<cost_t, Index::Max> g_map;
+  std::array<cost_t, Index::Max> r_map;
   std::bitset<Index::Max> in_map;
-  std::vector<Index> open_list;
+  cost_t k_m;
+  int wall_log_count;
+
   std::function<bool(const Index &i1, const Index &i2)> greater;
+  std::array<Index, Index::Max> from_map;
+  std::vector<Index> open_list;
+  std::array<cost_t, Index::Max> f_map;
 
 public:
   int max_open_list_size = 0;
