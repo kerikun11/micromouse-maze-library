@@ -329,7 +329,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     const auto index = open_list.back();
     open_list.pop_back();
     /* breaking condition */
-    if (index == index_start)
+    if (index == index_start.opposite())
       break;
     /* remove duplicated index */
     if (in_map[index] == false)
@@ -374,13 +374,11 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   path.erase(path.begin(), path.end());
   auto i = index_start;
   while (1) {
-    std::cout << f_map[i] - getHeuristic(i) << std::endl;
-    path.push_back(i.opposite());
+    path.push_back(i);
     if (f_map[i] == 0)
       break;
-    i = from_map[i];
+    i = from_map[i].opposite();
   }
-  // logi << f_map[index_start] - getHeuristic(index_start) << std::endl;
   return true;
 }
 
@@ -419,9 +417,9 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
                                            const bool diag_enabled) {
   if (!diag_enabled) {
     Dirs dirs;
-    for (int i = 1; i < (int)path.size(); ++i) {
+    for (int i = 0; i < (int)path.size() - 1; ++i) {
       const auto nd = path[i].getNodeDir();
-      const auto v = Vector(path[i - 1]) - Vector(path[i]);
+      const auto v = Vector(path[i + 1]) - Vector(path[i]);
       for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
         dirs.push_back(nd);
     }
