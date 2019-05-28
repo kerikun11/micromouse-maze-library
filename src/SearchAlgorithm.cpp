@@ -34,7 +34,9 @@ const char *SearchAlgorithm::stateString(const enum State s) {
  *  @brief 最短経路が導出されているか調べる関数
  */
 bool SearchAlgorithm::isComplete() {
+#if D_STAR_LITE_ENABLED
   shortestAlgorithm.Initialize();
+#endif
   Vectors candidates;
   findShortestCandidates(candidates);
   return candidates.empty();

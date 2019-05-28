@@ -189,7 +189,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
     /* 直前の壁 */
     const auto i_f = next(); //< i.e. index front
     if (!canGo(Vector(i_f), i_f.getDir())) {
-      // loge << "FWE: " << *this << std::endl;
+      loge << "FWE: " << *this << std::endl;
       return succs;
     }
     /* 直進で行けるところまで行く */
@@ -377,28 +377,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     path.push_back(i.opposite());
     if (f_map[i] == 0)
       break;
-#if 1
     i = from_map[i];
-#else
-    /* find the index with the min cost */
-    auto f_min = CostMax;
-    auto next = i;
-    const auto predecessors = i.getPredecessors(maze, known_only, diag_enabled);
-    for (const auto &p : predecessors) {
-      if (!Vector(p.first).isInsideOfField())
-        loge << "Out of Range! " << p.first << std::endl;
-      const auto f_p = f_map[p.first] + p.second;
-      if (f_min > f_p) {
-        f_min = f_p;
-        next = p.first;
-      }
-    }
-    if (next == i) {
-      logw << "No Path! " << i << std::endl;
-      return false;
-    }
-    i = next;
-#endif
   }
   return true;
 }
