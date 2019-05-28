@@ -303,9 +303,9 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   std::make_heap(open_list.begin(), open_list.end(), greater);
   /* clear in_map */
   in_map.reset();
-  /* clear node map */
-  for (auto &node : f_map)
-    node = CostMax;
+  /* clear f map */
+  for (auto &f : f_map)
+    f = CostMax;
   /* push the goal indexes */
   for (const auto v : maze.getGoals())
     for (const auto nd : Dir::ENWS()) {
@@ -320,7 +320,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     if (max_open_list_size < (int)open_list.size())
       max_open_list_size = open_list.size();
     if (open_list.empty()) {
-      logw << "open_list is empty " << std::endl;
+      logw << "open_list is empty! " << std::endl;
       return false;
     }
     /* place the element with the min cost to back */
@@ -371,13 +371,34 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     }
   }
   /* post process to find the path*/
-  path.erase(path.begin(), path.end());
-  auto i = index_start;
+  path.clear();
+  auto i = index_start.opposite();
   while (1) {
-    path.push_back(i);
+    path.push_back(i.opposite());
     if (f_map[i] == 0)
       break;
-    i = from_map[i].opposite();
+#if 1
+    i = from_map[i];
+#else
+    /* find the index with the min cost */
+    auto f_min = f_map[i];
+    auto next = i;
+    const auto predecessors = i.getPredecessors(maze, known_only, diag_enabled);
+    for (const auto &p : predecessors) {
+      if (!Vector(p.first).isInsideOfField())
+        loge << "Out of Range! " << p.first << std::endl;
+      const auto f_p = f_map[p.first] + p.second;
+      if (f_min > f_p) {
+        f_min = f_p;
+        next = p.first;
+      }
+    }
+    if (next == i) {
+      logw << "No Path! " << i << std::endl;
+      return false;
+    }
+    i = next;
+#endif
   }
   return true;
 }
@@ -417,9 +438,9 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
                                            const bool diag_enabled) {
   if (!diag_enabled) {
     Dirs dirs;
-    for (int i = 0; i < (int)path.size() - 1; ++i) {
+    for (int i = 1; i < (int)path.size(); ++i) {
       const auto nd = path[i].getNodeDir();
-      const auto v = Vector(path[i + 1]) - Vector(path[i]);
+      const auto v = Vector(path[i - 1]) - Vector(path[i]);
       for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
         dirs.push_back(nd);
     }

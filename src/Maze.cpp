@@ -84,7 +84,7 @@ int8_t Maze::wallCount(const Vector v) const {
                        [&](const Dir &d) { return isWall(v, d); });
 }
 int8_t Maze::unknownCount(const Vector v) const {
-  auto dirs = Dir::ENWS();
+  const auto dirs = Dir::ENWS();
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        [&](const Dir &d) { return !isKnown(v, d); });
 }

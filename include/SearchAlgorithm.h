@@ -20,7 +20,7 @@ public:
   /**
    *  @brief 進むべき方向の計算結果
    */
-  enum Status {
+  enum Status : uint8_t {
     Processing, /**< 現探索状態を継続 */
     Reached,    /**< 現探索状態が完了 */
     Error,      /**< エラー */
@@ -28,7 +28,7 @@ public:
   /**
    *  @brief 探索状態を列挙
    */
-  enum State {
+  enum State : uint8_t {
     START,                  /**< 初期位置，初期姿勢 */
     SEARCHING_FOR_GOAL,     /**< ゴール区画を探索中 */
     SEARCHING_ADDITIONALLY, /**< 追加探索中 */
@@ -47,12 +47,11 @@ public:
   SearchAlgorithm(Maze &maze) : maze(maze), shortestAlgorithm(maze) {}
   bool isComplete();
   void positionIdentifyingInit(Vector *pVector, Dir *pDir);
-  bool updateWall(const State &state, const Vector &v, const Dir &d,
+  bool updateWall(const State state, const Vector v, const Dir d,
                   const bool left, const bool front, const bool right,
                   const bool back);
-  bool updateWall(const State &state, const Vector &v, const Dir &d,
-                  const bool &b);
-  void resetLastWall(const State &state, const int num = 1);
+  bool updateWall(const State state, const Vector v, const Dir d, const bool b);
+  void resetLastWall(const State state, const int num = 1);
   enum Status calcNextDirs(State &state, Vector &curVec, Dir &curDir,
                            Dirs &nextDirs, Dirs &nextDirCandidates,
                            bool &isPositionIdentifying,
@@ -88,16 +87,16 @@ private:
   /**
    * @brief 各状態での進行方向列導出関数
    */
-  enum Status calcNextDirsSearchForGoal(const Vector &cv, const Dir &cd,
+  enum Status calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
                                         Dirs &nextDirsKnown,
                                         Dirs &nextDirCandidates);
-  enum Status calcNextDirsSearchAdditionally(const Vector &cv, const Dir &cd,
+  enum Status calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
                                              Dirs &nextDirsKnown,
                                              Dirs &nextDirCandidates);
-  enum Status calcNextDirsBackingToStart(const Vector &cv, const Dir &cd,
+  enum Status calcNextDirsBackingToStart(const Vector cv, const Dir cd,
                                          Dirs &nextDirsKnown,
                                          Dirs &nextDirCandidates);
-  enum Status calcNextDirsGoingToGoal(const Vector &cv, const Dir &cd,
+  enum Status calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
                                       Dirs &nextDirsKnown,
                                       Dirs &nextDirCandidates);
   enum Status calcNextDirsPositionIdentification(Vector &cv, Dir &cd,

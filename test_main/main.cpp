@@ -131,17 +131,17 @@ const Maze loadMaze() {
   case 16:
     return Maze("../mazedata/16MM2016CX.maze");
   case 32:
-    return Maze("../mazedata/32MM2017HX.maze");
+    return Maze("../mazedata/32MM2016HX.maze");
   }
 }
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
-#if 0
+#if 1
   maze_target = loadMaze();
   CLRobot robot;
   robot.replaceGoals(maze_target.getGoals());
-  display = 1;
+  display = 0;
   robot.searchRun();
   robot.printInfo();
   robot.fastRun(false);
@@ -194,7 +194,7 @@ int main(void) {
   std::cout << "};" << std::endl;
 #endif
 
-#if 1
+#if 0
   const int n = 1;
   const bool diag_enabled = 1;
   const bool known_only = 0;

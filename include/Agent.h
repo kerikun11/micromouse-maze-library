@@ -31,7 +31,7 @@ public:
    *  @param v 区画座標
    *  @param d 絶対方向
    */
-  void updateCurVecDir(const Vector &v, const Dir &d) {
+  void updateCurVecDir(const Vector v, const Dir d) {
     curVec = v;
     curDir = d;
   }
@@ -47,7 +47,7 @@ public:
    *  @param d 絶対方向
    *  @param b 壁の有無
    */
-  bool updateWall(const Vector &v, const Dir &d, const bool left,
+  bool updateWall(const Vector v, const Dir d, const bool left,
                   const bool front, const bool right, const bool back) {
     return searchAlgorithm.updateWall(state, v, d, left, front, right, back);
   }

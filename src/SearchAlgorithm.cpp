@@ -43,10 +43,9 @@ void SearchAlgorithm::positionIdentifyingInit(Vector *pVector, Dir *pDir) {
   *pDir = Dir::East;
   idMaze.reset(false);
 }
-bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
-                                 const Dir &d, const bool left,
-                                 const bool front, const bool right,
-                                 const bool back) {
+bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
+                                 const bool left, const bool front,
+                                 const bool right, const bool back) {
   bool result = true;
   result = result & updateWall(state, v, d + Dir::Left, left); // left wall
   shortestAlgorithm.UpdateChangedEdge(false, true);
@@ -58,13 +57,13 @@ bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
   shortestAlgorithm.UpdateChangedEdge(false, true);
   return result;
 }
-bool SearchAlgorithm::updateWall(const State &state, const Vector &v,
-                                 const Dir &d, const bool &b) {
+bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
+                                 const bool b) {
   if (state == IDENTIFYING_POSITION)
     return idMaze.updateWall(v, d, b);
   return maze.updateWall(v, d, b);
 }
-void SearchAlgorithm::resetLastWall(const State &state, const int num) {
+void SearchAlgorithm::resetLastWall(const State state, const int num) {
   if (state == IDENTIFYING_POSITION)
     return idMaze.resetLastWall(num);
   return maze.resetLastWall(num);
@@ -136,6 +135,7 @@ enum SearchAlgorithm::Status SearchAlgorithm::calcNextDirs(
   case SearchAlgorithm::Processing:
     return status;
   case SearchAlgorithm::Reached:
+    isForceBackToStart = false;
     break;
   case SearchAlgorithm::Error:
     return status;
@@ -156,8 +156,8 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
   // 候補の中で行ける方向を探す
   const auto it =
       std::find_if(nextDirCandidates.cbegin(), nextDirCandidates.cend(),
-                   [&](const Dir &dir) { return maze.canGo(v, dir); });
-  if (it == nextDirCandidates.end())
+                   [&](const Dir dir) { return maze.canGo(v, dir); });
+  if (it == nextDirCandidates.cend())
     return false;
   nextDir = *it;
   return true;
@@ -166,15 +166,22 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
   /* new algorithm*/
   ShortestAlgorithm::Indexes path;
+#if 1
+  if (!shortestAlgorithm.calcShortestPath(path, true, diag_enabled))
+    return false; /* 失敗 */
+#else
   shortestAlgorithm.Initialize();
   if (!shortestAlgorithm.ComputeShortestPath(true, diag_enabled))
     return false; /* 失敗 */
-  if (!shortestAlgorithm.FollowShortestPath(path, true, diag_enabled))
+  if (!shortestAlgorithm.FollowShortestPath(path, false, diag_enabled))
     return false; /* 失敗 */
+#endif
   shortestDirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
   auto v = maze.getStart();
   for (const auto d : shortestDirs)
     v = v.next(d);
+  if (shortestDirs.size() < 2)
+    return true;
   auto prev_dir = shortestDirs[shortestDirs.size() - 1 - 1];
   auto dir = shortestDirs[shortestDirs.size() - 1];
   // ゴール区画を行けるところまで直進(斜め考慮)する
@@ -331,11 +338,15 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
   // for (const auto diag_enabled : {true, false}) {
   for (const auto diag_enabled : {true}) {
     ShortestAlgorithm::Indexes path;
-    // if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
+#if 1
+    if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
+      return false; /* 失敗 */
+#else
     if (!shortestAlgorithm.ComputeShortestPath(false, diag_enabled))
       return false; /* 失敗 */
     if (!shortestAlgorithm.FollowShortestPath(path, false, diag_enabled))
       return false; /* 失敗 */
+#endif
     const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
     auto v = maze.getStart();
     for (const auto d : dirs) {
@@ -389,7 +400,7 @@ int SearchAlgorithm::countIdentityCandidates(
   return cnt;
 }
 enum SearchAlgorithm::Status
-SearchAlgorithm::calcNextDirsSearchForGoal(const Vector &cv, const Dir &cd,
+SearchAlgorithm::calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
                                            Dirs &nextDirsKnown,
                                            Dirs &nextDirCandidates) {
   Vectors candidates;
@@ -403,7 +414,7 @@ SearchAlgorithm::calcNextDirsSearchForGoal(const Vector &cv, const Dir &cd,
   return nextDirCandidates.empty() ? Error : Processing;
 }
 enum SearchAlgorithm::Status
-SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector &cv, const Dir &cd,
+SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
                                                 Dirs &nextDirsKnown,
                                                 Dirs &nextDirCandidates) {
   Vectors candidates;
@@ -415,7 +426,7 @@ SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector &cv, const Dir &cd,
   return nextDirCandidates.empty() ? Error : Processing;
 }
 enum SearchAlgorithm::Status
-SearchAlgorithm::calcNextDirsBackingToStart(const Vector &cv, const Dir &cd,
+SearchAlgorithm::calcNextDirsBackingToStart(const Vector cv, const Dir cd,
                                             Dirs &nextDirsKnown,
                                             Dirs &nextDirCandidates) {
   const auto v = stepMap.calcNextDirs(maze, {maze.getStart()}, cv, cd,
@@ -425,7 +436,7 @@ SearchAlgorithm::calcNextDirsBackingToStart(const Vector &cv, const Dir &cd,
   return nextDirCandidates.empty() ? Error : Processing;
 }
 enum SearchAlgorithm::Status
-SearchAlgorithm::calcNextDirsGoingToGoal(const Vector &cv, const Dir &cd,
+SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
                                          Dirs &nextDirsKnown,
                                          Dirs &nextDirCandidates) {
   const auto goals = maze.getGoals();

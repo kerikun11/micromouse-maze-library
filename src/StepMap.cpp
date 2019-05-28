@@ -26,20 +26,15 @@ void StepMap::reset(const step_t step) {
 step_t StepMap::getStep(const int8_t x, const int8_t y) const {
   /* (x, y) がフィールド内か確認 */
   if (x < 0 || y < 0 || x > MAZE_SIZE - 1 || y > MAZE_SIZE - 1) {
-    logw << "referred to out of field: ( " << x << ", " << y << ")"
-         << std::endl;
-    static step_t
-        outside; //< フィールド外のときの戻りメモリ(参照なので仕方なく用意)
-    outside = MAZE_STEP_MAX; //< フィールド外なので最大ステップとする
-    return outside;
+    logw << "referred to out of field: " << Vector(x, y) << std::endl;
+    return MAZE_STEP_MAX;
   }
   return stepMap[y][x];
 }
 bool StepMap::setStep(const int8_t x, const int8_t y, const step_t step) {
   // (x, y) がフィールド内か確認
   if (x < 0 || y < 0 || x >= MAZE_SIZE || y >= MAZE_SIZE) {
-    logw << "referred to out of field: ( " << x << ", " << y << ")"
-         << std::endl;
+    logw << "referred to out of field: " << Vector(x, y) << std::endl;
     return false;
   }
   stepMap[y][x] = step;
@@ -164,13 +159,13 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
   // 全区画のステップを最大値に設定
   reset();
   // となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
-  // std::queue<Vector> q;
-  std::function<bool(const Vector v1, const Vector v2)> greater =
-      [&](const Vector v1, const Vector v2) {
-        return getStep(v1) > getStep(v2);
-      };
-  std::priority_queue<Vector, std::vector<Vector>, decltype(greater)> q(
-      greater);
+  std::queue<Vector> q;
+  // std::function<bool(const Vector v1, const Vector v2)> greater =
+  //     [&](const Vector v1, const Vector v2) {
+  //       return getStep(v1) > getStep(v2);
+  //     };
+  // std::priority_queue<Vector, std::vector<Vector>, decltype(greater)> q(
+  //     greater);
   // destに含まれる区画のステップを0とする
   for (const auto v : dest) {
     setStep(v, 0);
@@ -179,8 +174,8 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
   // ステップの更新がなくなるまで更新処理
   while (!q.empty()) {
     // 注目する区画を取得
-    // const Vector focus = q.front();
-    const Vector focus = q.top();
+    const Vector focus = q.front();
+    // const Vector focus = q.top();
     q.pop();
     const step_t focus_step = getStep(focus);
     // 4方向更新がないか調べる

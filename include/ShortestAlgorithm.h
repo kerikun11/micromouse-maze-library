@@ -26,7 +26,7 @@ namespace MazeLib {
 class ShortestAlgorithm {
 public:
   ShortestAlgorithm(const Maze &maze)
-      : maze(maze), greater([&](const auto &i1, const auto &i2) {
+      : maze(maze), greater([&](const auto i1, const auto i2) {
           return f_map[i1] > f_map[i2];
         }) {}
 
@@ -78,9 +78,17 @@ public:
      * @brief unique な ID を返す
      */
     operator uint16_t() const {
+#define INDEX_ARRANGEMENT 1
+#if INDEX_ARRANGEMENT == 0
+      return (((~nd) & 1) << 13) | (z << 12) | (x << 5) | y; /*< M * M * 6 */
+#elif INDEX_ARRANGEMENT == 1
+      return ((nd & 3) << 11) | (z << 10) | (y << 5) | x; /*< M * M * 8 */
+#elif INDEX_ARRANGEMENT == 2
+      return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
+             y; /*< M * M * 12 */
+#elif INDEX_ARRANGEMENT == 3
       return (nd << 11) | (z << 10) | (y << 5) | x; /*< M * M * 16 */
-      // return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
-      //        y; /*< M * M * 12 */
+#endif
     }
     /**
      * @brief 座標の冗長を一意にする．
@@ -351,6 +359,9 @@ public:
       path.push_back(i);
       if (g_map[i] == 0)
         break;
+#if 0
+      i = from_map[i];
+#else
       /* find the index with the min cost */
       auto g_min = CostMax;
       auto next = i;
@@ -369,8 +380,7 @@ public:
         return false;
       }
       i = next;
-      /* alternative */
-      // i = from_map[i];
+#endif
     }
     return true;
   }
