@@ -32,7 +32,6 @@ const char *SearchAlgorithm::stateString(const enum State s) {
  *  @brief 最短経路が導出されているか調べる関数
  */
 bool SearchAlgorithm::isComplete() {
-  shortestAlgorithm.Initialize();
   Vectors candidates;
   findShortestCandidates(candidates);
   return candidates.empty();
@@ -47,14 +46,10 @@ bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
                                  const bool left, const bool front,
                                  const bool right, const bool back) {
   bool result = true;
-  result = result & updateWall(state, v, d + Dir::Left, left); // left wall
-  shortestAlgorithm.UpdateChangedEdge(false, true);
+  result = result & updateWall(state, v, d + Dir::Left, left);   // left wall
   result = result & updateWall(state, v, d + Dir::Front, front); // front wall
-  shortestAlgorithm.UpdateChangedEdge(false, true);
   result = result & updateWall(state, v, d + Dir::Right, right); // right wall
-  shortestAlgorithm.UpdateChangedEdge(false, true);
-  result = result & updateWall(state, v, d + Dir::Back, back); // back wall
-  shortestAlgorithm.UpdateChangedEdge(false, true);
+  result = result & updateWall(state, v, d + Dir::Back, back);   // back wall
   return result;
 }
 bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
@@ -166,22 +161,12 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
   /* new algorithm*/
   ShortestAlgorithm::Indexes path;
-#if 1
   if (!shortestAlgorithm.calcShortestPath(path, true, diag_enabled))
     return false; /* 失敗 */
-#else
-  shortestAlgorithm.Initialize();
-  if (!shortestAlgorithm.ComputeShortestPath(true, diag_enabled))
-    return false; /* 失敗 */
-  if (!shortestAlgorithm.FollowShortestPath(path, false, diag_enabled))
-    return false; /* 失敗 */
-#endif
   shortestDirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
   auto v = maze.getStart();
   for (const auto d : shortestDirs)
     v = v.next(d);
-  if (shortestDirs.size() < 2)
-    return true;
   auto prev_dir = shortestDirs[shortestDirs.size() - 1 - 1];
   auto dir = shortestDirs[shortestDirs.size() - 1];
   // ゴール区画を行けるところまで直進(斜め考慮)する
@@ -335,18 +320,10 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 #endif
   /* 新アルゴリズム */
   candidates.clear();
-  // for (const auto diag_enabled : {true, false}) {
-  for (const auto diag_enabled : {true}) {
+  for (const auto diag_enabled : {true, false}) {
     ShortestAlgorithm::Indexes path;
-#if 1
     if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
       return false; /* 失敗 */
-#else
-    if (!shortestAlgorithm.ComputeShortestPath(false, diag_enabled))
-      return false; /* 失敗 */
-    if (!shortestAlgorithm.FollowShortestPath(path, false, diag_enabled))
-      return false; /* 失敗 */
-#endif
     const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
     auto v = maze.getStart();
     for (const auto d : dirs) {
