@@ -78,16 +78,16 @@ public:
      * @brief unique な ID を返す
      */
     operator uint16_t() const {
-#define INDEX_ARRANGEMENT 1
+#define INDEX_ARRANGEMENT 0
 #if INDEX_ARRANGEMENT == 0
-      return (((~nd) & 1) << 13) | (z << 12) | (x << 5) | y; /*< M * M * 6 */
-#elif INDEX_ARRANGEMENT == 1
       return ((nd & 3) << 11) | (z << 10) | (y << 5) | x; /*< M * M * 8 */
+#elif INDEX_ARRANGEMENT == 1
+      return (nd << 11) | (z << 10) | (y << 5) | x; /*< M * M * 16 */
 #elif INDEX_ARRANGEMENT == 2
+      return (((~nd) & 1) << 13) | (z << 12) | (x << 5) | y; /*< M * M * 6 */
+#elif INDEX_ARRANGEMENT == 3
       return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
              y; /*< M * M * 12 */
-#elif INDEX_ARRANGEMENT == 3
-      return (nd << 11) | (z << 10) | (y << 5) | x; /*< M * M * 16 */
 #endif
     }
     /**

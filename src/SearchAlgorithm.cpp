@@ -176,14 +176,15 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
   /* new algorithm*/
   ShortestAlgorithm::Indexes path;
+  const bool known_only = true;
 #if D_STAR_LITE_ENABLED
   shortestAlgorithm.Initialize();
-  if (!shortestAlgorithm.ComputeShortestPath(true, diag_enabled))
+  if (!shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled))
     return false; /* 失敗 */
-  if (!shortestAlgorithm.FollowShortestPath(path, false, diag_enabled))
+  if (!shortestAlgorithm.FollowShortestPath(path, known_only, diag_enabled))
     return false; /* 失敗 */
 #else
-  if (!shortestAlgorithm.calcShortestPath(path, true, diag_enabled))
+  if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
     return false; /* 失敗 */
 #endif
   shortestDirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
@@ -345,7 +346,11 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 #endif
   /* 新アルゴリズム */
   candidates.clear();
+#if D_STAR_LITE_ENABLED
+  for (const auto diag_enabled : {true}) {
+#else
   for (const auto diag_enabled : {true, false}) {
+#endif
     ShortestAlgorithm::Indexes path;
 #if D_STAR_LITE_ENABLED
     if (!shortestAlgorithm.ComputeShortestPath(false, diag_enabled))

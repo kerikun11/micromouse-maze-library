@@ -381,7 +381,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     i = from_map[i];
 #else
     /* find the index with the min cost */
-    auto f_min = f_map[i];
+    auto f_min = CostMax;
     auto next = i;
     const auto predecessors = i.getPredecessors(maze, known_only, diag_enabled);
     for (const auto &p : predecessors) {
