@@ -189,7 +189,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
     /* 直前の壁 */
     const auto i_f = next(); //< i.e. index front
     if (!canGo(Vector(i_f), i_f.getDir())) {
-      loge << "FWE: " << *this << std::endl;
+      // loge << "FWE: " << *this << std::endl;
       return succs;
     }
     /* 直進で行けるところまで行く */
@@ -426,9 +426,17 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
                                            const bool diag_enabled) {
   if (!diag_enabled) {
     Dirs dirs;
+#if D_STAR_LITE_ENABLED
+    for (int i = 0; i < (int)path.size() - 1; ++i) {
+#else
     for (int i = 1; i < (int)path.size(); ++i) {
+#endif
       const auto nd = path[i].getNodeDir();
+#if D_STAR_LITE_ENABLED
+      const auto v = Vector(path[i + 1]) - Vector(path[i]);
+#else
       const auto v = Vector(path[i - 1]) - Vector(path[i]);
+#endif
       for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
         dirs.push_back(nd);
     }

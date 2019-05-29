@@ -19,8 +19,6 @@ namespace MazeLib {
  */
 #define SEARCHING_ADDITIONALLY_AT_START 1
 
-#define D_STAR_LITE_ENABLED 0
-
 const char *SearchAlgorithm::stateString(const enum State s) {
   static const char *const str[] = {
       "Start                 ", "Searching for Goal    ",
@@ -53,19 +51,21 @@ bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
   bool result = true;
   result = result & updateWall(state, v, d + Dir::Left, left); // left wall
 #if D_STAR_LITE_ENABLED
-  shortestAlgorithm.UpdateChangedEdge(false, true);
+  const bool known_only = false;
+  const bool diag_enabled = false;
+  shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
 #endif
   result = result & updateWall(state, v, d + Dir::Front, front); // front wall
 #if D_STAR_LITE_ENABLED
-  shortestAlgorithm.UpdateChangedEdge(false, true);
+  shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
 #endif
   result = result & updateWall(state, v, d + Dir::Right, right); // right wall
 #if D_STAR_LITE_ENABLED
-  shortestAlgorithm.UpdateChangedEdge(false, true);
+  shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
 #endif
   result = result & updateWall(state, v, d + Dir::Back, back); // back wall
 #if D_STAR_LITE_ENABLED
-  shortestAlgorithm.UpdateChangedEdge(false, true);
+  shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
 #endif
   return result;
 }

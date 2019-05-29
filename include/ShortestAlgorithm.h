@@ -20,6 +20,8 @@
 
 namespace MazeLib {
 
+#define D_STAR_LITE_ENABLED 0
+
 /**
  * @brief 最短経路導出アルゴリズム
  */
@@ -60,7 +62,11 @@ public:
     unsigned int all : 16; /**< @brief union element for all access */
 
   public:
+#if D_STAR_LITE_ENABLED
+#define INDEX_ARRANGEMENT 1
+#else
 #define INDEX_ARRANGEMENT 2
+#endif
 #if INDEX_ARRANGEMENT == 0
     static constexpr int Max = MAZE_SIZE * MAZE_SIZE * 8;
 #elif INDEX_ARRANGEMENT == 1
@@ -218,7 +224,6 @@ public:
   }
   void Initialize() {
     U.clear();
-    std::make_heap(U.begin(), U.end(), KeyCompare());
     k_m = 0;
     for (int i = 0; i < Index::Max; ++i)
       r_map[i] = g_map[i] = CostMax;
@@ -226,9 +231,9 @@ public:
       for (const auto nd : Dir::ENWS()) {
         const auto i = Index(v, Dir::AbsMax, nd);
         r_map[i] = 0;
+        in_map[i] = true;
         U.push_back({i, CalculateKey(i)});
         std::push_heap(U.begin(), U.end(), KeyCompare());
-        in_map[i] = true;
       }
     wall_log_count = 0;
   }
@@ -253,6 +258,9 @@ public:
     if (in_map[u]) {
       U.erase(std::find_if(U.cbegin(), U.cend(),
                            [u](const auto &e) { return e.first == u; }));
+      if (U.cend() != std::find_if(U.cbegin(), U.cend(),
+                                   [u](const auto &e) { return e.first == u; }))
+        loge << "Something Wrong!" << std::endl;
       in_map[u] = false;
     }
     if (g_map[u] != r_map[u]) {
@@ -322,13 +330,12 @@ public:
             r_map[index_start] != g_map[index_start]))
         break;
       if (U.empty()) {
-        logw << "U.empty()" << std::endl;
+        loge << "U.empty()" << std::endl;
         break;
       }
       const auto k_old = top.second;
       const auto u = top.first;
       U.pop_back();
-      // logi << u << std::endl;
       in_map[u] = false;
       if (k_old < CalculateKey(u)) {
         U.push_back({u, CalculateKey(u)});
@@ -379,7 +386,7 @@ public:
       for (const auto &p : successors) {
         if (!Vector(p.first).isInsideOfField())
           loge << "Out of Range! " << p.first << std::endl;
-        const auto g_p = g_map[p.first] + p.second;
+        const auto g_p = r_map[p.first] + p.second;
         if (g_min > g_p) {
           g_min = g_p;
           next = p.first;
