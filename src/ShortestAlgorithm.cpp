@@ -298,6 +298,13 @@ const ShortestAlgorithm::Index ShortestAlgorithm::Index::next() const {
 
 bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
                                          const bool diag_enabled) {
+  /* min max */
+  int8_t max_x = maze.getMaxX();
+  int8_t max_y = maze.getMaxY();
+  for (const auto v : maze.getGoals()) {
+    max_x = std::max(v.x, max_x);
+    max_y = std::max(v.y, max_y);
+  }
   /* clear open_list */
   open_list.clear();
   std::make_heap(open_list.begin(), open_list.end(), greater);
@@ -338,8 +345,11 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     /* successors */
     const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
     for (const auto &s : succs) {
-      if (!Vector(s.first).isInsideOfField())
+      const auto v = Vector(s.first);
+      if (!v.isInsideOfField())
         loge << "Out of Range! " << s.first << std::endl;
+      if (v.x > max_x + 1 || v.y > max_y + 1)
+        continue;
       const auto f_p_new =
           f_map[index] - getHeuristic(index) + getHeuristic(s.first) + s.second;
       if (f_map[s.first] > f_p_new) {
@@ -355,8 +365,11 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     const auto succs_opposite =
         index.opposite().getSuccessors(maze, known_only, diag_enabled);
     for (const auto &s : succs_opposite) {
-      if (!Vector(s.first).isInsideOfField())
+      const auto v = Vector(s.first);
+      if (!v.isInsideOfField())
         loge << "Out of Range! " << s.first << std::endl;
+      if (v.x > max_x + 1 || v.y > max_y + 1)
+        continue;
       const auto f_p_new =
           f_map[index] - getHeuristic(index) + getHeuristic(s.first) + s.second;
       if (f_map[s.first] > f_p_new) {

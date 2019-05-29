@@ -395,6 +395,10 @@ public:
    * @brief Get the Wall Logs object
    */
   const WallLogs &getWallLogs() const { return wallLogs; }
+  int8_t getMinX() const { return min_x; }
+  int8_t getMinY() const { return min_y; }
+  int8_t getMaxX() const { return max_x; }
+  int8_t getMaxY() const { return max_y; }
 
 private:
   wall_size_t wall[2][MAZE_SIZE - 1];  /**< 壁情報 */
@@ -402,6 +406,10 @@ private:
   Vectors goals;                       /**< ゴール区画 */
   Vector start;                        /**< スタート区画 */
   WallLogs wallLogs;                   /**< 更新した壁のログ */
+  int8_t min_x;
+  int8_t min_y;
+  int8_t max_x;
+  int8_t max_y;
 
   /** function isWall
    *  @brief 引数の壁情報配列を参照する関数

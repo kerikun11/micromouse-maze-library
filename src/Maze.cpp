@@ -74,6 +74,10 @@ void Maze::reset(const bool setStartWall) {
     updateWall(Vector(0, 0), Dir::North, false); //< start cell
   }
   wallLogs.clear();
+  min_x = MAZE_SIZE - 1;
+  min_y = MAZE_SIZE - 1;
+  max_x = 0;
+  max_y = 0;
 }
 bool Maze::canGo(const Vector v, const Dir d) const {
   return isKnown(v, d) && !isWall(v, d);
@@ -94,12 +98,12 @@ bool Maze::updateWall(const Vector v, const Dir d, const bool b,
   if (isKnown(v, d) && isWall(v, d) != b) {
     setWall(v, d, false);
     setKnown(v, d, false);
-    const auto wl =
+    const auto it =
         std::find_if(wallLogs.cbegin(), wallLogs.cend(), [&](const auto w) {
           return Vector(w) == v && Dir(w) == d;
         });
-    if (wl != wallLogs.end())
-      wallLogs.erase(wl);
+    if (it != wallLogs.end())
+      wallLogs.erase(it);
     return false;
   }
   // 未知壁なら壁情報を更新
@@ -109,6 +113,11 @@ bool Maze::updateWall(const Vector v, const Dir d, const bool b,
     // ログに追加
     if (pushLog)
       wallLogs.push_back(WallLog(v, d, b));
+    // 最大最小区画を更新
+    min_x = std::min(v.x, min_x);
+    min_y = std::min(v.y, min_y);
+    max_x = std::max(v.x, max_x);
+    max_y = std::max(v.y, max_y);
   }
   return true;
 }

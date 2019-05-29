@@ -176,6 +176,59 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 }
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
+#if 0
+  /* old */
+  stepMap.update(maze, maze.getGoals(), true, diag_enabled);
+  shortestDirs.clear();
+  auto v = maze.getStart();
+  Dir dir = Dir::North;
+  auto prev_dir = dir;
+  while (1) {
+    step_t min_step = MAZE_STEP_MAX;
+    prev_dir = dir;
+    for (const auto d : Dir::ENWS()) {
+      if (!maze.canGo(v, d))
+        continue;
+      step_t next_step = stepMap.getStep(v.next(d));
+      if (min_step > next_step) {
+        min_step = next_step;
+        dir = d;
+      }
+    }
+    if (stepMap.getStep(v) <= min_step)
+      return false; //< 失敗
+    shortestDirs.push_back(dir);
+    v = v.next(dir);
+    if (stepMap.getStep(v) == 0)
+      break; //< ゴール区画
+  }
+  // ゴール区画を行けるところまで直進(斜め考慮)する
+  bool loop = true;
+  while (loop) {
+    loop = false;
+    // 斜めを考慮した進行方向を列挙する
+    Dirs dirs;
+    const auto rel_dir = Dir(dir - prev_dir);
+    if (diag_enabled && rel_dir == Dir::Left)
+      dirs = {Dir(dir + Dir::Right), dir};
+    else if (diag_enabled && rel_dir == Dir::Right)
+      dirs = {Dir(dir + Dir::Left), dir};
+    else
+      dirs = {dir};
+    // 行ける方向に行く
+    for (const auto &d : dirs) {
+      if (maze.canGo(v, d)) {
+        shortestDirs.push_back(d);
+        v = v.next(d);
+        prev_dir = dir;
+        dir = d;
+        loop = true;
+        break;
+      }
+    }
+  }
+  return true;
+#else
   /* new algorithm*/
   ShortestAlgorithm::Indexes path;
   const bool known_only = true;
@@ -223,58 +276,6 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
     }
   }
   return true; /* 成功 */
-#if 0
-  /* old */
-  stepMap.update(maze, maze.getGoals(), true, diag_enabled);
-  shortestDirs.clear();
-  auto v = maze.getStart();
-  Dir dir = Dir::North;
-  auto prev_dir = dir;
-  while (1) {
-    step_t min_step = MAZE_STEP_MAX;
-    prev_dir = dir;
-    for (const auto d : Dir::ENWS()) {
-      if (!maze.canGo(v, d))
-        continue;
-      step_t next_step = stepMap.getStep(v.next(d));
-      if (min_step > next_step) {
-        min_step = next_step;
-        dir = d;
-      }
-    }
-    if (stepMap.getStep(v) <= min_step)
-      return false; //< 失敗
-    shortestDirs.push_back(dir);
-    v = v.next(dir);
-    if (stepMap.getStep(v) == 0)
-      break; //< ゴール区画
-  }
-  // ゴール区画を行けるところまで直進(斜め考慮)する
-  bool loop = true;
-  while (loop) {
-    loop = false;
-    // 斜めを考慮した進行方向を列挙する
-    Dirs dirs;
-    const auto rel_dir = Dir(dir - prev_dir);
-    if (diag_enabled && rel_dir == Dir::Left)
-      dirs = {Dir(dir + Dir::Right), dir};
-    else if (diagonal && rel_dir == Dir::Right)
-      dirs = {Dir(dir + Dir::Left), dir};
-    else
-      dirs = {dir};
-    // 行ける方向に行く
-    for (const auto &d : dirs) {
-      if (maze.canGo(v, d)) {
-        shortestDirs.push_back(d);
-        v = v.next(d);
-        prev_dir = dir;
-        dir = d;
-        loop = true;
-        break;
-      }
-    }
-  }
-  return true;
 #endif
 }
 

@@ -32,7 +32,7 @@ step_t StepMap::getStep(const int8_t x, const int8_t y) const {
   return stepMap[y][x];
 }
 bool StepMap::setStep(const int8_t x, const int8_t y, const step_t step) {
-  // (x, y) がフィールド内か確認
+  /* (x, y) がフィールド内か確認 */
   if (x < 0 || y < 0 || x >= MAZE_SIZE || y >= MAZE_SIZE) {
     logw << "referred to out of field: " << Vector(x, y) << std::endl;
     return false;
@@ -68,6 +68,13 @@ void StepMap::print(std::ostream &os, const Maze &maze, const Vector v,
 }
 void StepMap::update(const Maze &maze, const Vectors &dest,
                      const bool known_only, const bool diag_enabled) {
+  /* min max */
+  int8_t max_x = maze.getMaxX();
+  int8_t max_y = maze.getMaxY();
+  for (const auto v : maze.getGoals()) {
+    max_x = std::max(v.x, max_x);
+    max_y = std::max(v.y, max_y);
+  }
   // 全区画のステップを最大値に設定
   reset();
   // となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
@@ -90,6 +97,8 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
         continue; //< 壁があったら更新はしない
       if (known_only && !maze.isKnown(focus, d))
         continue; //< known_only で未知壁なら更新はしない
+      if (focus.x > max_x + 1 || focus.y > max_y + 1)
+        continue; //< 注目範囲外なら更新しない
       // 直線で行けるところまで更新する
       Vector next = focus;
       for (int8_t i = 0; i < MAZE_SIZE; ++i) {
@@ -156,7 +165,14 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
 }
 void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
                            const bool known_only) {
-  // 全区画のステップを最大値に設定
+  /* min max */
+  int8_t max_x = maze.getMaxX();
+  int8_t max_y = maze.getMaxY();
+  for (const auto v : maze.getGoals()) {
+    max_x = std::max(v.x, max_x);
+    max_y = std::max(v.y, max_y);
+  }
+  /* 全区画のステップを最大値に設定 */
   reset();
   // となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
   std::queue<Vector> q;
@@ -184,6 +200,8 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
         continue; //< 壁があったら更新はしない
       if (known_only && !maze.isKnown(focus, d))
         continue; //< known_only で未知壁なら更新はしない
+      if (focus.x > max_x + 1 || focus.y > max_y + 1)
+        continue; //< 注目範囲外なら更新しない
       const Vector next = focus.next(d);
       if (getStep(next) <= focus_step + 1)
         continue; //< 更新の必要がない

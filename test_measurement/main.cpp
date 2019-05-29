@@ -166,6 +166,11 @@ int main(void) {
     }
     robot.printInfo();
     std::cout << "Total Search:\t" << sum.count() / n << " [us]" << std::endl;
+    for (const auto diag_enabled : {false, true}) {
+      if (!robot.calcShortestDirs(diag_enabled))
+        loge << "Failed to Fine a Shortest Path! "
+             << (diag_enabled ? "true" : "false") << std::endl;
+    }
 #endif
 
 #if 1
