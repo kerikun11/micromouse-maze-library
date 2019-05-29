@@ -203,7 +203,7 @@ public:
     const auto v = Vector(i) - Vector(s);
     // const auto d = std::sqrt(v.x * v.x + v.y * v.y);
     const auto d = std::max(std::abs(v.x), std::abs(v.y));
-    return getEdgeCost(ST_ALONG, d);
+    return getEdgeCost(ST_DIAG, d);
   }
   using Key = std::pair<cost_t, cost_t>;
   struct KeyCompare {
@@ -235,13 +235,13 @@ public:
   void UpdateVertex(const Index u, const bool known_only,
                     const bool diag_enabled) {
     if (r_map[u] != 0) {
-      const auto successors = u.getSuccessors(maze, known_only, diag_enabled);
       /* min_element */
       auto min_g = CostMax;
+      const auto successors = u.getSuccessors(maze, known_only, diag_enabled);
       for (const auto &s_prime : successors) {
-        if (!Vector(s_prime.first).isInsideOfField())
-          std::cerr << __FILE__ << ":" << __LINE__ << " "
-                    << "Warning! " << s_prime.first << std::endl;
+        const auto v = Vector(s_prime.first);
+        if (!v.isInsideOfField())
+          loge << "Out of Range! " << s_prime.first << std::endl;
         const auto new_g = s_prime.second + g_map[s_prime.first];
         if (min_g > new_g) {
           min_g = new_g;
@@ -278,17 +278,17 @@ public:
             UpdateVertex(i, known_only, diag_enabled);
             for (const auto s :
                  i.getSuccessors(maze, known_only, diag_enabled)) {
-              if (!Vector(s.first).isInsideOfField())
-                std::cerr << __FILE__ << ":" << __LINE__ << " "
-                          << "Warning! " << s.first << std::endl;
+              const auto v = Vector(s.first);
+              if (!v.isInsideOfField())
+                loge << "Out of Range! " << s.first << std::endl;
               UpdateVertex(s.first, known_only, diag_enabled);
               UpdateVertex(s.first.opposite(), known_only, diag_enabled);
             }
             for (const auto s :
                  i.next().getSuccessors(maze, known_only, diag_enabled)) {
-              if (!Vector(s.first).isInsideOfField())
-                std::cerr << __FILE__ << ":" << __LINE__ << " "
-                          << "Warning! " << s.first << std::endl;
+              const auto v = Vector(s.first);
+              if (!v.isInsideOfField())
+                loge << "Out of Range! " << s.first << std::endl;
               UpdateVertex(s.first, known_only, diag_enabled);
               UpdateVertex(s.first.opposite(), known_only, diag_enabled);
             }
@@ -301,9 +301,9 @@ public:
           UpdateVertex(i, known_only, diag_enabled);
           UpdateVertex(i.opposite(), known_only, diag_enabled);
           for (const auto s : i.getSuccessors(maze, known_only, diag_enabled)) {
-            if (!Vector(s.first).isInsideOfField())
-              std::cerr << __FILE__ << ":" << __LINE__ << " "
-                        << "Warning! " << s.first << std::endl;
+            const auto v = Vector(s.first);
+            if (!v.isInsideOfField())
+              loge << "Out of Range! " << s.first << std::endl;
             UpdateVertex(s.first, known_only, diag_enabled);
             UpdateVertex(s.first.opposite(), known_only, diag_enabled);
           }
@@ -328,6 +328,7 @@ public:
       const auto k_old = top.second;
       const auto u = top.first;
       U.pop_back();
+      // logi << u << std::endl;
       in_map[u] = false;
       if (k_old < CalculateKey(u)) {
         U.push_back({u, CalculateKey(u)});
@@ -338,9 +339,9 @@ public:
         const auto predecessors =
             u.getPredecessors(maze, known_only, diag_enabled);
         for (const auto &s : predecessors) {
-          if (!Vector(s.first).isInsideOfField())
-            std::cerr << __FILE__ << ":" << __LINE__ << " "
-                      << "Warning! " << s.first << std::endl;
+          const auto v = Vector(s.first);
+          if (!v.isInsideOfField())
+            loge << "Out of Range! " << s.first << std::endl;
           UpdateVertex(s.first, known_only, diag_enabled);
         }
       } else {
@@ -349,9 +350,9 @@ public:
         const auto predecessors =
             u.getPredecessors(maze, known_only, diag_enabled);
         for (const auto &s : predecessors) {
-          if (!Vector(s.first).isInsideOfField())
-            std::cerr << __FILE__ << ":" << __LINE__ << " "
-                      << "Warning! " << s.first << std::endl;
+          const auto v = Vector(s.first);
+          if (!v.isInsideOfField())
+            loge << "Out of Range! " << s.first << std::endl;
           UpdateVertex(s.first, known_only, diag_enabled);
         }
       }
@@ -361,7 +362,7 @@ public:
   bool FollowShortestPath(Indexes &path, const bool known_only,
                           const bool diag_enabled) const {
     /* post process */
-    path.erase(path.begin(), path.end());
+    path.clear();
     auto i = index_start;
     while (1) {
       // std::cout << i << "\t" << g_map[i] << std::endl;

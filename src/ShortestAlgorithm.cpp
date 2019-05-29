@@ -242,16 +242,13 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
         return false;
       return true;
     };
+    const auto v_b = arrow_from();   //< i.e. vector back
+    const auto d_b = nd + Dir::Back; //< i.e. dir back
     /* 直進で行けるところまで行く */
-    auto v_st = arrow_from(); //< i.e. vector straight
-    for (int8_t n = 1;; ++n) {
-      v_st = v_st.next(nd + Dir::Back);
-      if (!canGo(v_st, nd))
-        break;
+    int8_t n = 1;
+    for (auto v_st = v_b.next(d_b); canGo(v_st, nd); v_st = v_st.next(d_b), ++n)
       preds.push_back({Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n)});
-    }
     /* ここからはターン */
-    const auto v_b = arrow_from(); //< i.e. vector front
     /* 左右を一般化 */
     for (const auto d_turn : {Dir::Left, Dir::Right})
       if (canGo(v_b, nd + d_turn)) //< 90度方向の壁
@@ -307,7 +304,6 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   }
   /* clear open_list */
   open_list.clear();
-  std::make_heap(open_list.begin(), open_list.end(), greater);
   /* clear in_map */
   in_map.reset();
   /* clear f map */
@@ -338,7 +334,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     /* breaking condition */
     if (index == index_start.opposite())
       break;
-    /* remove duplicated index */
+    /* ignore duplicated index */
     if (in_map[index] == false)
       continue;
     in_map[index] = false;
