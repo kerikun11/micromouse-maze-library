@@ -52,7 +52,7 @@ bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
   result = result & updateWall(state, v, d + Dir::Left, left); // left wall
 #if D_STAR_LITE_ENABLED
   const bool known_only = false;
-  const bool diag_enabled = false;
+  const bool diag_enabled = true;
   shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
 #endif
   result = result & updateWall(state, v, d + Dir::Front, front); // front wall
@@ -355,13 +355,14 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
   for (const auto diag_enabled : {true, false}) {
 #endif
     ShortestAlgorithm::Indexes path;
+    const bool known_only = false;
 #if D_STAR_LITE_ENABLED
-    if (!shortestAlgorithm.ComputeShortestPath(false, diag_enabled))
+    if (!shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled))
       return false; /* 失敗 */
-    if (!shortestAlgorithm.FollowShortestPath(path, false, diag_enabled))
+    if (!shortestAlgorithm.FollowShortestPath(path, known_only, diag_enabled))
       return false; /* 失敗 */
 #else
-    if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
+    if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
       return false; /* 失敗 */
 #endif
     const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
