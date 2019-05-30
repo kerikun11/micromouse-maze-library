@@ -147,7 +147,6 @@ public:
   uint16_t all; /**< @brief まとめて扱うとき用 */
   Vector(int8_t x, int8_t y) : x(x), y(y) {}
   Vector() : all(0) {}
-  Vector(const Vector &obj) : all(obj.all) {}
   /**
    * @brief 演算子のオーバーロード
    */
@@ -157,7 +156,6 @@ public:
   const Vector operator-(const Vector &obj) const {
     return Vector(x - obj.x, y - obj.y);
   }
-  const Vector &operator=(const Vector &obj) { return all = obj.all, *this; }
   bool operator==(const Vector &obj) const { return all == obj.all; }
   bool operator!=(const Vector &obj) const { return all != obj.all; }
   /** @function next
@@ -180,14 +178,12 @@ public:
     return *this;
   }
   /**
-   * @brief フィールド内かどうかを判定する関数
-   * @return true フィールド内
-   * @return false フィールド外
+   * @brief フィールド外かどうかを判定する関数
+   * @return true フィールド外
+   * @return false フィールド内
    */
-  bool isInsideOfField() const {
-    if (x < 0 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE)
-      return false;
-    return true;
+  bool isOutsideofField() const {
+    return (x & (0x100 - MAZE_SIZE)) || (y & (0x100 - MAZE_SIZE));
   }
   /**
    * @brief 座標を回転変換する

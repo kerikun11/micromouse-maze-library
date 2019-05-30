@@ -342,7 +342,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     const auto succs = index.getSuccessors(maze, known_only, diag_enabled);
     for (const auto &s : succs) {
       const auto v = Vector(s.first);
-      if (!v.isInsideOfField())
+      if (v.isOutsideofField())
         loge << "Out of Range! " << s.first << std::endl;
       if (v.x > max_x + 1 || v.y > max_y + 1)
         continue;
@@ -362,7 +362,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
         index.opposite().getSuccessors(maze, known_only, diag_enabled);
     for (const auto &s : succs_opposite) {
       const auto v = Vector(s.first);
-      if (!v.isInsideOfField())
+      if (v.isOutsideofField())
         loge << "Out of Range! " << s.first << std::endl;
       if (v.x > max_x + 1 || v.y > max_y + 1)
         continue;

@@ -199,7 +199,7 @@ void Maze::printPath(std::ostream &os, const Vector start,
   int counter = 1;
   for (const auto d : dirs) {
     v = v.next(d);
-    if (!v.isInsideOfField()) {
+    if (v.isOutsideofField()) {
       loge << "Out of Field! " << v << std::endl;
       continue;
     }

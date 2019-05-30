@@ -245,7 +245,7 @@ public:
       const auto successors = u.getSuccessors(maze, known_only, diag_enabled);
       for (const auto &s_prime : successors) {
         const auto v = Vector(s_prime.first);
-        if (!v.isInsideOfField())
+        if (v.isOutsideofField())
           loge << "Out of Range! " << s_prime.first << std::endl;
         const auto new_g = s_prime.second + g_map[s_prime.first];
         if (min_g > new_g) {
@@ -287,7 +287,7 @@ public:
             for (const auto s :
                  i.getSuccessors(maze, known_only, diag_enabled)) {
               const auto v = Vector(s.first);
-              if (!v.isInsideOfField())
+              if (v.isOutsideofField())
                 loge << "Out of Range! " << s.first << std::endl;
               UpdateVertex(s.first, known_only, diag_enabled);
               UpdateVertex(s.first.opposite(), known_only, diag_enabled);
@@ -295,7 +295,7 @@ public:
             for (const auto s :
                  i.next().getSuccessors(maze, known_only, diag_enabled)) {
               const auto v = Vector(s.first);
-              if (!v.isInsideOfField())
+              if (v.isOutsideofField())
                 loge << "Out of Range! " << s.first << std::endl;
               UpdateVertex(s.first, known_only, diag_enabled);
               UpdateVertex(s.first.opposite(), known_only, diag_enabled);
@@ -310,7 +310,7 @@ public:
           UpdateVertex(i.opposite(), known_only, diag_enabled);
           for (const auto s : i.getSuccessors(maze, known_only, diag_enabled)) {
             const auto v = Vector(s.first);
-            if (!v.isInsideOfField())
+            if (v.isOutsideofField())
               loge << "Out of Range! " << s.first << std::endl;
             UpdateVertex(s.first, known_only, diag_enabled);
             UpdateVertex(s.first.opposite(), known_only, diag_enabled);
@@ -347,7 +347,7 @@ public:
             u.getPredecessors(maze, known_only, diag_enabled);
         for (const auto &s : predecessors) {
           const auto v = Vector(s.first);
-          if (!v.isInsideOfField())
+          if (v.isOutsideofField())
             loge << "Out of Range! " << s.first << std::endl;
           UpdateVertex(s.first, known_only, diag_enabled);
         }
@@ -358,7 +358,7 @@ public:
             u.getPredecessors(maze, known_only, diag_enabled);
         for (const auto &s : predecessors) {
           const auto v = Vector(s.first);
-          if (!v.isInsideOfField())
+          if (v.isOutsideofField())
             loge << "Out of Range! " << s.first << std::endl;
           UpdateVertex(s.first, known_only, diag_enabled);
         }
@@ -384,7 +384,7 @@ public:
       auto next = i;
       const auto successors = i.getSuccessors(maze, known_only, diag_enabled);
       for (const auto &p : successors) {
-        if (!Vector(p.first).isInsideOfField())
+        if (Vector(p.first).isOutsideofField())
           loge << "Out of Range! " << p.first << std::endl;
         const auto g_p = r_map[p.first] + p.second;
         if (g_min > g_p) {
@@ -416,7 +416,7 @@ public:
   //         s_start.getSuccessors(maze, known_only, diag_enabled);
   //     auto min_g = CostMax;
   //     for (const auto &s_prime : successors) {
-  //       if (!Vector(s_prime.first).isInsideOfField())
+  //       if (Vector(s_prime.first).isOutsideofField())
   //         loge << "Out of Range! " << s_prime.first << std::endl;
   //       const auto new_g = s_prime.second + g_map[s_prime.first];
   //       if (min_g > new_g) {

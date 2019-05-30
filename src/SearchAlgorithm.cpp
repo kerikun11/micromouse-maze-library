@@ -392,7 +392,7 @@ int SearchAlgorithm::countIdentityCandidates(
         for (const auto wl : idWallLogs) {
           const auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset;
           const auto maze_d = wl.d + offset_d;
-          if (!maze_v.isInsideOfField()) {
+          if (maze_v.isOutsideofField()) {
             diffs = many;
             break;
           }
