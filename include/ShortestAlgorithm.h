@@ -115,7 +115,7 @@ public:
     bool operator==(const Index &obj) const { return all == obj.all; }
     bool operator!=(const Index &obj) const { return all != obj.all; }
     operator Vector() const { return Vector(x, y); }
-    friend std::ostream &operator<<(std::ostream &os, const Index &i) {
+    friend std::ostream &operator<<(std::ostream &os, const Index i) {
       return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
                 << (int)i.y << ", " << i.getDir().toChar() << ", "
                 << i.getNodeDir().toChar() << ")";

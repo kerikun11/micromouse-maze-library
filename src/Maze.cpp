@@ -16,7 +16,7 @@ namespace MazeLib {
  *   @brief 迷路上の方向を定義
  */
 
-std::ostream &operator<<(std::ostream &os, const Vector &v) {
+std::ostream &operator<<(std::ostream &os, const Vector v) {
   return os << "(" << std::setw(2) << (int)v.x << ", " << std::setw(2)
             << (int)v.y << ")";
 }
@@ -85,12 +85,12 @@ bool Maze::canGo(const Vector v, const Dir d) const {
 int8_t Maze::wallCount(const Vector v) const {
   auto dirs = Dir::ENWS();
   return std::count_if(dirs.cbegin(), dirs.cend(),
-                       [&](const Dir &d) { return isWall(v, d); });
+                       [&](const auto d) { return isWall(v, d); });
 }
 int8_t Maze::unknownCount(const Vector v) const {
   const auto dirs = Dir::ENWS();
   return std::count_if(dirs.cbegin(), dirs.cend(),
-                       [&](const Dir &d) { return !isKnown(v, d); });
+                       [&](const auto d) { return !isKnown(v, d); });
 }
 bool Maze::updateWall(const Vector v, const Dir d, const bool b,
                       const bool pushLog) {
@@ -197,10 +197,14 @@ void Maze::printPath(std::ostream &os, const Vector start,
   int steps[MAZE_SIZE][MAZE_SIZE] = {0};
   Vector v = start;
   int counter = 1;
-  std::for_each(dirs.cbegin(), dirs.cend(), [&](const auto d) {
+  for (const auto d : dirs) {
     v = v.next(d);
+    if (!v.isInsideOfField()) {
+      loge << "Out of Field! " << v << std::endl;
+      continue;
+    }
     steps[v.y][v.x] = counter++;
-  });
+  }
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';

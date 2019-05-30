@@ -14,6 +14,8 @@
 
 namespace MazeLib {
 
+#define STEP_MAP_USE_PRIORITY_QUEUE 1
+
 StepMap::StepMap() {
   calcStraightStepTable();
   reset();
@@ -78,17 +80,30 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
   // 全区画のステップを最大値に設定
   reset();
   // となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
+#if STEP_MAP_USE_PRIORITY_QUEUE
+  std::function<bool(const Vector v1, const Vector v2)> greater =
+      [&](const Vector v1, const Vector v2) {
+        return getStep(v1) > getStep(v2);
+      };
+  std::priority_queue<Vector, std::vector<Vector>, decltype(greater)> q(
+      greater);
+#else
   std::queue<Vector> q;
+#endif
   // destに含まれる区画のステップを0とする
   for (const auto v : dest) {
     setStep(v, 0);
     q.push(v);
   }
-#define CONFIG_FULL_UPDATE 0
+#define CONFIG_FULL_UPDATE 1
   // ステップの更新がなくなるまで更新処理
   while (!q.empty()) {
     // 注目する区画を取得
+#if STEP_MAP_USE_PRIORITY_QUEUE
+    const Vector focus = q.top();
+#else
     const Vector focus = q.front();
+#endif
     q.pop();
     const step_t focus_step = getStep(focus);
     // 4方向更新がないか調べる
@@ -175,13 +190,16 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
   /* 全区画のステップを最大値に設定 */
   reset();
   // となりの区画のステップが更新されたので更新が必要かもしれない区画のキュー
+#if STEP_MAP_USE_PRIORITY_QUEUE
+  std::function<bool(const Vector v1, const Vector v2)> greater =
+      [&](const Vector v1, const Vector v2) {
+        return getStep(v1) > getStep(v2);
+      };
+  std::priority_queue<Vector, std::vector<Vector>, decltype(greater)> q(
+      greater);
+#else
   std::queue<Vector> q;
-  // std::function<bool(const Vector v1, const Vector v2)> greater =
-  //     [&](const Vector v1, const Vector v2) {
-  //       return getStep(v1) > getStep(v2);
-  //     };
-  // std::priority_queue<Vector, std::vector<Vector>, decltype(greater)> q(
-  //     greater);
+#endif
   // destに含まれる区画のステップを0とする
   for (const auto v : dest) {
     setStep(v, 0);
@@ -190,8 +208,11 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
   // ステップの更新がなくなるまで更新処理
   while (!q.empty()) {
     // 注目する区画を取得
+#if STEP_MAP_USE_PRIORITY_QUEUE
+    const Vector focus = q.top();
+#else
     const Vector focus = q.front();
-    // const Vector focus = q.top();
+#endif
     q.pop();
     const step_t focus_step = getStep(focus);
     // 4方向更新がないか調べる
@@ -295,13 +316,13 @@ const Vector StepMap::calcNextDirs(const Maze &maze, const Vector start_v,
     if (!maze.isWall(focus_v, d) && getStep(focus_v.next(d)) != MAZE_STEP_MAX)
       dirs.push_back(d);
   // ステップが小さい順に並べ替え
-  std::sort(dirs.begin(), dirs.end(), [&](const Dir &d1, const Dir &d2) {
+  std::sort(dirs.begin(), dirs.end(), [&](const Dir d1, const Dir d2) {
     return getStep(focus_v.next(d1)) <
            getStep(focus_v.next(d2)); //< 低コスト優先
   });
   // 未知壁優先で並べ替え
   std::sort(dirs.begin(), dirs.end(),
-            [&](const Dir &d1 __attribute__((unused)), const Dir &d2) {
+            [&](const Dir d1 __attribute__((unused)), const Dir d2) {
               return !maze.unknownCount(focus_v.next(d2)); //< 未知壁優先
             });
   // 結果を代入

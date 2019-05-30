@@ -121,7 +121,7 @@ public:
   /**
    * @brief 表示
    */
-  friend std::ostream &operator<<(std::ostream &os, const Dir &d) {
+  friend std::ostream &operator<<(std::ostream &os, const Dir d) {
     return os << d.toChar();
   }
 
@@ -165,7 +165,7 @@ public:
    *  @param 隣接方向
    *  @return 隣接座標
    */
-  const Vector next(const Dir &dir) const {
+  const Vector next(const Dir dir) const {
     switch (dir) {
     case Dir::East:
       return Vector(x + 1, y);
@@ -201,7 +201,7 @@ public:
   /** @function <<
    *  @brief 表示
    */
-  friend std::ostream &operator<<(std::ostream &os, const Vector &v);
+  friend std::ostream &operator<<(std::ostream &os, const Vector v);
 };
 static_assert(sizeof(Vector) == 2, "sizeof(Vector) Error"); /**< Size Check */
 /**
