@@ -378,18 +378,16 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 int SearchAlgorithm::countIdentityCandidates(
     const WallLogs &idWallLogs, std::pair<Vector, Dir> &ans) const {
   /* min max */
-  int8_t min_x = maze.getMinX();
-  int8_t max_x = maze.getMaxX();
-  int8_t min_y = maze.getMinY();
-  int8_t max_y = maze.getMaxY();
+  const int8_t max_x = maze.getMaxX();
+  const int8_t max_y = maze.getMaxY();
   const int many = 1000;
   const int min_size = 12;
   const int min_diff = 4;
   if (idWallLogs.size() < min_size)
     return many;
   int cnt = 0;
-  for (int x = min_x; x < max_x + 1; ++x)
-    for (int y = min_y; y < max_y + 1; ++y)
+  for (int x = 0; x < max_x + 1; ++x)
+    for (int y = 0; y < max_y + 1; ++y)
       for (const auto offset_d : Dir::ENWS()) {
         Vector offset = Vector(x, y);
         int diffs = 0;
@@ -410,7 +408,8 @@ int SearchAlgorithm::countIdentityCandidates(
           if (diffs > min_diff)
             break;
         }
-        if (diffs > min_diff)
+        /* 非一致条件 */
+        if (diffs > min_diff || unknown * 5 > (int)idWallLogs.size() * 4)
           continue;
         ans.first = offset;
         ans.second = offset_d;
@@ -477,16 +476,10 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
                                                     int &matchCount) {
   /* オフセットを調整する */
   if (!idMaze.getWallLogs().empty()) {
-    int8_t min_x = MAZE_SIZE - 1;
-    int8_t min_y = MAZE_SIZE - 1;
-    int8_t max_x = 0;
-    int8_t max_y = 0;
-    for (const auto wl : idMaze.getWallLogs()) {
-      min_x = std::min((int8_t)wl.x, min_x);
-      min_y = std::min((int8_t)wl.y, min_y);
-      max_x = std::max((int8_t)wl.x, max_x);
-      max_y = std::max((int8_t)wl.y, max_y);
-    }
+    const int8_t min_x = idMaze.getMinX();
+    const int8_t min_y = idMaze.getMinY();
+    const int8_t max_x = idMaze.getMaxX();
+    const int8_t max_y = idMaze.getMaxY();
     const auto offset_new =
         idOffset + Vector((MAZE_SIZE - max_x - min_x - 1) / 2,
                           (MAZE_SIZE - max_y - min_y - 1) / 2);

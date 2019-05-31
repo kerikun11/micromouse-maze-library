@@ -182,7 +182,8 @@ int main(void) {
   robot.searchRun();
 
   /* Position Identification Run */
-  display = 0;
+#if 0
+  display = 1;
   offset_d = real_d = Dir::East;
   offset_v = real_v = Vector(31, 18);
   bool res = robot.positionIdentifyRun();
@@ -193,6 +194,7 @@ int main(void) {
               << std::endl;
     getc(stdin);
   }
+#endif
 
   /* Starts from each cell on the shortest path */
   display = 1;
