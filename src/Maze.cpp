@@ -12,20 +12,8 @@
 #include <iomanip> //< for std::setw()
 
 namespace MazeLib {
-/** @struct Dir
- *   @brief 迷路上の方向を定義
- */
 
-std::ostream &operator<<(std::ostream &os, const Vector v) {
-  return os << "(" << std::setw(2) << (int)v.x << ", " << std::setw(2)
-            << (int)v.y << ")";
-}
-
-/**
- * @brief 座標を回転変換する
- * @param d 回転角度
- * @return const Vector
- */
+/* Vector */
 const Vector Vector::rotate(const Dir d) const {
   switch (d) {
   case Dir::East:
@@ -40,10 +28,25 @@ const Vector Vector::rotate(const Dir d) const {
   loge << "invalid direction" << std::endl;
   return *this;
 }
+std::ostream &operator<<(std::ostream &os, const Vector v) {
+  return os << "(" << std::setw(2) << (int)v.x << ", " << std::setw(2)
+            << (int)v.y << ")";
+}
 
-/** @class Maze
- *   @brief 迷路の壁情報を管理するクラス
- */
+/* VecDir */
+std::ostream &operator<<(std::ostream &os, const VecDir &obj) {
+  return os << "( " << std::setw(2) << (int)obj.first.x << ", " << std::setw(2)
+            << (int)obj.first.y << ", " << obj.second.toChar() << ")";
+}
+
+/* WallLog */
+std::ostream &operator<<(std::ostream &os, const WallLog &obj) {
+  return os << "( " << std::setw(2) << (int)obj.x << ", " << std::setw(2)
+            << (int)obj.y << ", " << Dir(obj).toChar() << ", "
+            << (obj.b ? "true" : "false") << ")";
+}
+
+/* Maze */
 Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
            const std::array<Dir, 4> bit_to_dir_map) {
   for (int8_t y = 0; y < MAZE_SIZE; ++y)

@@ -10,6 +10,7 @@
  */
 #include "ShortestAlgorithm.h"
 
+#include <cmath>   /*< for std::sqrt */
 #include <utility> /*< for std::index_sequence */
 
 namespace MazeLib {

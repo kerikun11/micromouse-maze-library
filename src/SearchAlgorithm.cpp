@@ -377,14 +377,19 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 }
 int SearchAlgorithm::countIdentityCandidates(
     const WallLogs &idWallLogs, std::pair<Vector, Dir> &ans) const {
+  /* min max */
+  int8_t min_x = maze.getMinX();
+  int8_t max_x = maze.getMaxX();
+  int8_t min_y = maze.getMinY();
+  int8_t max_y = maze.getMaxY();
   const int many = 1000;
   const int min_size = 12;
   const int min_diff = 4;
   if (idWallLogs.size() < min_size)
     return many;
   int cnt = 0;
-  for (int x = 0; x < MAZE_SIZE; ++x)
-    for (int y = 0; y < MAZE_SIZE; ++y)
+  for (int x = min_x; x < max_x; ++x)
+    for (int y = min_y; y < max_y; ++y)
       for (const auto offset_d : Dir::ENWS()) {
         Vector offset = Vector(x, y);
         int diffs = 0;
@@ -401,19 +406,21 @@ int SearchAlgorithm::countIdentityCandidates(
             diffs++;
           if (!maze.isKnown(maze_v, maze_d))
             unknown++;
+          /* 打ち切り */
           if (diffs > min_diff)
             break;
         }
-        const int size = idWallLogs.size();
-        const int known = size - unknown;
+        // const int size = idWallLogs.size();
+        // const int known = size - unknown;
         // int matchs = known - diffs;
-        if (diffs <= min_diff && known > unknown) {
-          ans.first = offset;
-          ans.second = offset_d;
-          cnt++;
-          if (cnt > 1)
-            return many;
-        }
+        if (diffs > min_diff)
+          // if (diffs > min_diff || known * 2 < unknown)
+          continue;
+        ans.first = offset;
+        ans.second = offset_d;
+        cnt++;
+        // if (cnt > 1)
+        //   return many;
       }
   return cnt;
 }
@@ -471,6 +478,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
                                                     Dirs &nextDirsKnown,
                                                     Dirs &nextDirCandidates,
                                                     int &matchCount) {
+  /* オフセットを調整する */
   if (!idMaze.getWallLogs().empty()) {
     int8_t min_x = MAZE_SIZE - 1;
     int8_t min_y = MAZE_SIZE - 1;
@@ -504,11 +512,19 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   } else if (cnt == 0) {
     return Error;
   }
+  /* min max */
+  const int8_t min_x = std::max(idMaze.getMinX() - 1, 0);
+  const int8_t min_y = std::max(idMaze.getMinY() - 1, 0);
+  const int8_t max_x = std::min(idMaze.getMaxX() + 2, MAZE_SIZE);
+  const int8_t max_y = std::min(idMaze.getMaxY() + 2, MAZE_SIZE);
+  /* make candidates */
   Vectors candidates;
-  for (int8_t x = 0; x < MAZE_SIZE; ++x)
-    for (int8_t y = 0; y < MAZE_SIZE; ++y)
+  for (int8_t x = min_x; x < max_x; ++x)
+    for (int8_t y = min_y; y < max_y; ++y)
       if (idMaze.unknownCount(Vector(x, y)))
         candidates.push_back(Vector(x, y));
+  if (idMaze.getWallLogs().empty())
+    candidates.push_back(Vector(MAZE_SIZE / 2, MAZE_SIZE / 2));
   stepMap.calcNextDirs(idMaze, candidates, cv, cd, nextDirsKnown,
                        nextDirCandidates);
   return nextDirCandidates.empty() ? Error : Processing;

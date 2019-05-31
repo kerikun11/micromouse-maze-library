@@ -8,6 +8,7 @@
 #include "StepMap.h"
 
 #include <algorithm>
+#include <cmath> /*< for std::sqrt, std::pow */
 #include <functional>
 #include <iomanip> //< for std::setw()
 #include <queue>
@@ -73,7 +74,7 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
   /* min max */
   int8_t max_x = maze.getMaxX();
   int8_t max_y = maze.getMaxY();
-  for (const auto v : maze.getGoals()) {
+  for (const auto v : dest) {
     max_x = std::max(v.x, max_x);
     max_y = std::max(v.y, max_y);
   }
@@ -181,10 +182,14 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
 void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
                            const bool known_only) {
   /* min max */
+  int8_t min_x = maze.getMinX();
   int8_t max_x = maze.getMaxX();
+  int8_t min_y = maze.getMinY();
   int8_t max_y = maze.getMaxY();
-  for (const auto v : maze.getGoals()) {
+  for (const auto v : dest) {
+    min_x = std::min(v.x, min_x);
     max_x = std::max(v.x, max_x);
+    min_y = std::min(v.y, min_y);
     max_y = std::max(v.y, max_y);
   }
   /* 全区画のステップを最大値に設定 */
@@ -221,7 +226,8 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
         continue; //< 壁があったら更新はしない
       if (known_only && !maze.isKnown(focus, d))
         continue; //< known_only で未知壁なら更新はしない
-      if (focus.x > max_x + 1 || focus.y > max_y + 1)
+      if (focus.x > max_x || focus.y > max_y || focus.x < min_x ||
+          focus.y < min_y)
         continue; //< 注目範囲外なら更新しない
       const Vector next = focus.next(d);
       if (getStep(next) <= focus_step + 1)

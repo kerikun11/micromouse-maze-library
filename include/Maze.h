@@ -8,7 +8,6 @@
 #pragma once
 
 #include <array>
-#include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -194,8 +193,8 @@ public:
   const Vector rotate(const Dir d, const Vector &center) const {
     return center + (*this - center).rotate(d);
   }
-  /** @function <<
-   *  @brief 表示
+  /**
+   * @brief 表示
    */
   friend std::ostream &operator<<(std::ostream &os, const Vector v);
 };
@@ -204,6 +203,15 @@ static_assert(sizeof(Vector) == 2, "sizeof(Vector) Error"); /**< Size Check */
  * @brief Vector構造体の動的配列
  */
 typedef std::vector<Vector> Vectors;
+
+/**
+ * @brief VecDir
+ */
+typedef std::pair<Vector, Dir> VecDir;
+/**
+ * @brief Vector と Dir を同時に表示
+ */
+std::ostream &operator<<(std::ostream &os, const VecDir &obj);
 
 /**
  * @brief 区画位置，方向，壁の有無を保持する構造体
@@ -224,10 +232,7 @@ union __attribute__((__packed__)) WallLog {
       : x(x), y(y), d(d), b(b) {}
   operator Vector() const { return Vector(x, y); }
   operator Dir() const { return d; }
-  friend std::ostream &operator<<(std::ostream &os, const WallLog &obj) {
-    return os << "( " << (int)obj.x << ", " << (int)obj.y << ", "
-              << Dir(obj).toChar() << ", " << (obj.b ? "true" : "false") << ")";
-  }
+  friend std::ostream &operator<<(std::ostream &os, const WallLog &obj);
 };
 static_assert(sizeof(WallLog) == 2, "WallLog Size Error"); /**< Size Check */
 /**

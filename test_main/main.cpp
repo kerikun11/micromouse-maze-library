@@ -141,7 +141,7 @@ int main(void) {
   maze_target = loadMaze();
   CLRobot robot;
   robot.replaceGoals(maze_target.getGoals());
-  display = 0;
+  display = 1;
   robot.searchRun();
   robot.printInfo();
   robot.fastRun(false);

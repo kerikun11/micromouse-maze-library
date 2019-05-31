@@ -17,16 +17,14 @@ public:
   CLRobot() : RobotBase(maze) {}
 
   void printInfo(const bool showMaze = true) {
-    // getc(stdin);
     Agent::printInfo(showMaze);
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
                 (int)max_usec);
-    std::printf("Real: (%3d,%3d,%3c)\n", real_v.x, real_v.y, real_d.toChar());
-    std::printf("Offset: (%3d,%3d,%3c)\n", offset_v.x, offset_v.y,
-                offset_d.toChar());
+    std::cout << "Real:\t" << VecDir{real_v, real_d};
+    std::cout << "Offset:\t" << VecDir{offset_v, offset_d};
   }
 
 private:
@@ -73,13 +71,13 @@ private:
   }
   void discrepancyWithKnownWall() override {
     printInfo();
-    std::cout << "There was a discrepancy with known information! "
-              << getCurVec() << " " << getCurDir() << std::endl;
+    std::cout << "There was a discrepancy with known information! cur:\t"
+              << VecDir{getCurVec(), getCurDir()} << std::endl;
   }
   void crashed() {
     printInfo();
-    std::cerr << "The robot crashed into the wall! " << getCurVec() << " "
-              << getCurDir() << std::endl;
+    std::cerr << "The robot crashed into the wall! cur:\t"
+              << VecDir{getCurVec(), getCurDir()} << std::endl;
     while (1) {
     }
   }
@@ -169,7 +167,7 @@ static const Maze loadMaze() {
   case 16:
     return Maze("../mazedata/16MM2016CX.maze");
   case 32:
-    return Maze("../mazedata/32MM2016HX.maze");
+    return Maze("../mazedata/32MM2017HX.maze");
   }
 }
 
@@ -191,7 +189,9 @@ int main(void) {
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
-    std::cout << std::endl << "Failed to Identify!" << std::endl;
+    std::cout << std::endl
+              << "Failed to Identify! offset:\t" << VecDir{offset_v, offset_d}
+              << std::endl;
     getc(stdin);
   }
 
@@ -212,7 +212,9 @@ int main(void) {
           bool prev_display = display;
           display = 1;
           robot.printInfo();
-          std::cout << std::endl << "Failed to Identify!" << std::endl;
+          std::cout << std::endl
+                    << "Failed to Identify! offset:\t"
+                    << VecDir{offset_v, offset_d} << std::endl;
           getc(stdin);
           display = prev_display;
         }
