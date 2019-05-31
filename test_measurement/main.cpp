@@ -24,13 +24,13 @@ public:
     std::printf("Estimated Seaching Time: %2d:%02d, Step: %4d, Forward: %3d, "
                 "Left: %3d, Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    std::cout << "Max Calc Time:\t" << max_usec << std::endl;
     std::cout << "Max List:\t"
               << getSearchAlgorithm().getShortestAlgorithm().max_open_list_size
               << std::endl;
     std::cout << "Max Iteration:\t"
               << getSearchAlgorithm().getShortestAlgorithm().max_iteration_size
               << std::endl;
+    std::cout << "Max Calc Time:\t" << max_usec << "\t[us]" << std::endl;
   }
 
 private:
@@ -202,7 +202,7 @@ int main(void) {
       sum += us;
     }
     robot.printResult();
-    std::cout << "Total Search:\t" << sum.count() / n << " [us]" << std::endl;
+    std::cout << "Total Search:\t" << sum.count() / n << "\t[us]" << std::endl;
     for (const auto diag_enabled : {false, true})
       if (!robot.calcShortestDirs(diag_enabled))
         loge << "Failed to Find a Shortest Path! "
@@ -253,7 +253,7 @@ int main(void) {
         sum += us;
       }
       std::cout << "Shortest " << (diag_enabled ? "diag" : "along") << ":\t"
-                << sum.count() / n << " [us]" << std::endl;
+                << sum.count() / n << "\t[us]" << std::endl;
       // sa.printPath(std::cout, path);
     }
 #endif

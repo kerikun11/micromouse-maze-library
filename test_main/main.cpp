@@ -58,7 +58,7 @@ private:
   void discrepancyWithKnownWall() override {
     printInfo();
     std::cout << "There was a discrepancy with known information! "
-              << getCurVec() << " " << getCurDir() << std::endl;
+              << VecDir{getCurVec(), getCurDir()} << std::endl;
   }
   void queueAction(const Action action) override {
     if (display)

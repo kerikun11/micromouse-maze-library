@@ -88,12 +88,12 @@ bool Maze::canGo(const Vector v, const Dir d) const {
 int8_t Maze::wallCount(const Vector v) const {
   auto dirs = Dir::ENWS();
   return std::count_if(dirs.cbegin(), dirs.cend(),
-                       [&](const auto d) { return isWall(v, d); });
+                       [&](const Dir d) { return isWall(v, d); });
 }
 int8_t Maze::unknownCount(const Vector v) const {
   const auto dirs = Dir::ENWS();
   return std::count_if(dirs.cbegin(), dirs.cend(),
-                       [&](const auto d) { return !isKnown(v, d); });
+                       [&](const Dir d) { return !isKnown(v, d); });
 }
 bool Maze::updateWall(const Vector v, const Dir d, const bool b,
                       const bool pushLog) {
