@@ -23,8 +23,8 @@ public:
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
                 (int)max_usec);
-    std::cout << "Real:\t" << VecDir{real_v, real_d};
-    std::cout << "Offset:\t" << VecDir{offset_v, offset_d};
+    std::cout << "Real:\t" << VecDir{real_v, real_d} << std::endl;
+    std::cout << "Offset:\t" << VecDir{offset_v, offset_d} << std::endl;
   }
 
 private:
@@ -58,8 +58,8 @@ private:
       return;
 
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      // printInfo();
-      // sleep(1);
+      printInfo();
+      // getc(stdin);
       display = 0;
     }
     if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
@@ -78,8 +78,7 @@ private:
     printInfo();
     std::cerr << "The robot crashed into the wall! cur:\t"
               << VecDir{getCurVec(), getCurDir()} << std::endl;
-    while (1) {
-    }
+    getc(stdin);
   }
   void queueAction(const Action action) override {
     if (display)
@@ -184,8 +183,8 @@ int main(void) {
 
   /* Position Identification Run */
   display = 0;
-  offset_d = real_d = Dir::West;
-  offset_v = real_v = Vector(0, 3);
+  offset_d = real_d = Dir::East;
+  offset_v = real_v = Vector(31, 18);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();

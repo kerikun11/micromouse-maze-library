@@ -67,8 +67,9 @@ public:
                .count();
     if (max_usec < usec)
       max_usec = usec;
-    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION)
-      printInfo();
+    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
+      // printInfo();
+    }
     if (newState == prevState)
       return;
     /* State Change has occurred */

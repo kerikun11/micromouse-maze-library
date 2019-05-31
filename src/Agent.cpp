@@ -30,7 +30,7 @@ void Agent::printInfo(const bool showMaze, const Vector vec, const Dir dir,
   for (const auto d : getNextDirCandidates())
     std::printf("%c", d.toChar());
   std::printf("\n");
-  std::printf("Match Count: %d \n", matchCount);
+  std::printf("Match Count: %d   \n", matchCount);
 }
 
 } // namespace MazeLib

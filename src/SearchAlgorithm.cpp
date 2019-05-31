@@ -388,8 +388,8 @@ int SearchAlgorithm::countIdentityCandidates(
   if (idWallLogs.size() < min_size)
     return many;
   int cnt = 0;
-  for (int x = min_x; x < max_x; ++x)
-    for (int y = min_y; y < max_y; ++y)
+  for (int x = min_x; x < max_x + 1; ++x)
+    for (int y = min_y; y < max_y + 1; ++y)
       for (const auto offset_d : Dir::ENWS()) {
         Vector offset = Vector(x, y);
         int diffs = 0;
@@ -410,17 +410,14 @@ int SearchAlgorithm::countIdentityCandidates(
           if (diffs > min_diff)
             break;
         }
-        // const int size = idWallLogs.size();
-        // const int known = size - unknown;
-        // int matchs = known - diffs;
         if (diffs > min_diff)
-          // if (diffs > min_diff || known * 2 < unknown)
           continue;
         ans.first = offset;
         ans.second = offset_d;
         cnt++;
-        // if (cnt > 1)
-        //   return many;
+        /* 打ち切り */
+        if (cnt > 1)
+          return many;
       }
   return cnt;
 }
