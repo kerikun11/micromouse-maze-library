@@ -60,8 +60,8 @@ public:
    * true:未知の壁は通過不可能とする，false:未知の壁はないものとする
    *  @param diag_enabled true: 斜め直線あり false: 斜めはジグザグ
    */
-  void update(const Maze &maze, const Vectors &dest,
-              const bool known_only = false, const bool diag_enabled = true);
+  void update(const Maze &maze, const Vectors &dest, const bool known_only,
+              const bool diag_enabled);
   /** @function updateSimple
    *  @brief シンプルに1マス1ステップのステップマップ更新
    *  @param dest ステップを0とする区画の配列(destination)
@@ -69,7 +69,7 @@ public:
    * true:未知の壁は通過不可能とする，false:未知の壁はないものとする
    */
   void updateSimple(const Maze &maze, const Vectors &dest,
-                    const bool known_only = false);
+                    const bool known_only);
   /** @function calcNextDirs
    *  @brief ステップマップから次に行くべき方向を計算
    */

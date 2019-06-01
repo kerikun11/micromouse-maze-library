@@ -84,7 +84,6 @@ public:
     }
   }
   void discrepancyWithKnownWall() override {
-    // printInfo();
     if (getState() != SearchAlgorithm::IDENTIFYING_POSITION)
       std::cout
           << "There was a discrepancy with known information! CurVecDir:\t"
@@ -213,7 +212,7 @@ int main(void) {
     }
     robot.printResult();
     std::cout << "Max Calc Time:\t" << sum_max / n << "\t[us]" << std::endl;
-    std::cout << "Total Search:\t" << sum_total / n << "\t[us]" << std::endl;
+    // std::cout << "Total Search:\t" << sum_total / n << "\t[us]" << std::endl;
     for (const auto diag_enabled : {false, true})
       if (!robot.calcShortestDirs(diag_enabled))
         loge << "Failed to Find a Shortest Path! "
@@ -222,14 +221,14 @@ int main(void) {
 
 #if 1
     /* Position Identification Run */
-    for (auto diag : {true, false}) {
-      robot.calcShortestDirs(diag);
-      auto shortestDirs = robot.getShortestDirs();
-      auto v = Vector(0, 0);
-      for (const auto d : shortestDirs) {
-        v = v.next(d);
-        robot.real_v = robot.offset_v = v;
+    StepMap stepMap;
+    stepMap.updateSimple(maze_target, maze_target.getGoals(), false);
+    for (int8_t x = 0; x < MAZE_SIZE; ++x)
+      for (int8_t y = 0; y < MAZE_SIZE; ++y)
         for (const auto ed : Dir::ENWS()) {
+          if (stepMap.getStep(x, y) == MAZE_STEP_MAX)
+            continue;
+          robot.real_v = robot.offset_v = Vector(x, y);
           robot.real_d = robot.offset_d = ed;
           bool res = robot.positionIdentifyRun();
           if (!res) {
@@ -240,8 +239,6 @@ int main(void) {
             // getc(stdin);
           }
         }
-      }
-    }
     std::cout << "P.I. Max Time:\t" << robot.max_usec << "\t[us]" << std::endl;
 #endif
 

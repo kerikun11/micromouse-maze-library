@@ -81,11 +81,12 @@ public:
     }
   }
   void discrepancyWithKnownWall() override {
-    printInfo();
-    if (getState() != SearchAlgorithm::IDENTIFYING_POSITION)
+    if (getState() != SearchAlgorithm::IDENTIFYING_POSITION) {
+      printInfo();
       std::cout
           << "There was a discrepancy with known information! CurVecDir:\t"
           << VecDir{getCurVec(), getCurDir()} << std::endl;
+    }
   }
   void crashed() {
     printInfo();
@@ -182,16 +183,13 @@ int main(void) {
   const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
   CLRobot &robot = *p_robot;
   robot.replaceGoals(maze_target.getGoals());
-
-  /* Search Run */
-  robot.display = 0;
   robot.searchRun();
 
-#if 1
+#if 0
   /* Position Identification Run */
   robot.display = 1;
   robot.offset_d = robot.real_d = Dir::East;
-  robot.offset_v = robot.real_v = Vector(31, 18);
+  robot.offset_v = robot.real_v = Vector(14, 5);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
@@ -203,6 +201,30 @@ int main(void) {
 #endif
 
 #if 1
+  /* Position Identification Run */
+  StepMap stepMap;
+  stepMap.updateSimple(maze_target, maze_target.getGoals(), false);
+  for (int8_t x = 0; x < MAZE_SIZE; ++x)
+    for (int8_t y = 0; y < MAZE_SIZE; ++y)
+      for (const auto ed : Dir::ENWS()) {
+        if (stepMap.getStep(x, y) == MAZE_STEP_MAX)
+          continue;
+        robot.real_v = robot.offset_v = Vector(x, y);
+        robot.real_d = robot.offset_d = ed;
+        robot.display = 1;
+        bool res = robot.positionIdentifyRun();
+        if (!res) {
+          robot.printInfo();
+          std::cout << std::endl
+                    << "Failed to Identify! offset:\t"
+                    << VecDir{robot.offset_v, robot.offset_d} << std::endl;
+          getc(stdin);
+        }
+      }
+  std::cout << "P.I. Max Time:\t" << robot.max_usec << "\t[us]" << std::endl;
+#endif
+
+#if 0
   /* Starts from each cell on the shortest path */
   for (auto diag : {true, false}) {
     robot.calcShortestDirs(diag);
