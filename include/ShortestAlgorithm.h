@@ -239,6 +239,13 @@ public:
   }
   void UpdateVertex(const Index u, const bool known_only,
                     const bool diag_enabled) {
+    /* min max */
+    int8_t max_x = maze.getMaxX();
+    int8_t max_y = maze.getMaxY();
+    for (const auto v : maze.getGoals()) {
+      max_x = std::max(v.x, max_x);
+      max_y = std::max(v.y, max_y);
+    }
     if (r_map[u] != 0) {
       /* min_element */
       auto min_g = CostMax;
@@ -247,6 +254,8 @@ public:
         const auto v = Vector(s_prime.first);
         if (v.isOutsideofField())
           loge << "Out of Range! " << s_prime.first << std::endl;
+        if (v.x > max_x + 1 || v.y > max_y + 1)
+          continue;
         const auto new_g = s_prime.second + g_map[s_prime.first];
         if (min_g > new_g) {
           min_g = new_g;

@@ -83,11 +83,12 @@ public:
     }
   }
   void discrepancyWithKnownWall() override {
-    printInfo();
-    if (getState() != SearchAlgorithm::IDENTIFYING_POSITION)
+    if (getState() != SearchAlgorithm::IDENTIFYING_POSITION) {
+      printInfo();
       std::cout
           << "There was a discrepancy with known information! CurVecDir:\t"
           << VecDir{getCurVec(), getCurDir()} << std::endl;
+    }
   }
   void crashed() {
     printInfo();
@@ -189,7 +190,7 @@ int main(void) {
   robot.replaceGoals(maze_target.getGoals());
 #endif
 
-#if 0
+#if 1
   /* Search Run */
   robot.display = 1;
   robot.searchRun();

@@ -6,6 +6,8 @@ bool RobotBase::searchRun() {
   /* 既に探索済みなら正常終了 */
   if (!isForceGoingToGoal && isComplete())
     return true;
+  /* ゴール区画への訪問を指定 */
+  forceGoingToGoal();
   /* スタートのアクションをキュー */
   queueAction(START_STEP);
   updateCurVecDir(Vector(0, 1), Dir::North);
@@ -37,6 +39,7 @@ bool RobotBase::positionIdentifyRun() {
     stopDequeue();
     return false;
   }
+  /* スタート区画特有の処理 */
   queueAction(START_INIT);
   updateCurVecDir(Vector(0, 0), Dir::North);
   calcNextDirs(); /*< 時間がかかる処理！ */
@@ -61,6 +64,7 @@ bool RobotBase::endFastRunBackingToStartRun() {
     stopDequeue();
     return false;
   }
+  /* スタート区画特有の処理 */
   queueAction(START_INIT);
   updateCurVecDir(Vector(0, 0), Dir::North);
   calcNextDirs(); /*< 時間がかかる処理！ */

@@ -203,7 +203,8 @@ int main(void) {
     for (int i = 0; i < n; ++i) {
       robot.getMaze().reset();
       const auto t_s = std::chrono::system_clock().now();
-      robot.searchRun();
+      if (!robot.searchRun())
+        loge << "Failed to Find a Path to Goal! " << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
@@ -268,6 +269,6 @@ int main(void) {
     }
 #endif
   }
-  std::cout << std::endl << "End" << std::endl;
+  std::cout << std::endl << "Measurement End" << std::endl;
   return 0;
 }
