@@ -30,11 +30,12 @@ public:
     std::cout << "Max Iteration:\t"
               << getSearchAlgorithm().getShortestAlgorithm().max_iteration_size
               << std::endl;
-    std::cout << "Max Calc Time:\t" << max_usec << "\t[us]" << std::endl;
   }
 
 private:
   Maze maze;
+
+public:
   int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
   float cost = 0;
   int max_usec = 0;
@@ -84,12 +85,14 @@ public:
   }
   void discrepancyWithKnownWall() override {
     // printInfo();
-    std::cout << "There was a discrepancy with known information! cur:\t"
-              << VecDir{getCurVec(), getCurDir()} << std::endl;
+    if (getState() != SearchAlgorithm::IDENTIFYING_POSITION)
+      std::cout
+          << "There was a discrepancy with known information! CurVecDir:\t"
+          << VecDir{getCurVec(), getCurDir()} << std::endl;
   }
   void crashed() {
     // printInfo();
-    std::cerr << "The robot crashed into the wall! cur:\t"
+    std::cerr << "The robot crashed into the wall! CurVecDir:\t"
               << VecDir{getCurVec(), getCurDir()} << std::endl;
     getc(stdin);
   }
@@ -175,14 +178,16 @@ public:
 int main(void) {
   const std::string mazedata_dir = "../mazedata/";
   for (const auto filename : {
-           mazedata_dir + "32MM2012HX.maze",
-           mazedata_dir + "32MM2013HX.maze",
-           mazedata_dir + "32MM2014HX.maze",
-           mazedata_dir + "32MM2015HX.maze",
-           mazedata_dir + "32MM2016HX.maze",
-           mazedata_dir + "32MM2017HX.maze",
            mazedata_dir + "32MM2018HX.maze",
+           mazedata_dir + "32MM2017HX.maze",
+           mazedata_dir + "32MM2016HX.maze",
+           mazedata_dir + "32MM2015HX.maze",
+           mazedata_dir + "32MM2014HX.maze",
+           mazedata_dir + "32MM2013HX.maze",
+           mazedata_dir + "32MM2012HX.maze",
            mazedata_dir + "32MM2017CX.maze",
+           mazedata_dir + "32MM2016CX.maze",
+           mazedata_dir + "32_4x4_test.maze",
        }) {
     std::cout << std::endl;
     std::cout << "Maze File: \t" << filename << std::endl;
@@ -190,27 +195,32 @@ int main(void) {
 #if 1
     /* Search Run */
     Maze maze_target = Maze(filename.c_str());
-    CLRobot robot(maze_target);
+    const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
+    CLRobot &robot = *p_robot;
     robot.replaceGoals(maze_target.getGoals());
-    std::chrono::microseconds sum{0};
+    int sum_total = 0;
+    int sum_max = 0;
     const int n = 1;
     for (int i = 0; i < n; ++i) {
+      robot.getMaze().reset();
       const auto t_s = std::chrono::system_clock().now();
       robot.searchRun();
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
-      sum += us;
+      sum_total += us.count();
+      sum_max += robot.max_usec;
     }
     robot.printResult();
-    std::cout << "Total Search:\t" << sum.count() / n << "\t[us]" << std::endl;
+    std::cout << "Max Calc Time:\t" << sum_max / n << "\t[us]" << std::endl;
+    std::cout << "Total Search:\t" << sum_total / n << "\t[us]" << std::endl;
     for (const auto diag_enabled : {false, true})
       if (!robot.calcShortestDirs(diag_enabled))
         loge << "Failed to Find a Shortest Path! "
              << (diag_enabled ? "true" : "false") << std::endl;
 #endif
 
-#if 0
+#if 1
     /* Position Identification Run */
     for (auto diag : {true, false}) {
       robot.calcShortestDirs(diag);
@@ -232,7 +242,7 @@ int main(void) {
         }
       }
     }
-    robot.printResult();
+    std::cout << "P.I. Max Time:\t" << robot.max_usec << "\t[us]" << std::endl;
 #endif
 
 #if 1
@@ -242,7 +252,9 @@ int main(void) {
       const bool known_only = 0;
       Maze maze(filename.c_str());
       // Maze maze(loadMaze().getGoals());
-      ShortestAlgorithm sa(maze);
+      const auto p_sa =
+          std::unique_ptr<ShortestAlgorithm>(new ShortestAlgorithm(maze));
+      ShortestAlgorithm &sa = *p_sa;
       ShortestAlgorithm::Indexes path;
       std::chrono::microseconds sum{0};
       for (int i = 0; i < n; ++i) {
@@ -259,6 +271,6 @@ int main(void) {
     }
 #endif
   }
-  std::cout << std::endl;
+  std::cout << std::endl << "End" << std::endl;
   return 0;
 }
