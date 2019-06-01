@@ -96,7 +96,7 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
     setStep(v, 0);
     q.push(v);
   }
-#define CONFIG_FULL_UPDATE 1
+#define CONFIG_FULL_UPDATE 0
   // ステップの更新がなくなるまで更新処理
   while (!q.empty()) {
     // 注目する区画を取得

@@ -19,6 +19,9 @@ namespace MazeLib {
  */
 #define SEARCHING_ADDITIONALLY_AT_START 1
 
+#define USE_OLD_ALGORITHM 1
+#define USE_HYBRID_ALGORITHM 0
+
 const char *SearchAlgorithm::stateString(const enum State s) {
   static const char *const str[] = {
       "Start                 ", "Searching for Goal    ",
@@ -176,7 +179,7 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 }
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
-#if 0
+#if USE_OLD_ALGORITHM
   /* old */
   stepMap.update(maze, maze.getGoals(), true, diag_enabled);
   shortestDirs.clear();
@@ -288,7 +291,7 @@ void SearchAlgorithm::printMap(const State state, const Vector vec,
 }
 
 bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
-#if 0
+#if USE_OLD_ALGORITHM
   /* old */
   candidates.clear();
   // 斜めありなしの双方の最短経路上を候補とする
@@ -344,7 +347,9 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
       }
     }
   }
+#if USE_HYBRID_ALGORITHM
   if (!candidates.empty())
+#endif
     return true; //< 成功
 #endif
   /* 新アルゴリズム */
