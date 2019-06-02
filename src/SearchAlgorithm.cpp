@@ -89,6 +89,14 @@ enum SearchAlgorithm::Status SearchAlgorithm::calcNextDirs(
     bool &isForceBackToStart, bool &isForceGoingToGoal, int &matchCount) {
   state = START;
   SearchAlgorithm::Status status;
+  if (isForceGoingToGoal) {
+    const auto goals = maze.getGoals();
+    const auto it =
+        std::find_if(goals.cbegin(), goals.cend(),
+                     [curVec](const Vector nv) { return curVec == nv; });
+    if (it != goals.end())
+      isForceGoingToGoal = false;
+  }
   if (isPositionIdentifying) {
     state = IDENTIFYING_POSITION;
     status = calcNextDirsPositionIdentification(curVec, curDir, nextDirs,
