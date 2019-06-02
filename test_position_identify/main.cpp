@@ -100,6 +100,9 @@ public:
   void queueAction(const Action action) override {
     if (display)
       printInfo();
+    if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
+        real_v == maze.getStart())
+      logw << "Visited Start!" << std::endl;
     cost += getTimeCost(action);
     step++;
     switch (action) {

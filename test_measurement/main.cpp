@@ -96,6 +96,11 @@ public:
     getc(stdin);
   }
   void queueAction(const Action action) override {
+#if 0
+    if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
+        real_v == maze.getStart())
+      logw << "Visited Start!" << std::endl;
+#endif
     cost += getTimeCost(action);
     step++;
     switch (action) {
@@ -222,12 +227,15 @@ int main(void) {
 
 #if 1
     /* Position Identification Run */
+    robot.max_usec = 0;
     StepMap stepMap;
     stepMap.updateSimple(maze_target, maze_target.getGoals(), false);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
         for (const auto ed : Dir::ENWS()) {
           if (stepMap.getStep(x, y) == MAZE_STEP_MAX)
+            continue;
+          if (Vector(x, y) == robot.getMaze().getStart())
             continue;
           robot.real_v = robot.offset_v = Vector(x, y);
           robot.real_d = robot.offset_d = ed;
