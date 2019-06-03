@@ -59,7 +59,7 @@ public:
    *  注意: 処理に時間がかかる場合あり
    *  @return 探索状態
    */
-  SearchAlgorithm::Status calcNextDirs() {
+  SearchAlgorithm::Result calcNextDirs() {
     return searchAlgorithm.calcNextDirs(
         state, curVec, curDir, nextDirsKnown, nextDirCandidates,
         isPositionIdentifying, isForceBackToStart, isForceGoingToGoal,

@@ -83,12 +83,12 @@ void SearchAlgorithm::resetLastWall(const State state, const int num) {
     return idMaze.resetLastWall(num);
   return maze.resetLastWall(num);
 }
-enum SearchAlgorithm::Status SearchAlgorithm::calcNextDirs(
+enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
     State &state, Vector &curVec, Dir &curDir, Dirs &nextDirs,
     Dirs &nextDirCandidates, bool &isPositionIdentifying,
     bool &isForceBackToStart, bool &isForceGoingToGoal, int &matchCount) {
   state = START;
-  SearchAlgorithm::Status status;
+  enum Result result;
   if (isForceGoingToGoal) {
     const auto goals = maze.getGoals();
     const auto it =
@@ -99,72 +99,72 @@ enum SearchAlgorithm::Status SearchAlgorithm::calcNextDirs(
   }
   if (isPositionIdentifying) {
     state = IDENTIFYING_POSITION;
-    status = calcNextDirsPositionIdentification(curVec, curDir, nextDirs,
+    result = calcNextDirsPositionIdentification(curVec, curDir, nextDirs,
                                                 nextDirCandidates, matchCount);
-    switch (status) {
+    switch (result) {
     case SearchAlgorithm::Processing:
-      return status;
+      return result;
     case SearchAlgorithm::Reached:
       isPositionIdentifying = false;
       break;
     case SearchAlgorithm::Error:
-      return status;
+      return result;
     }
   }
   if (!SEARCHING_ADDITIONALLY_AT_START) {
     state = SEARCHING_FOR_GOAL;
-    status =
+    result =
         calcNextDirsSearchForGoal(curVec, curDir, nextDirs, nextDirCandidates);
-    switch (status) {
+    switch (result) {
     case SearchAlgorithm::Processing:
-      return status;
+      return result;
     case SearchAlgorithm::Reached:
       break;
     case SearchAlgorithm::Error:
-      return status;
+      return result;
     }
   }
   if (!isForceBackToStart) {
     state = SEARCHING_ADDITIONALLY;
-    status = calcNextDirsSearchAdditionally(curVec, curDir, nextDirs,
+    result = calcNextDirsSearchAdditionally(curVec, curDir, nextDirs,
                                             nextDirCandidates);
-    switch (status) {
+    switch (result) {
     case SearchAlgorithm::Processing:
-      return status;
+      return result;
     case SearchAlgorithm::Reached:
       break;
     case SearchAlgorithm::Error:
-      return status;
+      return result;
     }
   }
   if (isForceGoingToGoal) {
     state = GOING_TO_GOAL;
-    status =
+    result =
         calcNextDirsGoingToGoal(curVec, curDir, nextDirs, nextDirCandidates);
-    switch (status) {
+    switch (result) {
     case SearchAlgorithm::Processing:
-      return status;
+      return result;
     case SearchAlgorithm::Reached:
       isForceGoingToGoal = false;
       return SearchAlgorithm::Processing;
     case SearchAlgorithm::Error:
-      return status;
+      return result;
     }
   }
   state = BACKING_TO_START;
-  status =
+  result =
       calcNextDirsBackingToStart(curVec, curDir, nextDirs, nextDirCandidates);
-  switch (status) {
+  switch (result) {
   case SearchAlgorithm::Processing:
-    return status;
+    return result;
   case SearchAlgorithm::Reached:
     isForceBackToStart = false;
     break;
   case SearchAlgorithm::Error:
-    return status;
+    return result;
   }
   state = REACHED_START;
-  return status;
+  return result;
 }
 bool SearchAlgorithm::findNextDir(const State state, const Vector v,
                                   const Dir d, const Dirs &nextDirCandidates,
@@ -388,8 +388,8 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
   }
   return true; /* 成功 */
 }
-int SearchAlgorithm::countIdentityCandidates(
-    const WallLogs &idWallLogs, std::pair<Vector, Dir> &ans) const {
+int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
+                                             VecDir &ans) const {
   /* min max */
   const int8_t max_x = maze.getMaxX();
   const int8_t max_y = maze.getMaxY();
@@ -399,8 +399,8 @@ int SearchAlgorithm::countIdentityCandidates(
   if (idWallLogs.size() < min_size)
     return many;
   int cnt = 0;
-  for (int x = 0; x < max_x + 1; ++x)
-    for (int y = 0; y < max_y + 1; ++y)
+  for (int8_t x = 0; x < max_x + 1; ++x)
+    for (int8_t y = 0; y < max_y + 1; ++y)
       for (const auto offset_d : Dir::ENWS()) {
         Vector offset = Vector(x, y);
         int diffs = 0;
@@ -422,7 +422,7 @@ int SearchAlgorithm::countIdentityCandidates(
             break;
         }
         /* 非一致条件 */
-        if (diffs > min_diff || unknown * 5 > (int)idWallLogs.size() * 4)
+        if (diffs > min_diff || unknown * 4 > (int)idWallLogs.size() * 3)
           continue;
         ans.first = offset;
         ans.second = offset_d;
@@ -433,7 +433,7 @@ int SearchAlgorithm::countIdentityCandidates(
       }
   return cnt;
 }
-enum SearchAlgorithm::Status
+enum SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
                                            Dirs &nextDirsKnown,
                                            Dirs &nextDirCandidates) {
@@ -447,7 +447,7 @@ SearchAlgorithm::calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
                        nextDirCandidates);
   return nextDirCandidates.empty() ? Error : Processing;
 }
-enum SearchAlgorithm::Status
+enum SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
                                                 Dirs &nextDirsKnown,
                                                 Dirs &nextDirCandidates) {
@@ -459,7 +459,7 @@ SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
                        nextDirCandidates);
   return nextDirCandidates.empty() ? Error : Processing;
 }
-enum SearchAlgorithm::Status
+enum SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsBackingToStart(const Vector cv, const Dir cd,
                                             Dirs &nextDirsKnown,
                                             Dirs &nextDirCandidates) {
@@ -469,7 +469,7 @@ SearchAlgorithm::calcNextDirsBackingToStart(const Vector cv, const Dir cd,
     return Reached;
   return nextDirCandidates.empty() ? Error : Processing;
 }
-enum SearchAlgorithm::Status
+enum SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
                                          Dirs &nextDirsKnown,
                                          Dirs &nextDirCandidates) {
@@ -482,7 +482,7 @@ SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
     return Reached;
   return nextDirCandidates.empty() ? Error : Processing;
 }
-enum SearchAlgorithm::Status
+enum SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
                                                     Dirs &nextDirsKnown,
                                                     Dirs &nextDirCandidates,
@@ -505,7 +505,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
       idMaze.updateWall(Vector(wl) + offset_diff, wl.d, wl.b);
   }
   /* 自己位置同定 */
-  std::pair<Vector, Dir> ans;
+  VecDir ans;
   const int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
   matchCount = cnt;
   if (cnt == 1) {

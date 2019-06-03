@@ -20,7 +20,7 @@ public:
   /**
    *  @brief 進むべき方向の計算結果
    */
-  enum Status : uint8_t {
+  enum Result : uint8_t {
     Processing, /**< 現探索状態を継続 */
     Reached,    /**< 現探索状態が完了 */
     Error,      /**< エラー */
@@ -52,7 +52,7 @@ public:
                   const bool back);
   bool updateWall(const State state, const Vector v, const Dir d, const bool b);
   void resetLastWall(const State state, const int num = 1);
-  enum Status calcNextDirs(State &state, Vector &curVec, Dir &curDir,
+  enum Result calcNextDirs(State &state, Vector &curVec, Dir &curDir,
                            Dirs &nextDirs, Dirs &nextDirCandidates,
                            bool &isPositionIdentifying,
                            bool &isForceBackToStart, bool &isForceGoingToGoal,
@@ -82,24 +82,23 @@ private:
    *  @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
   bool findShortestCandidates(Vectors &candidates);
-  int countIdentityCandidates(const WallLogs &idWallLogs,
-                              std::pair<Vector, Dir> &ans) const;
+  int countIdentityCandidates(const WallLogs &idWallLogs, VecDir &ans) const;
   /**
    * @brief 各状態での進行方向列導出関数
    */
-  enum Status calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
+  enum Result calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
                                         Dirs &nextDirsKnown,
                                         Dirs &nextDirCandidates);
-  enum Status calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
+  enum Result calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
                                              Dirs &nextDirsKnown,
                                              Dirs &nextDirCandidates);
-  enum Status calcNextDirsBackingToStart(const Vector cv, const Dir cd,
+  enum Result calcNextDirsBackingToStart(const Vector cv, const Dir cd,
                                          Dirs &nextDirsKnown,
                                          Dirs &nextDirCandidates);
-  enum Status calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
+  enum Result calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
                                       Dirs &nextDirsKnown,
                                       Dirs &nextDirCandidates);
-  enum Status calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
+  enum Result calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
                                                  Dirs &nextDirsKnown,
                                                  Dirs &nextDirCandidates,
                                                  int &matchCount);
