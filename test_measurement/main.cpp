@@ -195,6 +195,7 @@ int main(void) {
            mazedata_dir + "16MM2017CX_pre.maze",
            mazedata_dir + "16MM2017C_East.maze",
            mazedata_dir + "16MM2017C_Cheese.maze",
+           mazedata_dir + "16MM2017Tashiro.maze",
            mazedata_dir + "16MM2016CX.maze",
            mazedata_dir + "16MM2013CX.maze",
        }) {
