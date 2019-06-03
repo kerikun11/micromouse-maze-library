@@ -189,9 +189,14 @@ int main(void) {
            mazedata_dir + "32MM2014HX.maze",
            mazedata_dir + "32MM2013HX.maze",
            mazedata_dir + "32MM2012HX.maze",
-           mazedata_dir + "32MM2017CX.maze",
-           mazedata_dir + "32MM2016CX.maze",
-           mazedata_dir + "32_4x4_test.maze",
+           mazedata_dir + "16MM2018CM.maze",
+           mazedata_dir + "16MM2018MS.maze",
+           mazedata_dir + "16MM2017CX.maze",
+           mazedata_dir + "16MM2017CX_pre.maze",
+           mazedata_dir + "16MM2017C_East.maze",
+           mazedata_dir + "16MM2017C_Cheese.maze",
+           mazedata_dir + "16MM2016CX.maze",
+           mazedata_dir + "16MM2013CX.maze",
        }) {
     std::cout << std::endl;
     std::cout << "Maze File: \t" << filename << std::endl;

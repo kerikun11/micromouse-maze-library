@@ -30,6 +30,25 @@ const char mazeData_MM2016CX[16 + 1][16 + 1] = {
     "e666666666666665",
 };
 
+const char mazeData_MM2018CM[16 + 1][16 + 1] = {
+    "7776aaaaaaaaaaa3", "55416aaaaaaaaaa1", "c0155eaa36aaaa35",
+    "695556aa096aaa15", "4a9554a283caa355", "4aa95568bd6aa955",
+    "56aa940b63caa355", "54aaa9d614aaa9dd", "556aa37c942a2a23",
+    "5c8a354aa9c20a15", "4aa355caaaa9ca15", "4a35556aaaaaaa81",
+    "c35555caaaaaaa35", "60155caaaaaaaa9d", "5541caaaaaaaaaa3",
+    "dddcaaaaaaaaaaa9",
+};
+
+const char mazeData_MM2018MS[16 + 1][16 + 1] = {
+    "6aa2aa2aaa2aaaa3", "4be82bc2a296a235", "4ab683e828356155",
+    "57e0a0be8a95c955", "c0bc296a2b682a95", "e0be0b4b56169621",
+    "e0b6169695497555", "e0b54969e0161555", "6834969629555c81",
+    "c35d696956955635", "6956969695695555", "c35ca8a969569541",
+    "e1caaa36975c3555", "6177775c34969555", "5540080bc9e8a9c1",
+    "dc9dca8aaaaaaaa9",
+
+};
+
 int main(void) {
   std::cout << "Maze File Generator" << std::endl;
   /* parameter */
@@ -42,10 +61,14 @@ int main(void) {
   std::array<Dir, 4> bit_order = {Dir::North, Dir::East, Dir::South, Dir::West};
 #endif
   const Vectors goals = {
-      Vector(7, 7),
-      Vector(8, 7),
-      Vector(7, 8),
-      Vector(8, 8),
+      // Vector(7, 7),
+      // Vector(8, 7),
+      // Vector(7, 8),
+      // Vector(8, 8),
+      Vector(12, 12),
+      Vector(13, 12),
+      Vector(12, 13),
+      Vector(13, 13),
   };
   /* process */
   Maze sample(maze_data, bit_order);

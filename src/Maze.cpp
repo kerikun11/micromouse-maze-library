@@ -97,26 +97,30 @@ int8_t Maze::unknownCount(const Vector v) const {
 }
 bool Maze::updateWall(const Vector v, const Dir d, const bool b,
                       const bool pushLog) {
-  // 既知の壁と食い違いがあったら未知壁としてreturn
+  /* 既知の壁と食い違いがあったら未知壁としてreturn */
   if (isKnown(v, d) && isWall(v, d) != b) {
     setWall(v, d, false);
     setKnown(v, d, false);
-    const auto it =
-        std::find_if(wallLogs.cbegin(), wallLogs.cend(), [&](const auto w) {
-          return Vector(w) == v && Dir(w) == d;
-        });
-    if (it != wallLogs.end())
-      wallLogs.erase(it);
+    /* ログに追加 */
+    if (pushLog)
+      wallLogs.push_back(WallLog(v, d, b));
+    /* ログから消去 */
+    // const auto it =
+    //     std::find_if(wallLogs.cbegin(), wallLogs.cend(), [&](const auto w) {
+    //       return Vector(w) == v && Dir(w) == d;
+    //     });
+    // if (it != wallLogs.end())
+    //   wallLogs.erase(it);
     return false;
   }
-  // 未知壁なら壁情報を更新
+  /* 未知壁なら壁情報を更新 */
   if (!isKnown(v, d)) {
     setWall(v, d, b);
     setKnown(v, d, true);
-    // ログに追加
+    /* ログに追加 */
     if (pushLog)
       wallLogs.push_back(WallLog(v, d, b));
-    // 最大最小区画を更新
+    /* 最大最小区画を更新 */
     min_x = std::min(v.x, min_x);
     min_y = std::min(v.y, min_y);
     max_x = std::max(v.x, max_x);
@@ -161,12 +165,22 @@ void Maze::print(std::ostream &os) const {
   }
 }
 bool Maze::parse(std::istream &is) {
+  is.seekg(0, std::ios_base::end);
+  int file_size = is.tellg();
+  is.seekg(0, std::ios_base::beg);
+  int maze_size = 0;
+  if (file_size > 8000)
+    maze_size = 32;
+  else if (file_size > 2000)
+    maze_size = 16;
+  else
+    maze_size = 8;
   reset();
   goals.clear();
-  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
-    if (y != MAZE_SIZE) {
+  for (int8_t y = maze_size; y >= 0; --y) {
+    if (y != maze_size) {
       is.ignore(10, '|'); //< 次の|が出てくるまでスキップ
-      for (int8_t x = 0; x < MAZE_SIZE; ++x) {
+      for (int8_t x = 0; x < maze_size; ++x) {
         is.ignore(1); //< " " 空欄分をスキップ
         char c = is.get();
         if (c == 'S')
@@ -181,7 +195,7 @@ bool Maze::parse(std::istream &is) {
           Maze::updateWall(Vector(x, y), Dir::East, false);
       }
     }
-    for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+    for (uint8_t x = 0; x < maze_size; ++x) {
       is.ignore(10, '+'); //< 次の+が出てくるまでスキップ
       std::string s;
       s += (char)is.get();
