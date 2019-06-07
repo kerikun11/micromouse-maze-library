@@ -87,10 +87,11 @@ public:
   /**
    * @brief 自己位置同定モードに設定する
    */
-  void positionIdentify() {
-    searchAlgorithm.positionIdentifyingInit(&curVec, &curDir);
+  void positionIdentify(const Dir estDir) {
+    searchAlgorithm.positionIdentifyingInit(&curVec, &curDir, estDir);
     state = SearchAlgorithm::IDENTIFYING_POSITION;
     isPositionIdentifying = true;
+    calcNextDirs(); /*< 時間がかかる処理！ */
   }
   /**
    *  @brief 探索状態の取得

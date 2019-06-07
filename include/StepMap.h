@@ -75,7 +75,8 @@ public:
    */
   const Vector calcNextDirs(Maze &maze, const Vectors &dest, const Vector vec,
                             const Dir dir, Dirs &nextDirsKnown,
-                            Dirs &nextDirCandidates);
+                            Dirs &nextDirCandidates,
+                            const bool prior_unknown = true);
 
 private:
   step_t stepMap[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数*/
@@ -94,7 +95,8 @@ private:
    */
   const Vector calcNextDirs(const Maze &maze, const Vector start_v,
                             const Dir start_d, Dirs &nextDirsKnown,
-                            Dirs &nextDirCandidates) const;
+                            Dirs &nextDirCandidates,
+                            const bool prior_unknown) const;
 };
 
 } // namespace MazeLib

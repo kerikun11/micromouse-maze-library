@@ -46,7 +46,7 @@ public:
 public:
   SearchAlgorithm(Maze &maze) : maze(maze), shortestAlgorithm(maze) {}
   bool isComplete();
-  void positionIdentifyingInit(Vector *pVector, Dir *pDir);
+  void positionIdentifyingInit(Vector *pVector, Dir *pDir, const Dir estIniDir);
   bool updateWall(const State state, const Vector v, const Dir d,
                   const bool left, const bool front, const bool right,
                   const bool back);
@@ -77,6 +77,7 @@ protected:
 private:
   Maze idMaze;     /**< 自己位置同定に使用する迷路 */
   Vector idOffset; /**< 自己位置同定迷路の始点位置 */
+  Dir estIniDir;
 
   /**
    *  @brief ステップマップにより最短経路上になりうる区画を洗い出す

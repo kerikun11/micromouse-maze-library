@@ -29,8 +29,8 @@ bool RobotBase::searchRun() {
   backupMazeToFlash();
   return true;
 }
-bool RobotBase::positionIdentifyRun() {
-  positionIdentify();
+bool RobotBase::positionIdentifyRun(const Dir estInitDir) {
+  positionIdentify(estInitDir);
   queueAction(STRAIGHT_HALF);
   calibration();
   startDequeue();

@@ -42,10 +42,12 @@ bool SearchAlgorithm::isComplete() {
   findShortestCandidates(candidates);
   return candidates.empty();
 }
-void SearchAlgorithm::positionIdentifyingInit(Vector *pVector, Dir *pDir) {
+void SearchAlgorithm::positionIdentifyingInit(Vector *pVector, Dir *pDir,
+                                              const Dir estIniDir) {
   idOffset = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
   *pVector = idOffset;
-  *pDir = Dir::East;
+  *pDir = estIniDir;
+  this->estIniDir = estIniDir;
   idMaze.reset(false);
 }
 bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
@@ -516,10 +518,13 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
     return Error;
   }
   /* min max */
-  const int8_t min_x = std::max(idMaze.getMinX() - 2, 0);
-  const int8_t min_y = std::max(idMaze.getMinY() - 2, 0);
-  const int8_t max_x = std::min(idMaze.getMaxX() + 3, MAZE_SIZE);
-  const int8_t max_y = std::min(idMaze.getMaxY() + 3, MAZE_SIZE);
+  int8_t min_x = std::max(idMaze.getMinX() - 2, 0);
+  int8_t min_y = std::max(idMaze.getMinY() - 2, 0);
+  int8_t max_x = std::min(idMaze.getMaxX() + 3, MAZE_SIZE);
+  int8_t max_y = std::min(idMaze.getMaxY() + 3, MAZE_SIZE);
+  /* not to go start */
+  // min_x = idOffset.x;
+  // min_y = idOffset.y;
   /* make candidates */
   Vectors candidates;
   for (int8_t x = min_x; x < max_x; ++x)
@@ -529,7 +534,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   if (idMaze.getWallLogs().empty())
     candidates.push_back(Vector(MAZE_SIZE / 2, MAZE_SIZE / 2));
   stepMap.calcNextDirs(idMaze, candidates, cv, cd, nextDirsKnown,
-                       nextDirCandidates);
+                       nextDirCandidates, false);
   return nextDirCandidates.empty() ? Error : Processing;
 }
 

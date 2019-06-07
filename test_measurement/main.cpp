@@ -68,9 +68,6 @@ public:
                .count();
     if (max_usec < usec)
       max_usec = usec;
-    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      // printInfo();
-    }
     if (newState == prevState)
       return;
     /* State Change has occurred */
@@ -93,7 +90,7 @@ public:
     // printInfo();
     std::cerr << "The robot crashed into the wall! CurVecDir:\t"
               << VecDir{getCurVec(), getCurDir()} << std::endl;
-    getc(stdin);
+    // getc(stdin);
   }
   void queueAction(const Action action) override {
 #if 0
@@ -239,13 +236,16 @@ int main(void) {
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
         for (const auto ed : Dir::ENWS()) {
-          if (stepMap.getStep(x, y) == MAZE_STEP_MAX)
+          const auto v = Vector(x, y);
+          if (stepMap.getStep(v) == MAZE_STEP_MAX)
             continue;
-          if (Vector(x, y) == robot.getMaze().getStart())
+          if (v == Vector(0, 0) || v == Vector(0, 1))
             continue;
+          // if (maze_target.isWall(v, ed))
+          //   continue;
           robot.real_v = robot.offset_v = Vector(x, y);
           robot.real_d = robot.offset_d = ed;
-          bool res = robot.positionIdentifyRun();
+          bool res = robot.positionIdentifyRun(ed);
           if (!res) {
             // robot.printInfo();
             std::cout << std::endl

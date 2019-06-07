@@ -184,7 +184,7 @@ int main(void) {
 
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = mazedata_dir + "32MM2017HX.maze";
+  const std::string filename = mazedata_dir + "32MM2018HX.maze";
   Maze maze_target = Maze(filename.c_str());
   const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
   CLRobot &robot = *p_robot;
@@ -194,9 +194,9 @@ int main(void) {
 #if 0
   /* Position Identification Run */
   robot.display = 1;
-  robot.offset_d = robot.real_d = Dir::East;
-  robot.offset_v = robot.real_v = Vector(14, 5);
-  bool res = robot.positionIdentifyRun();
+  robot.offset_d = robot.real_d = Dir::South;
+  robot.offset_v = robot.real_v = Vector(31, 2);
+  bool res = robot.positionIdentifyRun(robot.real_d);
   if (!res) {
     robot.printInfo();
     std::cout << std::endl
@@ -213,12 +213,17 @@ int main(void) {
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
       for (const auto ed : Dir::ENWS()) {
-        if (stepMap.getStep(x, y) == MAZE_STEP_MAX)
+        const auto v = Vector(x, y);
+        if (stepMap.getStep(v) == MAZE_STEP_MAX)
           continue;
+        if (v == Vector(0, 0) || v == Vector(0, 1))
+          continue;
+        // if (maze_target.isWall(v, ed))
+        //   continue;
         robot.real_v = robot.offset_v = Vector(x, y);
         robot.real_d = robot.offset_d = ed;
         robot.display = 1;
-        bool res = robot.positionIdentifyRun();
+        bool res = robot.positionIdentifyRun(ed);
         if (!res) {
           robot.printInfo();
           std::cout << std::endl

@@ -30,7 +30,7 @@ public:
     STRAIGHT_HALF,
   };
   bool searchRun();
-  bool positionIdentifyRun();
+  bool positionIdentifyRun(const Dir estInitDir);
   bool endFastRunBackingToStartRun();
   bool fastRun(const bool diagonal);
 
