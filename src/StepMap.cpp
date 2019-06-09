@@ -226,7 +226,7 @@ void StepMap::updateSimple(const Maze &maze, const Vectors &dest,
         continue; //< 壁があったら更新はしない
       if (known_only && !maze.isKnown(focus, d))
         continue; //< known_only で未知壁なら更新はしない
-      if (focus.x > max_x + 1 || focus.y > max_y + 1 || focus.x + 1 < min_x ||
+      if (focus.x > max_x + 2 || focus.y > max_y + 2 || focus.x + 1 < min_x ||
           focus.y + 1 < min_y)
         continue; //< 注目範囲外なら更新しない
       const Vector next = focus.next(d);

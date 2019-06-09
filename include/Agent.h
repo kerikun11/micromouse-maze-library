@@ -19,33 +19,33 @@ class Agent {
 public:
   Agent(Maze &maze) : maze(maze), searchAlgorithm(maze) {}
   /**
-   *  @brief ゴール区画を変更する関数
+   * @brief ゴール区画を変更する関数
    */
   void replaceGoals(const Vectors &goals) { maze.setGoals(goals); }
   /**
-   *  @brief 探索が完了しているかどうかを返す関数
+   * @brief 探索が完了しているかどうかを返す関数
    */
   bool isComplete() { return searchAlgorithm.isComplete(); }
   /**
-   *  @brief 現在地を更新
-   *  @param v 区画座標
-   *  @param d 絶対方向
+   * @brief 現在地を更新
+   * @param v 区画座標
+   * @param d 絶対方向
    */
   void updateCurVecDir(const Vector v, const Dir d) {
     curVec = v;
     curDir = d;
   }
   /**
-   *  @brief 次に行くべき方向を取得する
+   * @brief 次に行くべき方向を取得する
    */
   bool findNextDir(const Vector v, const Dir d, Dir &nextDir) const {
     return searchAlgorithm.findNextDir(state, v, d, nextDirCandidates, nextDir);
   }
   /**
-   *  @brief 絶対座標絶対方向で壁の1枚更新
-   *  @param v 区画座標
-   *  @param d 絶対方向
-   *  @param b 壁の有無
+   * @brief 絶対座標絶対方向で壁の1枚更新
+   * @param v 区画座標
+   * @param d 絶対方向
+   * @param b 壁の有無
    */
   bool updateWall(const Vector v, const Dir d, const bool left,
                   const bool front, const bool right, const bool back) {
@@ -55,9 +55,9 @@ public:
     return searchAlgorithm.resetLastWall(state, num);
   }
   /**
-   *  @brief 次に行くべき方向配列を計算
-   *  注意: 処理に時間がかかる場合あり
-   *  @return 探索状態
+   * @brief 次に行くべき方向配列を計算
+   * 注意: 処理に時間がかかる場合あり
+   * @return 探索状態
    */
   SearchAlgorithm::Result calcNextDirs() {
     return searchAlgorithm.calcNextDirs(
@@ -66,24 +66,24 @@ public:
         matchCount);
   }
   /**
-   *  @brief 最短経路を導出
-   *  @param diagonal true: 斜めあり, false: 斜めなし
-   *  @return true: 成功, false: 失敗
+   * @brief 最短経路を導出
+   * @param diagonal true: 斜めあり, false: 斜めなし
+   * @return true: 成功, false: 失敗
    */
   bool calcShortestDirs(const bool diag_enabled) {
     return searchAlgorithm.calcShortestDirs(shortestDirs, diag_enabled);
   }
   /**
-   *  @brief 探索を中止してスタート区画へ強制的に戻る
-   *  時間が残りわずかな時などに使う
+   * @brief 探索を中止してスタート区画へ強制的に戻る
+   * 時間が残りわずかな時などに使う
    */
-  void forceBackToStart(bool yes = true) { isForceBackToStart = yes; }
+  void setForceBackToStart(bool yes = true) { isForceBackToStart = yes; }
   /**
    * @brief
    * たとえゴール区画が探索済みでも，一度ゴール区画を訪れるモードに設定する
    * 最短失敗後の自己位置同定後などに使用する
    */
-  void forceGoingToGoal(bool yes = true) { isForceGoingToGoal = yes; }
+  void setForceGoingToGoal(bool yes = true) { isForceGoingToGoal = yes; }
   /**
    * @brief 自己位置同定モードに設定する
    */
@@ -94,40 +94,40 @@ public:
     calcNextDirs(); /*< 時間がかかる処理！ */
   }
   /**
-   *  @brief 探索状態の取得
+   * @brief 探索状態の取得
    */
   const SearchAlgorithm::State &getState() const { return state; }
   /**
-   *  @brief 次に行くべき方向配列の計算結果を取得
+   * @brief 次に行くべき方向配列の計算結果を取得
    */
   const Dirs &getNextDirs() const { return nextDirsKnown; }
   /**
-   *  @brief 次に行くべき方向配列の計算結果を取得
+   * @brief 次に行くべき方向配列の計算結果を取得
    */
   const Dirs &getNextDirCandidates() const { return nextDirCandidates; }
   /**
-   *  @brief 現在区画を取得
+   * @brief 現在区画を取得
    */
   const Vector &getCurVec() const { return curVec; }
   /**
-   *  @brief 現在の方向を取得
+   * @brief 現在の方向を取得
    */
   const Dir &getCurDir() const { return curDir; }
   /**
-   *  @brief 最短経路の方向配列の計算結果を取得
+   * @brief 最短経路の方向配列の計算結果を取得
    */
   const Dirs &getShortestDirs() const { return shortestDirs; }
   /**
-   *  @brief 迷路を取得
+   * @brief 迷路を取得
    */
-  Maze &getMaze() { return maze; }
+  const Maze &getMaze() const { return maze; }
   /**
    * @brief Get the Search Algorithm object
    */
   const SearchAlgorithm &getSearchAlgorithm() const { return searchAlgorithm; }
   /**
-   *  @brief 探索状態を表示
-   *  @param showMaze true:迷路も表示, false:迷路は非表示
+   * @brief 探索状態を表示
+   * @param showMaze true:迷路も表示, false:迷路は非表示
    */
   void printInfo(const bool showMaze = true) const {
     printInfo(showMaze, curVec, curDir, state);
@@ -135,7 +135,7 @@ public:
   void printInfo(const bool showMaze, const Vector vec, const Dir dir,
                  const SearchAlgorithm::State state) const;
   /**
-   *  @brief 最短経路の表示
+   * @brief 最短経路の表示
    */
   void printPath() const {
     maze.printPath(maze.getStart(), shortestDirs);
@@ -154,8 +154,8 @@ protected:
 
 private:
   SearchAlgorithm searchAlgorithm; /**< 探索器 */
-  Dirs nextDirsKnown;              /**< 次に行く探索方向配列 */
-  Dirs nextDirCandidates; /**< 次に行く方向の候補の優先順 */
+  Dirs nextDirsKnown;              /**< 次に行く既知方向配列 */
+  Dirs nextDirCandidates; /**< 次に行く未知方向候補の優先順 */
   Dirs shortestDirs;      /**< 最短経路の方向配列 */
   int matchCount = 0;     /**< 自己位置同定の候補数，表示用 */
 };

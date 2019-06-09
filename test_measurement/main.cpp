@@ -46,22 +46,14 @@ int test_measurement() {
     const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
     CLRobot &robot = *p_robot;
     robot.replaceGoals(maze_target.getGoals());
-    int sum_total = 0;
-    int sum_max = 0;
-    const int n = 1;
-    for (int i = 0; i < n; ++i) {
-      robot.getMaze().reset();
-      const auto t_s = std::chrono::system_clock().now();
-      if (!robot.searchRun())
-        loge << "Failed to Find a Path to Goal! " << std::endl;
-      const auto t_e = std::chrono::system_clock().now();
-      const auto us =
-          std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
-      sum_total += us.count();
-      sum_max += robot.max_usec;
-    }
+    const auto t_s = std::chrono::system_clock().now();
+    if (!robot.searchRun())
+      loge << "Failed to Find a Path to Goal! " << std::endl;
+    const auto t_e = std::chrono::system_clock().now();
+    const auto us =
+        std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
     robot.printResult();
-    std::cout << "Max Calc Time:\t" << sum_max / n << "\t[us]" << std::endl;
+    std::cout << "Max Calc Time:\t" << us.count() << "\t[us]" << std::endl;
     // std::cout << "Total Search:\t" << sum_total / n << "\t[us]" << std::endl;
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirs(diag_enabled))
@@ -99,7 +91,7 @@ int test_measurement() {
             getc(stdin);
           }
         }
-    std::cout << "P.I. Max Time:\t" << robot.max_usec << "\t[us]" << std::endl;
+    std::cout << "Max P.I. Time:\t" << robot.max_usec << "\t[us]" << std::endl;
 #endif
 
 #if 1

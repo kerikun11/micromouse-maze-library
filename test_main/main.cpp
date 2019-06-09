@@ -31,7 +31,7 @@ protected:
   virtual void queueAction(const Action action) override {
     if (display) {
       printInfo();
-      getc(stdin);
+      // getc(stdin);
     }
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&

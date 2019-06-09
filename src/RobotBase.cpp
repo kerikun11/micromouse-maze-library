@@ -7,7 +7,7 @@ bool RobotBase::searchRun() {
   if (!isForceGoingToGoal && isComplete())
     return true;
   /* ゴール区画への訪問を指定 */
-  forceGoingToGoal();
+  setForceGoingToGoal();
   /* スタートのアクションをキュー */
   queueAction(START_STEP);
   updateCurVecDir(Vector(0, 1), Dir::North);
@@ -18,7 +18,7 @@ bool RobotBase::positionIdentifyRun(const Dir estInitDir) {
   /* 自己位置同定の初期化 */
   positionIdentify(estInitDir);
   /* ゴール区画への訪問を指定 */
-  forceGoingToGoal();
+  setForceGoingToGoal();
   /* スタートのアクションをキュー */
   queueAction(STRAIGHT_HALF);
   /* 走行開始 */

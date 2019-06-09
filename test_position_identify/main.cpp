@@ -18,8 +18,7 @@ protected:
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
       if (display)
         printInfo();
-      // display = 0;
-      display = 1;
+      display = 0;
     }
   }
   virtual void crashed() override {
@@ -30,7 +29,7 @@ protected:
   virtual void queueAction(const Action action) override {
     if (display) {
       printInfo();
-      getc(stdin);
+      // getc(stdin);
     }
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.first == maze.getStart())
@@ -49,7 +48,7 @@ int test_position_identify() {
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
 
-#if 1
+#if 0
   /* Position Identification Run */
   robot.display = 0;
   robot.fake_offset.second = robot.real.second = Dir::South;
@@ -65,7 +64,7 @@ int test_position_identify() {
   }
 #endif
 
-#if 0
+#if 1
   /* Position Identification Run */
   StepMap stepMap;
   stepMap.updateSimple(maze_target, maze_target.getGoals(), false);
