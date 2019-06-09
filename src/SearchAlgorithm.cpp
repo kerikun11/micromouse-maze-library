@@ -1,9 +1,9 @@
 /**
- *  @file SearchAlgorithm.cpp
- *  @brief マイクロマウスの迷路の探索アルゴリズムを扱うクラス
- *  @author KERI (Github: kerikun11)
- *  @url https://kerikeri.top/
- *  @date 2017.11.05
+ * @file SearchAlgorithm.cpp
+ * @brief マイクロマウスの迷路の探索アルゴリズムを扱うクラス
+ * @author KERI (Github: kerikun11)
+ * @url https://kerikeri.top/
+ * @date 2017.11.05
  */
 #include "SearchAlgorithm.h"
 
@@ -14,8 +14,8 @@
 
 namespace MazeLib {
 
-/** @def SEARCHING_ADDITIONALLY_AT_START
- *  @brief 追加探索状態で探索を始める(ゴールを急がない)
+/**
+ * @brief 追加探索状態で探索を始める(ゴールを急がない)
  */
 #define SEARCHING_ADDITIONALLY_AT_START 1
 
@@ -31,8 +31,8 @@ const char *SearchAlgorithm::stateString(const enum State s) {
   };
   return str[s];
 }
-/** @function isComplete
- *  @brief 最短経路が導出されているか調べる関数
+/**
+ * @brief 最短経路が導出されているか調べる関数
  */
 bool SearchAlgorithm::isComplete() {
 #if D_STAR_LITE_ENABLED
@@ -304,7 +304,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 #if USE_OLD_ALGORITHM
   /* old */
   candidates.clear();
-  // 斜めありなしの双方の最短経路上を候補とする
+  /* 斜めありなしの双方の最短経路上を候補とする */
   for (const bool diagonal : {true, false}) {
     stepMap.update(maze, maze.getGoals(), false, diagonal);
     auto v = maze.getStart();
@@ -312,7 +312,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
     auto prev_dir = dir;
     while (1) {
       step_t min_step = MAZE_STEP_MAX;
-      // 周囲のマスの中で一番ステップの小さいマスに移動
+      /* 周囲のマスの中で一番ステップの小さいマスに移動 */
       for (const auto d : Dir::ENWS()) {
         if (maze.isWall(v, d))
           continue;
@@ -323,18 +323,18 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
         }
       }
       if (stepMap.getStep(v) <= min_step)
-        return false; //< 失敗
+        return false; /*< 失敗 */
       if (maze.unknownCount(v))
-        candidates.push_back(v); //< 未知壁があれば候補に入れる
+        candidates.push_back(v); /*< 未知壁があれば候補に入れる */
       v = v.next(dir);
       if (stepMap.getStep(v) == 0)
-        break; //< ゴール区画
+        break; /*< ゴール区画 */
     }
-    // ゴール区画を行けるところまで直進(斜め考慮)する
+    /* ゴール区画を行けるところまで直進(斜め考慮)する */
     bool loop = true;
     while (loop) {
       loop = false;
-      // 斜めを考慮した進行方向を列挙する
+      /* 斜めを考慮した進行方向を列挙する */
       Dirs dirs;
       const auto rel_dir = Dir(dir - prev_dir);
       if (diagonal && rel_dir == Dir::Left)
@@ -343,11 +343,11 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
         dirs = {Dir(dir + Dir::Left), dir};
       else
         dirs = {dir};
-      // 行ける方向に行く
+      /* 行ける方向に行く */
       for (const auto d : dirs) {
         if (!maze.isWall(v, d)) {
           if (maze.unknownCount(v))
-            candidates.push_back(v); //< 未知壁があれば候補に入れる
+            candidates.push_back(v); /*< 未知壁があれば候補に入れる */
           v = v.next(d);
           prev_dir = dir;
           dir = d;
@@ -360,7 +360,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 #if USE_HYBRID_ALGORITHM
   if (!candidates.empty())
 #endif
-    return true; //< 成功
+    return true; /*< 成功 */
 #endif
   /* 新アルゴリズム */
   candidates.clear();
@@ -373,12 +373,12 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
     const bool known_only = false;
 #if D_STAR_LITE_ENABLED
     if (!shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled))
-      return false; /* 失敗 */
+      return false; /*< 失敗 */
     if (!shortestAlgorithm.FollowShortestPath(path, known_only, diag_enabled))
-      return false; /* 失敗 */
+      return false; /*< 失敗 */
 #else
     if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
-      return false; /* 失敗 */
+      return false; /*< 失敗 */
 #endif
     const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
     auto v = maze.getStart();
@@ -388,7 +388,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
         candidates.push_back(v);
     }
   }
-  return true; /* 成功 */
+  return true; /*< 成功 */
 }
 int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
                                              VecDir &ans) const {
@@ -398,8 +398,10 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
   const int many = 1000;
   const int min_size = 12;
   const int min_diff = 4;
+  /* ある程度既知壁になるまで一致判定をしない */
   if (idWallLogs.size() < min_size)
     return many;
+  /* パターンマッチング開始 */
   int cnt = 0;
   for (int8_t x = 0; x < max_x + 1; ++x)
     for (int8_t y = 0; y < max_y + 1; ++y)
@@ -442,7 +444,7 @@ SearchAlgorithm::calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
   Vectors candidates;
   for (const auto v : maze.getGoals())
     if (maze.unknownCount(v))
-      candidates.push_back(v); //< ゴール区画の未知区画を洗い出す
+      candidates.push_back(v); /*< ゴール区画の未知区画を洗い出す */
   if (candidates.empty())
     return Reached;
   stepMap.calcNextDirs(maze, candidates, cv, cd, nextDirsKnown,
@@ -454,7 +456,7 @@ SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
                                                 Dirs &nextDirsKnown,
                                                 Dirs &nextDirCandidates) {
   Vectors candidates;
-  findShortestCandidates(candidates); //< 最短になりうる区画の洗い出し
+  findShortestCandidates(candidates); /*< 最短になりうる区画の洗い出し */
   if (candidates.empty())
     return Reached;
   stepMap.calcNextDirs(maze, candidates, cv, cd, nextDirsKnown,

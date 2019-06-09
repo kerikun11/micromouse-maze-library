@@ -176,7 +176,7 @@ public:
         return z == 1 ? Dir::Left45 : Dir::Right45;
       }
       loge << "invalid direction" << std::endl;
-      return Dir::AbsMax;
+      return Dir::Max;
     }
     /**
      * @brief NodeDir が向いている方向の隣の Index を返す
@@ -193,8 +193,8 @@ public:
     getPredecessors(const Maze &maze, const bool known_only,
                     const bool diag_enabled) const;
   };
-  static_assert(sizeof(Index) == 2, "Index Size Error"); /**< Size Check */
-  typedef std::vector<Index> Indexes;
+  static_assert(sizeof(Index) == 2, "sizeof(Index) Error"); /**< Size Check */
+  using Indexes = std::vector<Index>;
 
   /**
    * @brief Get the Heuristic Value
@@ -229,7 +229,7 @@ public:
       r_map[i] = g_map[i] = CostMax;
     for (const auto v : maze.getGoals())
       for (const auto nd : Dir::ENWS()) {
-        const auto i = Index(v, Dir::AbsMax, nd);
+        const auto i = Index(v, Dir::Max, nd);
         r_map[i] = 0;
         in_map[i] = true;
         U.push_back({i, CalculateKey(i)});
@@ -312,8 +312,8 @@ public:
           }
         }
         for (const auto i : {
-                 Index(w_v, Dir::AbsMax, w_d + Dir::Back),
-                 Index(w_v.next(w_d), Dir::AbsMax, w_d),
+                 Index(w_v, Dir::Max, w_d + Dir::Back),
+                 Index(w_v.next(w_d), Dir::Max, w_d),
              }) {
           UpdateVertex(i, known_only, diag_enabled);
           UpdateVertex(i.opposite(), known_only, diag_enabled);
@@ -472,7 +472,7 @@ public:
 private:
   const Maze &maze; /**< @brief 使用する迷路の参照 */
   const Index index_start =
-      Index(0, 0, Dir::AbsMax, Dir::North); /**< @brief スタート */
+      Index(0, 0, Dir::Max, Dir::North); /**< @brief スタート */
 
   std::vector<std::pair<Index, Key>> U;
   std::array<cost_t, Index::Max> g_map;

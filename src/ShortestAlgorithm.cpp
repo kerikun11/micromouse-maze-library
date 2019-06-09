@@ -107,7 +107,7 @@ void ShortestAlgorithm::Index::uniquify(const Dir d) {
     z = 1;
     y--;
     break;
-  case Dir::AbsMax:
+  case Dir::Max:
     z = 0;
     break;
   default:
@@ -146,7 +146,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
     /* 直進で行けるところまで行く */
     int8_t n = 1;
     for (auto v_st = v.next(nd); canGo(v_st, nd); v_st = v_st.next(nd), ++n)
-      succs.push_back({Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n)});
+      succs.push_back({Index(v_st, Dir::Max, nd), getEdgeCost(ST_ALONG, n)});
     if (diag_enabled) {
       /* 斜めありのターン */
       const auto d_f = nd;          //< i.e. dir front
@@ -164,8 +164,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
           if (canGo(v_fl, d_f))            //< 45度先の壁
             succs.push_back({Index(v_f, d_l, nd_45), getEdgeCost(F45)});
           if (canGo(v_fl, d_l)) //< 90度先の壁
-            succs.push_back(
-                {Index(v_fl, Dir::AbsMax, nd_90), getEdgeCost(F90)});
+            succs.push_back({Index(v_fl, Dir::Max, nd_90), getEdgeCost(F90)});
           const auto d_b = d_f + Dir::Back;    //< 後方向
           if (canGo(v_fl, d_b)) {              //< 135度の壁
             const auto v_fll = v_fl.next(d_b); //< 前左左の区画
@@ -173,7 +172,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
               succs.push_back({Index(v_fll, d_f, nd_135), getEdgeCost(F135)});
             if (canGo(v_fll, d_b)) //< 180度行先の壁
               succs.push_back(
-                  {Index(v_fll, Dir::AbsMax, nd_180), getEdgeCost(F180)});
+                  {Index(v_fll, Dir::Max, nd_180), getEdgeCost(F180)});
           }
         }
       }
@@ -183,7 +182,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
       for (const auto d_turn : {Dir::Left, Dir::Right})
         if (canGo(v_f, nd + d_turn)) //< 90度方向の壁
           succs.push_back(
-              {Index(v_f, Dir::AbsMax, nd + d_turn), getEdgeCost(FS90)});
+              {Index(v_f, Dir::Max, nd + d_turn), getEdgeCost(FS90)});
     }
   } else {
     /* 壁の中央（斜めありの場合しかありえない） */
@@ -210,7 +209,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
     auto v_45 = i_f.arrow_to();
     /* 45度方向 */
     if (canGo(v_45, d_45))
-      succs.push_back({Index(v_45, Dir::AbsMax, d_45), getEdgeCost(F45)});
+      succs.push_back({Index(v_45, Dir::Max, d_45), getEdgeCost(F45)});
     /* V90方向, 135度方向*/
     if (canGo(v_45, d_135)) {
       /* V90方向, 135度方向*/
@@ -218,7 +217,7 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
       if (canGo(v_135, d_45))
         succs.push_back({Index(v_45, d_135, nd_90), getEdgeCost(FV90)});
       if (canGo(v_135, d_135))
-        succs.push_back({Index(v_135, Dir::AbsMax, d_135), getEdgeCost(F135)});
+        succs.push_back({Index(v_135, Dir::Max, d_135), getEdgeCost(F135)});
     }
   }
   return succs;
@@ -248,13 +247,13 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
     /* 直進で行けるところまで行く */
     int8_t n = 1;
     for (auto v_st = v_b.next(d_b); canGo(v_st, nd); v_st = v_st.next(d_b), ++n)
-      preds.push_back({Index(v_st, Dir::AbsMax, nd), getEdgeCost(ST_ALONG, n)});
+      preds.push_back({Index(v_st, Dir::Max, nd), getEdgeCost(ST_ALONG, n)});
     /* ここからはターン */
     /* 左右を一般化 */
     for (const auto d_turn : {Dir::Left, Dir::Right})
       if (canGo(v_b, nd + d_turn)) //< 90度方向の壁
         preds.push_back(
-            {Index(v_b.next(nd + d_turn), Dir::AbsMax, nd + d_turn + Dir::Back),
+            {Index(v_b.next(nd + d_turn), Dir::Max, nd + d_turn + Dir::Back),
              getEdgeCost(FS90)});
     return preds; /* 終了 */
   }
@@ -271,7 +270,7 @@ const ShortestAlgorithm::Index ShortestAlgorithm::Index::next() const {
   case Dir::North:
   case Dir::West:
   case Dir::South:
-    return Index(Vector(x, y).next(nd), Dir::AbsMax, nd);
+    return Index(Vector(x, y).next(nd), Dir::Max, nd);
   /* 壁の中央 */
   case Dir::NorthEast:
     return z == 0 ? Index(Vector(x + 1, y), Dir::North, nd)
@@ -313,7 +312,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   /* push the goal indexes */
   for (const auto v : maze.getGoals())
     for (const auto nd : Dir::ENWS()) {
-      const auto i = Index(v, Dir::AbsMax, nd);
+      const auto i = Index(v, Dir::Max, nd);
       f_map[i] = 0;
       in_map[i] = true;
       open_list.push_back(i);

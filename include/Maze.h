@@ -22,7 +22,7 @@ static constexpr int MAZE_SIZE = 32;
  *  @brief 迷路のサイズのbit数と一致する整数型
  *   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
  */
-typedef uint32_t wall_size_t;
+using wall_size_t = uint32_t;
 static_assert(sizeof(wall_size_t) * 8 == MAZE_SIZE,
               "wall_size_t"); /* Size Check */
 
@@ -67,7 +67,7 @@ static_assert(sizeof(wall_size_t) * 8 == MAZE_SIZE,
  */
 struct Dir {
 public:
-  /** @enum Dir::AbsoluteDir
+  /**
    *  @brief 絶対方向の列挙型
    */
   enum AbsoluteDir : int8_t {
@@ -93,7 +93,7 @@ public:
     Right,
     Right45,
   };
-  static constexpr int8_t AbsMax = 8;
+  static constexpr int8_t Max = 8;
   /**
    *  @param d Absolute Direction
    */
@@ -106,7 +106,7 @@ public:
   bool isAlong() const { return (d & 1) == 0; }
   bool isDiag() const { return (d & 1) == 1; }
   /**
-   *  @brief 全方向の方向配列を生成する静的関数
+   *  @brief 方向配列を生成する静的関数
    */
   static const std::array<Dir, 4> &ENWS() {
     static const std::array<Dir, 4> all = {East, North, West, South};
@@ -131,7 +131,7 @@ static_assert(sizeof(Dir) == 1, "sizeof(Dir) Error"); /**< Size Check */
 /**
  *  @brief Dir構造体の動的配列
  */
-typedef std::vector<Dir> Dirs;
+using Dirs = std::vector<Dir>;
 
 /**
  * @brief 迷路上の座標を定義．左下の区画が (0,0) の (x,y) 平面
@@ -202,12 +202,12 @@ static_assert(sizeof(Vector) == 2, "sizeof(Vector) Error"); /**< Size Check */
 /**
  * @brief Vector構造体の動的配列
  */
-typedef std::vector<Vector> Vectors;
+using Vectors = std::vector<Vector>;
 
 /**
  * @brief VecDir
  */
-typedef std::pair<Vector, Dir> VecDir;
+using VecDir = std::pair<Vector, Dir>;
 /**
  * @brief Vector と Dir を同時に表示
  */
@@ -238,7 +238,7 @@ static_assert(sizeof(WallLog) == 2, "WallLog Size Error"); /**< Size Check */
 /**
  * @brief WallLog構造体の動的配列
  */
-typedef std::vector<WallLog> WallLogs;
+using WallLogs = std::vector<WallLog>;
 
 /**
  * @brief 迷路の壁情報を管理するクラス

@@ -17,7 +17,7 @@ protected:
   }
 };
 
-void test_measurement() {
+int test_measurement() {
   const std::string mazedata_dir = "../mazedata/";
   for (const auto filename : {
            mazedata_dir + "32MM2018HX.maze",
@@ -129,9 +129,11 @@ void test_measurement() {
 #endif
   }
   std::cout << std::endl << "Measurement End" << std::endl;
+
+  return 0;
 }
 
 int main(void) {
-  test_measurement();
-  return 0;
+  setvbuf(stdout, (char *)NULL, _IONBF, 0);
+  return test_measurement();
 }

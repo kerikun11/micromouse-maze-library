@@ -1,9 +1,9 @@
 /**
- *  @file StepMap.cpp
- *  @brief マイクロマウスの迷路のステップマップを扱うクラス
- *  @author KERI (Github: kerikun11)
- *  @url https://kerikeri.top/
- *  @date 2017.11.05
+ * @file StepMap.cpp
+ * @brief マイクロマウスの迷路のステップマップを扱うクラス
+ * @author KERI (Github: kerikun11)
+ * @url https://kerikeri.top/
+ * @date 2017.11.05
  */
 #include "StepMap.h"
 

@@ -11,7 +11,7 @@
 
 namespace MazeLib {
 
-typedef uint16_t step_t;               /**< @brief ステップマップの型*/
+using step_t = uint16_t;               /**< @brief ステップマップの型*/
 constexpr step_t MAZE_STEP_MAX = 9999; /**< @brief 最大ステップ値 */
 
 /**
@@ -48,11 +48,11 @@ public:
    *  @param v ハイライト区画
    */
   void print(const Maze &maze, const Vector v = Vector(-1, -1),
-             const Dir &d = Dir::AbsMax) const {
+             const Dir &d = Dir::Max) const {
     print(std::cout, maze, v, d);
   }
   void print(std::ostream &os, const Maze &maze,
-             const Vector v = Vector(-1, -1), const Dir d = Dir::AbsMax) const;
+             const Vector v = Vector(-1, -1), const Dir d = Dir::Max) const;
   /** @function update
    *  @brief ステップマップの更新
    *  @param dest ステップを0とする区画の配列

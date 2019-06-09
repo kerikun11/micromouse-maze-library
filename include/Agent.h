@@ -1,9 +1,9 @@
 /**
- *  @file Agent.h
- *  @brief マイクロマウスの探索ナビゲータ
- *  @author KERI (Github: kerikun11)
- *  @url https://kerikeri.top/
- *  @date 2018.05.20
+ * @file Agent.h
+ * @brief 現在位置，探索状態を管理するクラスを定義するファイル
+ * @author KERI (Github: kerikun11)
+ * @url https://kerikeri.top/
+ * @date 2018.05.20
  */
 #pragma once
 

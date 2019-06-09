@@ -1,7 +1,7 @@
 /**
  * @file Agent.cpp
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
- * @brief
+ * @brief 現在位置，探索状態を管理するクラスを定義するファイル
  * @version 0.1
  * @date 2019-05-09
  *

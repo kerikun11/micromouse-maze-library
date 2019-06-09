@@ -36,7 +36,7 @@ protected:
   }
 };
 
-void test_position_identify() {
+int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
   const std::string filename = mazedata_dir + "32MM2018HX.maze";
@@ -91,9 +91,12 @@ void test_position_identify() {
       }
   std::cout << "P.I. Max Time:\t" << robot.max_usec << "\t[us]" << std::endl;
 #endif
+  std::cout << std::endl << "End" << std::endl;
+
+  return 0;
 }
 
 int main(void) {
-  test_position_identify();
-  return 0;
+  setvbuf(stdout, (char *)NULL, _IONBF, 0);
+  return test_position_identify();
 }
