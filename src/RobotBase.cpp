@@ -49,6 +49,11 @@ bool RobotBase::positionIdentifyRun(const Dir estInitDir) {
   return true;
 }
 bool RobotBase::endFastRunBackingToStartRun() {
+  /* 現在位置を最短後の位置に移す */
+  Vector v = maze.getStart();
+  for (auto d : getShortestDirs())
+    v = v.next(d);
+  updateCurVecDir(v, getShortestDirs().back());
   /* 最短後は区画の中央にいるので，区画の切り替わり位置に移動 */
   updateCurVecDir(getCurVec().next(getCurDir() + Dir::Back),
                   getCurDir() + Dir::Back);
@@ -76,11 +81,6 @@ bool RobotBase::fastRun(const bool diag_enabled) {
     return false;
   }
   /* fast run here */
-  /* 現在位置を最短後の位置に移す */
-  Vector v = maze.getStart();
-  for (auto d : getShortestDirs())
-    v = v.next(d);
-  updateCurVecDir(v, getShortestDirs().back());
   return true;
 }
 
