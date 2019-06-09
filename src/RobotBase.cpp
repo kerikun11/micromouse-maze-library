@@ -11,42 +11,18 @@ bool RobotBase::searchRun() {
   /* スタートのアクションをキュー */
   queueAction(START_STEP);
   updateCurVecDir(Vector(0, 1), Dir::North);
-  /* スタート前のキャリブレーション */
-  calibration();
   /* 走行開始 */
-  startDequeue();
-  auto res = generalSearchRun();
-  if (!res) {
-    stopDequeue();
-    return false;
-  }
-  /* スタート区画特有の処理 */
-  queueAction(START_INIT);
-  updateCurVecDir(Vector(0, 0), Dir::North);
-  calcNextDirs(); /*< 時間がかかる処理！ */
-  waitForEndAction();
-  stopDequeue();
-  backupMazeToFlash();
-  return true;
+  return generalSearchRun();
 }
 bool RobotBase::positionIdentifyRun(const Dir estInitDir) {
+  /* 自己位置同定の初期化 */
   positionIdentify(estInitDir);
+  /* ゴール区画への訪問を指定 */
+  forceGoingToGoal();
+  /* スタートのアクションをキュー */
   queueAction(STRAIGHT_HALF);
-  calibration();
-  startDequeue();
-  auto res = generalSearchRun();
-  if (!res) {
-    stopDequeue();
-    return false;
-  }
-  /* スタート区画特有の処理 */
-  queueAction(START_INIT);
-  updateCurVecDir(Vector(0, 0), Dir::North);
-  calcNextDirs(); /*< 時間がかかる処理！ */
-  waitForEndAction();
-  stopDequeue();
-  backupMazeToFlash();
-  return true;
+  /* 走行開始 */
+  return generalSearchRun();
 }
 bool RobotBase::endFastRunBackingToStartRun() {
   /* 現在位置を最短後の位置に移す */
@@ -59,21 +35,8 @@ bool RobotBase::endFastRunBackingToStartRun() {
                   getCurDir() + Dir::Back);
   queueAction(ROTATE_180);
   queueAction(STRAIGHT_HALF);
-  calibration();
-  startDequeue();
-  auto res = generalSearchRun();
-  if (!res) {
-    stopDequeue();
-    return false;
-  }
-  /* スタート区画特有の処理 */
-  queueAction(START_INIT);
-  updateCurVecDir(Vector(0, 0), Dir::North);
-  calcNextDirs(); /*< 時間がかかる処理！ */
-  waitForEndAction();
-  stopDequeue();
-  backupMazeToFlash();
-  return true;
+  /* 走行開始 */
+  return generalSearchRun();
 }
 bool RobotBase::fastRun(const bool diag_enabled) {
   if (!calcShortestDirs(diag_enabled)) {
@@ -116,6 +79,10 @@ void RobotBase::queueNextDirs(const Dirs &nextDirs) {
   }
 }
 bool RobotBase::generalSearchRun() {
+  /* スタート前のキャリブレーション */
+  calibration();
+  /* 走行開始 */
+  startDequeue();
   while (1) {
     const auto &v = getCurVec();
     const auto &d = getCurDir();
@@ -129,9 +96,11 @@ bool RobotBase::generalSearchRun() {
     queueNextDirs(getNextDirs());
     /* 最短経路導出結果を確認 */
     if (status == SearchAlgorithm::Reached)
-      return true;
-    if (status == SearchAlgorithm::Error)
+      break;
+    if (status == SearchAlgorithm::Error) {
+      stopDequeue();
       return false;
+    }
     /* 走行が終わるのを待つ */
     waitForEndAction();
     /* 壁を確認 */
@@ -142,11 +111,20 @@ bool RobotBase::generalSearchRun() {
     /* 壁のない方向へ1マス移動 */
     Dir nextDir;
     if (!findNextDir(v, d, nextDir)) {
-      std::cerr << "I can't go anywhere!" << std::endl;
+      loge << "I can't go anywhere!" << std::endl;
+      stopDequeue();
       return false;
     }
     queueNextDirs({nextDir});
   }
+  /* スタート区画特有の処理 */
+  queueAction(START_INIT);
+  updateCurVecDir(Vector(0, 0), Dir::North);
+  calcNextDirs(); /*< 時間がかかる処理！ */
+  waitForEndAction();
+  stopDequeue();
+  backupMazeToFlash();
+  return true;
 }
 
 } // namespace MazeLib

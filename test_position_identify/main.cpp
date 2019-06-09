@@ -18,7 +18,8 @@ protected:
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
       if (display)
         printInfo();
-      display = 0;
+      // display = 0;
+      display = 1;
     }
   }
   virtual void crashed() override {
@@ -27,8 +28,10 @@ protected:
     getc(stdin);
   }
   virtual void queueAction(const Action action) override {
-    if (display)
+    if (display) {
       printInfo();
+      getc(stdin);
+    }
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.first == maze.getStart())
       logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
@@ -46,11 +49,11 @@ int test_position_identify() {
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
 
-#if 0
+#if 1
   /* Position Identification Run */
-  robot.display = 1;
+  robot.display = 0;
   robot.fake_offset.second = robot.real.second = Dir::South;
-  robot.fake_offset.first = robot.real.first = Vector(31, 2);
+  robot.fake_offset.first = robot.real.first = Vector(16, 16);
   bool res = robot.positionIdentifyRun(robot.real.second);
   if (!res) {
     robot.printInfo();
@@ -62,7 +65,7 @@ int test_position_identify() {
   }
 #endif
 
-#if 1
+#if 0
   /* Position Identification Run */
   StepMap stepMap;
   stepMap.updateSimple(maze_target, maze_target.getGoals(), false);

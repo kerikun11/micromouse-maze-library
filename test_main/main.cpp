@@ -29,8 +29,10 @@ protected:
     getc(stdin);
   }
   virtual void queueAction(const Action action) override {
-    if (display)
+    if (display) {
       printInfo();
+      getc(stdin);
+    }
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.first == maze.getStart())
@@ -61,9 +63,11 @@ int main(void) {
   robot.searchRun();
   robot.printInfo();
   robot.fastRun(false);
+  // robot.endFastRunBackingToStartRun();
   robot.printPath();
   robot.fastRun(true);
   robot.printPath();
+  // robot.endFastRunBackingToStartRun();
 #endif
 
 #if 0

@@ -92,7 +92,7 @@ enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
   state = START;
   enum Result result;
   /* check if in goal */
-  if (isForceGoingToGoal) {
+  if (!isPositionIdentifying && isForceGoingToGoal) {
     const auto goals = maze.getGoals();
     const auto it =
         std::find_if(goals.cbegin(), goals.cend(),
@@ -484,12 +484,12 @@ enum SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
                                          Dirs &nextDirsKnown,
                                          Dirs &nextDirCandidates) {
-  const auto goals = maze.getGoals();
-  const auto v = stepMap.calcNextDirs(maze, goals, cv, cd, nextDirsKnown,
-                                      nextDirCandidates);
+  const auto &goals = maze.getGoals();
+  stepMap.calcNextDirs(maze, goals, cv, cd, nextDirsKnown, nextDirCandidates);
+  const auto nv = cv.next(nextDirCandidates[0] + Dir::Back);
   const auto it = std::find_if(goals.cbegin(), goals.cend(),
-                               [v](const Vector nv) { return v == nv; });
-  if (it != goals.end())
+                               [nv](const auto v) { return nv == v; });
+  if (it != goals.cend())
     return Reached;
   return nextDirCandidates.empty() ? Error : Processing;
 }
