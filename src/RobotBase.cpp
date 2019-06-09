@@ -49,10 +49,7 @@ bool RobotBase::positionIdentifyRun(const Dir estInitDir) {
   return true;
 }
 bool RobotBase::endFastRunBackingToStartRun() {
-  Vector v = Vector(0, 0);
-  for (auto d : getShortestDirs())
-    v = v.next(d);
-  updateCurVecDir(v, getShortestDirs().back());
+  /* 最短後は区画の中央にいるので，区画の切り替わり位置に移動 */
   updateCurVecDir(getCurVec().next(getCurDir() + Dir::Back),
                   getCurDir() + Dir::Back);
   queueAction(ROTATE_180);
@@ -78,7 +75,12 @@ bool RobotBase::fastRun(const bool diag_enabled) {
     std::cerr << "Failed to find shortest path!" << std::endl;
     return false;
   }
-  /* move robot here */
+  /* fast run here */
+  /* 現在位置を最短後の位置に移す */
+  Vector v = maze.getStart();
+  for (auto d : getShortestDirs())
+    v = v.next(d);
+  updateCurVecDir(v, getShortestDirs().back());
   return true;
 }
 

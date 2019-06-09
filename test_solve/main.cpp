@@ -1,123 +1,24 @@
-#include "Maze.h"
-#include "RobotBase.h"
-#include <chrono>
-#include <cstdio>
+#include "CLRobotBase.h"
 
 using namespace MazeLib;
 
-static Maze target_maze;
-static bool display = 0;
-
-class TestRobot : public RobotBase {
+class CLRobot : public CLRobotBase {
 public:
-  TestRobot() : RobotBase(maze) {}
+  CLRobot(const Maze &maze_target) : CLRobotBase(maze_target) {}
 
-  void printInfo(const bool showMaze = true) {
-    Agent::printInfo(showMaze);
-    std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
-                "Right: %3d, Back: %3d\n",
-                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
-                (int)max_usec);
-  }
-
-private:
-  Maze maze;
-  int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
-  float cost = 0;
-  int max_usec = 0;
-  int usec;
-  std::chrono::system_clock::time_point start;
-  std::chrono::system_clock::time_point end;
-
-  void findWall(bool &left, bool &front, bool &right, bool &back) override {
-    const auto &v = getCurVec();
-    const auto &d = getCurDir();
-    left = target_maze.isWall(v, d + Dir::Left);
-    front = target_maze.isWall(v, d + Dir::Front);
-    right = target_maze.isWall(v, d + Dir::Right);
-    back = target_maze.isWall(v, d + Dir::Back);
-  }
-  void calcNextDirsPreCallback() override {
-    start = std::chrono::system_clock::now();
-  }
-  void calcNextDirsPostCallback(SearchAlgorithm::State prevState
-                                __attribute__((unused)),
-                                SearchAlgorithm::State newState
-                                __attribute__((unused))) override {
-    end = std::chrono::system_clock::now();
-    usec = std::chrono::duration_cast<std::chrono::microseconds>(end - start)
-               .count();
-    if (max_usec < usec)
-      max_usec = usec;
-  }
-  void discrepancyWithKnownWall() override {
+protected:
+  virtual void discrepancyWithKnownWall() override {
     printInfo();
-    std::cout << "There was a discrepancy with known information!" << std::endl;
+    std::cout << "There was a discrepancy with known information! CurVecDir:\t"
+              << VecDir{getCurVec(), getCurDir()} << std::endl;
+    getc(stdin);
   }
-  void queueAction(const Action action) override {
-    if (display)
-      printInfo();
-    cost += getTimeCost(action);
-    step++;
-    switch (action) {
-    case RobotBase::START_STEP:
-      f++;
-      break;
-    case RobotBase::START_INIT:
-      break;
-    case RobotBase::STOP_HALF:
-      break;
-    case RobotBase::TURN_LEFT_90:
-      l++;
-      break;
-    case RobotBase::TURN_RIGHT_90:
-      r++;
-      break;
-    case RobotBase::ROTATE_LEFT_90:
-      break;
-    case RobotBase::ROTATE_RIGHT_90:
-      break;
-    case RobotBase::ROTATE_180:
-      b++;
-      break;
-    case RobotBase::STRAIGHT_FULL:
-      f++;
-      break;
-    case RobotBase::STRAIGHT_HALF:
-      break;
-    }
-  }
-  float getTimeCost(const Action action) {
-    const float velocity = 240.0f;
-    const float segment = 90.0f;
-    switch (action) {
-    case RobotBase::START_STEP:
-      return 1.0f;
-    case RobotBase::START_INIT:
-      return 1.0f;
-    case RobotBase::STOP_HALF:
-      return segment / 2 / velocity;
-    case RobotBase::TURN_LEFT_90:
-      return 71 / velocity;
-    case RobotBase::TURN_RIGHT_90:
-      return 71 / velocity;
-    case RobotBase::ROTATE_LEFT_90:
-      return 0.5f;
-    case RobotBase::ROTATE_RIGHT_90:
-      return 0.5f;
-    case RobotBase::ROTATE_180:
-      return 2.0f;
-    case RobotBase::STRAIGHT_FULL:
-      return segment / velocity;
-    case RobotBase::STRAIGHT_HALF:
-      return segment / 2 / velocity;
-    }
-    return 0;
+  virtual void crashed() override {
+    printInfo();
+    CLRobotBase::crashed();
+    getc(stdin);
   }
 };
-
-TestRobot robot;
 
 int main(int argc, char *argv[]) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
@@ -127,12 +28,14 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   const auto filename = argv[1];
-  if (!target_maze.parse(filename)) {
+  Maze maze_target;
+  if (!maze_target.parse(filename)) {
     std::cout << "Failed to parse " << filename << " !" << std::endl;
     return -1;
   }
   std::cout << "Solving " << filename << " ..." << std::endl;
-  robot.replaceGoals(target_maze.getGoals());
+  CLRobot robot(maze_target);
+  robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
   robot.printInfo();
   robot.fastRun(false);

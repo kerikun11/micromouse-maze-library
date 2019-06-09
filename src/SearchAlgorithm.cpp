@@ -518,13 +518,10 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
     return Error;
   }
   /* min max */
-  int8_t min_x = std::max(idMaze.getMinX() - 2, 0);
-  int8_t min_y = std::max(idMaze.getMinY() - 2, 0);
-  int8_t max_x = std::min(idMaze.getMaxX() + 3, MAZE_SIZE);
-  int8_t max_y = std::min(idMaze.getMaxY() + 3, MAZE_SIZE);
-  /* not to go start */
-  // min_x = idOffset.x;
-  // min_y = idOffset.y;
+  int8_t min_x = std::max(idMaze.getMinX() - 1, 0);
+  int8_t min_y = std::max(idMaze.getMinY() - 1, 0);
+  int8_t max_x = std::min(idMaze.getMaxX() + 2, MAZE_SIZE);
+  int8_t max_y = std::min(idMaze.getMaxY() + 2, MAZE_SIZE);
   /* make candidates */
   Vectors candidates;
   for (int8_t x = min_x; x < max_x; ++x)
