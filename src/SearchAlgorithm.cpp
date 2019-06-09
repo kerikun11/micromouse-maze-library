@@ -48,7 +48,7 @@ void SearchAlgorithm::positionIdentifyingInit(Vector *pVector, Dir *pDir,
   *pVector = idOffset;
   *pDir = estIniDir;
   this->estIniDir = estIniDir;
-  idMaze.reset(false);
+  idMaze.reset(false); /*< reset without setting start cell */
 }
 bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
                                  const bool left, const bool front,
@@ -91,6 +91,7 @@ enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
     bool &isForceBackToStart, bool &isForceGoingToGoal, int &matchCount) {
   state = START;
   enum Result result;
+  /* check if in goal */
   if (isForceGoingToGoal) {
     const auto goals = maze.getGoals();
     const auto it =
@@ -99,6 +100,7 @@ enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
     if (it != goals.end())
       isForceGoingToGoal = false;
   }
+  /* position identification */
   if (isPositionIdentifying) {
     state = IDENTIFYING_POSITION;
     result = calcNextDirsPositionIdentification(curVec, curDir, nextDirs,
@@ -108,11 +110,12 @@ enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
       return result;
     case SearchAlgorithm::Reached:
       isPositionIdentifying = false;
-      break;
+      break; /*< go to next state */
     case SearchAlgorithm::Error:
       return result;
     }
   }
+  /* search for goal */
   if (!SEARCHING_ADDITIONALLY_AT_START) {
     state = SEARCHING_FOR_GOAL;
     result =
@@ -121,11 +124,12 @@ enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
     case SearchAlgorithm::Processing:
       return result;
     case SearchAlgorithm::Reached:
-      break;
+      break; /*< go to next state */
     case SearchAlgorithm::Error:
       return result;
     }
   }
+  /* search additionally */
   if (!isForceBackToStart) {
     state = SEARCHING_ADDITIONALLY;
     result = calcNextDirsSearchAdditionally(curVec, curDir, nextDirs,
@@ -134,11 +138,12 @@ enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
     case SearchAlgorithm::Processing:
       return result;
     case SearchAlgorithm::Reached:
-      break;
+      break; /*< go to next state */
     case SearchAlgorithm::Error:
       return result;
     }
   }
+  /* force going to goal */
   if (isForceGoingToGoal) {
     state = GOING_TO_GOAL;
     result =
@@ -148,11 +153,12 @@ enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
       return result;
     case SearchAlgorithm::Reached:
       isForceGoingToGoal = false;
-      return SearchAlgorithm::Processing;
+      break; /*< go to next state */
     case SearchAlgorithm::Error:
       return result;
     }
   }
+  /* backing to start */
   state = BACKING_TO_START;
   result =
       calcNextDirsBackingToStart(curVec, curDir, nextDirs, nextDirCandidates);
@@ -161,10 +167,11 @@ enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
     return result;
   case SearchAlgorithm::Reached:
     isForceBackToStart = false;
-    break;
+    break; /*< go to next state */
   case SearchAlgorithm::Error:
     return result;
   }
+  /* reached start */
   state = REACHED_START;
   return result;
 }
@@ -178,12 +185,12 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
                                   const Dir d __attribute__((unused)),
                                   const Dirs &nextDirCandidates,
                                   Dir &nextDir) const {
-  // 候補の中で行ける方向を探す
+  /* find a direction it can go in nextDirCandidates */
   const auto it =
       std::find_if(nextDirCandidates.cbegin(), nextDirCandidates.cend(),
                    [&](const Dir dir) { return maze.canGo(v, dir); });
   if (it == nextDirCandidates.cend())
-    return false;
+    return false; /*< no answer */
   nextDir = *it;
   return true;
 }

@@ -20,17 +20,17 @@ void Agent::printInfo(const bool showMaze, const Vector vec, const Dir dir,
     searchAlgorithm.printMap(state, vec, dir);
   }
   // 詳細を表示
-  std::printf("Cur: ( %2d, %2d, %2c), State: %s \n", vec.x, vec.y, dir.toChar(),
-              SearchAlgorithm::stateString(state));
-  std::printf("nextDirsKnown: ");
+  std::cout << "Cur: " << VecDir{vec, dir}
+            << ", State: " << SearchAlgorithm::stateString(state) << std::endl;
+  std::cout << "nextDirsKnown: ";
   for (const auto d : getNextDirs())
-    std::printf("%c", d.toChar());
-  std::printf(" \n");
-  std::printf("nextDirCandidates: ");
+    std::cout << d.toChar();
+  std::cout << "    " << std::endl;
+  std::cout << "nextDirCandidates: ";
   for (const auto d : getNextDirCandidates())
-    std::printf("%c", d.toChar());
-  std::printf("\n");
-  std::printf("Match Count: %d   \n", matchCount);
+    std::cout << d.toChar();
+  std::cout << "    " << std::endl;
+  std::cout << "Match Count: " << matchCount << "    " << std::endl;
 }
 
 } // namespace MazeLib

@@ -72,15 +72,15 @@ void Maze::reset(const bool setStartWall) {
     known[0][i] = 0;
     known[1][i] = 0;
   }
+  min_x = MAZE_SIZE - 1;
+  min_y = MAZE_SIZE - 1;
+  max_x = 0;
+  max_y = 0;
   if (setStartWall) {
     updateWall(Vector(0, 0), Dir::East, true);   //< start cell
     updateWall(Vector(0, 0), Dir::North, false); //< start cell
   }
   wallLogs.clear();
-  min_x = MAZE_SIZE - 1;
-  min_y = MAZE_SIZE - 1;
-  max_x = 0;
-  max_y = 0;
 }
 bool Maze::canGo(const Vector v, const Dir d) const {
   return isKnown(v, d) && !isWall(v, d);

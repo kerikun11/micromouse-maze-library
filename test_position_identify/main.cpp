@@ -46,7 +46,7 @@ int test_position_identify() {
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
 
-#if 1
+#if 0
   /* Position Identification Run */
   robot.display = 1;
   robot.fake_offset.second = robot.real.second = Dir::South;
@@ -74,8 +74,8 @@ int test_position_identify() {
           continue;
         if (v == Vector(0, 0) || v == Vector(0, 1))
           continue;
-        // if (maze_target.isWall(v, ed))
-        //   continue;
+        if (maze_target.isWall(v, ed))
+          continue;
         robot.real.first = robot.fake_offset.first = Vector(x, y);
         robot.real.second = robot.fake_offset.second = ed;
         robot.display = 1;
