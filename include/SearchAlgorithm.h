@@ -65,40 +65,11 @@ public:
   void printMap(const State state, const Vector vec, const Dir dir) const;
   const StepMap &getStepMap() const { return stepMap; }
   const Maze &getMaze() const { return maze; }
+  const Maze &getIdMaze() const { return idMaze; }
   const ShortestAlgorithm &getShortestAlgorithm() const {
     return shortestAlgorithm;
   }
-  const Dirs candidatesIncludeStart(const Vector cv) {
-    Dirs result_dirs;
-    const auto offset_v = Vector(0, 1) - (cv - idOffset);
-    const int min_diff = 4;
-    for (const auto offset_d : Dir::ENWS()) {
-      int diffs = 0;
-      int unknown = 0;
-      for (const auto wl : idMaze.getWallLogs()) {
-        const auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
-        const auto maze_d = wl.d + offset_d;
-        if (maze_v.isOutsideofField())
-          break;
-        if (maze.isKnown(maze_v, maze_d) && maze.isWall(maze_v, maze_d) != wl.b)
-          diffs++;
-        if (!maze.isKnown(maze_v, maze_d))
-          unknown++;
-        /* 打ち切り */
-        if (diffs > min_diff)
-          break;
-      }
-      /* 非一致条件 */
-      if (diffs > min_diff ||
-          unknown * 4 > (int)idMaze.getWallLogs().size() * 3)
-        continue;
-      // const auto cv_cand = (cv - idOffset).rotate(offset_d) + offset_v;
-      // const auto cd_cand = cd + offset_d;
-      // logi << "start cand.   " << offset_v << std::endl;
-      result_dirs.push_back(offset_d);
-    }
-    return result_dirs;
-  }
+  const Dirs candidatesIncludeStart(const Vector cv) const;
 
 protected:
   Maze &maze;                          /**< 使用する迷路の参照 */

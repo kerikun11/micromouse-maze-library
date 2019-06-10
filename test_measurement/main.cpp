@@ -8,7 +8,7 @@ public:
 
 protected:
   virtual void queueAction(const Action action) override {
-#if 0
+#if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.first == maze.getStart())
       logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
@@ -78,8 +78,6 @@ int test_measurement() {
             continue;
           if (v == Vector(0, 0) || v == Vector(0, 1))
             continue;
-          // if (maze_target.isWall(v, ed))
-          //   continue;
           /* set fake offset */
           robot.real = robot.fake_offset = VecDir{Vector(x, y), d};
           bool res = robot.positionIdentifyRun(Dir::East);
@@ -92,6 +90,8 @@ int test_measurement() {
           }
         }
     std::cout << "Max P.I. Time:\t" << robot.max_usec << "\t[us]" << std::endl;
+    std::cout << "P.I. wall:\t" << robot.min_id_wall << "\t"
+              << robot.max_id_wall << std::endl;
 #endif
 
 #if 1

@@ -404,7 +404,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
   const int8_t max_y = maze.getMaxY();
   const int many = 1000;
   const int min_size = 12;
-  const int min_diff = 4;
+  const int min_diff = 6;
   /* ある程度既知壁になるまで一致判定をしない */
   if (idWallLogs.size() < min_size)
     return many;
@@ -413,12 +413,13 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
   for (int8_t x = 0; x < max_x + 1; ++x)
     for (int8_t y = 0; y < max_y + 1; ++y)
       for (const auto offset_d : Dir::ENWS()) {
-        Vector offset = Vector(x, y);
+        const auto offset_v = Vector(x, y);
         int diffs = 0;
         int unknown = 0;
         for (const auto wl : idWallLogs) {
-          const auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset;
-          const auto maze_d = wl.d + offset_d;
+          const auto maze_v =
+              (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
+          const auto maze_d = wl.d - estIniDir + offset_d;
           if (maze_v.isOutsideofField()) {
             diffs = many;
             break;
@@ -432,10 +433,10 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
           if (diffs > min_diff)
             break;
         }
-        /* 非一致条件 */
-        if (diffs > min_diff || unknown * 4 > (int)idWallLogs.size() * 3)
+        /* 非一致条件，要パラメータチューニング */
+        if (diffs > min_diff || unknown * 2 > (int)idWallLogs.size() * 1)
           continue;
-        ans.first = offset;
+        ans.first = offset_v;
         ans.second = offset_d;
         cnt++;
         /* 打ち切り */
@@ -443,6 +444,36 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
           return many;
       }
   return cnt;
+}
+const Dirs SearchAlgorithm::candidatesIncludeStart(const Vector cv) const {
+  Dirs result_dirs;
+  const auto forbidden_v = Vector(0, 1);
+  for (const auto offset_d : Dir::ENWS()) {
+    const auto offset_v = forbidden_v - (cv - idOffset).rotate(offset_d);
+    int diffs = 0;
+    for (const auto wl : idMaze.getWallLogs()) {
+      const auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
+      const auto maze_d = wl.d - estIniDir + offset_d;
+      if (maze_v.isOutsideofField()) {
+        diffs = MAZE_SIZE * MAZE_SIZE * 4;
+        break;
+      }
+      if (maze.isKnown(maze_v, maze_d) && maze.isWall(maze_v, maze_d) != wl.b)
+        diffs++;
+      /* 打ち切り */
+      if (diffs > 0)
+        break;
+    }
+    /* 非一致条件 */
+    if (diffs > 0)
+      continue;
+    result_dirs.push_back(Dir::South - offset_d);
+  }
+  // std::cout << cv << " Dirs: ";
+  // for (auto d : result_dirs)
+  //   std::cout << d << " ";
+  // std::cout << "        " << std::endl;
+  return result_dirs;
 }
 enum SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
@@ -521,7 +552,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   matchCount = cnt;
   if (cnt == 1) {
     cv = (cv - idOffset).rotate(ans.second) + ans.first;
-    cd = cd + ans.second;
+    cd = cd - estIniDir + ans.second;
     return Reached;
   } else if (cnt == 0) {
     return Error;
@@ -539,8 +570,17 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
         candidates.push_back(Vector(x, y));
   if (idMaze.getWallLogs().empty())
     candidates.push_back(Vector(MAZE_SIZE / 2, MAZE_SIZE / 2));
-  stepMap.calcNextDirs(idMaze, candidates, cv, cd, nextDirsKnown,
-                       nextDirCandidates, false);
+  const auto nv = stepMap.calcNextDirs(idMaze, candidates, cv, cd,
+                                       nextDirsKnown, nextDirCandidates, false);
+  const auto forbidden = candidatesIncludeStart(nv);
+  const auto cached = nextDirCandidates;
+  nextDirCandidates.clear();
+  for (const auto d : cached)
+    if (std::find(forbidden.cbegin(), forbidden.cend(), d) == forbidden.cend())
+      nextDirCandidates.push_back(d);
+  for (const auto d : cached)
+    if (std::find(forbidden.cbegin(), forbidden.cend(), d) != forbidden.cend())
+      nextDirCandidates.push_back(d);
   return nextDirCandidates.empty() ? Error : Processing;
 }
 

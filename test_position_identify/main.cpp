@@ -6,6 +6,12 @@ class CLRobot : public CLRobotBase {
 public:
   CLRobot(const Maze &maze_target) : CLRobotBase(maze_target) {}
   bool display = false;
+  void printInfo() {
+    CLRobotBase::printInfo();
+    std::cout << "P.I. wall:\t"
+              << getSearchAlgorithm().getIdMaze().getWallLogs().size() << "    "
+              << std::endl;
+  }
 
 protected:
   virtual void
@@ -16,9 +22,9 @@ protected:
       return;
     /* State Change has occurred */
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      if (display)
-        printInfo();
       display = 0;
+      // printInfo();
+      // std::cout << "Fake:\t" << fake_offset << std::endl;
     }
   }
   virtual void crashed() override {
@@ -29,11 +35,13 @@ protected:
   virtual void queueAction(const Action action) override {
     if (display) {
       printInfo();
-      // getc(stdin);
+      getc(stdin);
     }
+#if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.first == maze.getStart())
       logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
+#endif
     CLRobotBase::queueAction(action);
   }
 };
@@ -41,19 +49,19 @@ protected:
 int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = mazedata_dir + "32MM2018HX.maze";
+  const std::string filename = mazedata_dir + "32MM2017HX.maze";
   Maze maze_target = Maze(filename.c_str());
   const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
   CLRobot &robot = *p_robot;
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
 
-#if 0
+#if 1
   /* Position Identification Run */
-  robot.display = 0;
+  robot.display = 1;
   robot.fake_offset.second = robot.real.second = Dir::South;
-  robot.fake_offset.first = robot.real.first = Vector(16, 16);
-  bool res = robot.positionIdentifyRun(robot.real.second);
+  robot.fake_offset.first = robot.real.first = Vector(6, 3);
+  bool res = robot.positionIdentifyRun(Dir::East);
   if (!res) {
     robot.printInfo();
     std::cout << std::endl
@@ -76,12 +84,10 @@ int test_position_identify() {
           continue;
         if (v == Vector(0, 0) || v == Vector(0, 1))
           continue;
-        if (maze_target.isWall(v, ed))
-          continue;
         robot.real.first = robot.fake_offset.first = Vector(x, y);
         robot.real.second = robot.fake_offset.second = ed;
         robot.display = 1;
-        bool res = robot.positionIdentifyRun(ed);
+        bool res = robot.positionIdentifyRun(Dir::East);
         if (!res) {
           robot.printInfo();
           std::cout << std::endl

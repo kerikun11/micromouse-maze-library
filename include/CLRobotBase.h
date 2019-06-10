@@ -34,12 +34,14 @@ public:
     std::printf("Estimated Seaching Time: %2d:%02d, Step: %4d, Forward: %3d, "
                 "Left: %3d, Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    std::cout << "Max List:\t"
-              << getSearchAlgorithm().getShortestAlgorithm().max_open_list_size
-              << std::endl;
-    std::cout << "Max Iteration:\t"
-              << getSearchAlgorithm().getShortestAlgorithm().max_iteration_size
-              << std::endl;
+    // std::cout << "Max List:\t"
+    //           <<
+    //           getSearchAlgorithm().getShortestAlgorithm().max_open_list_size
+    //           << std::endl;
+    // std::cout << "Max Iteration:\t"
+    //           <<
+    //           getSearchAlgorithm().getShortestAlgorithm().max_iteration_size
+    //           << std::endl;
   }
   bool endFastRunBackingToStartRun() {
     /* real を最短後の位置に移す */
@@ -56,6 +58,8 @@ public:
   float cost = 0;
   int max_usec = 0;
   int usec = 0;
+  size_t max_id_wall = 0;
+  size_t min_id_wall = MAZE_SIZE * MAZE_SIZE * 4;
   std::chrono::system_clock::time_point start;
   std::chrono::system_clock::time_point end;
 
@@ -84,11 +88,16 @@ protected:
     end = std::chrono::system_clock::now();
     usec = std::chrono::duration_cast<std::chrono::microseconds>(end - start)
                .count();
-    if (max_usec < usec)
-      max_usec = usec;
+    max_usec = std::max(max_usec, usec);
     if (newState == prevState)
       return;
     /* State Change has occurred */
+    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
+      min_id_wall = std::min(
+          min_id_wall, getSearchAlgorithm().getIdMaze().getWallLogs().size());
+      max_id_wall = std::max(
+          max_id_wall, getSearchAlgorithm().getIdMaze().getWallLogs().size());
+    }
     if (newState == SearchAlgorithm::IDENTIFYING_POSITION) {
     }
     if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
