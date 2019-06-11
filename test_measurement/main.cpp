@@ -36,6 +36,7 @@ int test_measurement() {
            mazedata_dir + "16MM2017Tashiro.maze",
            mazedata_dir + "16MM2016CX.maze",
            mazedata_dir + "16MM2013CX.maze",
+           mazedata_dir + "08MM2016CF_pre.maze",
        }) {
     std::cout << std::endl;
     std::cout << "Maze File: \t" << filename << std::endl;

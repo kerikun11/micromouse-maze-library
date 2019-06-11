@@ -194,7 +194,7 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 }
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
-#if USE_OLD_ALGORITHM
+#if 0
   /* old */
   stepMap.update(maze, maze.getGoals(), true, diag_enabled);
   shortestDirs.clear();
