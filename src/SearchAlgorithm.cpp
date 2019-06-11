@@ -397,23 +397,22 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 }
 int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
                                              VecDir &ans) const {
-  /* min max */
-  const int8_t max_x = maze.getMaxX();
-  const int8_t max_y = maze.getMaxY();
   const int many = 1000;
   const int min_size = 12;
-  const int min_diff = 6;
+  const int min_diff = 6; /*< 許容食い違い壁数 */
   /* ある程度既知壁になるまで一致判定をしない */
   if (idWallLogs.size() < min_size)
     return many;
+  /* min max */
+  const int8_t max_x = maze.getMaxX() + 1;
+  const int8_t max_y = maze.getMaxY() + 1;
   /* パターンマッチング開始 */
   int cnt = 0;
-  for (int8_t x = 0; x < max_x + 1; ++x)
-    for (int8_t y = 0; y < max_y + 1; ++y)
+  for (int8_t x = 0; x < max_x; ++x)
+    for (int8_t y = 0; y < max_y; ++y) {
+      const auto offset_v = Vector(x, y);
       for (const auto offset_d : Dir::ENWS()) {
-        const auto offset_v = Vector(x, y);
-        int diffs = 0;   /*< 既知壁との食い違い数 */
-        int unknown = 0; /*< 未知壁数 */
+        int diffs = 0; /*< 既知壁との食い違い数を数える */
         for (const auto wl : idWallLogs) {
           const auto maze_v =
               (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
@@ -424,23 +423,23 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
           }
           if (maze.isKnown(maze_v, maze_d) &&
               maze.isWall(maze_v, maze_d) != wl.b)
-            diffs++;
-          if (!maze.isKnown(maze_v, maze_d))
-            unknown++;
-          /* 打ち切り */
+            ++diffs;
+          /* 打ち切り条件 */
           if (diffs > min_diff)
             break;
         }
-        /* 非一致条件，要パラメータチューニング */
-        if (diffs > min_diff || unknown * 2 > (int)idWallLogs.size() * 1)
+        /* 非一致 */
+        if (diffs > min_diff)
           continue;
+        /* 一致 */
         ans.first = offset_v;
         ans.second = offset_d;
-        cnt++;
+        ++cnt;
         /* 打ち切り */
         if (cnt > 1)
           return many;
       }
+    }
   return cnt;
 }
 const Dirs
@@ -449,16 +448,16 @@ SearchAlgorithm::findDirMatchCandidates(const Vector cur_v,
   Dirs result_dirs;
   for (const auto offset_d : Dir::ENWS()) {
     const auto offset_v = target_v - (cur_v - idOffset).rotate(offset_d);
-    int diffs = 0; /*< 既知壁との食い違い数 */
+    int diffs = 0; /*< 既知壁との食い違い数を数える */
     for (const auto wl : idMaze.getWallLogs()) {
       const auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
       const auto maze_d = wl.d + offset_d;
       if (maze_v.isOutsideofField()) {
-        diffs = MAZE_SIZE * MAZE_SIZE * 4;
+        diffs = 9999;
         break;
       }
       if (maze.isKnown(maze_v, maze_d) && maze.isWall(maze_v, maze_d) != wl.b)
-        diffs++;
+        ++diffs;
       /* 打ち切り */
       if (diffs > 0)
         break;
@@ -466,6 +465,7 @@ SearchAlgorithm::findDirMatchCandidates(const Vector cur_v,
     /* 非一致条件 */
     if (diffs > 0)
       continue;
+    /* 一致 */
     result_dirs.push_back(Dir::South - offset_d);
   }
   // std::cout << cv << " Dirs: ";
@@ -571,11 +571,15 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
     for (int8_t x = min_x; x < max_x; ++x)
       for (int8_t y = min_y; y < max_y; ++y) {
         const auto v = Vector(x, y);
+        /* スタート区画を避ける */
         const auto forbidden = findDirMatchCandidates(v, Vector(0, 1));
         for (const auto d : forbidden) {
           tmp.push_back(WallLog(v, d, idMaze.isWall(v, d)));
           idMaze.setWall(v, d, true);
         }
+        /* 外周を追加 */
+        if ((x != min_x && x != max_x - 1) && (y != min_y && y != max_y - 1))
+          continue;
         if (idMaze.unknownCount(v))
           candidates.push_back(v);
       }
@@ -584,7 +588,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   idMaze.setWall(cv, cd + Dir::Back, false);
   /* スタート区画を避けて導出 */
   stepMap.calcNextDirs(idMaze, candidates, cv, cd, nextDirsKnown,
-                       nextDirCandidates, false);
+                       nextDirCandidates);
   /* restore idMaze */
   std::reverse(tmp.begin(), tmp.end());
   for (const auto wl : tmp)
@@ -592,7 +596,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   /* 既知情報からではスタート区画が避けられない場合は普通に導出 */
   if (nextDirCandidates.empty())
     stepMap.calcNextDirs(idMaze, candidates, cv, cd, nextDirsKnown,
-                         nextDirCandidates, false);
+                         nextDirCandidates);
   /* end */
   return nextDirCandidates.empty() ? Error : Processing;
 }
