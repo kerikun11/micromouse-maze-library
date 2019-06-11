@@ -80,7 +80,7 @@ int test_measurement() {
             continue;
           /* set fake offset */
           robot.real = robot.fake_offset = VecDir{Vector(x, y), d};
-          bool res = robot.positionIdentifyRun(Dir::East);
+          bool res = robot.positionIdentifyRun();
           if (!res) {
             robot.printInfo();
             std::cout << std::endl

@@ -87,8 +87,8 @@ public:
   /**
    * @brief 自己位置同定モードに設定する
    */
-  void positionIdentify(const Dir estDir) {
-    searchAlgorithm.positionIdentifyingInit(&curVec, &curDir, estDir);
+  void positionIdentify() {
+    searchAlgorithm.positionIdentifyingInit(&curVec, &curDir);
     state = SearchAlgorithm::IDENTIFYING_POSITION;
     isPositionIdentifying = true;
     calcNextDirs(); /*< 時間がかかる処理！ */

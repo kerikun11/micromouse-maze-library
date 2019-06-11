@@ -35,7 +35,7 @@ protected:
   virtual void queueAction(const Action action) override {
     if (display) {
       printInfo();
-      getc(stdin);
+      // getc(stdin);
     }
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
@@ -49,19 +49,19 @@ protected:
 int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = mazedata_dir + "32MM2017HX.maze";
+  const std::string filename = mazedata_dir + "32MM2016HX.maze";
   Maze maze_target = Maze(filename.c_str());
   const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
   CLRobot &robot = *p_robot;
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
 
-#if 1
+#if 0
   /* Position Identification Run */
   robot.display = 1;
   robot.fake_offset.second = robot.real.second = Dir::South;
-  robot.fake_offset.first = robot.real.first = Vector(6, 3);
-  bool res = robot.positionIdentifyRun(Dir::East);
+  robot.fake_offset.first = robot.real.first = Vector(0, 2);
+  bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
     std::cout << std::endl
@@ -78,16 +78,16 @@ int test_position_identify() {
   stepMap.updateSimple(maze_target, maze_target.getGoals(), false);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
-      for (const auto ed : Dir::ENWS()) {
+      for (const auto d : Dir::ENWS()) {
         const auto v = Vector(x, y);
         if (stepMap.getStep(v) == MAZE_STEP_MAX)
           continue;
         if (v == Vector(0, 0) || v == Vector(0, 1))
           continue;
         robot.real.first = robot.fake_offset.first = Vector(x, y);
-        robot.real.second = robot.fake_offset.second = ed;
+        robot.real.second = robot.fake_offset.second = d;
         robot.display = 1;
-        bool res = robot.positionIdentifyRun(Dir::East);
+        bool res = robot.positionIdentifyRun();
         if (!res) {
           robot.printInfo();
           std::cout << std::endl

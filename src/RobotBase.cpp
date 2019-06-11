@@ -14,9 +14,9 @@ bool RobotBase::searchRun() {
   /* 走行開始 */
   return generalSearchRun();
 }
-bool RobotBase::positionIdentifyRun(const Dir estInitDir) {
+bool RobotBase::positionIdentifyRun() {
   /* 自己位置同定の初期化 */
-  positionIdentify(estInitDir);
+  positionIdentify();
   /* ゴール区画への訪問を指定 */
   setForceGoingToGoal();
   /* スタートのアクションをキュー */

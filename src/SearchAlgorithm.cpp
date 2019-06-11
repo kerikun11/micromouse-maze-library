@@ -42,12 +42,10 @@ bool SearchAlgorithm::isComplete() {
   findShortestCandidates(candidates);
   return candidates.empty();
 }
-void SearchAlgorithm::positionIdentifyingInit(Vector *pVector, Dir *pDir,
-                                              const Dir estIniDir) {
+void SearchAlgorithm::positionIdentifyingInit(Vector *pVector, Dir *pDir) {
   idOffset = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
   *pVector = idOffset;
-  *pDir = estIniDir;
-  this->estIniDir = estIniDir;
+  *pDir = Dir::East;
   idMaze.reset(false); /*< reset without setting start cell */
 }
 bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
@@ -414,12 +412,12 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
     for (int8_t y = 0; y < max_y + 1; ++y)
       for (const auto offset_d : Dir::ENWS()) {
         const auto offset_v = Vector(x, y);
-        int diffs = 0;
-        int unknown = 0;
+        int diffs = 0;   /*< 既知壁との食い違い数 */
+        int unknown = 0; /*< 未知壁数 */
         for (const auto wl : idWallLogs) {
           const auto maze_v =
               (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
-          const auto maze_d = wl.d - estIniDir + offset_d;
+          const auto maze_d = wl.d + offset_d;
           if (maze_v.isOutsideofField()) {
             diffs = many;
             break;
@@ -445,15 +443,16 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
       }
   return cnt;
 }
-const Dirs SearchAlgorithm::candidatesIncludeStart(const Vector cv) const {
+const Dirs
+SearchAlgorithm::findDirMatchCandidates(const Vector cur_v,
+                                        const Vector target_v) const {
   Dirs result_dirs;
-  const auto forbidden_v = Vector(0, 1);
   for (const auto offset_d : Dir::ENWS()) {
-    const auto offset_v = forbidden_v - (cv - idOffset).rotate(offset_d);
-    int diffs = 0;
+    const auto offset_v = target_v - (cur_v - idOffset).rotate(offset_d);
+    int diffs = 0; /*< 既知壁との食い違い数 */
     for (const auto wl : idMaze.getWallLogs()) {
       const auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
-      const auto maze_d = wl.d - estIniDir + offset_d;
+      const auto maze_d = wl.d + offset_d;
       if (maze_v.isOutsideofField()) {
         diffs = MAZE_SIZE * MAZE_SIZE * 4;
         break;
@@ -552,7 +551,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   matchCount = cnt;
   if (cnt == 1) {
     cv = (cv - idOffset).rotate(ans.second) + ans.first;
-    cd = cd - estIniDir + ans.second;
+    cd = cd + ans.second;
     return Reached;
   } else if (cnt == 0) {
     return Error;
@@ -562,25 +561,39 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   int8_t min_y = std::max(idMaze.getMinY() - 1, 0);
   int8_t max_x = std::min(idMaze.getMaxX() + 2, MAZE_SIZE);
   int8_t max_y = std::min(idMaze.getMaxY() + 2, MAZE_SIZE);
+  /* tmp wall */
+  WallLogs tmp;
   /* make candidates */
   Vectors candidates;
-  for (int8_t x = min_x; x < max_x; ++x)
-    for (int8_t y = min_y; y < max_y; ++y)
-      if (idMaze.unknownCount(Vector(x, y)))
-        candidates.push_back(Vector(x, y));
   if (idMaze.getWallLogs().empty())
     candidates.push_back(Vector(MAZE_SIZE / 2, MAZE_SIZE / 2));
-  const auto nv = stepMap.calcNextDirs(idMaze, candidates, cv, cd,
-                                       nextDirsKnown, nextDirCandidates, false);
-  const auto forbidden = candidatesIncludeStart(nv);
-  const auto cached = nextDirCandidates;
-  nextDirCandidates.clear();
-  for (const auto d : cached)
-    if (std::find(forbidden.cbegin(), forbidden.cend(), d) == forbidden.cend())
-      nextDirCandidates.push_back(d);
-  for (const auto d : cached)
-    if (std::find(forbidden.cbegin(), forbidden.cend(), d) != forbidden.cend())
-      nextDirCandidates.push_back(d);
+  if (candidates.empty())
+    for (int8_t x = min_x; x < max_x; ++x)
+      for (int8_t y = min_y; y < max_y; ++y) {
+        const auto v = Vector(x, y);
+        const auto forbidden = findDirMatchCandidates(v, Vector(0, 1));
+        for (const auto d : forbidden) {
+          tmp.push_back(WallLog(v, d, idMaze.isWall(v, d)));
+          idMaze.setWall(v, d, true);
+        }
+        if (idMaze.unknownCount(v))
+          candidates.push_back(v);
+      }
+  /* 現在地の背後は壁なしにしないと移動できなくなることがある */
+  tmp.push_back(WallLog(cv, cd + Dir::Back, idMaze.isWall(cv, cd + Dir::Back)));
+  idMaze.setWall(cv, cd + Dir::Back, false);
+  /* スタート区画を避けて導出 */
+  stepMap.calcNextDirs(idMaze, candidates, cv, cd, nextDirsKnown,
+                       nextDirCandidates, false);
+  /* restore idMaze */
+  std::reverse(tmp.begin(), tmp.end());
+  for (const auto wl : tmp)
+    idMaze.setWall(Vector(wl), wl.d, wl.b);
+  /* 既知情報からではスタート区画が避けられない場合は普通に導出 */
+  if (nextDirCandidates.empty())
+    stepMap.calcNextDirs(idMaze, candidates, cv, cd, nextDirsKnown,
+                         nextDirCandidates, false);
+  /* end */
   return nextDirCandidates.empty() ? Error : Processing;
 }
 
