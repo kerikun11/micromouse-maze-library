@@ -163,16 +163,16 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
           const auto v_fl = v_f.next(d_l); //< 前左の区画
           if (canGo(v_fl, d_f))            //< 45度先の壁
             succs.push_back({Index(v_f, d_l, nd_45), getEdgeCost(F45)});
-          // if (canGo(v_fl, d_l)) //< 90度先の壁
-          succs.push_back({Index(v_fl, Dir::Max, nd_90), getEdgeCost(F90)});
+          if (canGo(v_fl, d_l)) //< 90度先の壁
+            succs.push_back({Index(v_fl, Dir::Max, nd_90), getEdgeCost(F90)});
           const auto d_b = d_f + Dir::Back;    //< 後方向
           if (canGo(v_fl, d_b)) {              //< 135度の壁
             const auto v_fll = v_fl.next(d_b); //< 前左左の区画
             if (canGo(v_fll, d_l))             //< 135度行先
               succs.push_back({Index(v_fll, d_f, nd_135), getEdgeCost(F135)});
-            // if (canGo(v_fll, d_b)) //< 180度行先の壁
-            succs.push_back(
-                {Index(v_fll, Dir::Max, nd_180), getEdgeCost(F180)});
+            if (canGo(v_fll, d_b)) //< 180度行先の壁
+              succs.push_back(
+                  {Index(v_fll, Dir::Max, nd_180), getEdgeCost(F180)});
           }
         }
       }
@@ -208,16 +208,16 @@ ShortestAlgorithm::Index::getSuccessors(const Maze &maze, const bool known_only,
     auto d_135 = nd + nd_r45 * 3;
     auto v_45 = i_f.arrow_to();
     /* 45度方向 */
-    // if (canGo(v_45, d_45))
-    succs.push_back({Index(v_45, Dir::Max, d_45), getEdgeCost(F45)});
+    if (canGo(v_45, d_45))
+      succs.push_back({Index(v_45, Dir::Max, d_45), getEdgeCost(F45)});
     /* V90方向, 135度方向*/
     if (canGo(v_45, d_135)) {
       /* V90方向, 135度方向*/
       auto v_135 = v_45.next(d_135);
       if (canGo(v_135, d_45))
         succs.push_back({Index(v_45, d_135, nd_90), getEdgeCost(FV90)});
-      // if (canGo(v_135, d_135))
-      succs.push_back({Index(v_135, Dir::Max, d_135), getEdgeCost(F135)});
+      if (canGo(v_135, d_135))
+        succs.push_back({Index(v_135, Dir::Max, d_135), getEdgeCost(F135)});
     }
   }
   return succs;
