@@ -412,7 +412,8 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
     for (int8_t y = 0; y < max_y; ++y) {
       const auto offset_v = Vector(x, y);
       for (const auto offset_d : Dir::ENWS()) {
-        int diffs = 0; /*< 既知壁との食い違い数を数える */
+        int unknown = 0; /*< 未知壁数 */
+        int diffs = 0;   /*< 既知壁との食い違い数を数える */
         for (const auto wl : idWallLogs) {
           const auto maze_v =
               (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
@@ -424,12 +425,14 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
           if (maze.isKnown(maze_v, maze_d) &&
               maze.isWall(maze_v, maze_d) != wl.b)
             ++diffs;
+          if (!maze.isKnown(maze_v, maze_d))
+            ++unknown;
           /* 打ち切り条件 */
           if (diffs > min_diff)
             break;
         }
-        /* 非一致 */
-        if (diffs > min_diff)
+        /* 非一致条件，要パラメータチューニング */
+        if (diffs > min_diff || unknown * 5 > (int)idWallLogs.size() * 4)
           continue;
         /* 一致 */
         ans.first = offset_v;
@@ -443,7 +446,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
   return cnt;
 }
 const Dirs
-SearchAlgorithm::findDirMatchCandidates(const Vector cur_v,
+SearchAlgorithm::findMatchDirCandidates(const Vector cur_v,
                                         const Vector target_v) const {
   Dirs result_dirs;
   for (const auto offset_d : Dir::ENWS()) {
@@ -561,7 +564,7 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
   int8_t min_y = std::max(idMaze.getMinY() - 1, 0);
   int8_t max_x = std::min(idMaze.getMaxX() + 2, MAZE_SIZE);
   int8_t max_y = std::min(idMaze.getMaxY() + 2, MAZE_SIZE);
-  /* tmp wall */
+  /* modify idMaze */
   WallLogs tmp;
   /* make candidates */
   Vectors candidates;
@@ -572,14 +575,11 @@ SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
       for (int8_t y = min_y; y < max_y; ++y) {
         const auto v = Vector(x, y);
         /* スタート区画を避ける */
-        const auto forbidden = findDirMatchCandidates(v, Vector(0, 1));
+        const auto forbidden = findMatchDirCandidates(v, Vector(0, 1));
         for (const auto d : forbidden) {
           tmp.push_back(WallLog(v, d, idMaze.isWall(v, d)));
           idMaze.setWall(v, d, true);
         }
-        /* 外周を追加 */
-        if ((x != min_x && x != max_x - 1) && (y != min_y && y != max_y - 1))
-          continue;
         if (idMaze.unknownCount(v))
           candidates.push_back(v);
       }

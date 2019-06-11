@@ -84,7 +84,7 @@ private:
    */
   bool findShortestCandidates(Vectors &candidates);
   int countIdentityCandidates(const WallLogs &idWallLogs, VecDir &ans) const;
-  const Dirs findDirMatchCandidates(const Vector cur_v,
+  const Dirs findMatchDirCandidates(const Vector cur_v,
                                     const Vector target_v) const;
 
   /**
