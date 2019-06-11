@@ -53,8 +53,8 @@ int test_measurement() {
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
     robot.printResult();
-    std::cout << "Max Calc Time:\t" << us.count() << "\t[us]" << std::endl;
-    // std::cout << "Total Search:\t" << sum_total / n << "\t[us]" << std::endl;
+    std::cout << "Max Calc Time:\t" << robot.max_usec << "\t[us]" << std::endl;
+    std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirs(diag_enabled))
         loge << "Failed to Find a Shortest Path! "
