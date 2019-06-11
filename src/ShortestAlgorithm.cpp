@@ -440,7 +440,6 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
       for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
         dirs.push_back(nd);
     }
-    dirs.push_back(path.back().getNodeDir());
     return dirs;
   }
   Dirs dirs;
