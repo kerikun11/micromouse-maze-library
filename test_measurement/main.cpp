@@ -83,11 +83,9 @@ int test_measurement() {
           robot.real = robot.fake_offset = VecDir{Vector(x, y), d};
           bool res = robot.positionIdentifyRun();
           if (!res) {
-            robot.printInfo();
             std::cout << std::endl
                       << "Failed to Identify! fake_offset:\t"
                       << robot.fake_offset << std::endl;
-            getc(stdin);
           }
         }
     std::cout << "Max P.I. Time:\t" << robot.max_usec << "\t[us]" << std::endl;

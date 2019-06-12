@@ -52,13 +52,13 @@ static_assert(sizeof(wall_size_t) * 8 == MAZE_SIZE,
  * @brief ログ
  */
 #ifndef loge
-#define loge (std::cerr << "E " << __FILE__ << ":" << __LINE__ << " ")
+#define loge (std::cerr << "[E][" << __FILE__ << ":" << __LINE__ << "] ")
 #endif
 #ifndef logw
-#define logw (std::cerr << "W " << __FILE__ << ":" << __LINE__ << " ")
+#define logw (std::cerr << "[W][" << __FILE__ << ":" << __LINE__ << "] ")
 #endif
 #ifndef logi
-#define logi (std::cout << "I " << __FILE__ << ":" << __LINE__ << " ")
+#define logi (std::cout << "[I][" << __FILE__ << ":" << __LINE__ << "] ")
 #endif
 
 /**

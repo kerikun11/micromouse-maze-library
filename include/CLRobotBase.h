@@ -116,8 +116,8 @@ protected:
     }
   }
   virtual void crashed() {
-    std::cerr << "The robot crashed into the wall! RealVecDir:\t" << real
-              << std::endl;
+    std::cerr << "The robot crashed into the wall! fake_offset:\t"
+              << fake_offset << "\treal:\t" << real << std::endl;
   }
   virtual void queueAction(const Action action) override {
     cost += getTimeCost(action);
