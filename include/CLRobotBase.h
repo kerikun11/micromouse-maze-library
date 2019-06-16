@@ -32,10 +32,10 @@ public:
         path += RobotBase::FastAction::ST_ALONG_FULL;
         break;
       case Dir::Left:
-        path += RobotBase::FastAction::L_FS90;
+        path += RobotBase::FastAction::FLS90;
         break;
       case Dir::Right:
-        path += RobotBase::FastAction::R_FS90;
+        path += RobotBase::FastAction::FRS90;
         break;
       default:
         loge << std::endl;

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Agent.h"
+#include <algorithm> //< std::replace
 
 namespace MazeLib {
 
@@ -31,28 +32,29 @@ public:
     ST_ALONG_FULL = 'S',
     ST_ALONG_HALF = 's',
     ST_DIAG = 'w',
-    L_F45 = 'z',
-    L_F45P = 'Z',
-    R_F45 = 'c',
-    R_F45P = 'C',
-    L_F90 = 'q',
-    R_F90 = 'Q',
-    L_FV90 = 'p',
-    R_FV90 = 'P',
-    L_FS90 = 'L',
-    R_FS90 = 'R',
-    L_F135 = 'a',
-    L_F135P = 'A',
-    R_F135 = 'd',
-    R_F135P = 'D',
-    L_F180 = 'u',
-    R_F180 = 'U',
+    FL45 = 'z',
+    FL45P = 'Z',
+    FR45 = 'c',
+    FR45P = 'C',
+    FL90 = 'q',
+    FR90 = 'Q',
+    FLV90 = 'p',
+    FRV90 = 'P',
+    FLS90 = 'L',
+    FRS90 = 'R',
+    FL135 = 'a',
+    FL135P = 'A',
+    FR135 = 'd',
+    FR135P = 'D',
+    FL180 = 'u',
+    FR180 = 'U',
   };
-  std::string pathConvertSearchToFast(std::string src, bool diag_enabled) {
+  static std::string pathConvertSearchToFast(std::string src,
+                                             bool diag_enabled) {
     src = (char)ST_ALONG_HALF + src + (char)ST_ALONG_HALF;
     return replaceStringSearchToFast(src, diag_enabled);
   }
-  std::string pathConvertSearchToKnown(std::string src) {
+  static std::string pathConvertSearchToKnown(std::string src) {
     auto f = src.find_first_of(ST_ALONG_FULL);
     auto b = src.find_last_of(ST_ALONG_FULL);
     if (f >= b)
@@ -92,7 +94,7 @@ private:
   void queueNextDirs(const Dirs &nextDirs);
   bool generalSearchRun();
 
-  int replace(std::string &src, std::string from, std::string to) const {
+  static int replace(std::string &src, std::string from, std::string to) {
     if (from.empty())
       return 0;
     auto pos = src.find(from);
@@ -104,7 +106,8 @@ private:
     }
     return i;
   }
-  std::string replaceStringSearchToFast(std::string src, bool diag_enabled) {
+  static std::string replaceStringSearchToFast(std::string src,
+                                               bool diag_enabled) {
     replace(src, "S", "ss");
     replace(src, "L", "ll");
     replace(src, "R", "rr");
