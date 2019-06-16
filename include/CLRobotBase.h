@@ -24,6 +24,28 @@ public:
 
   void printInfo(bool showMaze = true) {
     RobotBase::printInfo(showMaze);
+    const auto nextDirs = getNextDirs();
+    std::string path;
+    for (int i = 0; i < (int)nextDirs.size() - 1; ++i) {
+      switch (Dir(nextDirs[i + 1] - nextDirs[i])) {
+      case Dir::Front:
+        path += RobotBase::FastAction::ST_ALONG_FULL;
+        break;
+      case Dir::Left:
+        path += RobotBase::FastAction::L_FS90;
+        break;
+      case Dir::Right:
+        path += RobotBase::FastAction::R_FS90;
+        break;
+      default:
+        loge << std::endl;
+        break;
+      }
+    }
+    std::cout << "NextDirsKnownFast: \x1b[0K";
+    std::cout << path << std::endl;
+    std::cout << "NextDirsKnownFast: \x1b[0K";
+    std::cout << RobotBase::pathConvertSearchToKnown(path) << std::endl;
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
@@ -130,25 +152,21 @@ protected:
       break;
     case RobotBase::START_INIT:
       break;
-    case RobotBase::STOP_HALF:
+    case RobotBase::ST_HALF_STOP:
       break;
-    case RobotBase::TURN_LEFT_90:
+    case RobotBase::TURN_L:
       real.second = real.second + Dir::Left;
       if (!maze_target.canGo(real.first, real.second))
         crashed();
       real.first = real.first.next(real.second);
       l++;
       break;
-    case RobotBase::TURN_RIGHT_90:
+    case RobotBase::TURN_R:
       real.second = real.second + Dir::Right;
       if (!maze_target.canGo(real.first, real.second))
         crashed();
       real.first = real.first.next(real.second);
       r++;
-      break;
-    case RobotBase::ROTATE_LEFT_90:
-      break;
-    case RobotBase::ROTATE_RIGHT_90:
       break;
     case RobotBase::ROTATE_180:
       real.second = real.second + Dir::Back;
@@ -157,13 +175,13 @@ protected:
       real.first = real.first.next(real.second);
       b++;
       break;
-    case RobotBase::STRAIGHT_FULL:
+    case RobotBase::ST_FULL:
       if (!maze_target.canGo(real.first, real.second))
         crashed();
       real.first = real.first.next(real.second);
       f++;
       break;
-    case RobotBase::STRAIGHT_HALF:
+    case RobotBase::ST_HALF:
       break;
     }
   }
@@ -175,21 +193,17 @@ protected:
       return 1.0f;
     case RobotBase::START_INIT:
       return 1.0f;
-    case RobotBase::STOP_HALF:
+    case RobotBase::ST_HALF_STOP:
       return segment / 2 / velocity;
-    case RobotBase::TURN_LEFT_90:
+    case RobotBase::TURN_L:
       return 71 / velocity;
-    case RobotBase::TURN_RIGHT_90:
+    case RobotBase::TURN_R:
       return 71 / velocity;
-    case RobotBase::ROTATE_LEFT_90:
-      return 0.5f;
-    case RobotBase::ROTATE_RIGHT_90:
-      return 0.5f;
     case RobotBase::ROTATE_180:
       return 2.0f;
-    case RobotBase::STRAIGHT_FULL:
+    case RobotBase::ST_FULL:
       return segment / velocity;
-    case RobotBase::STRAIGHT_HALF:
+    case RobotBase::ST_HALF:
       return segment / 2 / velocity;
     }
     return 0;

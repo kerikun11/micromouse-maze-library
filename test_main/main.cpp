@@ -14,6 +14,10 @@ protected:
   calcNextDirsPostCallback(SearchAlgorithm::State prevState,
                            SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirsPostCallback(prevState, newState);
+    if (getNextDirs().size() > 0) {
+      printInfo();
+      getc(stdin);
+    }
     if (newState == prevState)
       return;
     /* State Change has occurred */
@@ -50,7 +54,7 @@ int main(void) {
 #if 1
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = mazedata_dir + "32MM2018HX.maze";
+  const std::string filename = mazedata_dir + "32MM2016HX.maze";
   Maze maze_target = Maze(filename.c_str());
   const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
   CLRobot &robot = *p_robot;

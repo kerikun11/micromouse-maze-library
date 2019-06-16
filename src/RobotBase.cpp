@@ -19,8 +19,8 @@ bool RobotBase::positionIdentifyRun() {
   positionIdentify();
   /* ゴール区画への訪問を指定 */
   setForceGoingToGoal();
-  /* スタートのアクションをキュー */
-  queueAction(STRAIGHT_HALF);
+  /* 最初のアクションをキュー */
+  queueAction(ST_HALF);
   /* 走行開始 */
   return generalSearchRun();
 }
@@ -34,7 +34,7 @@ bool RobotBase::endFastRunBackingToStartRun() {
   updateCurVecDir(getCurVec().next(getCurDir() + Dir::Back),
                   getCurDir() + Dir::Back);
   queueAction(ROTATE_180);
-  queueAction(STRAIGHT_HALF);
+  queueAction(ST_HALF);
   /* 走行開始 */
   return generalSearchRun();
 }
@@ -50,12 +50,12 @@ bool RobotBase::fastRun(const bool diag_enabled) {
 /* private: */
 
 void RobotBase::turnbackSave() {
-  queueAction(STOP_HALF);
+  queueAction(ST_HALF_STOP);
   waitForEndAction();
   stopDequeue();
   backupMazeToFlash();
   queueAction(ROTATE_180);
-  queueAction(STRAIGHT_HALF);
+  queueAction(ST_HALF);
   startDequeue();
 }
 void RobotBase::queueNextDirs(const Dirs &nextDirs) {
@@ -63,13 +63,13 @@ void RobotBase::queueNextDirs(const Dirs &nextDirs) {
     const auto nextVec = getCurVec().next(nextDir);
     switch (Dir(nextDir - getCurDir())) {
     case Dir::Front:
-      queueAction(STRAIGHT_FULL);
+      queueAction(ST_FULL);
       break;
     case Dir::Left:
-      queueAction(TURN_LEFT_90);
+      queueAction(TURN_L);
       break;
     case Dir::Right:
-      queueAction(TURN_RIGHT_90);
+      queueAction(TURN_R);
       break;
     case Dir::Back:
       turnbackSave();

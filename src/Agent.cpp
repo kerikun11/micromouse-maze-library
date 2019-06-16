@@ -14,22 +14,24 @@ namespace MazeLib {
 
 void Agent::printInfo(const bool showMaze, const Vector vec, const Dir dir,
                       const SearchAlgorithm::State state) const {
-  // 迷路を表示
+  /* 迷路を表示 */
   if (showMaze) {
-    std::cout << "\e[0;0H"; //< カーソルを左上に移動
+    std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
     searchAlgorithm.printMap(state, vec, dir);
   }
-  // 詳細を表示
+  /* 詳細を表示 */
   std::cout << "Cur: " << VecDir{vec, dir}
             << ", State: " << SearchAlgorithm::stateString(state) << std::endl;
+  std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
   std::cout << "nextDirsKnown: ";
   for (const auto d : getNextDirs())
     std::cout << d.toChar();
   std::cout << "    " << std::endl;
+  std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
   std::cout << "nextDirCandidates: ";
   for (const auto d : getNextDirCandidates())
     std::cout << d.toChar();
-  std::cout << "    " << std::endl;
+  std::cout << std::endl;
   std::cout << "Match Count: " << matchCount << "    " << std::endl;
 }
 
