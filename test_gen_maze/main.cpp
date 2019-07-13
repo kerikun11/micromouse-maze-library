@@ -57,6 +57,24 @@ const char mazeData_MM2017Tashiro[16 + 1][16 + 1] = {
     "dfca9fca9fcaaa9f",
 };
 
+const char MM2016C_chubu[16 + 1][16 + 1] = {
+    {14, 6, 6, 4, 6, 4, 5, 12, 4, 6, 6, 6, 6, 6, 6, 5},
+    {12, 4, 6, 3, 13, 9, 11, 9, 9, 12, 5, 12, 5, 12, 5, 9},
+    {9, 10, 6, 6, 1, 10, 5, 9, 10, 3, 10, 3, 9, 9, 9, 9},
+    {8, 6, 4, 5, 9, 13, 9, 9, 12, 5, 12, 5, 9, 9, 9, 9},
+    {8, 5, 9, 9, 10, 1, 9, 9, 9, 10, 3, 10, 3, 9, 9, 9},
+    {11, 10, 3, 10, 5, 10, 3, 9, 9, 12, 5, 12, 5, 9, 9, 9},
+    {13, 12, 6, 6, 0, 6, 4, 3, 10, 1, 10, 1, 9, 9, 9, 9},
+    {8, 2, 6, 6, 3, 14, 3, 12, 5, 10, 6, 3, 10, 1, 9, 9},
+    {9, 14, 4, 6, 6, 6, 6, 2, 3, 15, 12, 6, 4, 1, 9, 9},
+    {9, 12, 2, 4, 6, 4, 6, 5, 13, 12, 1, 12, 1, 9, 9, 9},
+    {9, 10, 4, 2, 4, 2, 4, 3, 8, 3, 9, 9, 9, 9, 9, 9},
+    {9, 12, 0, 4, 0, 4, 2, 5, 9, 12, 1, 8, 1, 9, 9, 9},
+    {9, 9, 9, 9, 9, 10, 4, 3, 8, 3, 10, 3, 9, 9, 9, 9},
+    {9, 8, 0, 2, 0, 4, 0, 6, 2, 4, 6, 6, 3, 9, 9, 9},
+    {9, 11, 11, 15, 11, 11, 11, 13, 14, 2, 6, 6, 6, 3, 10, 1},
+    {10, 6, 6, 6, 6, 6, 6, 2, 6, 6, 6, 6, 6, 6, 6, 3}};
+
 int main(void) {
   std::cout << "Maze File Generator" << std::endl;
   /* parameter */
@@ -67,16 +85,15 @@ int main(void) {
   std::array<Dir, 4> bit_order = {Dir::East, Dir::North, Dir::West, Dir::South};
 #elif BIT_ORDER == 1
   std::array<Dir, 4> bit_order = {Dir::North, Dir::East, Dir::South, Dir::West};
+#elif BIT_ORDER == 2
+  std::array<Dir, 4> bit_order = {Dir::North, Dir::East, Dir::West, Dir::South};
 #endif
   const Vectors goals = {
-      // Vector(7, 7),
-      // Vector(8, 7),
-      // Vector(7, 8),
-      // Vector(8, 8),
-      Vector(12, 12),
-      Vector(13, 12),
-      Vector(12, 13),
-      Vector(13, 13),
+      Vector(7, 7), Vector(8, 7), Vector(7, 8), Vector(8, 8),
+      // Vector(12, 12),
+      // Vector(13, 12),
+      // Vector(12, 13),
+      // Vector(13, 13),
   };
   /* process */
   Maze sample(maze_data, bit_order);

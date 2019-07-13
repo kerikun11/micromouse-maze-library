@@ -52,6 +52,7 @@ Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
   for (int8_t y = 0; y < MAZE_SIZE; ++y)
     for (int8_t x = 0; x < MAZE_SIZE; ++x) {
       const char c = data[MAZE_SIZE - y - 1][x];
+      // const char c = data[x][y];
       uint8_t h = 0;
       if ('0' <= c && c <= '9')
         h = c - '0';
@@ -59,6 +60,8 @@ Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
         h = c - 'a' + 10;
       else if ('A' <= c && c <= 'F')
         h = c - 'A' + 10;
+      else if (0 <= c && c <= 15)
+        h = c;
       updateWall(Vector(x, y), bit_to_dir_map[0], h & 0x01, false);
       updateWall(Vector(x, y), bit_to_dir_map[1], h & 0x02, false);
       updateWall(Vector(x, y), bit_to_dir_map[2], h & 0x04, false);
