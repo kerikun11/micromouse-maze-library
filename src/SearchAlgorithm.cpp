@@ -52,31 +52,25 @@ bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
                                  const bool left, const bool front,
                                  const bool right, const bool back) {
   bool result = true;
-  result = result & updateWall(state, v, d + Dir::Left, left); // left wall
+  result = result & updateWall(state, v, d + Dir::Left, left);   // left wall
+  result = result & updateWall(state, v, d + Dir::Front, front); // front wall
+  result = result & updateWall(state, v, d + Dir::Right, right); // right wall
+  result = result & updateWall(state, v, d + Dir::Back, back);   // back wall
+  return result;
+}
+bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
+                                 const bool b) {
+  bool result;
+  if (state == IDENTIFYING_POSITION)
+    result = idMaze.updateWall(v, d, b);
+  else
+    result = maze.updateWall(v, d, b);
 #if D_STAR_LITE_ENABLED
   const bool known_only = false;
   const bool diag_enabled = true;
   shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
 #endif
-  result = result & updateWall(state, v, d + Dir::Front, front); // front wall
-#if D_STAR_LITE_ENABLED
-  shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
-#endif
-  result = result & updateWall(state, v, d + Dir::Right, right); // right wall
-#if D_STAR_LITE_ENABLED
-  shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
-#endif
-  result = result & updateWall(state, v, d + Dir::Back, back); // back wall
-#if D_STAR_LITE_ENABLED
-  shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
-#endif
   return result;
-}
-bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
-                                 const bool b) {
-  if (state == IDENTIFYING_POSITION)
-    return idMaze.updateWall(v, d, b);
-  return maze.updateWall(v, d, b);
 }
 void SearchAlgorithm::resetLastWall(const State state, const int num) {
   if (state == IDENTIFYING_POSITION)

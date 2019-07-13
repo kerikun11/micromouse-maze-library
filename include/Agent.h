@@ -51,6 +51,9 @@ public:
                   const bool front, const bool right, const bool back) {
     return searchAlgorithm.updateWall(state, v, d, left, front, right, back);
   }
+  bool updateWall(const Vector v, const Dir d, const bool b) {
+    return searchAlgorithm.updateWall(state, v, d, b);
+  }
   void resetLastWall(const int num = 1) {
     return searchAlgorithm.resetLastWall(state, num);
   }

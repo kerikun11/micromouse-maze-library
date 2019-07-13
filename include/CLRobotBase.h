@@ -99,6 +99,12 @@ protected:
     front = maze_target.isWall(real.first, real.second + Dir::Front);
     right = maze_target.isWall(real.first, real.second + Dir::Right);
     back = maze_target.isWall(real.first, real.second + Dir::Back);
+#if 0
+    /* 前1区画先の壁を読める場合 */
+    if (!front)
+      updateWall(curVec.next(curDir), curDir,
+                 maze_target.isWall(real.first.next(real.second), real.second));
+#endif
   }
   virtual void calcNextDirsPreCallback() override {
     start = std::chrono::system_clock::now();
