@@ -18,32 +18,35 @@ protected:
 };
 
 int test_measurement() {
+  std::ofstream csv("out.csv");
   const std::string mazedata_dir = "../mazedata/";
   for (const auto filename : {
-           mazedata_dir + "32MM2018HX.maze",
-           mazedata_dir + "32MM2017HX.maze",
-           mazedata_dir + "32MM2016HX.maze",
-           mazedata_dir + "32MM2015HX.maze",
-           mazedata_dir + "32MM2014HX.maze",
-           mazedata_dir + "32MM2013HX.maze",
-           mazedata_dir + "32MM2012HX.maze",
-           mazedata_dir + "16MM2018CM.maze",
-           mazedata_dir + "16MM2018MS.maze",
-           mazedata_dir + "16MM2017CX.maze",
-           mazedata_dir + "16MM2017CX_pre.maze",
-           mazedata_dir + "16MM2017C_East.maze",
-           mazedata_dir + "16MM2017C_Cheese.maze",
-           mazedata_dir + "16MM2017Tashiro.maze",
-           mazedata_dir + "16MM2016CX.maze",
-           mazedata_dir + "16MM2013CX.maze",
-           mazedata_dir + "08MM2016CF_pre.maze",
+           "32MM2018HX.maze",
+           "32MM2017HX.maze",
+           "32MM2016HX.maze",
+           "32MM2015HX.maze",
+           "32MM2014HX.maze",
+           "32MM2013HX.maze",
+           "32MM2012HX.maze",
+           "16MM2018CM.maze",
+           "16MM2018MS.maze",
+           "16MM2017CX.maze",
+           "16MM2017CX_pre.maze",
+           "16MM2017C_East.maze",
+           "16MM2017C_Cheese.maze",
+           "16MM2017Tashiro.maze",
+           "16MM2016CX.maze",
+           "16MM2016C_Chubu.maze",
+           "16MM2013CX.maze",
+           "08MM2016CF_pre.maze",
        }) {
     std::cout << std::endl;
     std::cout << "Maze File: \t" << filename << std::endl;
+    csv << filename;
 
 #if 1
     /* Search Run */
-    Maze maze_target = Maze(filename.c_str());
+    Maze maze_target = Maze((mazedata_dir + filename).c_str());
     const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
     CLRobot &robot = *p_robot;
     robot.replaceGoals(maze_target.getGoals());
@@ -54,8 +57,12 @@ int test_measurement() {
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
     robot.printResult();
+    csv << "," << robot.step << "," << robot.f << "," << robot.l << ","
+        << robot.r << "," << robot.b;
     std::cout << "Max Calc Time:\t" << robot.max_usec << "\t[us]" << std::endl;
     std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
+    csv << "," << robot.max_usec;
+    csv << "," << us.count();
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirs(diag_enabled))
         loge << "Failed to Find a Shortest Path! "
@@ -66,7 +73,7 @@ int test_measurement() {
     }
 #endif
 
-#if 1
+#if 0
     /* Position Identification Run */
     robot.max_usec = 0;
     StepMap stepMap;
@@ -98,7 +105,7 @@ int test_measurement() {
     for (const auto diag_enabled : {false, true}) {
       const int n = 100;
       const bool known_only = 0;
-      Maze maze(filename.c_str());
+      Maze maze = Maze((mazedata_dir + filename).c_str());
       // Maze maze(loadMaze().getGoals());
       const auto p_sa =
           std::unique_ptr<ShortestAlgorithm>(new ShortestAlgorithm(maze));
@@ -118,6 +125,7 @@ int test_measurement() {
       // sa.printPath(std::cout, path);
     }
 #endif
+    csv << std::endl;
   }
   std::cout << std::endl << "Measurement End" << std::endl;
 
