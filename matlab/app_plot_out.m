@@ -23,13 +23,12 @@ rawdata = dlmread([pathname filename]);
 rawdata = rawdata';
 
 %% extract
-value = rawdata(1, :);
-walllog = rawdata(2, :);
+value = rawdata(:, :);
 
 %% Visualization
 %% Velocity
 figure(figindex); figindex = figindex + 1;
-subplotNum = 2; subplotIndex = 1;
+subplotNum = 1; subplotIndex = 1;
 
 subplot(subplotNum, 1, subplotIndex); hold on;
 subplotIndex = subplotIndex + 1;
@@ -38,18 +37,16 @@ title('Calculation Time');
 xlabel('Search Step');
 ylabel('Calculation Time [us]');
 
-subplot(subplotNum, 1, subplotIndex); hold on;
-subplotIndex = subplotIndex + 1;
-plot(walllog); grid on;
-title('The Number of the Known Wall');
-xlabel('Search Step');
-ylabel('The Number of the Known Wall');
-
 %% save
 fig = gcf;
-fig.Position(3) = 960;
-fig.Position(4) = 720;
+% fig.Position(3) = 480; fig.Position(4) = 360;
 fig.PaperPositionMode = 'auto';
-fig_pos = fig.PaperPosition;
-fig.PaperSize = [fig_pos(3) fig_pos(4)];
-print(fig, [datestr(datetime('now'), 'yymmdd-HHMMSS') '.pdf'], '-dpdf');
+fig.PaperSize = [fig.PaperPosition(3) fig.PaperPosition(4)];
+date_time_str = datestr(datetime('now'), 'yymmdd-HHMMSS');
+outdir = 'output/';
+[~, ~] = mkdir(outdir);
+warning('off', 'all');
+print(fig, [outdir date_time_str '.pdf'], '-dpdf');
+print(fig, [outdir date_time_str '.png'], '-dpng');
+savefig([outdir date_time_str '.fig']);
+warning('on', 'all');
