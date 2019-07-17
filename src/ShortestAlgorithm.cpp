@@ -22,15 +22,14 @@ namespace MazeLib {
  * @param am accel max [mm/s/s]
  * @param vs velocity start [mm/s]
  * @param vm velocity max [mm/s]
- * @param isAlong true: along; false: diag
+ * @param seg segment distance [mm]
  * @return constexpr ShortestAlgorithm::cost_t time [ms]
  */
 constexpr ShortestAlgorithm::cost_t gen_cost_impl(const int i, const float am,
                                                   const float vs,
                                                   const float vm,
-                                                  const bool isAlong) {
-  const auto d = (isAlong ? 90.0f : 45.0f * std::sqrt(2.0f)) *
-                 (i + 1); /*< (i+1) 区画分の走行距離 */
+                                                  const float seg) {
+  const auto d = seg * (i + 1); /*< (i+1) 区画分の走行距離 */
   /* グラフの面積から時間を求める */
   const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
   if (d < d_thr)
@@ -40,33 +39,25 @@ constexpr ShortestAlgorithm::cost_t gen_cost_impl(const int i, const float am,
 }
 template <std::size_t... vals>
 constexpr auto gen_cost_table(std::index_sequence<vals...>, const float am,
-                              const float vs, const float vm,
-                              const bool isAlong) {
+                              const float vs, const float vm, const float seg) {
   return std::array<ShortestAlgorithm::cost_t, sizeof...(vals)>{
-      {gen_cost_impl(vals, am, vs, vm, isAlong)...}};
+      {gen_cost_impl(vals, am, vs, vm, seg)...}};
 }
 
 ShortestAlgorithm::cost_t
 ShortestAlgorithm::getEdgeCost(const enum ShortestAlgorithm::Pattern p,
                                const int n) {
-  static constexpr auto am = 3000.0f; /*< 最大加速度 [mm/s/s] */
-  static constexpr auto vs = 450.0f;  /*< 終始速度 [mm/s] */
-  static constexpr auto vm = 2400.0f; /*< 飽和速度 [mm/s] */
+  static constexpr auto vs = 400.0f;    /*< 終始速度 [mm/s] */
+  static constexpr auto am_a = 3000.0f; /*< 最大加速度 [mm/s/s] */
+  static constexpr auto am_d = 2000.0f; /*< 最大加速度 [mm/s/s] */
+  static constexpr auto vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
+  static constexpr auto vm_d = 1200.0f; /*< 最大加速度 [mm/s/s] */
   /* コストテーブルをコンパイル時生成 */
-  static constexpr auto cost_table_along = gen_cost_table(
-      std::make_index_sequence<MAZE_SIZE * 2>(), am, vs, vm, true);
-  static constexpr auto cost_table_diag = gen_cost_table(
-      std::make_index_sequence<MAZE_SIZE * 2>(), am, vs, vm, false);
-  /* n along diag @ am = 3000, vs = 450, vm = 1800.
-   * 1   158  118
-   * 2   274  209
-   * 3   370  286
-   * 4   454  355
-   */
-  // for (int i = 0; i < MAZE_SIZE * 2; ++i) {
-  //   std::cout << i + 1 << "\t" << cost_table_along[i] << "\t"
-  //             << cost_table_diag[i] << std::endl;
-  // }
+  constexpr auto seq = std::make_index_sequence<MAZE_SIZE * 2>();
+  static constexpr auto cost_table_along =
+      gen_cost_table(seq, am_a, vs, vm_a, 90.0f);
+  static constexpr auto cost_table_diag =
+      gen_cost_table(seq, am_d, vs, vm_d, 45.0f * std::sqrt(2));
   switch (p) {
   case ST_ALONG:
     return cost_table_along[n - 1]; /*< [ms] */
