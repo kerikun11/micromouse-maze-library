@@ -223,6 +223,7 @@ ShortestAlgorithm::Index::getPredecessors(const Maze &maze,
   if (!diag_enabled) {
     /* 戻り値を用意 */
     std::vector<std::pair<Index, cost_t>> preds;
+    preds.reserve(MAZE_SIZE * 2);
     /* known_only を考慮した壁の判定式を用意 */
     const auto canGo = [&](const Vector vec, const Dir dir) {
       // if (vec == Vector(0, 0) && dir == Dir::South)

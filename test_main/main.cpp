@@ -103,5 +103,37 @@ int main(void) {
   std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
 #endif
 
+#if 0
+  /* Shortest Algorithm */
+  for (const auto diag_enabled : {false, true}) {
+    const int n = 100;
+    const bool known_only = 0;
+    // Maze maze = Maze((mazedata_dir + filename).c_str());
+    Maze maze = Maze({
+        Vector(MAZE_SIZE - 2, MAZE_SIZE - 2),
+        Vector(MAZE_SIZE - 2, MAZE_SIZE - 3),
+        Vector(MAZE_SIZE - 3, MAZE_SIZE - 2),
+        Vector(MAZE_SIZE - 3, MAZE_SIZE - 3),
+    });
+    // maze.print();
+    const auto p_sa =
+        std::unique_ptr<ShortestAlgorithm>(new ShortestAlgorithm(maze));
+    ShortestAlgorithm &sa = *p_sa;
+    ShortestAlgorithm::Indexes path;
+    std::chrono::microseconds sum{0};
+    for (int i = 0; i < n; ++i) {
+      const auto t_s = std::chrono::system_clock().now();
+      sa.calcShortestPath(path, known_only, diag_enabled);
+      const auto t_e = std::chrono::system_clock().now();
+      const auto us =
+          std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+      sum += us;
+    }
+    std::cout << "Shortest " << (diag_enabled ? "diag" : "along") << ":\t"
+              << sum.count() / n << "\t[us]" << std::endl;
+    // sa.printPath(std::cout, path);
+  }
+#endif
+
   return 0;
 }

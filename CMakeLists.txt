@@ -3,7 +3,7 @@
 # author: Ryotaro Onuki
 # date: 2019.05.07
 #
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.10)
 project("MazeLib" CXX)
 
 ## display option

@@ -26,10 +26,12 @@ public:
     RobotBase::printInfo(showMaze);
     const auto nextDirs = getNextDirs();
     std::string path;
-    for (int i = 0; i < (int)nextDirs.size() - 1; ++i) {
-      switch (Dir(nextDirs[i + 1] - nextDirs[i])) {
+    auto prev_d = curDir;
+    for (int i = 0; i < (int)nextDirs.size(); ++i) {
+      const auto next_d = nextDirs[i];
+      switch (Dir(next_d - prev_d)) {
       case Dir::Front:
-        path += RobotBase::FastAction::ST_ALONG_FULL;
+        path += RobotBase::FastAction::F_ST_FULL;
         break;
       case Dir::Left:
         path += RobotBase::FastAction::FLS90;
@@ -37,12 +39,16 @@ public:
       case Dir::Right:
         path += RobotBase::FastAction::FRS90;
         break;
+      case Dir::Back:
+        path += RobotBase::FastAction::TURN_BACK;
+        break;
       default:
         loge << std::endl;
         break;
       }
+      prev_d = next_d;
     }
-    std::cout << "NextDirsKnownFast: \x1b[0K";
+    std::cout << "NextDirsKnown:     \x1b[0K";
     std::cout << path << std::endl;
     std::cout << "NextDirsKnownFast: \x1b[0K";
     std::cout << RobotBase::pathConvertSearchToKnown(path) << std::endl;

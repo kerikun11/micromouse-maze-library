@@ -29,9 +29,10 @@ public:
     ROTATE_180,
   };
   enum FastAction : char {
-    ST_ALONG_FULL = 'S',
-    ST_ALONG_HALF = 's',
-    ST_DIAG = 'w',
+    TURN_BACK = 'B',
+    F_ST_FULL = 'S',
+    F_ST_HALF = 's',
+    F_ST_DIAG = 'w',
     FL45 = 'z',
     FL45P = 'Z',
     FR45 = 'c',
@@ -51,12 +52,12 @@ public:
   };
   static std::string pathConvertSearchToFast(std::string src,
                                              bool diag_enabled) {
-    src = (char)ST_ALONG_HALF + src + (char)ST_ALONG_HALF;
+    src = (char)F_ST_HALF + src + (char)F_ST_HALF;
     return replaceStringSearchToFast(src, diag_enabled);
   }
   static std::string pathConvertSearchToKnown(std::string src) {
-    auto f = src.find_first_of(ST_ALONG_FULL);
-    auto b = src.find_last_of(ST_ALONG_FULL);
+    auto f = src.find_first_of(F_ST_FULL);
+    auto b = src.find_last_of(F_ST_FULL);
     if (f >= b)
       return src;
     auto fb = src.substr(f, b - f + 1);
