@@ -7,10 +7,7 @@
  */
 #include "SearchAlgorithm.h"
 
-#include "ShortestAlgorithm.h"
-
 #include <algorithm>
-#include <chrono>
 
 namespace MazeLib {
 
