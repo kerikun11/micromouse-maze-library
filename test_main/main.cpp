@@ -62,7 +62,7 @@ int main(void) {
   const std::string mazedata_dir = "../mazedata/";
   const std::string filename = "32MM2016HX.maze";
   Maze maze_target = Maze((mazedata_dir + filename).c_str());
-  const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
+  const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;
   robot.replaceGoals(maze_target.getGoals());
 #endif
@@ -88,7 +88,7 @@ int main(void) {
   std::chrono::microseconds sum{0};
   Maze maze = Maze(filename.c_str());
   ShortestAlgorithm sa(maze);
-  ShortestAlgorithm::Indexes path;
+  Indexes path;
   for (int i = 0; i < n; ++i) {
     const auto t_s = std::chrono::system_clock().now();
     sa.Initialize();
@@ -103,7 +103,7 @@ int main(void) {
   std::cout << "It took " << sum.count() / n << " [us]" << std::endl;
 #endif
 
-#if 0
+#if 1
   /* Shortest Algorithm */
   for (const auto diag_enabled : {false, true}) {
     const int n = 100;
@@ -116,10 +116,9 @@ int main(void) {
         Vector(MAZE_SIZE - 3, MAZE_SIZE - 3),
     });
     // maze.print();
-    const auto p_sa =
-        std::unique_ptr<ShortestAlgorithm>(new ShortestAlgorithm(maze));
+    const auto p_sa = std::make_unique<ShortestAlgorithm>(maze);
     ShortestAlgorithm &sa = *p_sa;
-    ShortestAlgorithm::Indexes path;
+    Indexes path;
     std::chrono::microseconds sum{0};
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();

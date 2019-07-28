@@ -242,7 +242,7 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
   return true;
 #else
   /* new algorithm*/
-  ShortestAlgorithm::Indexes path;
+  Indexes path;
   const bool known_only = true;
 #if D_STAR_LITE_ENABLED
   shortestAlgorithm.Initialize();
@@ -368,7 +368,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 #else
   for (const auto diag_enabled : {true, false}) {
 #endif
-    ShortestAlgorithm::Indexes path;
+    Indexes path;
     const bool known_only = false;
 #if D_STAR_LITE_ENABLED
     if (!shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled))

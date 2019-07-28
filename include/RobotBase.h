@@ -33,6 +33,7 @@ public:
     F_ST_FULL = 'S',
     F_ST_HALF = 's',
     F_ST_DIAG = 'w',
+    F_STOP = 'E',
     FL45 = 'z',
     FL45P = 'Z',
     FR45 = 'c',
@@ -56,12 +57,13 @@ public:
     return replaceStringSearchToFast(src, diag_enabled);
   }
   static std::string pathConvertSearchToKnown(std::string src) {
-    auto f = src.find_first_of(F_ST_FULL);
-    auto b = src.find_last_of(F_ST_FULL);
+    auto f = src.find_first_of(F_ST_FULL); /*< 最初の直線を探す */
+    auto b = src.find_last_of(F_ST_FULL);  /*< 最後の直線を探す */
     if (f >= b)
-      return src;
-    auto fb = src.substr(f, b - f + 1);
-    fb = replaceStringSearchToFast(fb, true);
+      return src;                       /*< 直線なし */
+    auto fb = src.substr(f, b - f + 1); /*< 直線に挟まれた区間を抽出 */
+    fb = replaceStringSearchToFast(fb, true); /*< 最短走行パターンに変換 */
+    /* 最初の直線前と最後の直線後を連結して完了 */
     return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
   }
   bool searchRun();

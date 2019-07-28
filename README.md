@@ -19,3 +19,20 @@ cd build
 cmake -DCROSS_COMPILING=1 -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain_xtensa-esp32-elf.cmake ..
 make
 ```
+
+## Class Design
+
+- Dir
+- Vector
+- WallLog
+- Maze
+
+- StepMap
+- ShortestAlgorithm
+  - RunParameter
+  - EdgeCost
+  - Index
+- SearchAlgorithm
+- Agent
+- RobotBase
+- CLRobotBase

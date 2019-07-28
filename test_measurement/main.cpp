@@ -47,7 +47,7 @@ int test_measurement() {
 #if 1
     /* Search Run */
     Maze maze_target = Maze((mazedata_dir + filename).c_str());
-    const auto p_robot = std::unique_ptr<CLRobot>(new CLRobot(maze_target));
+    const auto p_robot = std::make_unique<CLRobot>(maze_target);
     CLRobot &robot = *p_robot;
     robot.replaceGoals(maze_target.getGoals());
     const auto t_s = std::chrono::system_clock().now();
@@ -107,10 +107,9 @@ int test_measurement() {
       const bool known_only = 0;
       Maze maze = Maze((mazedata_dir + filename).c_str());
       // Maze maze(loadMaze().getGoals());
-      const auto p_sa =
-          std::unique_ptr<ShortestAlgorithm>(new ShortestAlgorithm(maze));
+      const auto p_sa = std::make_unique<ShortestAlgorithm>(maze);
       ShortestAlgorithm &sa = *p_sa;
-      ShortestAlgorithm::Indexes path;
+      Indexes path;
       std::chrono::microseconds sum{0};
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
@@ -120,8 +119,10 @@ int test_measurement() {
             std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
         sum += us;
       }
-      std::cout << "Shortest " << (diag_enabled ? "diag" : "along") << ":\t"
+      std::cout << "Shortest " << (diag_enabled ? "diag" : "no_d") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
+      std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
+                << sa.getPathCost() << "\t[ms]" << std::endl;
       // sa.printPath(std::cout, path);
     }
 #endif

@@ -72,9 +72,14 @@ public:
     //           << std::endl;
   }
   bool endFastRunBackingToStartRun() {
+    /* エラー処理 */
+    if (getShortestDirs().empty()) {
+      logw << "ShortestDirs are empty!" << std::endl;
+      return false;
+    }
     /* real を最短後の位置に移す */
     Vector v = maze.getStart();
-    for (auto d : getShortestDirs())
+    for (const auto d : getShortestDirs())
       v = v.next(d);
     real = VecDir(v, getShortestDirs().back());
     /* 基底関数を呼ぶ */
