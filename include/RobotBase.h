@@ -19,14 +19,14 @@ class RobotBase : public Agent {
 public:
   RobotBase(Maze &maze) : Agent(maze) {}
   enum Action : char {
-    START_STEP,
-    START_INIT,
-    ST_FULL,
-    ST_HALF,
-    ST_HALF_STOP,
-    TURN_L,
-    TURN_R,
-    ROTATE_180,
+    START_STEP = '1',
+    START_INIT = '2',
+    ST_FULL = 'S',
+    ST_HALF = 's',
+    ST_HALF_STOP = 'E',
+    TURN_L = 'L',
+    TURN_R = 'R',
+    ROTATE_180 = 'T',
   };
   enum FastAction : char {
     TURN_BACK = 'B',
@@ -57,8 +57,9 @@ public:
     return replaceStringSearchToFast(src, diag_enabled);
   }
   static std::string pathConvertSearchToKnown(std::string src) {
-    auto f = src.find_first_of(F_ST_FULL); /*< 最初の直線を探す */
-    auto b = src.find_last_of(F_ST_FULL);  /*< 最後の直線を探す */
+    replace(src, "S", "ss");
+    auto f = src.find_first_of(F_ST_HALF); /*< 最初の直線を探す */
+    auto b = src.find_last_of(F_ST_HALF);  /*< 最後の直線を探す */
     if (f >= b)
       return src;                       /*< 直線なし */
     auto fb = src.substr(f, b - f + 1); /*< 直線に挟まれた区間を抽出 */
@@ -101,14 +102,21 @@ private:
     if (from.empty())
       return 0;
     auto pos = src.find(from);
-    auto toLen = to.length();
+    auto toLen = to.size();
     int i = 0;
     while ((pos = src.find(from, pos)) != std::string::npos) {
-      src.replace(pos, from.length(), to);
+      src.replace(pos, from.size(), to);
       pos += toLen;
     }
     return i;
   }
+  /**
+   * @brief 探索パターンを最短パターンに変換する関数
+   *
+   * @param src { s, S, L, R} からなる探索パターン文字列
+   * @param diag_enabled 斜めありかどうか
+   * @return std::string 最短パターン文字列
+   */
   static std::string replaceStringSearchToFast(std::string src,
                                                bool diag_enabled) {
     replace(src, "S", "ss");

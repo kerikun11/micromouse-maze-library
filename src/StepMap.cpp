@@ -50,22 +50,31 @@ void StepMap::print(std::ostream &os, const Maze &maze, const Vector v,
     if (y != MAZE_SIZE) {
       os << '|';
       for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
-        if (v == Vector(x, y))
-          os << " " << C_YELLOW << d.toChar() << C_RESET << " ";
+        // if (v == Vector(x, y))
+        //   os << " " << C_YELLOW << d.toChar() << C_RESET << " ";
+        // else
+        os << C_CYAN << std::setw(3) << std::min(getStep(x, y), (step_t)999)
+           << C_RESET;
+        if ((v == Vector(x, y) && d == Dir::West) ||
+            (v == Vector(x, y).next(Dir::East) && d == Dir::East))
+          os << C_YELLOW << d.toChar() << C_RESET;
         else
-          os << C_CYAN << std::setw(3) << std::min(getStep(x, y), (step_t)999)
-             << C_RESET;
-        os << (maze.isKnown(x, y, Dir::East)
-                   ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
-                   : (C_RED "." C_RESET));
+          os << (maze.isKnown(x, y, Dir::East)
+                     ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+                     : (C_RED "." C_RESET));
       }
       os << std::endl;
     }
-    for (uint8_t x = 0; x < MAZE_SIZE; ++x)
-      os << "+"
-         << (maze.isKnown(x, y, Dir::South)
-                 ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
-                 : (C_RED " . " C_RESET));
+    for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+      os << "+";
+      if ((v == Vector(x, y) && d == Dir::North) ||
+          (v == Vector(x, y).next(Dir::South) && d == Dir::South))
+        os << " " << C_YELLOW << d.toChar() << C_RESET << " ";
+      else
+        os << (maze.isKnown(x, y, Dir::South)
+                   ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
+                   : (C_RED " . " C_RESET));
+    }
     os << "+" << std::endl;
   }
 }
@@ -241,8 +250,13 @@ const Vector StepMap::calcNextDirs(Maze &maze, const Vectors &dest,
                                    const Vector vec, const Dir dir,
                                    Dirs &nextDirsKnown, Dirs &nextDirCandidates,
                                    const bool prior_unknown) {
+  /* ステップマップの更新 */
+#if 1
+  update(maze, dest, false, true);
+#else
   updateSimple(maze, dest, false);
-  // 事前に進む候補を決定する
+#endif
+  /* 事前に進む候補を決定する */
   const auto v = calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates,
                               prior_unknown);
   Dirs ndcs; //< Next Dir Candidates

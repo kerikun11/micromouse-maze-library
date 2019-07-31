@@ -19,7 +19,7 @@ namespace MazeLib {
 #define USE_OLD_ALGORITHM 1
 #define USE_HYBRID_ALGORITHM 0
 
-const char *SearchAlgorithm::stateString(const enum State s) {
+const char *SearchAlgorithm::stateString(const State s) {
   static const char *const str[] = {
       "Start                 ", "Searching for Goal    ",
       "Searching Additionally", "Backing to Start      ",
@@ -74,12 +74,12 @@ void SearchAlgorithm::resetLastWall(const State state, const int num) {
     return idMaze.resetLastWall(num);
   return maze.resetLastWall(num);
 }
-enum SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
+SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
     State &state, Vector &curVec, Dir &curDir, Dirs &nextDirs,
     Dirs &nextDirCandidates, bool &isPositionIdentifying,
     bool &isForceBackToStart, bool &isForceGoingToGoal, int &matchCount) {
   state = START;
-  enum Result result;
+  Result result;
   /* check if in goal */
   if (!isPositionIdentifying && isForceGoingToGoal) {
     const auto goals = maze.getGoals();
@@ -468,7 +468,7 @@ SearchAlgorithm::findMatchDirCandidates(const Vector cur_v,
   // std::cout << "        " << std::endl;
   return result_dirs;
 }
-enum SearchAlgorithm::Result
+SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
                                            Dirs &nextDirsKnown,
                                            Dirs &nextDirCandidates) {
@@ -482,7 +482,7 @@ SearchAlgorithm::calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
                        nextDirCandidates);
   return nextDirCandidates.empty() ? Error : Processing;
 }
-enum SearchAlgorithm::Result
+SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
                                                 Dirs &nextDirsKnown,
                                                 Dirs &nextDirCandidates) {
@@ -494,7 +494,7 @@ SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
                        nextDirCandidates);
   return nextDirCandidates.empty() ? Error : Processing;
 }
-enum SearchAlgorithm::Result
+SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsBackingToStart(const Vector cv, const Dir cd,
                                             Dirs &nextDirsKnown,
                                             Dirs &nextDirCandidates) {
@@ -504,7 +504,7 @@ SearchAlgorithm::calcNextDirsBackingToStart(const Vector cv, const Dir cd,
     return Reached;
   return nextDirCandidates.empty() ? Error : Processing;
 }
-enum SearchAlgorithm::Result
+SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
                                          Dirs &nextDirsKnown,
                                          Dirs &nextDirCandidates) {
@@ -517,11 +517,9 @@ SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
     return Reached;
   return nextDirCandidates.empty() ? Error : Processing;
 }
-enum SearchAlgorithm::Result
-SearchAlgorithm::calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
-                                                    Dirs &nextDirsKnown,
-                                                    Dirs &nextDirCandidates,
-                                                    int &matchCount) {
+SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
+    Vector &cv, Dir &cd, Dirs &nextDirsKnown, Dirs &nextDirCandidates,
+    int &matchCount) {
   /* オフセットを調整する */
   if (!idMaze.getWallLogs().empty()) {
     const int8_t min_x = idMaze.getMinX();

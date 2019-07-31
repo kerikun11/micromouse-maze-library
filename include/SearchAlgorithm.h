@@ -41,7 +41,7 @@ public:
   /**
    *  @brief Stateの表示用文字列を返す関数
    */
-  static const char *stateString(const enum State s);
+  static const char *stateString(const State s);
 
 public:
   SearchAlgorithm(Maze &maze) : maze(maze), shortestAlgorithm(maze) {}
@@ -52,11 +52,10 @@ public:
                   const bool back);
   bool updateWall(const State state, const Vector v, const Dir d, const bool b);
   void resetLastWall(const State state, const int num = 1);
-  enum Result calcNextDirs(State &state, Vector &curVec, Dir &curDir,
-                           Dirs &nextDirs, Dirs &nextDirCandidates,
-                           bool &isPositionIdentifying,
-                           bool &isForceBackToStart, bool &isForceGoingToGoal,
-                           int &matchCount);
+  Result calcNextDirs(State &state, Vector &curVec, Dir &curDir, Dirs &nextDirs,
+                      Dirs &nextDirCandidates, bool &isPositionIdentifying,
+                      bool &isForceBackToStart, bool &isForceGoingToGoal,
+                      int &matchCount);
   bool findNextDir(const State state, const Vector v, const Dir d,
                    const Dirs &nextDirCandidates, Dir &nextDir) const;
   bool findNextDir(const Maze &maze, const Vector v, const Dir d,
@@ -90,22 +89,21 @@ private:
   /**
    * @brief 各状態での進行方向列導出関数
    */
-  enum Result calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
+  Result calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
+                                   Dirs &nextDirsKnown,
+                                   Dirs &nextDirCandidates);
+  Result calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
                                         Dirs &nextDirsKnown,
                                         Dirs &nextDirCandidates);
-  enum Result calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
-                                             Dirs &nextDirsKnown,
-                                             Dirs &nextDirCandidates);
-  enum Result calcNextDirsBackingToStart(const Vector cv, const Dir cd,
-                                         Dirs &nextDirsKnown,
-                                         Dirs &nextDirCandidates);
-  enum Result calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
-                                      Dirs &nextDirsKnown,
-                                      Dirs &nextDirCandidates);
-  enum Result calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
-                                                 Dirs &nextDirsKnown,
-                                                 Dirs &nextDirCandidates,
-                                                 int &matchCount);
+  Result calcNextDirsBackingToStart(const Vector cv, const Dir cd,
+                                    Dirs &nextDirsKnown,
+                                    Dirs &nextDirCandidates);
+  Result calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
+                                 Dirs &nextDirsKnown, Dirs &nextDirCandidates);
+  Result calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
+                                            Dirs &nextDirsKnown,
+                                            Dirs &nextDirCandidates,
+                                            int &matchCount);
 };
 
 } // namespace MazeLib
