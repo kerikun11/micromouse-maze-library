@@ -31,16 +31,18 @@ public:
       const auto next_d = nextDirs[i];
       switch (Dir(next_d - prev_d)) {
       case Dir::Front:
-        path += RobotBase::FastAction::F_ST_FULL;
+        path += RobotBase::Action::ST_FULL;
         break;
       case Dir::Left:
-        path += RobotBase::FastAction::FLS90;
+        path += RobotBase::Action::TURN_L;
         break;
       case Dir::Right:
-        path += RobotBase::FastAction::FRS90;
+        path += RobotBase::Action::TURN_R;
         break;
       case Dir::Back:
-        path += RobotBase::FastAction::TURN_BACK;
+        path += RobotBase::Action::ST_HALF_STOP;
+        path += RobotBase::Action::ROTATE_180;
+        path += RobotBase::Action::ST_HALF;
         break;
       default:
         loge << std::endl;
@@ -209,7 +211,7 @@ protected:
     case RobotBase::START_STEP:
       return 1.0f;
     case RobotBase::START_INIT:
-      return 1.0f;
+      return 3.0f;
     case RobotBase::ST_HALF_STOP:
       return segment / 2 / velocity;
     case RobotBase::TURN_L:

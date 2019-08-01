@@ -123,6 +123,7 @@ bool RobotBase::generalSearchRun() {
     queueNextDirs({nextDir});
   }
   /* スタート区画特有の処理 */
+  queueAction(ST_HALF_STOP);
   queueAction(START_INIT);
   updateCurVecDir(Vector(0, 0), Dir::North);
   calcNextDirs(); /*< 時間がかかる処理！ */

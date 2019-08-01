@@ -29,11 +29,9 @@ public:
     ROTATE_180 = 'T',
   };
   enum FastAction : char {
-    TURN_BACK = 'B',
     F_ST_FULL = 'S',
     F_ST_HALF = 's',
     F_ST_DIAG = 'w',
-    F_STOP = 'E',
     FL45 = 'z',
     FL45P = 'Z',
     FR45 = 'c',
