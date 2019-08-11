@@ -30,27 +30,60 @@ static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
  * @brief 最短走行パターン
  */
 enum Pattern : int8_t { ST_ALONG, ST_DIAG, F45, F90, F135, F180, FV90, FS90 };
-/**
- * @brief Get the Edge Cost
- * @param p パターン
- * @param n 直線の場合，区画数
- * @return cost_t コスト
- */
-struct RunParameter {
-  RunParameter() {}
-  float vs = 400.0f;    /*< 基本速度 [mm/s] */
-  float am_a = 3000.0f; /*< 最大加速度 [mm/s/s] */
-  float am_d = 2000.0f; /*< 最大加速度 [mm/s/s] */
-  float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
-  float vm_d = 1200.0f; /*< 最大加速度 [mm/s/s] */
-  cost_t t_F45 = 249;   /*< [ms] @ v = 425.272 [mm/s] */
-  cost_t t_F90 = 375;   /*< [ms] @ v = 422.846 [mm/s] */
-  cost_t t_F135 = 421;  /*< [ms] @ v = 375.888 [mm/s] */
-  cost_t t_F180 = 563;  /*< [ms] @ v = 412.408 [mm/s] */
-  cost_t t_FV90 = 370;  /*< [ms] @ v = 302.004 [mm/s] */
-  cost_t t_FS90 = 280;  /*< [ms] @ v = 271.797 [mm/s] */
+
+struct Action {
+  enum Type {
+    Straight,
+    Slalom,
+    TypeMax,
+  };
+  enum Slalom {
+    F45,
+    F90,
+    F135,
+    F180,
+    FV90,
+    FS90,
+    SlalomMax,
+  };
+  enum Dir {
+    Left,
+    Right,
+  };
+  Type type;
+  int index;
+  Dir dir;
 };
+
+struct RunParameter {
+  float slalom_gain[Action::SlalomMax];
+  float v_max;
+  float a_max;
+};
+
 class EdgeCost {
+public:
+  /**
+   * @brief Get the Edge Cost
+   * @param p パターン
+   * @param n 直線の場合，区画数
+   * @return cost_t コスト
+   */
+  struct RunParameter {
+    RunParameter() {}
+    float vs = 400.0f;    /*< 基本速度 [mm/s] */
+    float am_a = 3000.0f; /*< 最大加速度 [mm/s/s] */
+    float am_d = 2000.0f; /*< 最大加速度 [mm/s/s] */
+    float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
+    float vm_d = 1200.0f; /*< 最大加速度 [mm/s/s] */
+    cost_t t_F45 = 249;   /*< [ms] @ v = 425.272 [mm/s] */
+    cost_t t_F90 = 375;   /*< [ms] @ v = 422.846 [mm/s] */
+    cost_t t_F135 = 421;  /*< [ms] @ v = 375.888 [mm/s] */
+    cost_t t_F180 = 563;  /*< [ms] @ v = 412.408 [mm/s] */
+    cost_t t_FV90 = 370;  /*< [ms] @ v = 302.004 [mm/s] */
+    cost_t t_FS90 = 280;  /*< [ms] @ v = 271.797 [mm/s] */
+  };
+
 public:
   EdgeCost(const struct RunParameter rp = RunParameter()) : rp(rp) {
     const float seg_a = 90.0f;
@@ -82,9 +115,11 @@ public:
     std::cerr << "Unknown Pattern" << std::endl;
     return 0;
   }
+  const RunParameter &getRunParameter() const { return rp; }
+  void setRunParameter(const RunParameter &rp) { this->rp = rp; }
 
 private:
-  struct RunParameter rp;
+  RunParameter rp;
   std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
   std::array<cost_t, MAZE_SIZE * 2> cost_table_diag;
   cost_t gen_cost_impl(const int i, const float am, const float vs,
