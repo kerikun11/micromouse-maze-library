@@ -19,6 +19,18 @@ class Agent {
 public:
   Agent(Maze &maze) : maze(maze), searchAlgorithm(maze) {}
   /**
+   * @brief 初期化
+   */
+  void reset() {
+    maze.reset();
+    state = SearchAlgorithm::START;
+    curDir = Dir::North;
+    curVec = Vector(0, 0);
+    isPositionIdentifying = false;
+    isForceBackToStart = false;
+    isForceGoingToGoal = false;
+  }
+  /**
    * @brief ゴール区画を変更する関数
    */
   void replaceGoals(const Vectors &goals) { maze.setGoals(goals); }

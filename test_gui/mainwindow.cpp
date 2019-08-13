@@ -91,7 +91,13 @@ void MainWindow::on_searchButton_clicked()
     /* Print Maze */
     maze_simulator.clear();
     maze_simulator.searchRun();
-    maze_simulator.next();
+    maze_simulator.draw();
+    /* Draw Shortest Path */
+    if(!maze_simulator.drawShortest(maze_simulator.getMaze(), true)){
+        QMessageBox box(QMessageBox::Warning, "Path Error", "Failed to Find any Shortest Path!");
+        box.exec();
+        return;
+    }
 }
 
 void MainWindow::on_shortestDiagButton_clicked()

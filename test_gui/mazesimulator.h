@@ -21,10 +21,6 @@ public:
         loop->connect(timer, SIGNAL(timeout()), loop, SLOT(quit()));
     }
 
-    void reset(){
-        loop->exit(-1);
-        maze.reset();
-    }
     void toggle(const int ms = 100){
         if(timer->isActive()){
             timer->stop();
