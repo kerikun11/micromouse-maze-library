@@ -264,6 +264,22 @@ public:
   Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
        const std::array<Dir, 4> bit_to_dir_map = {Dir::East, Dir::North,
                                                   Dir::West, Dir::South});
+  const Maze &operator=(const Maze &obj) {
+    for (int8_t i = 0; i < MAZE_SIZE - 1; ++i) {
+      wall[0][i] = obj.wall[0][i];
+      wall[1][i] = obj.wall[1][i];
+      known[0][i] = obj.known[0][i];
+      known[1][i] = obj.known[1][i];
+    }
+    goals = obj.goals;
+    start = obj.start;
+    wallLogs = obj.wallLogs;
+    min_x = obj.min_x;
+    min_y = obj.min_y;
+    max_x = obj.max_x;
+    max_y = obj.max_y;
+    return *this;
+  }
   /** @function reset
    *  @brief 迷路の初期化．壁を削除し，スタート区画を既知に
    */

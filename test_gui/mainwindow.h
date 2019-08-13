@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "mazedrawer.h"
+#include "mazesimulator.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,9 +27,14 @@ private slots:
 
     void on_actionDraw_triggered();
 
+    void on_startButton_clicked();
+
+    void on_fileSeectEdit_returnPressed();
+
 private:
     Ui::MainWindow *ui;
-    MazeDrawer maze_drawer;
+    QGraphicsScene* scene;
+    MazeSimulator maze_simulator;
 };
 
 #endif // MAINWINDOW_H

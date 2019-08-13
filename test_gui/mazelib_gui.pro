@@ -34,8 +34,7 @@ SOURCES += \
     ../src/SearchAlgorithm.cpp \
     ../src/ShortestAlgorithm.cpp \
     ../src/StepMap.cpp \
-    mazesimulator.cpp \
-    mazedrawer.cpp
+    mazesimulator.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -46,8 +45,7 @@ HEADERS += \
     ../include/SearchAlgorithm.h \
     ../include/ShortestAlgorithm.h \
     ../include/StepMap.h \
-    mazesimulator.h \
-    mazedrawer.h
+    mazesimulator.h
 
 FORMS += \
     mainwindow.ui
