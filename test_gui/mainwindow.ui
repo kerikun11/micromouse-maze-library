@@ -28,9 +28,9 @@
     <property name="geometry">
      <rect>
       <x>960</x>
-      <y>170</y>
+      <y>289</y>
       <width>309</width>
-      <height>740</height>
+      <height>621</height>
      </rect>
     </property>
    </widget>
@@ -58,19 +58,6 @@
     </property>
     <property name="text">
      <string>Maze File</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="startButton">
-    <property name="geometry">
-     <rect>
-      <x>960</x>
-      <y>130</y>
-      <width>311</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Start</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -118,6 +105,145 @@
      <string>Exit</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="toggleButton">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>210</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pause / Resume</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="stepButton">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>250</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Next</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="shortestDiagButton">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>130</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Shortest Path Diag</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="shortestNoDiagButton">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>130</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Shortest Path No Diag</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="searchButton">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>170</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Search Run</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="stepTimeBox">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>210</y>
+      <width>111</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>1000</number>
+    </property>
+    <property name="singleStep">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>100</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="stepCountBox">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>250</y>
+      <width>111</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>10000</number>
+    </property>
+    <property name="value">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>1080</x>
+      <y>210</y>
+      <width>31</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>[ms]</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>1080</x>
+      <y>250</y>
+      <width>31</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>[step]</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="resetButton">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>170</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reset</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="enabled">
@@ -151,7 +277,7 @@
       <x>424</x>
       <y>96</y>
       <width>146</width>
-      <height>19</height>
+      <height>42</height>
      </rect>
     </property>
     <property name="title">
@@ -164,7 +290,7 @@
       <x>384</x>
       <y>96</y>
       <width>146</width>
-      <height>19</height>
+      <height>42</height>
      </rect>
     </property>
     <property name="title">

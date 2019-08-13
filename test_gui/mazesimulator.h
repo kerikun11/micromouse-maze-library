@@ -17,7 +17,25 @@ using namespace MazeLib;
 class MazeSimulator : public MazeLib::RobotBase
 {
 public:
-    MazeSimulator(QGraphicsScene* scene): RobotBase(maze),scene(scene){}
+    MazeSimulator(QGraphicsScene* scene): RobotBase(maze),scene(scene){
+        loop->connect(timer, SIGNAL(timeout()), loop, SLOT(quit()));
+    }
+
+    void reset(){
+        loop->exit(-1);
+        maze.reset();
+    }
+    void toggle(const int ms = 100){
+        if(timer->isActive()){
+            timer->stop();
+        }else{
+            timer->start(ms);
+        }
+    }
+    void next(int n = 1){
+        for(int i=0; i<n; ++i)
+            loop->exit();
+    }
 
     void clear(){
         /* set Background Color */
@@ -66,19 +84,61 @@ public:
                 }
             }
     }
+    void drawStep(const StepMap& map) {
+        for(int x=0; x<MazeLib::MAZE_SIZE; ++x)
+            for(int y=0; y<MazeLib::MAZE_SIZE; ++y) {
+                scene->addText(QString::number(std::min(map.getStep(x, y), (step_t)999)))->setPos(cell2posX(x), cell2posY(y+1));
+                /* Draw Wall */
+                QPen pen(Qt::red);
+            }
+    }
     void drawVecDir(const VecDir& vd) {
         /* Draw Machine */
         const auto v = vd.first;
         const auto d = vd.second;
-//        scene->addRect(cell2posX(v.x), cell2posY(v.y+1), wall_px, wall_px, QPen(Qt::yellow), QBrush(Qt::yellow));
         QPolygon pol;
-        pol  << QPoint(0, wall_unit_px/4)  << QPoint(0, -wall_unit_px/4) << QPoint(wall_unit_px/4, 0);
-        pol.translate(-QPoint(wall_unit_px/2, 0));
+        pol  << QPoint(0, wall_unit_px/6)  << QPoint(0, -wall_unit_px/6) << QPoint(wall_unit_px/4, 0);
+        pol.translate(-QPoint(wall_unit_px*2/3, 0));
         QMatrix mat;
         mat.rotate(-45*d);
         pol = mat.map(pol);
         pol.translate(QPoint(cell2posX(v.x)+wall_unit_px/2, cell2posY(v.y)-wall_unit_px/2));
         scene->addPolygon(pol, QPen(Qt::yellow), QBrush(Qt::yellow));
+    }
+    bool drawShortest(const Maze& maze, const bool diag_enabled){
+        Maze maze_tmp = maze;
+        SearchAlgorithm sa(maze_tmp);
+        Dirs dirs;
+        if(!sa.calcShortestDirs(dirs, diag_enabled))
+            return false;
+        //        auto v = maze.getStart();
+        //        for(size_t i=0; i<dirs.size(); ++i){
+        //            const auto d = dirs[i];
+        //            v = v.next(d);
+        //            drawVecDir(VecDir{v, d});
+        //        }
+        auto v = maze.getStart();
+        for(size_t i = 0; i < dirs.size(); ++i){
+            const auto d = dirs[i];
+            const auto nv = v.next(d);
+            QPoint p1, p2;
+            if(diag_enabled){
+                if(i == dirs.size()-1)
+                    continue;
+                const auto nd = dirs[i+1];
+                p1=p2 = QPoint(wall_unit_px/2, 0);
+                QMatrix m1, m2;
+                m1.rotate(-45*d);
+                m2.rotate(-45*nd);
+                p1 = m1.map(p1);
+                p2 = m2.map(p2);
+            }
+            QPen pen(Qt::yellow);
+            pen.setWidth(2);
+            scene->addLine(p1.x()+cell2posX(v.x)+wall_unit_px/2, p1.y()+cell2posY(v.y)-wall_unit_px/2, p2.x()+cell2posX(nv.x)+wall_unit_px/2, p2.y()+cell2posY(nv.y)-wall_unit_px/2, pen);
+            v = nv;
+        }
+        return true;
     }
     Maze& getMazeTarget() { return maze_target; }
     void setMazeTarget(const Maze& maze) { maze_target = maze; }
@@ -96,12 +156,18 @@ public:
         /* 基底関数を呼ぶ */
         return RobotBase::endFastRunBackingToStartRun();
     }
+    void draw(){
+        clear();
+        drawMaze(maze);
+        drawStep(getSearchAlgorithm().getStepMap());
+        drawVecDir(real);
+    }
 
 protected:
     Maze maze;
     Maze maze_target;
     VecDir fake_offset;
-    VecDir real;
+    VecDir real = {Vector(0,0), Dir::North};
 
     virtual void findWall(bool &left, bool &front, bool &right,
                           bool &back) override {
@@ -117,14 +183,14 @@ protected:
 #endif
     }
     virtual void calcNextDirsPreCallback() override {
-        start = std::chrono::system_clock::now();
+        t_start = std::chrono::system_clock::now();
     }
     virtual void calcNextDirsPostCallback(SearchAlgorithm::State prevState
                                           __attribute__((unused)),
                                           SearchAlgorithm::State newState
                                           __attribute__((unused))) override {
         end = std::chrono::system_clock::now();
-        usec = std::chrono::duration_cast<std::chrono::microseconds>(end - start)
+        usec = std::chrono::duration_cast<std::chrono::microseconds>(end - t_start)
                 .count();
         max_usec = std::max(max_usec, usec);
         if (newState == prevState)
@@ -158,10 +224,13 @@ protected:
                   << fake_offset << "\treal:\t" << real << std::endl;
     }
     virtual void queueAction(const Action action) override {
-        clear();
-        drawMaze(maze);
-        drawVecDir(real);
-        msleep(10);
+        /* draw */
+        draw();
+        /* block */
+        int code =  loop->exec();
+        if(code < 0)
+            return;
+        /* release */
         cost += getTimeCost(action);
         step++;
         switch (action) {
@@ -171,6 +240,10 @@ protected:
             f++;
             break;
         case RobotBase::START_INIT:
+            real.second = real.second + Dir::Back;
+            if (!maze_target.canGo(real.first, real.second))
+                crashed();
+            real.first = real.first.next(real.second);
             break;
         case RobotBase::ST_HALF_STOP:
             break;
@@ -236,10 +309,12 @@ private:
     int usec = 0;
     size_t max_id_wall = 0;
     size_t min_id_wall = MAZE_SIZE * MAZE_SIZE * 4;
-    std::chrono::system_clock::time_point start;
+    std::chrono::system_clock::time_point t_start;
     std::chrono::system_clock::time_point end;
 
 private:
+    QEventLoop* loop = new QEventLoop();
+    QTimer* timer = new QTimer();
     QGraphicsScene* scene;
     int wall_unit_px = 28;
     int pillar_px = 2;
@@ -271,12 +346,6 @@ private:
         int w = wall_unit_px;
         int s = MazeLib::MAZE_SIZE;
         return (s-y)*w;
-    }
-
-    void msleep(int ms) {
-        QEventLoop loop;
-        QTimer::singleShot(ms, &loop, SLOT(quit()));
-        loop.exec();
     }
 };
 

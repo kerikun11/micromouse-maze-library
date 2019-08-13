@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     maze_simulator(scene)
 {
     ui->setupUi(this);
-    ui->fileSeectEdit->setText("../mazedata/32MM2017HX.maze");
+    ui->fileSeectEdit->setText("../mazedata/32MM2016HX.maze");
     ui->statusBar->showMessage("Hello World!");
     ui->mazeView->setScene(scene);
 }
@@ -25,10 +25,17 @@ MainWindow::~MainWindow()
 void MainWindow::on_fileSelectButton_clicked()
 {
     QFileInfo fileinfo = QFileDialog::getOpenFileName(nullptr, "Select a Maze File", "../mazedata");
+    /* get Relative Path */
     QDir pwd(".");
     QString s = pwd.relativeFilePath(fileinfo.filePath());
     ui->fileSeectEdit->setText(s);
-    on_fileSeectEdit_returnPressed();
+    /* draw */
+    on_drawButton_clicked();
+}
+
+void MainWindow::on_fileSeectEdit_returnPressed()
+{
+    on_drawButton_clicked();
 }
 
 void MainWindow::on_drawButton_clicked()
@@ -37,16 +44,16 @@ void MainWindow::on_drawButton_clicked()
     /* Parse Maze File */
     MazeLib::Maze maze;
     if(!maze.parse(filepath.toStdString().c_str())){
-        QMessageBox box;
-        box.setWindowTitle("Parse Error");
-        box.setText("Failed to Parse the Maze File!");
-        box.setIcon(QMessageBox::Critical);
+        QMessageBox box(QMessageBox::Critical, "Parse Error", "Failed to Parse the Maze File!");
         box.exec();
         return;
     }
     /* Print Maze */
     maze_simulator.clear();
     maze_simulator.drawMaze(maze);
+    /* Set the Maze */
+    maze_simulator.setMazeTarget(maze);
+    maze_simulator.replaceGoals(maze.getGoals());
 }
 
 void MainWindow::on_exitButton_clicked()
@@ -64,27 +71,45 @@ void MainWindow::on_actionDraw_triggered()
     on_drawButton_clicked();
 }
 
-void MainWindow::on_startButton_clicked()
+void MainWindow::on_resetButton_clicked()
 {
-    QString filepath = ui->fileSeectEdit->text();
-    /* Parse Maze File */
-    MazeLib::Maze maze;
-    if(!maze.parse(filepath.toStdString().c_str())){
-        QMessageBox box;
-        box.setWindowTitle("Parse Error");
-        box.setText("Failed to Parse the Maze File!");
-        box.setIcon(QMessageBox::Critical);
+    maze_simulator.reset();
+}
+
+void MainWindow::on_toggleButton_clicked()
+{
+    maze_simulator.toggle(ui->stepTimeBox->text().toInt());
+}
+
+void MainWindow::on_stepButton_clicked()
+{
+    maze_simulator.next(ui->stepCountBox->text().toInt());
+}
+
+void MainWindow::on_searchButton_clicked()
+{
+    /* Print Maze */
+    maze_simulator.clear();
+    maze_simulator.searchRun();
+    maze_simulator.next();
+}
+
+void MainWindow::on_shortestDiagButton_clicked()
+{
+    /* Draw Shortest Path */
+    if(!maze_simulator.drawShortest(maze_simulator.getMazeTarget(), true)){
+        QMessageBox box(QMessageBox::Warning, "Path Error", "Failed to Find any Shortest Path!");
         box.exec();
         return;
     }
-    /* Print Maze */
-    maze_simulator.clear();
-    maze_simulator.setMazeTarget(maze);
-    maze_simulator.replaceGoals(maze.getGoals());
-    maze_simulator.searchRun();
 }
 
-void MainWindow::on_fileSeectEdit_returnPressed()
+void MainWindow::on_shortestNoDiagButton_clicked()
 {
-    on_drawButton_clicked();
+    /* Draw Shortest Path */
+    if(!maze_simulator.drawShortest(maze_simulator.getMazeTarget(), false)){
+        QMessageBox box(QMessageBox::Warning, "Path Error", "Failed to Find any Shortest Path!");
+        box.exec();
+        return;
+    }
 }
