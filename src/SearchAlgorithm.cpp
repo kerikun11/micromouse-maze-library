@@ -14,7 +14,7 @@ namespace MazeLib {
 /**
  * @brief 追加探索状態で探索を始める(ゴールを急がない)
  */
-#define SEARCHING_ADDITIONALLY_AT_START 1
+#define SEARCHING_ADDITIONALLY_AT_START 0
 
 #define USE_OLD_ALGORITHM 1
 #define USE_HYBRID_ALGORITHM 0

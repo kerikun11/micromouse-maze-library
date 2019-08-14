@@ -71,11 +71,11 @@ public:
    */
   struct RunParameter {
     RunParameter() {}
-    float vs = 400.0f;    /*< 基本速度 [mm/s] */
-    float am_a = 3000.0f; /*< 最大加速度 [mm/s/s] */
-    float am_d = 2000.0f; /*< 最大加速度 [mm/s/s] */
+    float vs = 300.0f;    /*< 基本速度 [mm/s] */
+    float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
+    float am_d = 3600.0f; /*< 最大加速度(斜め) [mm/s/s] */
     float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
-    float vm_d = 1200.0f; /*< 最大加速度 [mm/s/s] */
+    float vm_d = 1200.0f; /*< 飽和速度(斜め) [mm/s] */
     cost_t t_F45 = 249;   /*< [ms] @ v = 425.272 [mm/s] */
     cost_t t_F90 = 375;   /*< [ms] @ v = 422.846 [mm/s] */
     cost_t t_F135 = 421;  /*< [ms] @ v = 375.888 [mm/s] */
