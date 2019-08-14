@@ -298,58 +298,30 @@ void SearchAlgorithm::printMap(const State state, const Vector vec,
 
 bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
 #if USE_OLD_ALGORITHM
-  /* old */
   candidates.clear();
-  /* 斜めありなしの双方の最短経路上を候補とする */
-  for (const bool diagonal : {true, false}) {
-    stepMap.update(maze, maze.getGoals(), false, diagonal);
-    auto v = maze.getStart();
-    Dir dir = Dir::North;
-    auto prev_dir = dir;
-    while (1) {
-      step_t min_step = MAZE_STEP_MAX;
-      /* 周囲のマスの中で一番ステップの小さいマスに移動 */
-      for (const auto d : Dir::ENWS()) {
-        if (maze.isWall(v, d))
-          continue;
-        step_t next_step = stepMap.getStep(v.next(d));
-        if (min_step > next_step) {
-          min_step = next_step;
-          dir = d;
-        }
-      }
-      if (stepMap.getStep(v) <= min_step)
-        return false; /*< 失敗 */
-      if (maze.unknownCount(v))
-        candidates.push_back(v); /*< 未知壁があれば候補に入れる */
-      v = v.next(dir);
-      if (stepMap.getStep(v) == 0)
-        break; /*< ゴール区画 */
+  /* no diag */
+  {
+    Dirs shortest_dirs;
+    if (!stepMap.calcShortestDirs(maze, shortest_dirs, false))
+      return false; /*< 失敗 */
+    auto i = maze.getStart();
+    for (const auto d : shortest_dirs) {
+      if (!maze.isKnown(i, d))
+        candidates.push_back(i);
+      i = i.next(d);
     }
-    /* ゴール区画を行けるところまで直進(斜め考慮)する */
-    bool loop = true;
-    while (loop) {
-      loop = false;
-      /* 斜めを考慮した進行方向を列挙する */
-      Dirs dirs;
-      const auto rel_dir = Dir(dir - prev_dir);
-      if (diagonal && rel_dir == Dir::Left)
-        dirs = {Dir(dir + Dir::Right), dir};
-      else if (diagonal && rel_dir == Dir::Right)
-        dirs = {Dir(dir + Dir::Left), dir};
-      else
-        dirs = {dir};
-      /* 行ける方向に行く */
-      for (const auto d : dirs) {
-        if (!maze.isWall(v, d)) {
-          if (maze.unknownCount(v))
-            candidates.push_back(v); /*< 未知壁があれば候補に入れる */
-          v = v.next(d);
-          prev_dir = dir;
-          dir = d;
-          loop = true;
-          break;
-        }
+  }
+  /* diag */
+  {
+    Dirs shortest_dirs;
+    if (!stepMapWall.calcShortestDirs(maze, shortest_dirs, false))
+      return false; /*< 失敗 */
+    auto i = WallIndex(0, 0, 1);
+    for (const auto d : shortest_dirs) {
+      i = i.next(d);
+      if (!maze.isKnown(i)) {
+        candidates.push_back(i.getVector());
+        candidates.push_back(i.getVector().next(i.getDir()));
       }
     }
   }

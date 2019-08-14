@@ -319,7 +319,13 @@ public:
    */
   bool calcShortestPath(Indexes &path, const bool known_only,
                         const bool diag_enabled);
-  cost_t getPathCost() const { return f_map[index_start]; }
+  /**
+   * @brief Get the Shortest Path Cost
+   * call calcShortestPath first.
+   *
+   * @return cost_t [ms]
+   */
+  cost_t getShortestPathCost() const { return f_map[index_start.opposite()]; }
   /**
    * @brief print the path on the maze
    *

@@ -49,7 +49,7 @@ protected:
 int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = "32MM2016HX.maze";
+  const std::string filename = "32MM2014HX.maze";
   Maze maze_target = Maze((mazedata_dir + filename).c_str());
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;
@@ -75,7 +75,7 @@ int test_position_identify() {
 #if 1
   /* Position Identification Run */
   StepMap stepMap;
-  stepMap.updateSimple(maze_target, maze_target.getGoals(), false);
+  stepMap.update(maze_target, maze_target.getGoals(), false);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
       for (const auto d : Dir::ENWS()) {

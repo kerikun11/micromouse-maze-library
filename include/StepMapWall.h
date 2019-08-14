@@ -9,7 +9,6 @@ namespace MazeLib {
 
 class StepMapWall {
 public:
-public:
   StepMapWall() { calcStraightStepTable(); }
   void reset(const step_t step = MAZE_STEP_MAX) {
     for (int8_t z = 0; z < 2; ++z)
@@ -95,6 +94,17 @@ public:
   }
   void update(const Maze &maze, const WallIndexes &dest,
               const bool known_only) {
+    /* min max */
+    int8_t min_x = maze.getMinX();
+    int8_t max_x = maze.getMaxX();
+    int8_t min_y = maze.getMinY();
+    int8_t max_y = maze.getMaxY();
+    for (const auto v : dest) {
+      min_x = std::min(v.x, min_x);
+      max_x = std::max(v.x, max_x);
+      min_y = std::min(v.y, min_y);
+      max_y = std::max(v.y, max_y);
+    }
     /* 全区画のステップを最大値に設定 */
     reset();
     /* ステップの更新予約のキュー */
@@ -106,64 +116,117 @@ public:
     }
     /* ステップの更新がなくなるまで更新処理 */
     while (!q.empty()) {
-      /* 注目する区画を取得 */
+      /* 注目する壁を取得 */
       const auto focus = q.front();
       q.pop();
       const step_t focus_step = getStep(focus);
       /* 周辺を走査 */
       for (const auto d : focus.getNextDir6()) {
-        const auto next = focus.next(d);
-        if (known_only && !maze.isKnown(next))
-          continue; /*< known_only で未知壁なら更新はしない */
-        if (maze.isWall(next))
-          continue; /*< 壁があったら更新はしない */
-        if (getStep(next) <= focus_step + 1)
-          continue;                    /*< 更新の必要がない */
-        setStep(next, focus_step + 1); /*< 更新 */
-        q.push(next); /*< 再帰的に更新され得るのでキューにプッシュ */
+        auto next = focus;
+        /* 直線で行けるところまで更新する */
+        for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
+          /* 移動 */
+          next = next.next(d);
+          if (known_only && !maze.isKnown(next))
+            break; /*< known_only で未知壁なら更新はしない */
+          if (maze.isWall(next))
+            break; /*< 壁があったら更新はしない */
+          if (next.x > max_x + 2 || next.y > max_y + 2 || next.x + 1 < min_x ||
+              next.y + 1 < min_y)
+            break; /*< 注目範囲外なら更新しない */
+          /* 直線加速を考慮したステップを算出 */
+          const auto next_step =
+              focus_step +
+              (d.isAlong() ? step_table_along[i] : step_table_diag[i]);
+          if (getStep(next) <= next_step)
+            // continue;               /*< 更新の必要がない */
+            break;                  /*< 更新の必要がない */
+          setStep(next, next_step); /*< 更新 */
+          q.push(next); /*< 再帰的に更新され得るのでキューにプッシュ */
+        }
       }
     }
   }
-  bool calcShortestDirs(const Maze &maze, const WallIndexes dest,
-                        Dirs &shortestDirs, const bool known_only) {
+  const WallIndexes convertDestinations(const Maze &maze,
+                                        const Vectors vectors) const {
+    WallIndexes dest;
+    for (const auto v : vectors)
+      for (const auto d : Dir::ENWS())
+        if (!maze.isWall(v, d))
+          dest.push_back(WallIndex(v, d));
+    return dest;
+  }
+  const Dir convertDir(const Dir d, const WallIndex i) const {
+    switch (d) {
+    case Dir::East:
+    case Dir::North:
+    case Dir::West:
+    case Dir::South:
+      return d;
+    case Dir::NorthEast:
+      return i.z == 0 ? Dir::North : Dir::East;
+    case Dir::SouthWest:
+      return i.z == 0 ? Dir::South : Dir::West;
+    case Dir::NorthWest:
+      return i.z == 0 ? Dir::North : Dir::West;
+    case Dir::SouthEast:
+      return i.z == 0 ? Dir::South : Dir::East;
+    }
+    return Dir::Max;
+  }
+  const Dirs convertDirsKnown(const Dirs src, const WallIndex start) const {
+    Dirs dirs;
+    auto i = start;
+    for (const auto d : src) {
+      i = i.next(d);
+      dirs.push_back(convertDir(d, i));
+    }
+    return dirs;
+  }
+  bool calcShortestDirs(const Maze &maze, Dirs &shortestDirs,
+                        const bool known_only) {
+    /* 目的地を作成 */
+    WallIndexes dest = convertDestinations(maze, maze.getGoals());
     update(maze, dest, known_only);
     WallIndex end;
-    shortestDirs = calcStepDownDirs(maze, WallIndex(0, 0, 1), end, known_only);
+    shortestDirs =
+        calcStepDownDirs(maze, WallIndex(0, 0, 1), end, false, known_only);
     if (getStep(end) == 0)
       return true;
     return false;
   }
-  const Vector calcNextDirs(Maze &maze, const Vectors &dest, const Vector vec,
-                            const Dir dir, Dirs &nextDirsKnown,
-                            Dirs &nextDirCandidates,
-                            const bool prior_unknown = true);
-  void calcNextDirs(const Maze &maze, const WallIndex start,
-                    Dirs &nextDirsKnown, Dirs &nextDirCandidates,
-                    const bool prior_unknown = true) const {
-    WallIndex known_end;
-    /* 既知区間の優先順方向列を作成 */
-    nextDirsKnown = calcStepDownDirs(maze, start, known_end, false);
-    /* 未知区間の優先順方向列を作成 */
-    nextDirCandidates = calcNextDirCandidates(maze, known_end, prior_unknown);
-  }
 
 private:
   step_t stepMap[WallIndex::SIZE]; /**< @brief ステップ数*/
-  step_t straightStepTable[MAZE_SIZE * 2];
+  step_t step_table_along[MAZE_SIZE * 2];
+  step_t step_table_diag[MAZE_SIZE * 2];
 
+  step_t gen_cost_impl(const int i, const float am, const float vs,
+                       const float vm, const float seg) {
+    const auto d = seg * (i + 1); /*< (i+1) 区画分の走行距離 */
+    /* グラフの面積から時間を求める */
+    const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
+    if (d < d_thr)
+      return 2 * (std::sqrt(vs * vs + am * d) - vs) / am * 100; /*< 三角加速 */
+    else
+      return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 100; /*< 台形加速 */
+  }
   void calcStraightStepTable() {
-    const float a = 6000;
-    const float v0 = 300;
-    const float factor =
-        1.0f / (sqrt(pow(v0 / a, 2) + 90 * (MAZE_SIZE * 2) / a) -
-                sqrt(pow(v0 / a, 2) + 90 * (MAZE_SIZE * 2 - 1) / a));
+    float vs = 450.0f;    /*< 基本速度 [mm/s] */
+    float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
+    float am_d = 3600.0f; /*< 最大加速度(斜め) [mm/s/s] */
+    float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
+    float vm_d = 1200.0f; /*< 飽和速度(斜め) [mm/s] */
+    const float seg_a = 90.0f;
+    const float seg_d = 45.0f * std::sqrt(2);
     for (int i = 0; i < MAZE_SIZE * 2; ++i) {
-      const float x = 90 * (i + 1);
-      straightStepTable[i] = (sqrt(pow(v0 / a, 2) + x / a) - v0 / a) * factor;
+      step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
+      step_table_diag[i] = gen_cost_impl(i, am_d, vs, vm_d, seg_d);
     }
   }
   const Dirs calcStepDownDirs(const Maze &maze, const WallIndex start,
-                              WallIndex &focus, const bool known_only) const {
+                              WallIndex &focus, const bool break_unknown,
+                              const bool known_only) const {
     /* ステップマップから既知区間進行方向列を生成 */
     Dirs nextDirsKnown;
     /* start から順にステップマップを下って行く */
@@ -174,12 +237,15 @@ private:
       auto min_step = MAZE_STEP_MAX;
       for (const auto d : focus.getNextDir6()) {
         const auto next = focus.next(d);
-        /* 未知壁ならば既知区間は終了 */
-        if (known_only && !maze.isKnown(next))
-          return nextDirsKnown;
-        /* 壁があったら次へ */
+        /* 壁があったらスキップ */
         if (maze.isWall(next))
           continue;
+        /* known_only で未知壁ならばスキップ */
+        if (known_only && !maze.isKnown(next))
+          continue;
+        /* break_unknown で未知壁ならば既知区間は終了 */
+        if (break_unknown && !maze.isKnown(next))
+          return nextDirsKnown;
         /* min_step よりステップが小さければ更新 (同じなら更新しない) */
         const auto next_step = getStep(next);
         if (min_step > next_step) {

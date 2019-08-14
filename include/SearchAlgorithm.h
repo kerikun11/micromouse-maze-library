@@ -73,6 +73,7 @@ public:
 protected:
   Maze &maze;                          /**< 使用する迷路の参照 */
   StepMap stepMap;                     /**< 使用するステップマップ */
+  StepMapWall stepMapWall;             /**< 使用するステップマップ */
   ShortestAlgorithm shortestAlgorithm; /**< 最短経路導出器 */
 
 private:

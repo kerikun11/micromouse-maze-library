@@ -65,19 +65,27 @@ int test_measurement() {
     csv << "," << us.count();
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirs(diag_enabled))
-        loge << "Failed to Find a Shortest Path! "
+        loge << "Failed to Find a Shortest Path! diag: "
              << (diag_enabled ? "true" : "false") << std::endl;
       robot.fastRun(diag_enabled);
       // robot.printPath();
       robot.endFastRunBackingToStartRun();
+      /* Shortest Path Comparison */
+      Agent at(maze_target);
+      at.calcShortestDirs(diag_enabled);
+      if (at.getShortestDirs() != robot.getShortestDirs()) {
+        logw << "The path found in search is not shortest! diag: "
+             << (diag_enabled ? "true" : "false") << std::endl;
+        // at.printPath(); robot.printPath();
+      }
     }
 #endif
 
-#if 0
+#if 1
     /* Position Identification Run */
     robot.max_usec = 0;
     StepMap stepMap;
-    stepMap.updateSimple(maze_target, maze_target.getGoals(), false);
+    stepMap.update(maze_target, maze_target.getGoals(), false);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
         for (const auto d : Dir::ENWS()) {
@@ -122,7 +130,7 @@ int test_measurement() {
       std::cout << "Shortest " << (diag_enabled ? "diag" : "no_d") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
       std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
-                << sa.getPathCost() << "\t[ms]" << std::endl;
+                << sa.getShortestPathCost() << "\t[ms]" << std::endl;
       // sa.printPath(std::cout, path);
     }
 #endif
