@@ -117,7 +117,7 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
     /* 壁の中央（斜めありの場合しかありえない） */
     /* 直前の壁 */
     const auto i_f = next(); //< i.e. index front
-    if (!canGo(Vector(i_f), i_f.getDir())) {
+    if (!canGo(i_f.getVector(), i_f.getDir())) {
       // loge << "FWE: " << *this << std::endl;
       return succs;
     }
@@ -125,7 +125,7 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
     auto i_st = i_f; //< i.e. index straight
     for (int8_t n = 1;; ++n) {
       auto i_ff = i_st.next(); //< 行先の壁
-      if (!canGo(Vector(i_ff), i_ff.getDir()))
+      if (!canGo(i_ff.getVector(), i_ff.getDir()))
         break;
       succs.push_back({i_st, edge_cost.getEdgeCost(ST_DIAG, n)});
       i_st = i_ff;
@@ -274,7 +274,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     const auto succs =
         index.getSuccessors(maze, edge_cost, known_only, diag_enabled);
     for (const auto &s : succs) {
-      const auto v = Vector(s.first);
+      const auto v = s.first.getVector();
       if (v.isOutsideofField())
         loge << "Out of Range! " << s.first << std::endl;
       if (v.x > max_x + 1 || v.y > max_y + 1)
@@ -294,7 +294,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     const auto succs_opposite = index.opposite().getSuccessors(
         maze, edge_cost, known_only, diag_enabled);
     for (const auto &s : succs_opposite) {
-      const auto v = Vector(s.first);
+      const auto v = s.first.getVector();
       if (v.isOutsideofField())
         loge << "Out of Range! " << s.first << std::endl;
       if (v.x > max_x + 1 || v.y > max_y + 1)
@@ -329,7 +329,7 @@ void ShortestAlgorithm::printPath(std::ostream &os,
   int steps[MAZE_SIZE][MAZE_SIZE] = {0};
   int counter = 1;
   for (const auto i : indexes) {
-    auto v = Vector(i);
+    auto v = i.getVector();
     steps[v.y][v.x] = counter++;
   }
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
@@ -368,7 +368,7 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
 #if D_STAR_LITE_ENABLED
       const auto v = Vector(path[i + 1]) - Vector(path[i]);
 #else
-      const auto v = Vector(path[i - 1]) - Vector(path[i]);
+      const auto v = path[i - 1].getVector() - path[i].getVector();
 #endif
       for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
         dirs.push_back(nd);
@@ -378,7 +378,7 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
   Dirs dirs;
   for (int i = 0; i < (int)path.size() - 1; ++i) {
     const auto nd = path[i].getNodeDir();
-    const auto rel_v = Vector(path[i + 1]) - Vector(path[i]);
+    const auto rel_v = path[i + 1].getVector() - path[i].getVector();
     const auto rel_nd = Dir(path[i + 1].getNodeDir() - path[i].getNodeDir());
     if (nd.isAlong()) {
       switch (rel_nd) {

@@ -201,9 +201,7 @@ public:
   void uniquify(const Dir d);
   const Dir getDir() const { return z == 0 ? Dir::East : Dir::North; }
   const Dir getNodeDir() const { return nd; }
-  bool operator==(const Index &obj) const { return all == obj.all; }
-  bool operator!=(const Index &obj) const { return all != obj.all; }
-  operator Vector() const { return Vector(x, y); }
+  const Vector getVector() const { return Vector(x, y); }
   friend std::ostream &operator<<(std::ostream &os, const Index i) {
     return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
               << (int)i.y << ", " << i.getDir().toChar() << ", "
@@ -304,7 +302,7 @@ public:
   }
   cost_t getHeuristic(const Index i, const Index s) const {
     // return 0;
-    const auto v = Vector(i) - Vector(s);
+    const auto v = i.getVector() - s.getVector();
     // const auto d = std::sqrt(v.x * v.x + v.y * v.y);
     const auto d = std::max(std::abs(v.x), std::abs(v.y));
     return edge_cost.getEdgeCost(ST_DIAG, d);
@@ -394,7 +392,7 @@ public:
       const auto successors =
           u.getSuccessors(maze, edge_cost, known_only, diag_enabled);
       for (const auto &s_prime : successors) {
-        const auto v = Vector(s_prime.first);
+        const auto v = s_prime.first.getVector();
         if (v.isOutsideofField())
           loge << "Out of Range! " << s_prime.first << std::endl;
         if (v.x > max_x + 1 || v.y > max_y + 1)
@@ -438,7 +436,7 @@ public:
             UpdateVertex(i, known_only, diag_enabled);
             for (const auto s :
                  i.getSuccessors(maze, edge_cost, known_only, diag_enabled)) {
-              const auto v = Vector(s.first);
+              const auto v = s.first.getVector();
               if (v.isOutsideofField())
                 loge << "Out of Range! " << s.first << std::endl;
               UpdateVertex(s.first, known_only, diag_enabled);
@@ -446,7 +444,7 @@ public:
             }
             for (const auto s : i.next().getSuccessors(
                      maze, edge_cost, known_only, diag_enabled)) {
-              const auto v = Vector(s.first);
+              const auto v = s.first.getVector();
               if (v.isOutsideofField())
                 loge << "Out of Range! " << s.first << std::endl;
               UpdateVertex(s.first, known_only, diag_enabled);
@@ -462,7 +460,7 @@ public:
           UpdateVertex(i.opposite(), known_only, diag_enabled);
           for (const auto s :
                i.getSuccessors(maze, edge_cost, known_only, diag_enabled)) {
-            const auto v = Vector(s.first);
+            const auto v = s.first.getVector();
             if (v.isOutsideofField())
               loge << "Out of Range! " << s.first << std::endl;
             UpdateVertex(s.first, known_only, diag_enabled);
@@ -499,7 +497,7 @@ public:
         const auto predecessors =
             u.getPredecessors(maze, edge_cost, known_only, diag_enabled);
         for (const auto &s : predecessors) {
-          const auto v = Vector(s.first);
+          const auto v = s.first.getVector();
           if (v.isOutsideofField())
             loge << "Out of Range! " << s.first << std::endl;
           UpdateVertex(s.first, known_only, diag_enabled);
@@ -510,7 +508,7 @@ public:
         const auto predecessors =
             u.getPredecessors(maze, edge_cost, known_only, diag_enabled);
         for (const auto &s : predecessors) {
-          const auto v = Vector(s.first);
+          const auto v = s.first.getVector();
           if (v.isOutsideofField())
             loge << "Out of Range! " << s.first << std::endl;
           UpdateVertex(s.first, known_only, diag_enabled);
@@ -538,7 +536,7 @@ public:
       const auto successors =
           i.getSuccessors(maze, edge_cost, known_only, diag_enabled);
       for (const auto &p : successors) {
-        if (Vector(p.first).isOutsideofField())
+        if (p.first.getVector().isOutsideofField())
           loge << "Out of Range! " << p.first << std::endl;
         const auto g_p = r_map[p.first] + p.second;
         if (g_min > g_p) {
