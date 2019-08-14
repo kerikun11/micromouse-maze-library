@@ -71,7 +71,7 @@ public:
    */
   struct RunParameter {
     RunParameter() {}
-    float vs = 300.0f;    /*< 基本速度 [mm/s] */
+    float vs = 450.0f;    /*< 基本速度 [mm/s] */
     float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
     float am_d = 3600.0f; /*< 最大加速度(斜め) [mm/s/s] */
     float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
@@ -91,6 +91,8 @@ public:
     for (int i = 0; i < MAZE_SIZE * 2; ++i) {
       cost_table_along[i] = gen_cost_impl(i, rp.am_a, rp.vs, rp.vm_a, seg_a);
       cost_table_diag[i] = gen_cost_impl(i, rp.am_d, rp.vs, rp.vm_d, seg_d);
+      // std::cout << i + 1 << "\t" << cost_table_along[i] << "\t"
+      //           << cost_table_diag[i] << std::endl;
     }
   }
   cost_t getEdgeCost(const Pattern p, const int n = 1) const {
@@ -154,7 +156,7 @@ public:
 #if D_STAR_LITE_ENABLED
 #define INDEX_ARRANGEMENT 1
 #else
-#define INDEX_ARRANGEMENT 2
+#define INDEX_ARRANGEMENT 3
 #endif
 #if INDEX_ARRANGEMENT == 0
   static constexpr int Max = MAZE_SIZE * MAZE_SIZE * 8;

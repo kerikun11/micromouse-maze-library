@@ -291,26 +291,6 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
         in_map[s.first] = true;
       }
     }
-    const auto succs_opposite = index.opposite().getSuccessors(
-        maze, edge_cost, known_only, diag_enabled);
-    for (const auto &s : succs_opposite) {
-      const auto v = s.first.getVector();
-      if (v.isOutsideofField())
-        loge << "Out of Range! " << s.first << std::endl;
-      if (v.x > max_x + 1 || v.y > max_y + 1)
-        continue;
-      const auto f_p_new =
-          f_map[index] - getHeuristic(index) + getHeuristic(s.first) + s.second;
-      if (f_map[s.first] > f_p_new) {
-        f_map[s.first] = f_p_new;
-        from_map[s.first] = index.opposite();
-        if (!in_map[s.first]) {
-          open_list.push_back(s.first);
-          std::push_heap(open_list.begin(), open_list.end(), greater);
-        }
-        in_map[s.first] = true;
-      }
-    }
   }
   /* post process to find the path */
   path.clear();
