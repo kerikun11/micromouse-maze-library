@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     scene(new QGraphicsScene),
-    maze_simulator(scene)
+    maze_simulator(ui, scene)
 {
     ui->setupUi(this);
     ui->fileSeectEdit->setText("../mazedata/32MM2016HX.maze");

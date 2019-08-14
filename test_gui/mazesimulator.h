@@ -1,15 +1,22 @@
 #ifndef MAZESIMULATOR_H
 #define MAZESIMULATOR_H
 
+#include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QEventLoop>
 #include <QTimer>
+#include <sstream>
 
 #include "Maze.h"
 #include "RobotBase.h"
+#include "ui_mainwindow.h"
 
 using namespace MazeLib;
+
+namespace Ui {
+class MainWindow;
+}
 
 /**
  * @brief The MazeSimulator class
@@ -17,7 +24,7 @@ using namespace MazeLib;
 class MazeSimulator : public MazeLib::RobotBase
 {
 public:
-    MazeSimulator(QGraphicsScene* scene): RobotBase(maze),scene(scene){
+    MazeSimulator(Ui::MainWindow *ui, QGraphicsScene* scene): RobotBase(maze), ui(ui), scene(scene){
         loop->connect(timer, SIGNAL(timeout()), loop, SLOT(quit()));
     }
 
@@ -152,11 +159,19 @@ public:
         /* 基底関数を呼ぶ */
         return RobotBase::endFastRunBackingToStartRun();
     }
+    void drawStatus(){
+        std::stringstream ss;
+        ss << "State: " << SearchAlgorithm::stateString(getState());
+        ss << "\t";
+        ss << "Pos: " << VecDir{getCurVec(), getCurDir()};
+        ui->statusBar->showMessage(ss.str().c_str());
+    }
     void draw(){
         clear();
         drawMaze(maze);
         drawStep(getSearchAlgorithm().getStepMap());
         drawVecDir(real);
+        drawStatus();
     }
 
 protected:
@@ -311,6 +326,7 @@ private:
 private:
     QEventLoop* loop = new QEventLoop();
     QTimer* timer = new QTimer();
+    Ui::MainWindow* ui;
     QGraphicsScene* scene;
     int wall_unit_px = 28;
     int pillar_px = 2;
