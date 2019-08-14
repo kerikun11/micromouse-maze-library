@@ -13,6 +13,8 @@
 #include <iostream>
 #include <vector>
 
+#include <iomanip> /*< for std::setw() */
+
 namespace MazeLib {
 /**
  *  @brief 迷路の1辺の区画数の定数
@@ -162,8 +164,8 @@ public:
    *  @param 隣接方向
    *  @return 隣接座標
    */
-  const Vector next(const Dir dir) const {
-    switch (dir) {
+  const Vector next(const Dir d) const {
+    switch (d) {
     case Dir::East:
       return Vector(x + 1, y);
     case Dir::North:
@@ -212,6 +214,81 @@ using VecDir = std::pair<Vector, Dir>;
  * @brief Vector と Dir を同時に表示
  */
 std::ostream &operator<<(std::ostream &os, const VecDir &obj);
+
+/**
+ * @brief 区画ベースではなく，壁ベースの管理ID
+ */
+union __attribute__((__packed__)) WallIndex {
+  static constexpr int SIZE = MAZE_SIZE * MAZE_SIZE * 2;
+  struct {
+    int8_t x : 7; /**< @brief x coordinate of the cell */
+    int8_t y : 7; /**< @brief y coordinate of the cell */
+    uint8_t
+        z : 1; /**< @brief position assignment in the cell; 0:East,1:North */
+  };
+  unsigned int all : 16; /**< @brief union element for all access */
+
+public:
+  WallIndex(const int8_t x, const int8_t y, const int8_t z)
+      : x(x), y(y), z(z) {}
+  WallIndex(const Vector v, const Dir d) : x(v.x), y(v.y) { uniquify(d); }
+  WallIndex() : all(0) {}
+  operator uint16_t() const {
+    return (z << 10) | (y << 5) | x; /*< M * M * 2 */
+  }
+  void uniquify(const Dir d) {
+    z = (d >> 1) & 1;
+    if (d == Dir::West)
+      x--;
+    if (d == Dir::South)
+      y--;
+  }
+  const Dir getDir() const { return z == 0 ? Dir::East : Dir::North; }
+  const Vector getVector() const { return Vector(x, y); }
+  friend std::ostream &operator<<(std::ostream &os, const WallIndex i) {
+    return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
+              << (int)i.y << ", " << i.getDir().toChar() << ")";
+  }
+  bool isInsideOfFiled() const {
+    if (x >= 0 && y >= 0 && x < MAZE_SIZE && y < MAZE_SIZE)
+      return true;
+    return false;
+  }
+  const WallIndex next(const Dir d) const {
+    switch (d) {
+    case Dir::East:
+      return WallIndex(x + 1, y, z);
+    case Dir::NorthEast:
+      return WallIndex(x + (1 - z), y + z, 1 - z);
+    case Dir::North:
+      return WallIndex(x, y + 1, z);
+    case Dir::NorthWest:
+      return WallIndex(x - z, y + z, 1 - z);
+    case Dir::West:
+      return WallIndex(x - 1, y, z);
+    case Dir::SouthWest:
+      return WallIndex(x - z, y - (1 - z), 1 - z);
+    case Dir::South:
+      return WallIndex(x, y - 1, z);
+    case Dir::SouthEast:
+      return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
+    default:
+      loge << "invalid direction" << std::endl;
+      return WallIndex();
+    }
+  }
+  const std::array<Dir, 6> getNextDir6() const {
+    const auto d = getDir();
+    return {d + Dir::Front,   d + Dir::Back,    d + Dir::Left45,
+            d + Dir::Right45, d + Dir::Left135, d + Dir::Right135};
+  }
+  const std::array<Dir, 3> getNextDir3(const Dir d) const {
+    return {d + Dir::Front, d + Dir::Left45, d + Dir::Right45};
+  }
+};
+static_assert(sizeof(WallIndex) == 2,
+              "sizeof(WallIndex) Error"); /**< Size Check */
+using WallIndexes = std::vector<WallIndex>;
 
 /**
  * @brief 区画位置，方向，壁の有無を保持する構造体
@@ -296,6 +373,9 @@ public:
   bool isWall(const int8_t x, const int8_t y, const Dir d) const {
     return isWall(wall, x, y, d);
   }
+  bool isWall(const WallIndex i) const {
+    return isWall(wall, i.x, i.y, i.getDir());
+  }
   /**
    *  @brief 壁を更新をする
    *  @param v 区画の座標
@@ -307,6 +387,9 @@ public:
   }
   void setWall(const int8_t x, const int8_t y, const Dir d, const bool b) {
     return setWall(wall, x, y, d, b);
+  }
+  void setWall(const WallIndex i, const bool b) {
+    return setWall(wall, i.x, i.y, i.getDir(), b);
   }
   /**
    *  @brief 壁が探索済みかを返す
@@ -320,6 +403,9 @@ public:
   bool isKnown(const int8_t x, const int8_t y, const Dir d) const {
     return isWall(known, x, y, d);
   }
+  bool isKnown(const WallIndex i) const {
+    return isWall(known, i.x, i.y, i.getDir());
+  }
   /**
    *  @brief 壁の既知を更新する
    *  @param v 区画の座標
@@ -332,13 +418,19 @@ public:
   void setKnown(const int8_t x, const int8_t y, const Dir d, const bool b) {
     return setWall(known, x, y, d, b);
   }
+  void setKnown(const WallIndex i, const bool b) {
+    return setWall(known, i.x, i.y, i.getDir(), b);
+  }
   /**
    *  @brief 通過可能かどうかを返す
    *  @param v 区画の座標
    *  @param d 壁の方向
    *  @return true:既知かつ壁なし，false:それ以外
    */
-  bool canGo(const Vector v, const Dir d) const;
+  bool canGo(const WallIndex i) const { return isKnown(i) && !isWall(i); }
+  bool canGo(const Vector v, const Dir d) const {
+    return isKnown(v, d) && !isWall(v, d);
+  }
   /**
    *  @brief 引数区画の壁の数を返す
    *  @param v 区画の座標

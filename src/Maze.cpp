@@ -85,9 +85,6 @@ void Maze::reset(const bool setStartWall) {
   }
   wallLogs.clear();
 }
-bool Maze::canGo(const Vector v, const Dir d) const {
-  return isKnown(v, d) && !isWall(v, d);
-}
 int8_t Maze::wallCount(const Vector v) const {
   auto dirs = Dir::ENWS();
   return std::count_if(dirs.cbegin(), dirs.cend(),
@@ -109,7 +106,8 @@ bool Maze::updateWall(const Vector v, const Dir d, const bool b,
       wallLogs.push_back(WallLog(v, d, b));
     /* ログから消去 */
     // const auto it =
-    //     std::find_if(wallLogs.cbegin(), wallLogs.cend(), [&](const auto w) {
+    //     std::find_if(wallLogs.cbegin(), wallLogs.cend(), [&](const auto w)
+    //     {
     //       return Vector(w) == v && Dir(w) == d;
     //     });
     // if (it != wallLogs.end())

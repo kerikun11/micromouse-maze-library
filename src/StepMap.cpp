@@ -296,10 +296,6 @@ void StepMap::calcStraightStepTable() {
     const float x = 90 * (i + 1);
     straightStepTable[i] = (sqrt(pow(v0 / a, 2) + x / a) - v0 / a) * factor;
   }
-  for (int i = 0; i < MAZE_SIZE * 2; ++i) {
-    const float x = 90 * (i + 1);
-    straightStepTable[i] = (sqrt(pow(v0 / a, 2) + x / a) - v0 / a) * factor;
-  }
 }
 const Vector StepMap::calcNextDirs(const Maze &maze, const Vector start_v,
                                    const Dir start_d, Dirs &nextDirsKnown,

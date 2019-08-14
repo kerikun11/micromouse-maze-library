@@ -10,6 +10,7 @@
 #include "Maze.h"
 #include "ShortestAlgorithm.h"
 #include "StepMap.h"
+#include "StepMapWall.h"
 
 namespace MazeLib {
 /**
