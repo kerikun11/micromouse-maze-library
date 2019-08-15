@@ -25,7 +25,7 @@ const Vector Vector::rotate(const Dir d) const {
   case Dir::South:
     return Vector(y, -x);
   }
-  loge << "invalid direction" << std::endl;
+  assert(1); /*< invalid direction */
   return *this;
 }
 std::ostream &operator<<(std::ostream &os, const Vector v) {

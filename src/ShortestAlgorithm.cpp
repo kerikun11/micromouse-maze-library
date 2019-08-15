@@ -220,7 +220,7 @@ const Index Index::next() const {
   default:
     break;
   }
-  loge << "invalid direction" << std::endl;
+  assert(1); /*< invalid direction */
   return Index();
 }
 

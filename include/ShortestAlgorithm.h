@@ -186,7 +186,9 @@ public:
     return (((~nd) & 1) << 12) | (z << 11) | (nd & 2) << 9 | (y << 5) |
            x; /*< M * M * 6 */
 #elif INDEX_ARRANGEMENT == 3
-    return (((~nd) & 1) << 13) | (z << 12) | ((6 & nd) << 9) | (x << 5) |
+    return (((~nd) & 1) << (2 * MAZE_SIZE_BIT + 3)) |
+           (z << (2 * MAZE_SIZE_BIT + 2)) |
+           ((6 & nd) << (2 * MAZE_SIZE_BIT - 1)) | (x << MAZE_SIZE_BIT) |
            y; /*< M * M * 12 */
 #endif
   }
@@ -221,7 +223,7 @@ public:
     default:
       break;
     }
-    loge << "invalid direction" << std::endl;
+    assert(1); /*< invalid direction */
     return Vector(x, y);
   }
   const Vector arrow_to() const {
@@ -242,7 +244,7 @@ public:
     default:
       break;
     }
-    loge << "invalid direction" << std::endl;
+    assert(1); /*< invalid direction */
     return Vector(x, y);
   }
   /**
@@ -258,7 +260,7 @@ public:
     case Dir::SouthEast:
       return z == 1 ? Dir::Left45 : Dir::Right45;
     }
-    loge << "invalid direction" << std::endl;
+    assert(1); /*< invalid direction */
     return Dir::Max;
   }
   /**

@@ -9,6 +9,8 @@
 
 #include <array>
 #include <bitset>
+#include <cassert>
+#include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -18,16 +20,10 @@
 
 namespace MazeLib {
 /**
- *  @brief 迷路の1辺の区画数の定数
+ *  @brief 迷路の1辺の区画数の定数．2の累乗でなければならない
  */
 static constexpr int MAZE_SIZE = 32;
-/**
- *  @brief 迷路のサイズのbit数と一致する整数型
- *   32x32の迷路ならuint32_t，16x16ならuint16_t，8x8ならuint8_t
- */
-using wall_size_t = uint32_t;
-static_assert(sizeof(wall_size_t) * 8 == MAZE_SIZE,
-              "wall_size_t"); /* Size Check */
+static constexpr int MAZE_SIZE_BIT = std::log2(MAZE_SIZE);
 
 /**
  *  @brief 迷路のカラー表示切替
@@ -176,7 +172,7 @@ public:
     case Dir::South:
       return Vector(x, y - 1);
     }
-    loge << "invalid direction" << std::endl;
+    assert(1); /*< invalid direction */
     return *this;
   }
   /**
@@ -185,7 +181,9 @@ public:
    * @return false フィールド内
    */
   bool isOutsideofField() const {
-    return (x & (0x100 - MAZE_SIZE)) || (y & (0x100 - MAZE_SIZE));
+    // return x < 0 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE;
+    /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
+    return ((x | y) & (0x100 - MAZE_SIZE));
   }
   /**
    * @brief 座標を回転変換する
@@ -220,28 +218,38 @@ std::ostream &operator<<(std::ostream &os, const VecDir &obj);
  * @brief 区画ベースではなく，壁ベースの管理ID
  */
 union __attribute__((__packed__)) WallIndex {
+  /**
+   * @brief 壁をuniqueな通し番号として表現したときの総数
+   */
   static constexpr int SIZE = MAZE_SIZE * MAZE_SIZE * 2;
+  /**
+   * @brief インデックスの実体
+   */
   struct {
     int8_t x : 7; /**< @brief x coordinate of the cell */
     int8_t y : 7; /**< @brief y coordinate of the cell */
     uint8_t
         z : 1; /**< @brief position assignment in the cell; 0:East,1:North */
   };
-  unsigned int all : 16; /**< @brief union element for all access */
 
 public:
   WallIndex(const int8_t x, const int8_t y, const uint8_t z)
       : x(x), y(y), z(z) {}
-  WallIndex(const Vector v, const Dir d) : x(v.x), y(v.y) { uniquify(d); }
   WallIndex(const int8_t x, const int8_t y, const Dir d) : x(x), y(y) {
     uniquify(d);
   }
-  WallIndex() : all(0) {}
+  WallIndex(const Vector v, const Dir d) : x(v.x), y(v.y) { uniquify(d); }
+  WallIndex() {}
+  /**
+   * @brief 迷路中の壁をuniqueな通し番号として表現したID
+   *
+   * @return uint16_t ID
+   */
   operator uint16_t() const {
-    return (z << 10) | (y << 5) | x; /*< M * M * 2 */
+    return (z << (2 * MAZE_SIZE_BIT)) | (y << MAZE_SIZE_BIT) | x;
   }
   void uniquify(const Dir d) {
-    z = (d >> 1) & 1;
+    z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
     if (d == Dir::West)
       x--;
     if (d == Dir::South)
@@ -254,9 +262,9 @@ public:
               << (int)i.y << ", " << i.getDir().toChar() << ")";
   }
   bool isInsideOfFiled() const {
-    if (x >= 0 && y >= 0 && x < MAZE_SIZE && y < MAZE_SIZE)
-      return true;
-    return false;
+    // return (x >= 0 && y >= 0 && x < MAZE_SIZE && y < MAZE_SIZE);
+    /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
+    return !((x | y) & (0x100 - MAZE_SIZE));
   }
   const WallIndex next(const Dir d) const {
     switch (d) {
@@ -277,8 +285,8 @@ public:
     case Dir::SouthEast:
       return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
     default:
-      loge << "invalid direction" << std::endl;
-      return WallIndex();
+      assert(1); /*< invalid direction */
+      return WallIndex(x, y, z);
     }
   }
   const std::array<Dir, 6> getNextDir6() const {
