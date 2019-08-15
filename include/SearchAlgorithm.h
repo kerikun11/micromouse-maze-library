@@ -83,7 +83,7 @@ private:
   /**
    *  @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
-  bool findShortestCandidates(Vectors &candidates);
+  bool findShortestCandidates(Vectors &candidates, const bool simple);
   int countIdentityCandidates(const WallLogs &idWallLogs, VecDir &ans) const;
   const Dirs findMatchDirCandidates(const Vector cur_v,
                                     const Vector target_v) const;

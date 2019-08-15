@@ -66,14 +66,18 @@ public:
   /** @function calcNextDirs
    *  @brief ステップマップから次に行くべき方向を計算
    */
-  const Vector calcNextDirs(Maze &maze, const Vectors &dest, const Vector vec,
-                            const Dir dir, Dirs &nextDirsKnown,
+  const Vector calcNextDirsAdv(Maze &maze, const Vectors &dest,
+                               const Vector vec, const Dir dir,
+                               Dirs &nextDirsKnown, Dirs &nextDirCandidates,
+                               const bool prior_unknown = true);
+  const Vector calcNextDirs(const Maze &maze, const Vector start_v,
+                            const Dir start_d, Dirs &nextDirsKnown,
                             Dirs &nextDirCandidates,
-                            const bool prior_unknown = true);
+                            const bool prior_unknown) const;
   bool calcShortestDirs(const Maze &maze, Dirs &shortestDirs,
-                        const bool known_only) {
+                        const bool known_only, const bool simple) {
     /* 目的地を作成 */
-    update(maze, maze.getGoals(), known_only, false);
+    update(maze, maze.getGoals(), known_only, simple);
     VecDir end;
     shortestDirs = calcNextDirsKnown(maze, {maze.getStart(), Dir::North}, end,
                                      false, known_only);
@@ -95,10 +99,6 @@ private:
    *  @brief ステップマップにより次に行くべき方向列を生成する
    *  @return true:成功, false:失敗(迷子)
    */
-  const Vector calcNextDirs(const Maze &maze, const Vector start_v,
-                            const Dir start_d, Dirs &nextDirsKnown,
-                            Dirs &nextDirCandidates,
-                            const bool prior_unknown) const;
   const Dirs calcNextDirsKnown(const Maze &maze, const VecDir start,
                                VecDir &focus, const bool break_unknown,
                                const bool known_only) const {

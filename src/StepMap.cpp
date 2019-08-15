@@ -134,10 +134,11 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
     }
   }
 }
-const Vector StepMap::calcNextDirs(Maze &maze, const Vectors &dest,
-                                   const Vector vec, const Dir dir,
-                                   Dirs &nextDirsKnown, Dirs &nextDirCandidates,
-                                   const bool prior_unknown) {
+const Vector StepMap::calcNextDirsAdv(Maze &maze, const Vectors &dest,
+                                      const Vector vec, const Dir dir,
+                                      Dirs &nextDirsKnown,
+                                      Dirs &nextDirCandidates,
+                                      const bool prior_unknown) {
   /* ステップマップの更新 */
   update(maze, dest, false, false);
   /* 事前に進む候補を決定する */
@@ -157,7 +158,7 @@ const Vector StepMap::calcNextDirs(Maze &maze, const Vectors &dest,
     maze.setKnown(v, d, true); //< 既知とする
     Dirs tmp_nds;
     // 行く方向を計算しなおす
-    update(maze, dest, false, true);
+    update(maze, dest, false, false);
     calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates, prior_unknown);
     if (!tmp_nds.empty())
       nextDirCandidates = tmp_nds; //< 既知区間になった場合

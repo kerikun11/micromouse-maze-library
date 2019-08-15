@@ -92,8 +92,8 @@ public:
       os << std::endl;
     }
   }
-  void update(const Maze &maze, const WallIndexes &dest,
-              const bool known_only) {
+  void update(const Maze &maze, const WallIndexes &dest, const bool known_only,
+              const bool simple) {
     /* min max */
     int8_t min_x = maze.getMinX();
     int8_t max_x = maze.getMaxX();
@@ -143,6 +143,8 @@ public:
             break;                  /*< 更新の必要がない */
           setStep(next, next_step); /*< 更新 */
           q.push(next); /*< 再帰的に更新され得るのでキューにプッシュ */
+          if (simple)
+            break;
         }
       }
     }
@@ -184,10 +186,10 @@ public:
     return dirs;
   }
   bool calcShortestDirs(const Maze &maze, Dirs &shortestDirs,
-                        const bool known_only) {
+                        const bool known_only, const bool simple) {
     /* 目的地を作成 */
     WallIndexes dest = convertDestinations(maze, maze.getGoals());
-    update(maze, dest, known_only);
+    update(maze, dest, known_only, simple);
     WallIndex end;
     shortestDirs =
         calcStepDownDirs(maze, WallIndex(0, 0, 1), end, false, known_only);
