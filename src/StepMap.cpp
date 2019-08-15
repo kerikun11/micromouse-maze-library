@@ -79,7 +79,7 @@ void StepMap::print(std::ostream &os, const Maze &maze, const Vector v,
   }
 }
 void StepMap::update(const Maze &maze, const Vectors &dest,
-                     const bool known_only) {
+                     const bool known_only, const bool simple) {
   /* min max */
   int8_t min_x = maze.getMinX();
   int8_t max_x = maze.getMaxX();
@@ -121,12 +121,15 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
         /* 移動 */
         next = next.next(d);
         /* 直線加速を考慮したステップを算出 */
-        const auto next_step = focus_step + step_table_along[i];
+        const auto next_step = focus_step + (simple ? 1 : step_table_along[i]);
         if (getStep(next) <= next_step)
           // continue;               /*< 更新の必要がない */
           break;                  /*< 更新の必要がない */
         setStep(next, next_step); /*< 更新 */
         q.push(next); /*< 再帰的に更新され得るのでキューにプッシュ */
+        /* 軽量版なら break */
+        if (simple)
+          break;
       }
     }
   }
@@ -136,7 +139,7 @@ const Vector StepMap::calcNextDirs(Maze &maze, const Vectors &dest,
                                    Dirs &nextDirsKnown, Dirs &nextDirCandidates,
                                    const bool prior_unknown) {
   /* ステップマップの更新 */
-  update(maze, dest, false);
+  update(maze, dest, false, false);
   /* 事前に進む候補を決定する */
   const auto v = calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates,
                               prior_unknown);
@@ -154,7 +157,7 @@ const Vector StepMap::calcNextDirs(Maze &maze, const Vectors &dest,
     maze.setKnown(v, d, true); //< 既知とする
     Dirs tmp_nds;
     // 行く方向を計算しなおす
-    update(maze, dest, false);
+    update(maze, dest, false, true);
     calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates, prior_unknown);
     if (!tmp_nds.empty())
       nextDirCandidates = tmp_nds; //< 既知区間になった場合

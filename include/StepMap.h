@@ -61,7 +61,8 @@ public:
    *  @param known_only
    * true:未知の壁は通過不可能とする，false:未知の壁はないものとする
    */
-  void update(const Maze &maze, const Vectors &dest, const bool known_only);
+  void update(const Maze &maze, const Vectors &dest, const bool known_only,
+              const bool simple);
   /** @function calcNextDirs
    *  @brief ステップマップから次に行くべき方向を計算
    */
@@ -72,7 +73,7 @@ public:
   bool calcShortestDirs(const Maze &maze, Dirs &shortestDirs,
                         const bool known_only) {
     /* 目的地を作成 */
-    update(maze, maze.getGoals(), known_only);
+    update(maze, maze.getGoals(), known_only, false);
     VecDir end;
     shortestDirs = calcNextDirsKnown(maze, {maze.getStart(), Dir::North}, end,
                                      false, known_only);

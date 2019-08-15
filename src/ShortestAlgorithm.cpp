@@ -339,17 +339,9 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
                                            const bool diag_enabled) {
   if (!diag_enabled) {
     Dirs dirs;
-#if D_STAR_LITE_ENABLED
-    for (int i = 0; i < (int)path.size() - 1; ++i) {
-#else
     for (int i = 1; i < (int)path.size(); ++i) {
-#endif
       const auto nd = path[i].getNodeDir();
-#if D_STAR_LITE_ENABLED
-      const auto v = Vector(path[i + 1]) - Vector(path[i]);
-#else
       const auto v = path[i - 1].getVector() - path[i].getVector();
-#endif
       for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
         dirs.push_back(nd);
     }

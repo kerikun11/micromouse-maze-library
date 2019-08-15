@@ -1,6 +1,6 @@
 {
     "name": "MazeLib",
-    "description": "Maze Solver for Micromouse",
+    "description": "Maze Solver for MicroMouse",
     "keywords": "micromouse",
     "build": {
         "flags": [

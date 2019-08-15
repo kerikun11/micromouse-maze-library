@@ -16,9 +16,6 @@ namespace MazeLib {
  */
 #define SEARCHING_ADDITIONALLY_AT_START 0
 
-#define USE_OLD_ALGORITHM 1
-#define USE_HYBRID_ALGORITHM 0
-
 const char *SearchAlgorithm::stateString(const State s) {
   static const char *const str[] = {
       "Start                 ", "Searching for Goal    ",
@@ -28,13 +25,7 @@ const char *SearchAlgorithm::stateString(const State s) {
   };
   return str[s];
 }
-/**
- * @brief 最短経路が導出されているか調べる関数
- */
 bool SearchAlgorithm::isComplete() {
-#if D_STAR_LITE_ENABLED
-  shortestAlgorithm.Initialize();
-#endif
   Vectors candidates;
   findShortestCandidates(candidates);
   return candidates.empty();
@@ -62,11 +53,6 @@ bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
     result = idMaze.updateWall(v, d, b);
   else
     result = maze.updateWall(v, d, b);
-#if D_STAR_LITE_ENABLED
-  const bool known_only = false;
-  const bool diag_enabled = true;
-  shortestAlgorithm.UpdateChangedEdge(known_only, diag_enabled);
-#endif
   return result;
 }
 void SearchAlgorithm::resetLastWall(const State state, const int num) {
@@ -185,72 +171,10 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 }
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
-#if 0
-  /* old */
-  stepMap.update(maze, maze.getGoals(), true, diag_enabled);
-  shortestDirs.clear();
-  auto v = maze.getStart();
-  Dir dir = Dir::North;
-  auto prev_dir = dir;
-  while (1) {
-    step_t min_step = MAZE_STEP_MAX;
-    prev_dir = dir;
-    for (const auto d : Dir::ENWS()) {
-      if (!maze.canGo(v, d))
-        continue;
-      step_t next_step = stepMap.getStep(v.next(d));
-      if (min_step > next_step) {
-        min_step = next_step;
-        dir = d;
-      }
-    }
-    if (stepMap.getStep(v) <= min_step)
-      return false; //< 失敗
-    shortestDirs.push_back(dir);
-    v = v.next(dir);
-    if (stepMap.getStep(v) == 0)
-      break; //< ゴール区画
-  }
-  // ゴール区画を行けるところまで直進(斜め考慮)する
-  bool loop = true;
-  while (loop) {
-    loop = false;
-    // 斜めを考慮した進行方向を列挙する
-    Dirs dirs;
-    const auto rel_dir = Dir(dir - prev_dir);
-    if (diag_enabled && rel_dir == Dir::Left)
-      dirs = {Dir(dir + Dir::Right), dir};
-    else if (diag_enabled && rel_dir == Dir::Right)
-      dirs = {Dir(dir + Dir::Left), dir};
-    else
-      dirs = {dir};
-    // 行ける方向に行く
-    for (const auto &d : dirs) {
-      if (maze.canGo(v, d)) {
-        shortestDirs.push_back(d);
-        v = v.next(d);
-        prev_dir = dir;
-        dir = d;
-        loop = true;
-        break;
-      }
-    }
-  }
-  return true;
-#else
-  /* new algorithm*/
   Indexes path;
   const bool known_only = true;
-#if D_STAR_LITE_ENABLED
-  shortestAlgorithm.Initialize();
-  if (!shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled))
-    return false; /* 失敗 */
-  if (!shortestAlgorithm.FollowShortestPath(path, known_only, diag_enabled))
-    return false; /* 失敗 */
-#else
   if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
-    return false; /* 失敗 */
-#endif
+    return false; /* failed */
   shortestDirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
   auto v = maze.getStart();
   for (const auto d : shortestDirs)
@@ -259,7 +183,7 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
     return true;
   auto prev_dir = shortestDirs[shortestDirs.size() - 1 - 1];
   auto dir = shortestDirs[shortestDirs.size() - 1];
-  // ゴール区画を行けるところまで直進(斜め考慮)する
+  /* ゴール区画を行けるところまで直進(斜め考慮)する */
   bool loop = true;
   while (loop) {
     loop = false;
@@ -285,7 +209,6 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
     }
   }
   return true; /* 成功 */
-#endif
 }
 
 void SearchAlgorithm::printMap(const State state, const Vector vec,
@@ -297,7 +220,6 @@ void SearchAlgorithm::printMap(const State state, const Vector vec,
 }
 
 bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
-#if USE_OLD_ALGORITHM
   candidates.clear();
   /* no diag */
   {
@@ -325,29 +247,15 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
       }
     }
   }
-#if USE_HYBRID_ALGORITHM
-  if (!candidates.empty())
-#endif
-    return true; /*< 成功 */
-#endif
+  return true; /*< 成功 */
+#if 0
   /* 新アルゴリズム */
   candidates.clear();
-#if D_STAR_LITE_ENABLED
-  for (const auto diag_enabled : {true}) {
-#else
   for (const auto diag_enabled : {true, false}) {
-#endif
     Indexes path;
     const bool known_only = false;
-#if D_STAR_LITE_ENABLED
-    if (!shortestAlgorithm.ComputeShortestPath(known_only, diag_enabled))
-      return false; /*< 失敗 */
-    if (!shortestAlgorithm.FollowShortestPath(path, known_only, diag_enabled))
-      return false; /*< 失敗 */
-#else
     if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
       return false; /*< 失敗 */
-#endif
     const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
     auto v = maze.getStart();
     for (const auto d : dirs) {
@@ -356,6 +264,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates) {
         candidates.push_back(v);
     }
   }
+#endif
   return true; /*< 成功 */
 }
 int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,

@@ -75,7 +75,7 @@ int test_position_identify() {
 #if 1
   /* Position Identification Run */
   StepMap stepMap;
-  stepMap.update(maze_target, maze_target.getGoals(), false);
+  stepMap.update(maze_target, maze_target.getGoals(), false, false);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
       for (const auto d : Dir::ENWS()) {
