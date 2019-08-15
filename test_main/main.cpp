@@ -4,7 +4,7 @@ using namespace MazeLib;
 
 #if 1
 
-std::ofstream csv("../matlab/out.csv");
+std::ofstream csv("main.csv");
 
 class CLRobot : public CLRobotBase {
 public:

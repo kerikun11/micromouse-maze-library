@@ -8,7 +8,7 @@ public:
 
 protected:
   virtual void queueAction(const Action action) override {
-#if 1
+#if 0
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.first == maze.getStart())
       logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
@@ -18,27 +18,19 @@ protected:
 };
 
 int test_measurement() {
-  std::ofstream csv("out.csv");
+  std::ofstream csv("measurement.csv");
   const std::string mazedata_dir = "../mazedata/";
   for (const auto filename : {
-           "32MM2018HX.maze",
-           "32MM2017HX.maze",
-           "32MM2016HX.maze",
-           "32MM2015HX.maze",
-           "32MM2014HX.maze",
-           "32MM2013HX.maze",
-           "32MM2012HX.maze",
-           "16MM2018CM.maze",
-           "16MM2018MS.maze",
-           "16MM2017CX.maze",
-           "16MM2017CX_pre.maze",
-           "16MM2017C_East.maze",
-           "16MM2017C_Cheese.maze",
-           "16MM2017Tashiro.maze",
-           "16MM2016CX.maze",
-           "16MM2016C_Chubu.maze",
-           "16MM2013CX.maze",
-           "08MM2016CF_pre.maze",
+           "32MM2018HX.maze",       "32MM2017HX.maze",
+           "32MM2016HX.maze",       "32MM2015HX.maze",
+           "32MM2014HX.maze",       "32MM2013HX.maze",
+           "32MM2012HX.maze",       "16MM2019H_kanazawa.maze",
+           "16MM2019H_kansai.maze", "16MM2018C.maze",
+           "16MM2018H.maze",        "16MM2017C_East.maze",
+           "16MM2017H_Cheese.maze", "16MM2017H_Tashiro.maze",
+           "16MM2017CX_pre.maze",   "16MM2017CX.maze",
+           "16MM2016C_Chubu.maze",  "16MM2016CX.maze",
+           "16MM2013CX.maze",       "08MM2016CF_pre.maze",
        }) {
     std::cout << std::endl;
     std::cout << "Maze File: \t" << filename << std::endl;
@@ -71,7 +63,8 @@ int test_measurement() {
       // robot.printPath();
       robot.endFastRunBackingToStartRun();
       /* Shortest Path Comparison */
-      Agent at(maze_target);
+      const auto p_at = std::make_unique<Agent>(maze_target);
+      Agent &at = *p_at;
       at.calcShortestDirs(diag_enabled);
       if (at.getShortestDirs() != robot.getShortestDirs()) {
         logw << "The path found in search is not shortest! diag: "
