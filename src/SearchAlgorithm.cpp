@@ -376,8 +376,8 @@ SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
     return Reached; /*< 探索完了 */
   /* 既知区間移動方向列を生成 */
   stepMap.update(maze, candidates, false, true);
-  const auto v = stepMap.calcNextDirs(maze, cv, cd, nextDirsKnown,
-                                      nextDirCandidates, true);
+  const auto v =
+      stepMap.calcNextDirs(maze, cv, cd, nextDirsKnown, nextDirCandidates);
   /* 事前に進む方向の候補を決定する */
   Dirs ndcs;         /*< Next Dir Candidates */
   WallIndexes cache; /*< 一時的に壁を立てるときのバックアップ */
@@ -398,7 +398,7 @@ SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
       stepMap.update(maze, candidates, false, false);
     Dirs tmp_nds;
     /* 既知区間終了地点から次行く方向列を計算 */
-    stepMap.calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates, true);
+    stepMap.calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates);
     /* 既知区間になった場合 */
     if (!tmp_nds.empty()) {
       ndcs.push_back(tmp_nds.front());
@@ -438,7 +438,7 @@ SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
     Vector &cv, Dir &cd, Dirs &nextDirsKnown, Dirs &nextDirCandidates,
     int &matchCount) {
-  /* オフセットを調整する */
+  /* オフセットを調整する(処理はこのブロックで完結) */
   if (!idMaze.getWallLogs().empty()) {
     const int8_t min_x = idMaze.getMinX();
     const int8_t min_y = idMaze.getMinY();
@@ -466,6 +466,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
   } else if (cnt == 0) {
     return Error;
   }
+  /* 探索方向の決定 */
   /* min max */
   int8_t min_x = std::max(idMaze.getMinX() - 1, 0);
   int8_t min_y = std::max(idMaze.getMinY() - 1, 0);
@@ -487,7 +488,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
           tmp.push_back(WallLog(v, d, idMaze.isWall(v, d)));
           idMaze.setWall(v, d, true);
         }
-        if (idMaze.unknownCount(v))
+        /* 禁止区画でない未知区画を訪問候補に追加する */
+        if (forbidden.empty() && idMaze.unknownCount(v))
           candidates.push_back(v);
       }
   /* 現在地の背後は壁なしにしないと移動できなくなることがある */
@@ -500,8 +502,10 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
   std::reverse(tmp.begin(), tmp.end());
   for (const auto wl : tmp)
     idMaze.setWall(Vector(wl), wl.d, wl.b);
+  /* 既知壁がスタート候補でどこにも行けなくなるバグ対策 */
+  nextDirCandidates.push_back(cd + Dir::Back);
   /* 既知情報からではスタート区画が避けられない場合は普通に導出 */
-  if (nextDirCandidates.empty())
+  if (stepMap.getStep(cv) == MAZE_STEP_MAX)
     stepMap.calcNextDirsAdv(idMaze, candidates, cv, cd, nextDirsKnown,
                             nextDirCandidates);
   /* end */

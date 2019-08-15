@@ -93,7 +93,9 @@ int test_measurement() {
         for (const auto d : Dir::ENWS()) {
           const auto v = Vector(x, y);
           if (stepMap.getStep(v) == MAZE_STEP_MAX)
-            continue;
+            continue; /*< そもそも行けない区画は除外 */
+          if (maze_target.isWall(v, d + Dir::Back))
+            continue; /*< 壁上からは除外 */
           if (v == Vector(0, 0) || v == Vector(0, 1))
             continue;
           /* set fake offset */

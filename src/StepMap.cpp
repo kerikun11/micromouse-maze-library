@@ -137,13 +137,11 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
 const Vector StepMap::calcNextDirsAdv(Maze &maze, const Vectors &dest,
                                       const Vector vec, const Dir dir,
                                       Dirs &nextDirsKnown,
-                                      Dirs &nextDirCandidates,
-                                      const bool prior_unknown) {
+                                      Dirs &nextDirCandidates) {
   /* ステップマップの更新 */
-  update(maze, dest, false, false);
+  update(maze, dest, false, true);
   /* 事前に進む候補を決定する */
-  const auto v = calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates,
-                              prior_unknown);
+  const auto v = calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
   Dirs ndcs; //< Next Dir Candidates
   WallLogs cache;
   while (1) {
@@ -158,8 +156,8 @@ const Vector StepMap::calcNextDirsAdv(Maze &maze, const Vectors &dest,
     maze.setKnown(v, d, true); //< 既知とする
     Dirs tmp_nds;
     // 行く方向を計算しなおす
-    update(maze, dest, false, false);
-    calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates, prior_unknown);
+    update(maze, dest, false, true);
+    calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates);
     if (!tmp_nds.empty())
       nextDirCandidates = tmp_nds; //< 既知区間になった場合
   }
@@ -169,6 +167,7 @@ const Vector StepMap::calcNextDirsAdv(Maze &maze, const Vectors &dest,
     maze.setKnown(Vector(wl), wl.d, false);
   }
   nextDirCandidates = ndcs;
+  nextDirCandidates.push_back(dir + Dir::Back);
   return v;
 }
 static step_t gen_cost_impl(const int i, const float am, const float vs,
@@ -196,11 +195,10 @@ void StepMap::calcStraightStepTable() {
 }
 const Vector StepMap::calcNextDirs(const Maze &maze, const Vector start_v,
                                    const Dir start_d, Dirs &nextDirsKnown,
-                                   Dirs &nextDirCandidates,
-                                   const bool prior_unknown) const {
+                                   Dirs &nextDirCandidates) const {
   VecDir end;
   nextDirsKnown = calcNextDirsKnown(maze, {start_v, start_d}, end, true, false);
-  nextDirCandidates = calcNextDirCandidates(maze, end, prior_unknown);
+  nextDirCandidates = calcNextDirCandidates(maze, end);
   return end.first;
 }
 

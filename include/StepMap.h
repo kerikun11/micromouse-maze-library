@@ -68,12 +68,10 @@ public:
    */
   const Vector calcNextDirsAdv(Maze &maze, const Vectors &dest,
                                const Vector vec, const Dir dir,
-                               Dirs &nextDirsKnown, Dirs &nextDirCandidates,
-                               const bool prior_unknown = true);
+                               Dirs &nextDirsKnown, Dirs &nextDirCandidates);
   const Vector calcNextDirs(const Maze &maze, const Vector start_v,
                             const Dir start_d, Dirs &nextDirsKnown,
-                            Dirs &nextDirCandidates,
-                            const bool prior_unknown) const;
+                            Dirs &nextDirCandidates) const;
   bool calcShortestDirs(const Maze &maze, Dirs &shortestDirs,
                         const bool known_only, const bool simple) {
     /* 目的地を作成 */
@@ -139,8 +137,7 @@ private:
     }
     return nextDirsKnown;
   }
-  const Dirs calcNextDirCandidates(const Maze &maze, const VecDir focus,
-                                   bool prior_unknown) const {
+  const Dirs calcNextDirCandidates(const Maze &maze, const VecDir focus) const {
     /* 方向の候補を抽出 */
     Dirs dirs;
     for (const auto d : {focus.second + Dir::Front, focus.second + Dir::Left,
@@ -155,11 +152,10 @@ private:
              getStep(focus.first.next(d2)); /*< 低コスト優先 */
     });
     /* 未知壁優先で並べ替え, これがないと探索時間増大 */
-    if (prior_unknown)
-      std::sort(dirs.begin(), dirs.end(),
-                [&](const Dir d1 __attribute__((unused)), const Dir d2) {
-                  return !maze.unknownCount(focus.first.next(d2));
-                });
+    std::sort(dirs.begin(), dirs.end(),
+              [&](const Dir d1 __attribute__((unused)), const Dir d2) {
+                return !maze.unknownCount(focus.first.next(d2));
+              });
     return dirs;
   }
 };
