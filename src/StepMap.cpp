@@ -173,13 +173,13 @@ const Vector StepMap::calcNextDirsAdv(Maze &maze, const Vectors &dest,
 }
 static step_t gen_cost_impl(const int i, const float am, const float vs,
                             const float vm, const float seg) {
-  const auto d = seg * (i + 1); /*< (i+1) 区画分の走行距離 */
+  const auto d = seg * i; /*< i 区画分の走行距離 */
   /* グラフの面積から時間を求める */
   const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
   if (d < d_thr)
-    return 2 * (std::sqrt(vs * vs + am * d) - vs) / am * 100; /*< 三角加速 */
+    return 2 * (std::sqrt(vs * vs + am * d) - vs) / am * 1000; /*< 三角加速 */
   else
-    return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 100; /*< 台形加速 */
+    return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 1000; /*< 台形加速 */
 }
 void StepMap::calcStraightStepTable() {
   float vs = 450.0f;    /*< 基本速度 [mm/s] */
@@ -188,6 +188,10 @@ void StepMap::calcStraightStepTable() {
   const float seg_a = 90.0f;
   for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
+  }
+  const step_t turn_cost = 280 - step_table_along[1];
+  for (int i = 0; i < MAZE_SIZE * 2; ++i) {
+    step_table_along[i] += turn_cost;
   }
 }
 const Vector StepMap::calcNextDirs(const Maze &maze, const Vector start_v,

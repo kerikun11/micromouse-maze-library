@@ -205,7 +205,7 @@ private:
 
   step_t gen_cost_impl(const int i, const float am, const float vs,
                        const float vm, const float seg) {
-    const auto d = seg * (i + 1); /*< (i+1) 区画分の走行距離 */
+    const auto d = seg * i; /*< i 区画分の走行距離 */
     /* グラフの面積から時間を求める */
     const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
     if (d < d_thr)
@@ -224,6 +224,11 @@ private:
     for (int i = 0; i < MAZE_SIZE * 2; ++i) {
       step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
       step_table_diag[i] = gen_cost_impl(i, am_d, vs, vm_d, seg_d);
+    }
+    const step_t turn_cost = 280 - step_table_along[1];
+    for (int i = 0; i < MAZE_SIZE * 2; ++i) {
+      step_table_along[i] += turn_cost;
+      step_table_diag[i] += turn_cost;
     }
   }
   const Dirs calcStepDownDirs(const Maze &maze, const WallIndex start,

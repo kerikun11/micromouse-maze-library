@@ -67,9 +67,18 @@ int test_measurement() {
       Agent &at = *p_at;
       at.calcShortestDirs(diag_enabled);
       if (at.getShortestDirs() != robot.getShortestDirs()) {
-        logw << "The path found in search is not shortest! diag: "
+        logw << "searched path is not shortest! diag: "
              << (diag_enabled ? "true" : "false") << std::endl;
         // at.printPath(); robot.printPath();
+        logi << "target: "
+             << at.getSearchAlgorithm()
+                    .getShortestAlgorithm()
+                    .getShortestPathCost()
+             << " search: "
+             << robot.getSearchAlgorithm()
+                    .getShortestAlgorithm()
+                    .getShortestPathCost()
+             << std::endl;
       }
     }
 #endif
