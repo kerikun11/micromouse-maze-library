@@ -8,6 +8,7 @@
 #pragma once
 
 #include <array>
+#include <bitset>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -229,9 +230,12 @@ union __attribute__((__packed__)) WallIndex {
   unsigned int all : 16; /**< @brief union element for all access */
 
 public:
-  WallIndex(const int8_t x, const int8_t y, const int8_t z)
+  WallIndex(const int8_t x, const int8_t y, const uint8_t z)
       : x(x), y(y), z(z) {}
   WallIndex(const Vector v, const Dir d) : x(v.x), y(v.y) { uniquify(d); }
+  WallIndex(const int8_t x, const int8_t y, const Dir d) : x(x), y(y) {
+    uniquify(d);
+  }
   WallIndex() : all(0) {}
   operator uint16_t() const {
     return (z << 10) | (y << 5) | x; /*< M * M * 2 */
@@ -341,22 +345,6 @@ public:
   Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
        const std::array<Dir, 4> bit_to_dir_map = {Dir::East, Dir::North,
                                                   Dir::West, Dir::South});
-  const Maze &operator=(const Maze &obj) {
-    for (int8_t i = 0; i < MAZE_SIZE - 1; ++i) {
-      wall[0][i] = obj.wall[0][i];
-      wall[1][i] = obj.wall[1][i];
-      known[0][i] = obj.known[0][i];
-      known[1][i] = obj.known[1][i];
-    }
-    goals = obj.goals;
-    start = obj.start;
-    wallLogs = obj.wallLogs;
-    min_x = obj.min_x;
-    min_y = obj.min_y;
-    max_x = obj.max_x;
-    max_y = obj.max_y;
-    return *this;
-  }
   /** @function reset
    *  @brief 迷路の初期化．壁を削除し，スタート区画を既知に
    */
@@ -368,14 +356,12 @@ public:
    *  @return true: 壁あり，false: 壁なし
    */
   bool isWall(const Vector v, const Dir d) const {
-    return isWall(wall, v.x, v.y, d);
+    return isWall(wall, WallIndex(v, d));
   }
   bool isWall(const int8_t x, const int8_t y, const Dir d) const {
-    return isWall(wall, x, y, d);
+    return isWall(wall, WallIndex(x, y, d));
   }
-  bool isWall(const WallIndex i) const {
-    return isWall(wall, i.x, i.y, i.getDir());
-  }
+  bool isWall(const WallIndex i) const { return isWall(wall, i); }
   /**
    *  @brief 壁を更新をする
    *  @param v 区画の座標
@@ -383,14 +369,12 @@ public:
    *  @param b 壁の有無 true:壁あり，false:壁なし
    */
   void setWall(const Vector v, const Dir d, const bool b) {
-    return setWall(wall, v.x, v.y, d, b);
+    return setWall(wall, WallIndex(v, d), b);
   }
   void setWall(const int8_t x, const int8_t y, const Dir d, const bool b) {
-    return setWall(wall, x, y, d, b);
+    return setWall(wall, WallIndex(x, y, d), b);
   }
-  void setWall(const WallIndex i, const bool b) {
-    return setWall(wall, i.x, i.y, i.getDir(), b);
-  }
+  void setWall(const WallIndex i, const bool b) { return setWall(wall, i, b); }
   /**
    *  @brief 壁が探索済みかを返す
    *  @param v 区画の座標
@@ -398,14 +382,12 @@ public:
    *  @return true: 探索済み，false: 未探索
    */
   bool isKnown(const Vector v, const Dir d) const {
-    return isWall(known, v.x, v.y, d);
+    return isWall(known, WallIndex(v, d));
   }
   bool isKnown(const int8_t x, const int8_t y, const Dir d) const {
-    return isWall(known, x, y, d);
+    return isWall(known, WallIndex(x, y, d));
   }
-  bool isKnown(const WallIndex i) const {
-    return isWall(known, i.x, i.y, i.getDir());
-  }
+  bool isKnown(const WallIndex i) const { return isWall(known, i); }
   /**
    *  @brief 壁の既知を更新する
    *  @param v 区画の座標
@@ -413,13 +395,13 @@ public:
    *  @param b 壁の未知既知 true:既知，false:未知
    */
   void setKnown(const Vector v, const Dir d, const bool b) {
-    return setWall(known, v.x, v.y, d, b);
+    return setWall(known, WallIndex(v, d), b);
   }
   void setKnown(const int8_t x, const int8_t y, const Dir d, const bool b) {
-    return setWall(known, x, y, d, b);
+    return setWall(known, WallIndex(x, y, d), b);
   }
   void setKnown(const WallIndex i, const bool b) {
-    return setWall(known, i.x, i.y, i.getDir(), b);
+    return setWall(known, i, b);
   }
   /**
    *  @brief 通過可能かどうかを返す
@@ -510,30 +492,29 @@ public:
   int8_t getMaxY() const { return max_y; }
 
 private:
-  wall_size_t wall[2][MAZE_SIZE - 1];  /**< 壁情報 */
-  wall_size_t known[2][MAZE_SIZE - 1]; /**< 既知壁情報 */
-  Vectors goals;                       /**< ゴール区画 */
-  Vector start;                        /**< スタート区画 */
-  WallLogs wallLogs;                   /**< 更新した壁のログ */
+  std::bitset<WallIndex::SIZE> wall;  /**< 壁情報 */
+  std::bitset<WallIndex::SIZE> known; /**< 既知壁情報 */
+  Vectors goals;                      /**< ゴール区画 */
+  Vector start;                       /**< スタート区画 */
+  WallLogs wallLogs;                  /**< 更新した壁のログ */
   int8_t min_x;
   int8_t min_y;
   int8_t max_x;
   int8_t max_y;
 
-  /** function isWall
-   *  @brief 引数の壁情報配列を参照する関数
-   *  @param wall 壁情報の配列ポインタ
-   *  @param x,y,d 区画の座標，方向
-   */
-  static bool isWall(const wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
-                     const int8_t y, const Dir d);
-  /** function isWall
-   *  @brief 引数の壁情報配列を更新する関数
-   *  @param wall 壁情報の配列ポインタ
-   *  @param x,y,d 区画の座標，方向
-   *  @param b 壁の有無
-   */
-  static void setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
-                      const int8_t y, const Dir d, const bool b);
+  bool isWall(const std::bitset<WallIndex::SIZE> &wall,
+              const WallIndex i) const {
+    if (!i.isInsideOfFiled() || (i.z == 0 && i.x == MAZE_SIZE - 1) ||
+        (i.z == 1 && i.y == MAZE_SIZE - 1))
+      return true;
+    return wall[i];
+  }
+  void setWall(std::bitset<WallIndex::SIZE> &wall, const WallIndex i,
+               const bool b) const {
+    if (!i.isInsideOfFiled() || (i.z == 0 && i.x == MAZE_SIZE - 1) ||
+        (i.z == 1 && i.y == MAZE_SIZE - 1))
+      return;
+    wall[i] = b;
+  }
 };
 } // namespace MazeLib

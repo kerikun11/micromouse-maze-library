@@ -69,12 +69,8 @@ Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
     }
 }
 void Maze::reset(const bool setStartWall) {
-  for (int8_t i = 0; i < MAZE_SIZE - 1; ++i) {
-    wall[0][i] = 0;
-    wall[1][i] = 0;
-    known[0][i] = 0;
-    known[1][i] = 0;
-  }
+  wall.reset();
+  known.reset();
   min_x = MAZE_SIZE - 1;
   min_y = MAZE_SIZE - 1;
   max_x = 0;
@@ -148,7 +144,7 @@ void Maze::print(std::ostream &os) const {
         const auto v = Vector(x, y);
         if (v == start)
           os << " S ";
-        else if (std::find(goals.cbegin(), goals.cend(), v) != goals.end())
+        else if (std::find(goals.cbegin(), goals.cend(), v) != goals.cend())
           os << " G ";
         else
           os << "   ";
@@ -243,67 +239,6 @@ void Maze::printPath(std::ostream &os, const Vector start,
                  : (C_RED " . " C_RESET));
     os << "+" << std::endl;
   }
-}
-bool Maze::isWall(const wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
-                  const int8_t y, const Dir d) {
-  switch (d) {
-  case Dir::East:
-    if (x < 0 || x >= MAZE_SIZE - 1 || y < 0 || y >= MAZE_SIZE)
-      return true; //< 盤面外
-    return wall[0][x] & (1 << y);
-  case Dir::North:
-    if (x < 0 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE - 1)
-      return true; //< 盤面外
-    return wall[1][y] & (1 << x);
-  case Dir::West:
-    if (x < 1 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE)
-      return true; //< 盤面外
-    return wall[0][x - 1] & (1 << y);
-  case Dir::South:
-    if (x < 0 || x >= MAZE_SIZE || y < 1 || y >= MAZE_SIZE)
-      return true; //< 盤面外
-    return wall[1][y - 1] & (1 << x);
-  }
-  loge << "invalid direction" << std::endl;
-  return true; //< とりあえず壁ありとする
-}
-void Maze::setWall(wall_size_t wall[2][MAZE_SIZE - 1], const int8_t x,
-                   const int8_t y, const Dir d, const bool b) {
-  switch (d) {
-  case Dir::East:
-    if (x < 0 || x >= MAZE_SIZE - 1 || y < 0 || y >= MAZE_SIZE)
-      return; //< 盤面外
-    if (b)
-      wall[0][x] |= (1 << y);
-    else
-      wall[0][x] &= ~(1 << y);
-    return;
-  case Dir::North:
-    if (x < 0 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE - 1)
-      return; //< 盤面外
-    if (b)
-      wall[1][y] |= (1 << x);
-    else
-      wall[1][y] &= ~(1 << x);
-    return;
-  case Dir::West:
-    if (x < 1 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE)
-      return; //< 盤面外
-    if (b)
-      wall[0][x - 1] |= (1 << y);
-    else
-      wall[0][x - 1] &= ~(1 << y);
-    return;
-  case Dir::South:
-    if (x < 0 || x >= MAZE_SIZE || y < 1 || y >= MAZE_SIZE)
-      return; //< 盤面外
-    if (b)
-      wall[1][y - 1] |= (1 << x);
-    else
-      wall[1][y - 1] &= ~(1 << x);
-    return;
-  }
-  loge << "invalid direction" << std::endl;
 }
 
 } // namespace MazeLib
