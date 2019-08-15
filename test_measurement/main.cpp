@@ -26,7 +26,7 @@ int test_measurement() {
            "32MM2014HX.maze",       "32MM2013HX.maze",
            "32MM2012HX.maze",       "16MM2019H_kanazawa.maze",
            "16MM2019H_kansai.maze", "16MM2018C.maze",
-           "16MM2018H.maze",        "16MM2017C_East.maze",
+           "16MM2018H_semi.maze",   "16MM2017C_East.maze",
            "16MM2017H_Cheese.maze", "16MM2017H_Tashiro.maze",
            "16MM2017CX_pre.maze",   "16MM2017CX.maze",
            "16MM2016C_Chubu.maze",  "16MM2016CX.maze",
