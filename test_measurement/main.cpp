@@ -8,7 +8,7 @@ public:
 
 protected:
   virtual void queueAction(const Action action) override {
-#if 0
+#if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.first == maze.getStart())
       logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
@@ -57,8 +57,8 @@ int test_measurement() {
     csv << "," << us.count();
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirs(diag_enabled))
-        loge << "Failed to Find a Shortest Path! diag: "
-             << (diag_enabled ? "true" : "false") << std::endl;
+        loge << "Failed to Find a Shortest Path! "
+             << (diag_enabled ? "diag" : "no_diag") << std::endl;
       robot.fastRun(diag_enabled);
       // robot.printPath();
       robot.endFastRunBackingToStartRun();
@@ -67,8 +67,8 @@ int test_measurement() {
       Agent &at = *p_at;
       at.calcShortestDirs(diag_enabled);
       if (at.getShortestDirs() != robot.getShortestDirs()) {
-        logw << "searched path is not shortest! diag: "
-             << (diag_enabled ? "true" : "false") << std::endl;
+        logw << "searched path is not shortest! "
+             << (diag_enabled ? "diag" : "no_diag") << std::endl;
         // at.printPath(); robot.printPath();
         logi << "target: "
              << at.getSearchAlgorithm()

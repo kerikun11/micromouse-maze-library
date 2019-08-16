@@ -149,8 +149,8 @@ public:
       }
     }
   }
-  const WallIndexes convertDestinations(const Maze &maze,
-                                        const Vectors vectors) const {
+  static const WallIndexes convertDestinations(const Maze &maze,
+                                               const Vectors vectors) {
     WallIndexes dest;
     for (const auto v : vectors)
       for (const auto d : Dir::ENWS())
@@ -158,7 +158,7 @@ public:
           dest.push_back(WallIndex(v, d));
     return dest;
   }
-  const Dir convertDir(const Dir d, const WallIndex i) const {
+  static const Dir convertDir(const Dir d, const WallIndex i) {
     switch (d) {
     case Dir::East:
     case Dir::North:
@@ -176,7 +176,7 @@ public:
     }
     return Dir::Max;
   }
-  const Dirs convertDirsKnown(const Dirs src, const WallIndex start) const {
+  static const Dirs convertDirsKnown(const Dirs src, const WallIndex start) {
     Dirs dirs;
     auto i = start;
     for (const auto d : src) {
