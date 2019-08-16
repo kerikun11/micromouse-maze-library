@@ -139,7 +139,7 @@ const Vector StepMap::calcNextDirsAdv(Maze &maze, const Vectors &dest,
                                       Dirs &nextDirsKnown,
                                       Dirs &nextDirCandidates) {
   /* ステップマップの更新 */
-  update(maze, dest, false, true);
+  update(maze, dest, false, false);
   /* 事前に進む候補を決定する */
   const auto v = calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
   Dirs ndcs; //< Next Dir Candidates
@@ -156,7 +156,7 @@ const Vector StepMap::calcNextDirsAdv(Maze &maze, const Vectors &dest,
     maze.setKnown(v, d, true); //< 既知とする
     Dirs tmp_nds;
     // 行く方向を計算しなおす
-    update(maze, dest, false, true);
+    update(maze, dest, false, false);
     calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates);
     if (!tmp_nds.empty())
       nextDirCandidates = tmp_nds; //< 既知区間になった場合
