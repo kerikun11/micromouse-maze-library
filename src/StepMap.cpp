@@ -167,7 +167,6 @@ const Vector StepMap::calcNextDirsAdv(Maze &maze, const Vectors &dest,
     maze.setKnown(Vector(wl), wl.d, false);
   }
   nextDirCandidates = ndcs;
-  nextDirCandidates.push_back(dir + Dir::Back);
   return v;
 }
 static step_t gen_cost_impl(const int i, const float am, const float vs,
