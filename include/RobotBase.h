@@ -56,8 +56,9 @@ public:
   }
   static std::string pathConvertSearchToKnown(std::string src) {
     replace(src, "S", "ss");
-    auto f = src.find_first_of(F_ST_HALF); /*< 最初の直線を探す */
-    auto b = src.find_last_of(F_ST_HALF);  /*< 最後の直線を探す */
+    /* 初手ターンを防ぐ */
+    auto f = src.find_first_of(F_ST_HALF, 1); /*< 最初の直線を探す */
+    auto b = src.find_last_of(F_ST_HALF);     /*< 最後の直線を探す */
     if (f >= b)
       return src;                       /*< 直線なし */
     auto fb = src.substr(f, b - f + 1); /*< 直線に挟まれた区間を抽出 */
