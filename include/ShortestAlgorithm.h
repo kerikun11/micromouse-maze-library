@@ -226,7 +226,7 @@ public:
     default:
       break;
     }
-    assert(1); /*< invalid direction */
+    logw << "Invalid Dir: " << nd << std::endl;
     return Vector(x, y);
   }
   const Vector arrow_to() const {
@@ -247,7 +247,7 @@ public:
     default:
       break;
     }
-    assert(1); /*< invalid direction */
+    logw << "Invalid Dir: " << nd << std::endl;
     return Vector(x, y);
   }
   /**
@@ -263,7 +263,7 @@ public:
     case Dir::SouthEast:
       return z == 1 ? Dir::Left45 : Dir::Right45;
     }
-    assert(1); /*< invalid direction */
+    logw << "Invalid Dir: " << nd << std::endl;
     return Dir::Max;
   }
   /**

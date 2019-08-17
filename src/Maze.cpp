@@ -25,7 +25,7 @@ const Vector Vector::next(const Dir d) const {
   case Dir::South:
     return Vector(x, y - 1);
   }
-  assert(1); /*< invalid direction */
+  logw << "Invalid Dir: " << d << std::endl;
   return *this;
 }
 const Vector Vector::rotate(const Dir d) const {
@@ -39,7 +39,7 @@ const Vector Vector::rotate(const Dir d) const {
   case Dir::South:
     return Vector(y, -x);
   }
-  assert(1); /*< invalid direction */
+  logw << "Invalid Dir: " << d << std::endl;
   return *this;
 }
 std::ostream &operator<<(std::ostream &os, const Vector v) {
@@ -73,7 +73,7 @@ const WallIndex WallIndex::next(const Dir d) const {
   case Dir::SouthEast:
     return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
   default:
-    assert(1); /*< invalid direction */
+    logw << "Invalid Dir: " << d << std::endl;
     return WallIndex(x, y, z);
   }
 }

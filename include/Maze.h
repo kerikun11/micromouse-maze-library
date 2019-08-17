@@ -9,7 +9,6 @@
 
 #include <array>
 #include <bitset>
-#include <cassert>
 #include <cmath> /*< for std::log2 */
 #include <cstdint>
 #include <fstream>
@@ -376,46 +375,48 @@ public:
    *  @return true: 壁あり，false: 壁なし
    */
   bool isWall(const Vector v, const Dir d) const {
-    return isWall(wall, WallIndex(v, d));
+    return isWallBase(wall, WallIndex(v, d));
   }
   bool isWall(const int8_t x, const int8_t y, const Dir d) const {
-    return isWall(wall, WallIndex(x, y, d));
+    return isWallBase(wall, WallIndex(x, y, d));
   }
-  bool isWall(const WallIndex i) const { return isWall(wall, i); }
+  bool isWall(const WallIndex i) const { return isWallBase(wall, i); }
   /**
    *  @brief 壁を更新をする
    *  @param b 壁の有無 true:壁あり，false:壁なし
    */
-  void setWall(const WallIndex i, const bool b) { return setWall(wall, i, b); }
+  void setWall(const WallIndex i, const bool b) {
+    return setWallBase(wall, i, b);
+  }
   void setWall(const Vector v, const Dir d, const bool b) {
-    return setWall(wall, WallIndex(v, d), b);
+    return setWallBase(wall, WallIndex(v, d), b);
   }
   void setWall(const int8_t x, const int8_t y, const Dir d, const bool b) {
-    return setWall(wall, WallIndex(x, y, d), b);
+    return setWallBase(wall, WallIndex(x, y, d), b);
   }
   /**
    *  @brief 壁が探索済みかを返す
    *  @return true: 探索済み，false: 未探索
    */
-  bool isKnown(const WallIndex i) const { return isWall(known, i); }
+  bool isKnown(const WallIndex i) const { return isWallBase(known, i); }
   bool isKnown(const Vector v, const Dir d) const {
-    return isWall(known, WallIndex(v, d));
+    return isWallBase(known, WallIndex(v, d));
   }
   bool isKnown(const int8_t x, const int8_t y, const Dir d) const {
-    return isWall(known, WallIndex(x, y, d));
+    return isWallBase(known, WallIndex(x, y, d));
   }
   /**
    *  @brief 壁の既知を更新する
    *  @param b 壁の未知既知 true:既知，false:未知
    */
   void setKnown(const Vector v, const Dir d, const bool b) {
-    return setWall(known, WallIndex(v, d), b);
+    return setWallBase(known, WallIndex(v, d), b);
   }
   void setKnown(const int8_t x, const int8_t y, const Dir d, const bool b) {
-    return setWall(known, WallIndex(x, y, d), b);
+    return setWallBase(known, WallIndex(x, y, d), b);
   }
   void setKnown(const WallIndex i, const bool b) {
-    return setWall(known, i, b);
+    return setWallBase(known, i, b);
   }
   /**
    *  @brief 通過可能かどうかを返す
@@ -505,15 +506,15 @@ public:
   int8_t getMaxY() const { return max_y; }
 
 private:
-  std::bitset<WallIndex::SIZE> wall;  /**< 壁情報 */
-  std::bitset<WallIndex::SIZE> known; /**< 既知壁情報 */
-  Vectors goals;                      /**< ゴール区画 */
-  Vector start;                       /**< スタート区画 */
-  WallLogs wallLogs;                  /**< 更新した壁のログ */
-  int8_t min_x;                       /**< 既知壁の最小区画 */
-  int8_t min_y;                       /**< 既知壁の最小区画 */
-  int8_t max_x;                       /**< 既知壁の最大区画 */
-  int8_t max_y;                       /**< 既知壁の最大区画 */
+  std::bitset<WallIndex::SIZE> wall;  /**< @brief 壁情報 */
+  std::bitset<WallIndex::SIZE> known; /**< @brief 既知壁情報 */
+  Vectors goals;                      /**< @brief ゴール区画 */
+  Vector start;                       /**< @brief スタート区画 */
+  WallLogs wallLogs;                  /**< @brief 更新した壁のログ */
+  int8_t min_x;                       /**< @brief 既知壁の最小区画 */
+  int8_t min_y;                       /**< @brief 既知壁の最小区画 */
+  int8_t max_x;                       /**< @brief 既知壁の最大区画 */
+  int8_t max_y;                       /**< @brief 既知壁の最大区画 */
 
   /**
    * @brief 壁の確認のベース関数
@@ -523,11 +524,9 @@ private:
    * @return true
    * @return false
    */
-  bool isWall(const std::bitset<WallIndex::SIZE> &wall,
-              const WallIndex i) const {
-    if (!i.isInsideOfFiled())
-      return true;
-    return wall[i];
+  bool isWallBase(const std::bitset<WallIndex::SIZE> &wall,
+                  const WallIndex i) const {
+    return i.isInsideOfFiled() ? wall[i] : true;
   }
   /**
    * @brief 壁の更新のベース関数
@@ -537,11 +536,11 @@ private:
    * @return true
    * @return false
    */
-  void setWall(std::bitset<WallIndex::SIZE> &wall, const WallIndex i,
-               const bool b) const {
-    if (!i.isInsideOfFiled())
-      return;
-    wall[i] = b;
+  void setWallBase(std::bitset<WallIndex::SIZE> &wall, const WallIndex i,
+                   const bool b) const {
+    if (i.isInsideOfFiled())
+      wall[i] = b;
   }
 };
+
 } // namespace MazeLib

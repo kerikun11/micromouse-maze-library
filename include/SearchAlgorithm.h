@@ -14,20 +14,20 @@
 
 namespace MazeLib {
 /**
- *  @brief 迷路探索アルゴリズムを司るクラス
+ * @brief 迷路探索アルゴリズムを司るクラス
  */
 class SearchAlgorithm {
 public:
   /**
-   *  @brief 進むべき方向の計算結果
+   * @brief 進むべき方向の計算結果
    */
   enum Result : uint8_t {
     Processing, /**< 現探索状態を継続 */
     Reached,    /**< 現探索状態が完了 */
-    Error,      /**< エラー */
+    Error,      /**< エラーが発生 */
   };
   /**
-   *  @brief 探索状態を列挙
+   * @brief 探索状態を列挙
    */
   enum State : uint8_t {
     START,                  /**< 初期位置，初期姿勢 */
@@ -40,7 +40,7 @@ public:
     GOING_TO_GOAL,        /**< ゴールへ向かっている */
   };
   /**
-   *  @brief Stateの表示用文字列を返す関数
+   * @brief Stateの表示用文字列を返す関数
    */
   static const char *stateString(const State s);
 
@@ -63,17 +63,22 @@ public:
                    const Dirs &nextDirCandidates, Dir &nextDir) const;
   bool calcShortestDirs(Dirs &shortestDirs, const bool diag_enabled = true);
   void printMap(const State state, const Vector vec, const Dir dir) const;
-  const StepMap &getStepMap() const { return stepMap; }
+
+  /**
+   * @brief Getters
+   */
   const Maze &getMaze() const { return maze; }
-  const Maze &getIdMaze() const { return idMaze; }
+  const StepMap &getStepMap() const { return step_map; }
+  const StepMapWall &getStepMapWall() const { return step_map_wall; }
   const ShortestAlgorithm &getShortestAlgorithm() const {
     return shortestAlgorithm;
   }
+  const Maze &getIdMaze() const { return idMaze; }
 
 protected:
   Maze &maze;                          /**< 使用する迷路の参照 */
-  StepMap stepMap;                     /**< 使用するステップマップ */
-  StepMapWall stepMapWall;             /**< 使用するステップマップ */
+  StepMap step_map;                    /**< 使用するステップマップ */
+  StepMapWall step_map_wall;           /**< 使用するステップマップ */
   ShortestAlgorithm shortestAlgorithm; /**< 最短経路導出器 */
 
 private:
@@ -81,7 +86,7 @@ private:
   Vector idOffset; /**< 自己位置同定迷路の始点位置 */
 
   /**
-   *  @brief ステップマップにより最短経路上になりうる区画を洗い出す
+   * @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
   bool findShortestCandidates(Vectors &candidates, const bool simple);
   int countIdentityCandidates(const WallLogs &idWallLogs, VecDir &ans) const;

@@ -214,9 +214,9 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
 void SearchAlgorithm::printMap(const State state, const Vector vec,
                                const Dir dir) const {
   if (state == IDENTIFYING_POSITION)
-    stepMap.print(idMaze, vec, dir);
+    step_map.print(idMaze, vec, dir);
   else
-    stepMap.print(maze, vec, dir);
+    step_map.print(maze, vec, dir);
 }
 
 bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
@@ -225,7 +225,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
   /* no diag */
   {
     Dirs shortest_dirs;
-    if (!stepMap.calcShortestDirs(maze, shortest_dirs, false, simple))
+    if (!step_map.calcShortestDirs(maze, shortest_dirs, false, simple))
       return false; /*< 失敗 */
     auto i = maze.getStart();
     for (const auto d : shortest_dirs) {
@@ -237,7 +237,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
   /* diag */
   {
     Dirs shortest_dirs;
-    if (!stepMapWall.calcShortestDirs(maze, shortest_dirs, false, simple))
+    if (!step_map_wall.calcShortestDirs(maze, shortest_dirs, false, simple))
       return false; /*< 失敗 */
     auto i = WallIndex(0, 0, 1);
     for (const auto d : shortest_dirs) {
@@ -360,7 +360,7 @@ SearchAlgorithm::calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
       candidates.push_back(v); /*< ゴール区画の未知区画を洗い出す */
   if (candidates.empty())
     return Reached;
-  stepMap.calcNextDirsAdv(maze, candidates, cv, cd, nextDirsKnown,
+  step_map.calcNextDirsAdv(maze, candidates, cv, cd, nextDirsKnown,
                           nextDirCandidates);
   return nextDirCandidates.empty() ? Error : Processing;
 }
@@ -375,9 +375,9 @@ SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
   if (candidates.empty())
     return Reached; /*< 探索完了 */
   /* 既知区間移動方向列を生成 */
-  stepMap.update(maze, candidates, false, true);
+  step_map.update(maze, candidates, false, true);
   const auto v =
-      stepMap.calcNextDirs(maze, cv, cd, nextDirsKnown, nextDirCandidates);
+      step_map.calcNextDirs(maze, cv, cd, nextDirsKnown, nextDirCandidates);
   /* 事前に進む方向の候補を決定する */
   Dirs ndcs;         /*< Next Dir Candidates */
   WallIndexes cache; /*< 一時的に壁を立てるときのバックアップ */
@@ -395,10 +395,10 @@ SearchAlgorithm::calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
     /* 最短になりうる区画の洗い出し */
     findShortestCandidates(candidates, false);
     if (!candidates.empty())
-      stepMap.update(maze, candidates, false, false);
+      step_map.update(maze, candidates, false, false);
     Dirs tmp_nds;
     /* 既知区間終了地点から次行く方向列を計算 */
-    stepMap.calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates);
+    step_map.calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates);
     /* 既知区間になった場合 */
     if (!tmp_nds.empty()) {
       ndcs.push_back(tmp_nds.front());
@@ -415,7 +415,7 @@ SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsBackingToStart(const Vector cv, const Dir cd,
                                             Dirs &nextDirsKnown,
                                             Dirs &nextDirCandidates) {
-  const auto v = stepMap.calcNextDirsAdv(maze, {maze.getStart()}, cv, cd,
+  const auto v = step_map.calcNextDirsAdv(maze, {maze.getStart()}, cv, cd,
                                          nextDirsKnown, nextDirCandidates);
   if (v == maze.getStart())
     return Reached;
@@ -426,7 +426,7 @@ SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
                                          Dirs &nextDirsKnown,
                                          Dirs &nextDirCandidates) {
   const auto &goals = maze.getGoals();
-  stepMap.calcNextDirsAdv(maze, goals, cv, cd, nextDirsKnown,
+  step_map.calcNextDirsAdv(maze, goals, cv, cd, nextDirsKnown,
                           nextDirCandidates);
   const auto nv = cv.next(nextDirCandidates[0] + Dir::Back);
   const auto it = std::find_if(goals.cbegin(), goals.cend(),
@@ -496,7 +496,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
   tmp.push_back(WallLog(cv, cd + Dir::Back, idMaze.isWall(cv, cd + Dir::Back)));
   idMaze.setWall(cv, cd + Dir::Back, false);
   /* スタート区画を避けて導出 */
-  stepMap.calcNextDirsAdv(idMaze, candidates, cv, cd, nextDirsKnown,
+  step_map.calcNextDirsAdv(idMaze, candidates, cv, cd, nextDirsKnown,
                           nextDirCandidates);
   /* restore idMaze */
   std::reverse(tmp.begin(), tmp.end());
@@ -505,8 +505,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
   /* 既知壁がスタート候補でどこにも行けなくなるバグ対策 */
   nextDirCandidates.push_back(cd + Dir::Back);
   /* 既知情報からではスタート区画が避けられない場合は普通に導出 */
-  if (stepMap.getStep(cv) == MAZE_STEP_MAX)
-    stepMap.calcNextDirsAdv(idMaze, candidates, cv, cd, nextDirsKnown,
+  if (step_map.getStep(cv) == STEP_MAX)
+    step_map.calcNextDirsAdv(idMaze, candidates, cv, cd, nextDirsKnown,
                             nextDirCandidates);
   /* end */
   return nextDirCandidates.empty() ? Error : Processing;
