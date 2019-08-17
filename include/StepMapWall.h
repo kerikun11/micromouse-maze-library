@@ -30,14 +30,14 @@ public:
       if (y != MAZE_SIZE) {
         os << '|';
         for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
-          os << C_CYAN << std::setw(3)
-             << std::min(getStep(WallIndex(x, y, 1)), (step_t)999) << C_RESET;
+          os << C_CY << std::setw(3)
+             << std::min(getStep(WallIndex(x, y, 1)), (step_t)999) << C_NO;
           os << " ";
-          os << C_CYAN << std::setw(3)
-             << std::min(getStep(WallIndex(x, y, 0)), (step_t)999) << C_RESET;
+          os << C_CY << std::setw(3)
+             << std::min(getStep(WallIndex(x, y, 0)), (step_t)999) << C_NO;
           os << (maze.isKnown(x, y, Dir::East)
                      ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
-                     : (C_RED "." C_RESET));
+                     : (C_RE "." C_NO));
         }
         os << std::endl;
       }
@@ -45,7 +45,7 @@ public:
         os << "+";
         os << (maze.isKnown(x, y, Dir::South)
                    ? (maze.isWall(x, y, Dir::South) ? "-------" : "       ")
-                   : (C_RED "  . .  " C_RESET));
+                   : (C_RE "  . .  " C_NO));
       }
       os << "+" << std::endl;
     }
@@ -69,11 +69,11 @@ public:
         os << "+";
         if (std::find(indexes.cbegin(), indexes.cend(), WallIndex(x, y, 1)) !=
             indexes.cend())
-          os << C_YELLOW << " X " << C_RESET;
+          os << C_YE << " X " << C_NO;
         else
           os << (maze.isKnown(x, y, Dir::North)
                      ? (maze.isWall(x, y, Dir::North) ? "---" : "   ")
-                     : (C_RED " . " C_RESET));
+                     : (C_RE " . " C_NO));
       }
       os << "+" << std::endl;
       if (y != -1) {
@@ -82,11 +82,11 @@ public:
           os << "   ";
           if (std::find(indexes.cbegin(), indexes.cend(), WallIndex(x, y, 0)) !=
               indexes.cend())
-            os << C_YELLOW << "X" << C_RESET;
+            os << C_YE << "X" << C_NO;
           else
             os << (maze.isKnown(x, y, Dir::East)
                        ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
-                       : (C_RED "." C_RESET));
+                       : (C_RE "." C_NO));
         }
       }
       os << std::endl;

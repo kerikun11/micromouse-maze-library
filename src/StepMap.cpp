@@ -50,18 +50,15 @@ void StepMap::print(std::ostream &os, const Maze &maze, const Vector v,
     if (y != MAZE_SIZE) {
       os << '|';
       for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
-        // if (v == Vector(x, y))
-        //   os << " " << C_YELLOW << d.toChar() << C_RESET << " ";
-        // else
-        os << C_CYAN << std::setw(3) << std::min(getStep(x, y), (step_t)999)
-           << C_RESET;
+        os << C_CY << std::setw(3) << std::min(getStep(x, y), (step_t)999)
+           << C_NO;
         if ((v == Vector(x, y) && d == Dir::West) ||
             (v == Vector(x, y).next(Dir::East) && d == Dir::East))
-          os << C_YELLOW << d.toChar() << C_RESET;
+          os << C_YE << d.toChar() << C_NO;
         else
           os << (maze.isKnown(x, y, Dir::East)
                      ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
-                     : (C_RED "." C_RESET));
+                     : (C_RE "." C_NO));
       }
       os << std::endl;
     }
@@ -69,11 +66,11 @@ void StepMap::print(std::ostream &os, const Maze &maze, const Vector v,
       os << "+";
       if ((v == Vector(x, y) && d == Dir::North) ||
           (v == Vector(x, y).next(Dir::South) && d == Dir::South))
-        os << " " << C_YELLOW << d.toChar() << C_RESET << " ";
+        os << " " << C_YE << d.toChar() << C_NO << " ";
       else
         os << (maze.isKnown(x, y, Dir::South)
                    ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
-                   : (C_RED " . " C_RESET));
+                   : (C_RE " . " C_NO));
     }
     os << "+" << std::endl;
   }

@@ -14,6 +14,20 @@
 namespace MazeLib {
 
 /* Vector */
+const Vector Vector::next(const Dir d) const {
+  switch (d) {
+  case Dir::East:
+    return Vector(x + 1, y);
+  case Dir::North:
+    return Vector(x, y + 1);
+  case Dir::West:
+    return Vector(x - 1, y);
+  case Dir::South:
+    return Vector(x, y - 1);
+  }
+  assert(1); /*< invalid direction */
+  return *this;
+}
 const Vector Vector::rotate(const Dir d) const {
   switch (d) {
   case Dir::East:
@@ -37,6 +51,35 @@ std::ostream &operator<<(std::ostream &os, const Vector v) {
 std::ostream &operator<<(std::ostream &os, const VecDir &obj) {
   return os << "( " << std::setw(2) << (int)obj.first.x << ", " << std::setw(2)
             << (int)obj.first.y << ", " << obj.second.toChar() << ")";
+}
+
+/* WallIndex */
+const WallIndex WallIndex::next(const Dir d) const {
+  switch (d) {
+  case Dir::East:
+    return WallIndex(x + 1, y, z);
+  case Dir::NorthEast:
+    return WallIndex(x + (1 - z), y + z, 1 - z);
+  case Dir::North:
+    return WallIndex(x, y + 1, z);
+  case Dir::NorthWest:
+    return WallIndex(x - z, y + z, 1 - z);
+  case Dir::West:
+    return WallIndex(x - 1, y, z);
+  case Dir::SouthWest:
+    return WallIndex(x - z, y - (1 - z), 1 - z);
+  case Dir::South:
+    return WallIndex(x, y - 1, z);
+  case Dir::SouthEast:
+    return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
+  default:
+    assert(1); /*< invalid direction */
+    return WallIndex(x, y, z);
+  }
+}
+std::ostream &operator<<(std::ostream &os, const WallIndex i) {
+  return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
+            << (int)i.y << ", " << i.getDir().toChar() << ")";
 }
 
 /* WallLog */
@@ -68,14 +111,14 @@ Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
       updateWall(Vector(x, y), bit_to_dir_map[3], h & 0x08, false);
     }
 }
-void Maze::reset(const bool setStartWall) {
+void Maze::reset(const bool set_start_wall) {
   wall.reset();
   known.reset();
   min_x = MAZE_SIZE - 1;
   min_y = MAZE_SIZE - 1;
   max_x = 0;
   max_y = 0;
-  if (setStartWall) {
+  if (set_start_wall) {
     updateWall(Vector(0, 0), Dir::East, true);   //< start cell
     updateWall(Vector(0, 0), Dir::North, false); //< start cell
   }
@@ -206,9 +249,9 @@ bool Maze::parse(std::istream &is) {
   }
   return true;
 }
-void Maze::printPath(std::ostream &os, const Vector start,
-                     const Dirs &dirs) const {
-  int steps[MAZE_SIZE][MAZE_SIZE] = {0};
+void Maze::printPath(const Vector start, const Dirs &dirs,
+                     std::ostream &os) const {
+  uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {0};
   Vector v = start;
   int counter = 1;
   for (const auto d : dirs) {
@@ -224,11 +267,11 @@ void Maze::printPath(std::ostream &os, const Vector start,
       os << '|';
       for (int8_t x = 0; x < MAZE_SIZE; ++x) {
         if (steps[y][x] != 0)
-          os << C_YELLOW << std::setw(3) << steps[y][x] << C_RESET;
+          os << C_YE << std::setw(3) << steps[y][x] << C_NO;
         else
           os << "   ";
         os << (isKnown(x, y, Dir::East) ? (isWall(x, y, Dir::East) ? "|" : " ")
-                                        : (C_RED "." C_RESET));
+                                        : (C_RE "." C_NO));
       }
       os << std::endl;
     }
@@ -236,7 +279,7 @@ void Maze::printPath(std::ostream &os, const Vector start,
       os << "+"
          << (isKnown(x, y, Dir::South)
                  ? (isWall(x, y, Dir::South) ? "---" : "   ")
-                 : (C_RED " . " C_RESET));
+                 : (C_RE " . " C_NO));
     os << "+" << std::endl;
   }
 }

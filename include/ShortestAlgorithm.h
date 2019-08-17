@@ -197,6 +197,9 @@ public:
    * d を East or North のどちらかにそろえる
    */
   void uniquify(const Dir d);
+  /**
+   * @brief Getters
+   */
   const Dir getDir() const { return z == 0 ? Dir::East : Dir::North; }
   const Dir getNodeDir() const { return nd; }
   const Vector getVector() const { return Vector(x, y); }
@@ -276,7 +279,7 @@ public:
   getPredecessors(const Maze &maze, const EdgeCost &edge_cost,
                   const bool known_only, const bool diag_enabled) const;
 };
-static_assert(sizeof(Index) == 2, "sizeof(Index) Error"); /**< Size Check */
+static_assert(sizeof(Index) == 2, "size error"); /**< size check */
 using Indexes = std::vector<Index>;
 
 /**

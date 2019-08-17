@@ -317,12 +317,12 @@ void ShortestAlgorithm::printPath(std::ostream &os,
       os << '|';
       for (int8_t x = 0; x < MAZE_SIZE; ++x) {
         if (steps[y][x] != 0)
-          os << C_YELLOW << std::setw(3) << steps[y][x] << C_RESET;
+          os << C_YE << std::setw(3) << steps[y][x] << C_NO;
         else
           os << "   ";
         os << (maze.isKnown(x, y, Dir::East)
                    ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
-                   : (C_RED "." C_RESET));
+                   : (C_RE "." C_NO));
       }
       os << std::endl;
     }
@@ -330,7 +330,7 @@ void ShortestAlgorithm::printPath(std::ostream &os,
       os << "+"
          << (maze.isKnown(x, y, Dir::South)
                  ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
-                 : (C_RED " . " C_RESET));
+                 : (C_RE " . " C_NO));
     os << "+" << std::endl;
   }
 }
