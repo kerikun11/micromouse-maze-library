@@ -135,7 +135,7 @@ int test_measurement() {
                 << sum.count() / n << "\t[us]" << std::endl;
       std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
                 << sa.getShortestPathCost() << "\t[ms]" << std::endl;
-      // sa.printPath(std::cout, path);
+      // sa.printPath(path);
     }
 #endif
     csv << std::endl;

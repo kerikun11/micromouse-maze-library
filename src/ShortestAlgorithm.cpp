@@ -41,6 +41,87 @@ void Index::uniquify(const Dir d) {
     break;
   }
 }
+const Vector Index::arrow_from() const {
+  switch (nd) {
+  case Dir::East:
+  case Dir::North:
+  case Dir::West:
+  case Dir::South:
+    return Vector(x, y);
+  case Dir::NorthEast:
+    return Vector(x, y);
+  case Dir::NorthWest:
+    return z == 0 ? Vector(x + 1, y) : Vector(x, y);
+  case Dir::SouthWest:
+    return z == 0 ? Vector(x + 1, y) : Vector(x, y + 1);
+  case Dir::SouthEast:
+    return z == 0 ? Vector(x, y) : Vector(x, y + 1);
+  default:
+    break;
+  }
+  logw << "Invalid Dir: " << nd << std::endl;
+  return Vector(x, y);
+}
+const Vector Index::arrow_to() const {
+  switch (nd) {
+  case Dir::East:
+  case Dir::North:
+  case Dir::West:
+  case Dir::South:
+    return Vector(x, y).next(nd);
+  case Dir::NorthEast:
+    return z == 0 ? Vector(x + 1, y) : Vector(x, y + 1);
+  case Dir::NorthWest:
+    return z == 0 ? Vector(x, y) : Vector(x, y + 1);
+  case Dir::SouthWest:
+    return Vector(x, y);
+  case Dir::SouthEast:
+    return z == 0 ? Vector(x + 1, y) : Vector(x, y);
+  default:
+    break;
+  }
+  logw << "Invalid Dir: " << nd << std::endl;
+  return Vector(x, y);
+}
+const Dir Index::arrow_diag_to_along_45() const {
+  switch (nd) {
+  case Dir::NorthEast:
+  case Dir::SouthWest:
+    return z == 0 ? Dir::Left45 : Dir::Right45;
+  case Dir::NorthWest:
+  case Dir::SouthEast:
+    return z == 1 ? Dir::Left45 : Dir::Right45;
+  }
+  logw << "Invalid Dir: " << nd << std::endl;
+  return Dir::Max;
+}
+const Index Index::next() const {
+  switch (nd) {
+  /* 区画の中央 */
+  case Dir::East:
+  case Dir::North:
+  case Dir::West:
+  case Dir::South:
+    return Index(Vector(x, y).next(nd), Dir::Max, nd);
+  /* 壁の中央 */
+  case Dir::NorthEast:
+    return z == 0 ? Index(Vector(x + 1, y), Dir::North, nd)
+                  : Index(Vector(x, y + 1), Dir::East, nd);
+  case Dir::NorthWest:
+    return z == 0 ? Index(Vector(x, y), Dir::North, nd)
+                  : Index(Vector(x - 1, y + 1), Dir::East, nd);
+  case Dir::SouthWest:
+    return z == 0 ? Index(Vector(x, y - 1), Dir::North, nd)
+                  : Index(Vector(x - 1, y), Dir::East, nd);
+  case Dir::SouthEast:
+    return z == 0 ? Index(Vector(x + 1, y - 1), Dir::North, nd)
+                  : Index(Vector(x, y), Dir::East, nd);
+  default:
+    break;
+  }
+  logw << "Invalid Dir: " << nd << std::endl;
+  return Index();
+}
 const std::vector<std::pair<Index, cost_t>>
 Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
                      const bool known_only, const bool diag_enabled) const {
@@ -196,33 +277,6 @@ Index::getPredecessors(const Maze &maze, const EdgeCost &edge_cost,
     p.first = p.first.opposite();
   return preds;
 }
-const Index Index::next() const {
-  switch (nd) {
-  /* 区画の中央 */
-  case Dir::East:
-  case Dir::North:
-  case Dir::West:
-  case Dir::South:
-    return Index(Vector(x, y).next(nd), Dir::Max, nd);
-  /* 壁の中央 */
-  case Dir::NorthEast:
-    return z == 0 ? Index(Vector(x + 1, y), Dir::North, nd)
-                  : Index(Vector(x, y + 1), Dir::East, nd);
-  case Dir::NorthWest:
-    return z == 0 ? Index(Vector(x, y), Dir::North, nd)
-                  : Index(Vector(x - 1, y + 1), Dir::East, nd);
-  case Dir::SouthWest:
-    return z == 0 ? Index(Vector(x, y - 1), Dir::North, nd)
-                  : Index(Vector(x - 1, y), Dir::East, nd);
-  case Dir::SouthEast:
-    return z == 0 ? Index(Vector(x + 1, y - 1), Dir::North, nd)
-                  : Index(Vector(x, y), Dir::East, nd);
-  default:
-    break;
-  }
-  logw << "Invalid Dir: " << nd << std::endl;
-  return Index();
-}
 
 /* ShortestAlgorithm */
 
@@ -304,8 +358,8 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   return true;
 }
 
-void ShortestAlgorithm::printPath(std::ostream &os,
-                                  const Indexes indexes) const {
+void ShortestAlgorithm::printPath(const Indexes indexes,
+                                  std::ostream &os) const {
   int steps[MAZE_SIZE][MAZE_SIZE] = {0};
   int counter = 1;
   for (const auto i : indexes) {

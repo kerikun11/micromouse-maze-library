@@ -208,64 +208,13 @@ public:
               << (int)i.y << ", " << i.getDir().toChar() << ", "
               << i.getNodeDir().toChar() << ")";
   }
-  const Vector arrow_from() const {
-    switch (nd) {
-    case Dir::East:
-    case Dir::North:
-    case Dir::West:
-    case Dir::South:
-      return Vector(x, y);
-    case Dir::NorthEast:
-      return Vector(x, y);
-    case Dir::NorthWest:
-      return z == 0 ? Vector(x + 1, y) : Vector(x, y);
-    case Dir::SouthWest:
-      return z == 0 ? Vector(x + 1, y) : Vector(x, y + 1);
-    case Dir::SouthEast:
-      return z == 0 ? Vector(x, y) : Vector(x, y + 1);
-    default:
-      break;
-    }
-    logw << "Invalid Dir: " << nd << std::endl;
-    return Vector(x, y);
-  }
-  const Vector arrow_to() const {
-    switch (nd) {
-    case Dir::East:
-    case Dir::North:
-    case Dir::West:
-    case Dir::South:
-      return Vector(x, y).next(nd);
-    case Dir::NorthEast:
-      return z == 0 ? Vector(x + 1, y) : Vector(x, y + 1);
-    case Dir::NorthWest:
-      return z == 0 ? Vector(x, y) : Vector(x, y + 1);
-    case Dir::SouthWest:
-      return Vector(x, y);
-    case Dir::SouthEast:
-      return z == 0 ? Vector(x + 1, y) : Vector(x, y);
-    default:
-      break;
-    }
-    logw << "Invalid Dir: " << nd << std::endl;
-    return Vector(x, y);
-  }
+  const Vector arrow_from() const;
+  const Vector arrow_to() const;
   /**
    * @brief 斜め方向に向いているときの区画への相対方向(±45度)を返す
    * @return const Dir Dir::Left45 or Dir::Right45
    */
-  const Dir arrow_diag_to_along_45() const {
-    switch (nd) {
-    case Dir::NorthEast:
-    case Dir::SouthWest:
-      return z == 0 ? Dir::Left45 : Dir::Right45;
-    case Dir::NorthWest:
-    case Dir::SouthEast:
-      return z == 1 ? Dir::Left45 : Dir::Right45;
-    }
-    logw << "Invalid Dir: " << nd << std::endl;
-    return Dir::Max;
-  }
+  const Dir arrow_diag_to_along_45() const;
   /**
    * @brief NodeDir が向いている方向の隣の Index を返す
    * @return const Index
@@ -320,7 +269,7 @@ public:
                         const bool diag_enabled);
   /**
    * @brief Get the Shortest Path Cost
-   * call calcShortestPath first.
+   *        call calcShortestPath first.
    *
    * @return cost_t [ms]
    */
@@ -328,10 +277,10 @@ public:
   /**
    * @brief print the path on the maze
    *
-   * @param os out stream
    * @param indexes path
+   * @param os out stream
    */
-  void printPath(std::ostream &os, const Indexes indexes) const;
+  void printPath(const Indexes indexes, std::ostream &os = std::cout) const;
   /**
    * @brief convert from indexes to dirs
    *
