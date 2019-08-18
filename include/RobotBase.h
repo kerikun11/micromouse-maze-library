@@ -97,6 +97,15 @@ private:
   void queueNextDirs(const Dirs &nextDirs);
   bool generalSearchRun();
 
+  /**
+   * @brief 文字列置換の汎用関数，
+   * 置換対象文字列に含まれる置換前文字列をすべて置換後文字列に置換する
+   *
+   * @param src 置換対象文字列
+   * @param from 置換前文字列
+   * @param to 置換後文字列
+   * @return int 置換した数
+   */
   static int replace(std::string &src, std::string from, std::string to) {
     if (from.empty())
       return 0;
@@ -106,6 +115,7 @@ private:
     while ((pos = src.find(from, pos)) != std::string::npos) {
       src.replace(pos, from.size(), to);
       pos += toLen;
+      i++;
     }
     return i;
   }

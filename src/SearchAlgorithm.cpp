@@ -221,6 +221,29 @@ void SearchAlgorithm::printMap(const State state, const Vector vec,
 
 bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
                                              const bool simple) {
+#if 0
+  /* スラロームコスト考慮 */
+  candidates.clear();
+  for (const auto diag_enabled : {true, false}) {
+    Indexes path;
+    const bool known_only = false;
+    Indexes dest;
+    for (const auto v : maze.getGoals())
+      for (const auto nd : Dir::ENWS())
+        dest.push_back(Index(v, Dir::Max, nd));
+    shortestAlgorithm.update(maze, dest, known_only, diag_enabled);
+    if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
+      return false; /*< 失敗 */
+    const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
+    auto v = maze.getStart();
+    for (const auto d : dirs) {
+      v = v.next(d);
+      if (maze.unknownCount(v))
+        candidates.push_back(v);
+    }
+  }
+  return true;
+#endif
   candidates.clear();
   /* no diag */
   {
@@ -361,7 +384,7 @@ SearchAlgorithm::calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
   if (candidates.empty())
     return Reached;
   step_map.calcNextDirsAdv(maze, candidates, cv, cd, nextDirsKnown,
-                          nextDirCandidates);
+                           nextDirCandidates);
   return nextDirCandidates.empty() ? Error : Processing;
 }
 SearchAlgorithm::Result
@@ -416,7 +439,7 @@ SearchAlgorithm::calcNextDirsBackingToStart(const Vector cv, const Dir cd,
                                             Dirs &nextDirsKnown,
                                             Dirs &nextDirCandidates) {
   const auto v = step_map.calcNextDirsAdv(maze, {maze.getStart()}, cv, cd,
-                                         nextDirsKnown, nextDirCandidates);
+                                          nextDirsKnown, nextDirCandidates);
   if (v == maze.getStart())
     return Reached;
   return nextDirCandidates.empty() ? Error : Processing;
@@ -427,7 +450,7 @@ SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
                                          Dirs &nextDirCandidates) {
   const auto &goals = maze.getGoals();
   step_map.calcNextDirsAdv(maze, goals, cv, cd, nextDirsKnown,
-                          nextDirCandidates);
+                           nextDirCandidates);
   const auto nv = cv.next(nextDirCandidates[0] + Dir::Back);
   const auto it = std::find_if(goals.cbegin(), goals.cend(),
                                [nv](const auto v) { return nv == v; });
@@ -497,7 +520,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
   idMaze.setWall(cv, cd + Dir::Back, false);
   /* スタート区画を避けて導出 */
   step_map.calcNextDirsAdv(idMaze, candidates, cv, cd, nextDirsKnown,
-                          nextDirCandidates);
+                           nextDirCandidates);
   /* restore idMaze */
   std::reverse(tmp.begin(), tmp.end());
   for (const auto wl : tmp)
@@ -507,7 +530,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
   /* 既知情報からではスタート区画が避けられない場合は普通に導出 */
   if (step_map.getStep(cv) == STEP_MAX)
     step_map.calcNextDirsAdv(idMaze, candidates, cv, cd, nextDirsKnown,
-                            nextDirCandidates);
+                             nextDirCandidates);
   /* end */
   return nextDirCandidates.empty() ? Error : Processing;
 }

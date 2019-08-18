@@ -282,6 +282,10 @@ Index::getPredecessors(const Maze &maze, const EdgeCost &edge_cost,
 
 bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
                                          const bool diag_enabled) {
+  const auto dest = convertDestinations(maze.getGoals());
+  update(maze, edge_cost, dest, known_only, diag_enabled);
+  return genPathFromMap(path);
+#if 0
   /* min max */
   int8_t max_x = maze.getMaxX();
   int8_t max_y = maze.getMaxY();
@@ -353,9 +357,12 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     path.push_back(i.opposite());
     if (f_map[i] == 0)
       break;
+    if (f_map[i] <= f_map[from_map[i]])
+      return false;
     i = from_map[i];
   }
   return true;
+#endif
 }
 
 void ShortestAlgorithm::printPath(const Indexes indexes,

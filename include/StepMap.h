@@ -8,11 +8,13 @@
 #pragma once
 
 #include "Maze.h"
+#include <limits> /*< for std::numeric_limits */
 
 namespace MazeLib {
 
-using step_t = uint16_t;           /**< @brief ステップマップの型*/
-constexpr step_t STEP_MAX = 65000; /**< @brief 最大ステップ値 */
+using step_t = uint16_t; /**< @brief ステップマップの型*/
+static constexpr step_t STEP_MAX =
+    std::numeric_limits<step_t>::max(); /**< @brief 最大ステップ値 */
 
 /**
  * @brief 足立法のためのステップマップを管理するクラス

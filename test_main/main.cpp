@@ -92,7 +92,6 @@ int main(void) {
         Vector(MAZE_SIZE - 3, MAZE_SIZE - 2),
         Vector(MAZE_SIZE - 3, MAZE_SIZE - 3),
     });
-    // maze.print();
     const auto p_sa = std::make_unique<ShortestAlgorithm>(maze);
     ShortestAlgorithm &sa = *p_sa;
     Indexes path;
@@ -100,6 +99,10 @@ int main(void) {
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
       sa.calcShortestPath(path, known_only, diag_enabled);
+      // sa.update(maze, EdgeCost(),
+      //           ShortestAlgorithm::convertDestinations(maze.getGoals()),
+      //           known_only, diag_enabled);
+      // sa.genPathWithFromMap(path);
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
@@ -107,7 +110,7 @@ int main(void) {
     }
     std::cout << "Shortest " << (diag_enabled ? "diag" : "along") << ":\t"
               << sum.count() / n << "\t[us]" << std::endl;
-    // sa.printPath(std::cout, path);
+    // sa.printPath(path);
   }
 #endif
 
