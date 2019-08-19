@@ -40,7 +40,7 @@ protected:
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.first == maze.getStart() && action != ST_HALF_STOP) {
-      logw << "P.I. Visited Start! fake_offset: " << fake_offset << std::endl;
+      logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
       // getc(stdin);
     }
 #endif

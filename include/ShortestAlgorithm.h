@@ -62,12 +62,6 @@ struct RunParameter {
 
 class EdgeCost {
 public:
-  /**
-   * @brief Get the Edge Cost
-   * @param p パターン
-   * @param n 直線の場合，区画数
-   * @return cost_t コスト
-   */
   struct RunParameter {
     RunParameter() {}
     float vs = 450.0f;    /*< 基本速度 [mm/s] */
@@ -277,7 +271,7 @@ public:
   /**
    * @brief コストマップの更新
    */
-  void update(const Maze &maze, const EdgeCost &edge_cost, const Indexes dest,
+  void update(const Maze &maze, const EdgeCost &edge_cost, const Indexes &dest,
               const bool known_only, const bool diag_enabled) {
     /* 全ノードのコストを最大値に設定 */
     for (auto &f : f_map)
@@ -305,7 +299,7 @@ public:
       const auto focus = q.front();
       q.pop();
       const auto focus_cost = f_map[focus];
-      const auto pushAndContinue = [&](const auto next, const auto cost) {
+      const auto pushAndContinue = [&](const Index next, const cost_t cost) {
         const auto next_cost = focus_cost + cost;
         if (f_map[next] <= next_cost)
           return false;
