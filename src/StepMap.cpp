@@ -42,8 +42,31 @@ bool StepMap::setStep(const int8_t x, const int8_t y, const step_t step) {
   step_map[y][x] = step;
   return true;
 }
-void StepMap::print(std::ostream &os, const Maze &maze, const Vector v,
-                    const Dir d) const {
+void StepMap::printFull(const Maze &maze, std::ostream &os) const {
+  os << std::endl;
+  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
+    if (y != MAZE_SIZE) {
+      os << '|';
+      for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+        os << C_CY << std::setw(5) << std::min(getStep(x, y), (step_t)99999)
+           << C_NO;
+        os << (maze.isKnown(x, y, Dir::East)
+                   ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+                   : (C_RE "." C_NO));
+      }
+      os << std::endl;
+    }
+    for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+      os << "+";
+      os << (maze.isKnown(x, y, Dir::South)
+                 ? (maze.isWall(x, y, Dir::South) ? "-----" : "     ")
+                 : (C_RE " . . " C_NO));
+    }
+    os << "+" << std::endl;
+  }
+}
+void StepMap::print(const Maze &maze, const Vector v, const Dir d,
+                    std::ostream &os) const {
   os << std::endl;
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
@@ -71,6 +94,41 @@ void StepMap::print(std::ostream &os, const Maze &maze, const Vector v,
                    ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
                    : (C_RE " . " C_NO));
     }
+    os << "+" << std::endl;
+  }
+}
+void StepMap::print(const Maze &maze, const Dirs &dirs, const Vector start,
+                    std::ostream &os) const {
+  uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {0};
+  Vector v = start;
+  int counter = 1;
+  for (const auto d : dirs) {
+    v = v.next(d);
+    if (v.isOutsideofField()) {
+      loge << "Out of Field! " << v << std::endl;
+      continue;
+    }
+    steps[v.y][v.x] = counter++;
+  }
+  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
+    if (y != MAZE_SIZE) {
+      os << '|';
+      for (int8_t x = 0; x < MAZE_SIZE; ++x) {
+        if (steps[y][x] != 0)
+          os << C_YE << std::setw(3) << steps[y][x] << C_NO;
+        else
+          os << "   ";
+        os << (maze.isKnown(x, y, Dir::East)
+                   ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+                   : (C_RE "." C_NO));
+      }
+      os << std::endl;
+    }
+    for (int8_t x = 0; x < MAZE_SIZE; ++x)
+      os << "+"
+         << (maze.isKnown(x, y, Dir::South)
+                 ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
+                 : (C_RE " . " C_NO));
     os << "+" << std::endl;
   }
 }

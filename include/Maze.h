@@ -109,7 +109,7 @@ public:
   /** @brief 整数へのキャスト */
   operator int8_t() const { return d; }
   /** @brief 表示用char型へのキャスト */
-  char toChar() const { return ">'^`<,v.x"[d]; }
+  char toChar() const { return ">'^`<,v.X"[d]; }
   bool isAlong() const { return (d & 1) == 0; }
   bool isDiag() const { return (d & 1) == 1; }
   /**

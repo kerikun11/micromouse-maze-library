@@ -436,6 +436,93 @@ public:
       os << std::endl;
     }
   }
+  const Dirs indexes2dirs(const Indexes &path) {
+    Dirs dirs;
+    for (int i = 0; i < (int)path.size() - 1; ++i) {
+      const auto nd = path[i].getNodeDir();
+      const auto rel_v = path[i + 1].getVector() - path[i].getVector();
+      const auto rel_nd = Dir(path[i + 1].getNodeDir() - path[i].getNodeDir());
+      if (nd.isAlong()) {
+        switch (rel_nd) {
+        case Dir::Front:
+          for (int j = 0; j < std::abs(rel_v.x) + std::abs(rel_v.y); ++j)
+            dirs.push_back(nd);
+          break;
+        case Dir::Left45:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Left);
+          break;
+        case Dir::Right45:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Right);
+          break;
+        case Dir::Left:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Left);
+          break;
+        case Dir::Right:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Right);
+          break;
+        case Dir::Left135:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Left);
+          dirs.push_back(nd + Dir::Back);
+          break;
+        case Dir::Right135:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Dir::Right);
+          dirs.push_back(nd + Dir::Back);
+          break;
+        case Dir::Back:
+          dirs.push_back(nd);
+          if (rel_v.rotate(-nd).y > 0) {
+            dirs.push_back(nd + Dir::Left);
+            dirs.push_back(nd + Dir::Back);
+          } else {
+            dirs.push_back(nd + Dir::Right);
+            dirs.push_back(nd + Dir::Back);
+          }
+          break;
+        }
+      } else {
+        switch (rel_nd) {
+        case Dir::Front:
+          for (auto index = path[i]; index != path[i + 1];
+               index = index.next(index.getNodeDir())) {
+            const auto nd_45 = index.arrow_diag_to_along_rel_45();
+            dirs.push_back(index.getNodeDir() + nd_45);
+          }
+          break;
+        case Dir::Left45:
+          dirs.push_back(nd + Dir::Left45);
+          break;
+        case Dir::Right45:
+          dirs.push_back(nd + Dir::Right45);
+          break;
+        case Dir::Left:
+          /* V90 */
+          dirs.push_back(nd + Dir::Left45);
+          dirs.push_back(nd + Dir::Left135);
+          break;
+        case Dir::Right:
+          /* V90 */
+          dirs.push_back(nd + Dir::Right45);
+          dirs.push_back(nd + Dir::Right135);
+          break;
+        case Dir::Left135:
+          dirs.push_back(nd + Dir::Left45);
+          dirs.push_back(nd + Dir::Left135);
+          break;
+        case Dir::Right135:
+          dirs.push_back(nd + Dir::Right45);
+          dirs.push_back(nd + Dir::Right135);
+          break;
+        }
+      }
+    }
+    return dirs;
+  }
 
 private:
   const Index index_start = Index(Vector(0, 0), Dir::North);

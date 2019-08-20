@@ -47,12 +47,12 @@ public:
    * @brief ステップの表示
    * @param v ハイライト区画
    */
+  void printFull(const Maze &maze, std::ostream &os = std::cout) const;
   void print(const Maze &maze, const Vector v = Vector(-1, -1),
-             const Dir &d = Dir::Max) const {
-    print(std::cout, maze, v, d);
-  }
-  void print(std::ostream &os, const Maze &maze,
-             const Vector v = Vector(-1, -1), const Dir d = Dir::Max) const;
+             const Dir d = Dir::Max, std::ostream &os = std::cout) const;
+  void print(const Maze &maze, const Dirs &dirs,
+             const Vector start = Vector(0, 0),
+             std::ostream &os = std::cout) const;
   /**
    * @brief ステップマップの更新
    * @param dest ステップを0とする区画の配列
@@ -85,7 +85,7 @@ public:
                         const bool known_only, const bool simple);
 
 private:
-  step_t step_map[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数*/
+  step_t step_map[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
   step_t step_table_along[MAZE_SIZE * 2]; /**< @brief 加速を考慮したステップ */
 
   /**

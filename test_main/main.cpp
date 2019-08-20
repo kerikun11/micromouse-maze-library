@@ -115,10 +115,16 @@ int main(void) {
 #endif
 
 #if 0
-  StepMapWall map;
+  // StepMapWall map;
+  StepMap map;
   Dirs shortest_dirs;
-  map.calcShortestDirs(maze_target, shortest_dirs, true, false);
-  map.print(maze_target, shortest_dirs);
+  // Maze &maze = maze_target;
+  const Maze &maze = robot.getMaze();
+  const bool known_only = false;
+  // map.calcShortestDirs(maze, shortest_dirs, true, false);
+  map.update(maze, maze.getGoals(), known_only, false);
+  // map.print(maze, shortest_dirs);
+  map.printFull(maze);
 #endif
 
 #if 0

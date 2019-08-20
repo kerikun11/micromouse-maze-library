@@ -171,11 +171,12 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 }
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
                                        const bool diag_enabled) {
-  Indexes path;
   const bool known_only = true;
+  Indexes path;
   if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
     return false; /* failed */
   shortestDirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
+  /* ゴール区画までたどる */
   auto v = maze.getStart();
   for (const auto d : shortestDirs)
     v = v.next(d);
@@ -183,7 +184,7 @@ bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
     return true;
   auto prev_dir = shortestDirs[shortestDirs.size() - 1 - 1];
   auto dir = shortestDirs[shortestDirs.size() - 1];
-  /* ゴール区画を行けるところまで直進(斜め考慮)する */
+  /* ゴール区画内を行けるところまで直進(斜め考慮)する */
   bool loop = true;
   while (loop) {
     loop = false;
@@ -226,13 +227,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
   candidates.clear();
   for (const auto diag_enabled : {true, false}) {
     Indexes path;
-    const bool known_only = false;
-    Indexes dest;
-    for (const auto v : maze.getGoals())
-      for (const auto nd : Dir::ENWS())
-        dest.push_back(Index(v, Dir::Max, nd));
-    shortestAlgorithm.update(maze, dest, known_only, diag_enabled);
-    if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
+    if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
       return false; /*< 失敗 */
     const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
     auto v = maze.getStart();
@@ -252,7 +247,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
       return false; /*< 失敗 */
     auto i = maze.getStart();
     for (const auto d : shortest_dirs) {
-      if (!maze.isKnown(i, d))
+      if (maze.unknownCount(i))
         candidates.push_back(i);
       i = i.next(d);
     }
