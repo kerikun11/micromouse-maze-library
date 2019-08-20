@@ -247,7 +247,7 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
       return false; /*< 失敗 */
     auto i = maze.getStart();
     for (const auto d : shortest_dirs) {
-      if (maze.unknownCount(i))
+      if (!maze.isKnown(i, d))
         candidates.push_back(i);
       i = i.next(d);
     }
