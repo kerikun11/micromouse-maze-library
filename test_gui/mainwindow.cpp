@@ -76,7 +76,7 @@ void MainWindow::on_resetButton_clicked()
     maze_simulator.reset();
 }
 
-void MainWindow::on_toggleButton_clicked()
+void MainWindow::on_stepToggleButton_clicked()
 {
     maze_simulator.toggle(ui->stepTimeBox->text().toInt());
 }

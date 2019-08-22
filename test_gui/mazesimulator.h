@@ -90,7 +90,9 @@ public:
     void drawStep(const StepMap& map) {
         for(int x=0; x<MazeLib::MAZE_SIZE; ++x)
             for(int y=0; y<MazeLib::MAZE_SIZE; ++y) {
-                scene->addText(QString::number(std::min(map.getStep(x, y), (step_t)999)))->setPos(cell2posX(x), cell2posY(y+1));
+                QFont font;
+                font.setPointSize(5);
+                scene->addText(QString::number(std::min((int)map.getStep(x, y), 99999)), font)->setPos(cell2posX(x), cell2posY(y+1));
                 /* Draw Wall */
                 QPen pen(Qt::red);
             }
@@ -114,12 +116,6 @@ public:
         Dirs dirs;
         if(!sa.calcShortestDirs(dirs, diag_enabled))
             return false;
-        //        auto v = maze.getStart();
-        //        for(size_t i=0; i<dirs.size(); ++i){
-        //            const auto d = dirs[i];
-        //            v = v.next(d);
-        //            drawVecDir(VecDir{v, d});
-        //        }
         auto v = maze.getStart();
         for(size_t i = 0; i < dirs.size(); ++i){
             const auto d = dirs[i];

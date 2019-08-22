@@ -27,8 +27,6 @@ private slots:
 
     void on_actionDraw_triggered();
 
-    void on_toggleButton_clicked();
-
     void on_fileSeectEdit_returnPressed();
 
     void on_shortestDiagButton_clicked();
@@ -36,6 +34,8 @@ private slots:
     void on_shortestNoDiagButton_clicked();
 
     void on_stepButton_clicked();
+
+    void on_stepToggleButton_clicked();
 
     void on_searchButton_clicked();
 

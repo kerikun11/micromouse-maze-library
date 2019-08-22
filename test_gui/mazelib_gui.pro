@@ -28,16 +28,18 @@ INCLUDEPATH += \
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    mazesimulator.cpp \
     ../src/Agent.cpp \
     ../src/Maze.cpp \
     ../src/RobotBase.cpp \
     ../src/SearchAlgorithm.cpp \
     ../src/ShortestAlgorithm.cpp \
     ../src/StepMap.cpp \
-    mazesimulator.cpp
+    ../src/StepMapWall.cpp
 
 HEADERS += \
     mainwindow.h \
+    mazesimulator.h \
     ../include/Agent.h \
     ../include/CLRobotBase.h \
     ../include/Maze.h \
@@ -45,7 +47,10 @@ HEADERS += \
     ../include/SearchAlgorithm.h \
     ../include/ShortestAlgorithm.h \
     ../include/StepMap.h \
-    mazesimulator.h
+    ../include/StepMapSlalom.h \
+    ../include/StepMapWall.h
 
 FORMS += \
     mainwindow.ui
+
+DISTFILES +=
