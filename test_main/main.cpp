@@ -171,6 +171,9 @@ int main(void) {
     }
     std::cout << "StepMapWall::update() " << (simple ? "simple" : "normal")
               << ":\t" << sum.count() / n << "\t[us]" << std::endl;
+    // Dirs dirs;
+    // map.calcShortestDirs(maze, dirs, known_only, simple);
+    // map.print(maze, dirs);
   }
 #endif
 

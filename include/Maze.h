@@ -146,6 +146,10 @@ using Dirs = std::vector<Dir>;
  */
 union Vector {
 public:
+  /**
+   * @brief フィールドの区画数
+   */
+  static constexpr int SIZE = MAZE_SIZE * MAZE_SIZE;
   /* @brief 座標の構造体を定義 */
   struct {
     int8_t x; /**< @brief 迷路の区画座標 */
@@ -160,6 +164,7 @@ public:
    */
   Vector(int8_t x, int8_t y) : x(x), y(y) {}
   Vector() : all(0) {}
+  operator uint16_t() const { return (x << MAZE_SIZE_BIT) | y; }
   /**
    * @brief 演算子のオーバーロード
    */

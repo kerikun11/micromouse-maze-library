@@ -52,7 +52,7 @@ int test_measurement() {
     csv << "," << robot.step << "," << robot.f << "," << robot.l << ","
         << robot.r << "," << robot.b;
     std::cout << "Max Calc Time:\t" << robot.max_usec << "\t[us]" << std::endl;
-    std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
+    // std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
     csv << "," << robot.max_usec;
     csv << "," << us.count();
     for (const auto diag_enabled : {false, true}) {

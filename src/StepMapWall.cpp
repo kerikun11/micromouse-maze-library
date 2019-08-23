@@ -95,12 +95,12 @@ void StepMapWall::print(const Maze &maze, const Dirs &shortest_dirs,
 }
 void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
                          const bool known_only, const bool simple) {
-  /* min max */
+  /* 迷路の大きさを決定 */
   int8_t min_x = maze.getMinX();
   int8_t max_x = maze.getMaxX();
   int8_t min_y = maze.getMinY();
   int8_t max_y = maze.getMaxY();
-  for (const auto v : dest) {
+  for (const auto v : dest) { /*< ゴールを含めないと導出不可能になる */
     min_x = std::min(v.x, min_x);
     max_x = std::max(v.x, max_x);
     min_y = std::min(v.y, min_y);
@@ -111,10 +111,8 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
   /* ステップの更新予約のキュー */
   std::queue<WallIndex> q;
   /* destのステップを0とする */
-  for (const auto i : dest) {
-    setStep(i, 0);
-    q.push(i);
-  }
+  for (const auto i : dest)
+    setStep(i, 0), q.push(i);
   /* ステップの更新がなくなるまで更新処理 */
   while (!q.empty()) {
     /* 注目する壁を取得 */
@@ -126,12 +124,9 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
       auto next = focus;
       /* 直線で行けるところまで更新する */
       for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
-        /* 移動 */
-        next = next.next(d);
-        if (known_only && !maze.isKnown(next))
-          break; /*< known_only で未知壁なら更新はしない */
-        if (maze.isWall(next))
-          break; /*< 壁があったら更新はしない */
+        next = next.next(d); /*< 移動 */
+        if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
+          break; /*< 壁あり or 既知壁のみで未知壁 ならば次へ */
         if (next.x > max_x + 2 || next.y > max_y + 2 || next.x + 1 < min_x ||
             next.y + 1 < min_y)
           break; /*< 注目範囲外なら更新しない */
@@ -139,11 +134,10 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
         const auto next_step = focus_step + (d.isAlong() ? step_table_along[i]
                                                          : step_table_diag[i]);
         if (getStep(next) <= next_step)
-          // continue;               /*< 更新の必要がない */
           break;                  /*< 更新の必要がない */
         setStep(next, next_step); /*< 更新 */
         q.push(next); /*< 再帰的に更新され得るのでキューにプッシュ */
-        if (simple)
+        if (simple) /*< 軽量版なら break */
           break;
       }
     }
@@ -240,29 +234,37 @@ const Dirs StepMapWall::calcStepDownDirs(const Maze &maze,
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
     auto min_d = Dir::Max;
     auto min_step = STEP_MAX;
+    auto min_i = focus;
+    /* 周辺を走査 */
     for (const auto d : focus.getNextDir6()) {
-      const auto next = focus.next(d);
-      /* 壁があったらスキップ */
-      if (maze.isWall(next))
-        continue;
-      /* known_only で未知壁ならばスキップ */
-      if (known_only && !maze.isKnown(next))
-        continue;
+      auto next = focus; /*< 隣接 */
       /* break_unknown で未知壁ならば既知区間は終了 */
-      if (break_unknown && !maze.isKnown(next))
+      if (break_unknown && !maze.isKnown(next.next(d)))
         return nextDirsKnown;
-      /* min_step よりステップが小さければ更新 (同じなら更新しない) */
-      const auto next_step = getStep(next);
-      if (min_step > next_step) {
+      /* 直線で行けるところまで更新する */
+      for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
+        // for (int8_t i = 1; i < 2; ++i) {
+        next = next.next(d); /*< 移動 */
+        /* 壁があったら次へ */
+        if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
+          break;
+        /* min_step よりステップが小さければ更新 (同じなら更新しない) */
+        const auto next_step = getStep(next);
+        if (min_step <= next_step)
+          break;
         min_step = next_step;
         min_d = d;
+        min_i = next;
       }
     }
     /* focus_step より大きかったらなんかおかしい */
     if (getStep(focus) <= min_step)
-      break;                        //< 永遠ループ防止
-    nextDirsKnown.push_back(min_d); //< 既知区間移動
-    focus = focus.next(min_d);      //< 位置を更新
+      break;
+    /* 直線の分だけ移動 */
+    while (focus != min_i) {
+      focus = focus.next(min_d);      //< 位置を更新
+      nextDirsKnown.push_back(min_d); //< 既知区間移動
+    }
   }
   return nextDirsKnown;
 }
