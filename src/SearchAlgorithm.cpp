@@ -74,7 +74,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
   if (isPositionIdentifying) {
     state = IDENTIFYING_POSITION;
     result = calcNextDirsPositionIdentification(curVec, curDir, nextDirs,
-                                                nextDirCandidates, matchCount);
+                                                nextDirCandidates,
+                                                isForceGoingToGoal, matchCount);
     switch (result) {
     case SearchAlgorithm::Processing:
       return result;
@@ -423,7 +424,7 @@ SearchAlgorithm::calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
 }
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
     Vector &cv, Dir &cd, Dirs &nextDirsKnown, Dirs &nextDirCandidates,
-    int &matchCount) {
+    bool &isForceGoingToGoal, int &matchCount) {
   /* オフセットを調整する(処理はこのブロックで完結) */
   if (!idMaze.getWallLogs().empty()) {
     const int8_t min_x = idMaze.getMinX();
@@ -446,8 +447,15 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
   const int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
   matchCount = cnt;
   if (cnt == 1) {
+    /* 自己位置を修正する */
     cv = (cv - idOffset).rotate(ans.second) + ans.first;
     cd = cd + ans.second;
+    /* 自己位置同定中にゴール区画訪問済みなら，ゴール区画訪問をfalseにする */
+    for (const auto maze_v : maze.getGoals()) {
+      const auto id_v = (maze_v - ans.first).rotate(-ans.second) + idOffset;
+      if (idMaze.unknownCount(id_v) == 0)
+        isForceGoingToGoal = false;
+    }
     return Reached;
   } else if (cnt == 0) {
     return Error;

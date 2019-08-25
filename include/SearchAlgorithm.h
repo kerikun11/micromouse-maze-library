@@ -126,6 +126,7 @@ private:
   Result calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
                                             Dirs &nextDirsKnown,
                                             Dirs &nextDirCandidates,
+                                            bool &isForceGoingToGoal,
                                             int &matchCount);
 };
 
