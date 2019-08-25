@@ -62,7 +62,7 @@ public:
                    const Dirs &nextDirCandidates, Dir &nextDir) const;
   bool findNextDir(const Maze &maze, const Vector v, const Dir d,
                    const Dirs &nextDirCandidates, Dir &nextDir) const;
-  bool calcShortestDirs(Dirs &shortestDirs, const bool diag_enabled = true);
+  bool calcShortestDirs(Dirs &shortest_dirs, const bool diag_enabled = true);
   void printMap(const State state, const Vector vec, const Dir dir) const;
 
   /**
@@ -90,9 +90,24 @@ private:
    * @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
   bool findShortestCandidates(Vectors &candidates, const bool simple);
+  /**
+   * @brief 自己位置同定のパターンにマッチする候補をカウントする
+   *
+   * @param idWallLogs
+   * @param ans マッチした解のひとつ
+   * @return int マッチ数, 0: 失敗, 1: 特定, 2-: 複数マッチ
+   */
   int countIdentityCandidates(const WallLogs &idWallLogs, VecDir &ans) const;
+  /**
+   * @brief 特定の区画にマッチする方向を返す
+   * スタート区画への訪問を避けるために使用する関数
+   *
+   * @param cur_v 注目する区画
+   * @param target 検索対象の区画と方向
+   * @return const Dirs 注目する区画からの方向
+   */
   const Dirs findMatchDirCandidates(const Vector cur_v,
-                                    const Vector target_v) const;
+                                    const VecDir target) const;
 
   /**
    * @brief 各状態での進行方向列導出関数

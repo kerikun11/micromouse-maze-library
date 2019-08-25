@@ -170,27 +170,29 @@ const Dir StepMapWall::convertDir(const Dir d, const WallIndex i) {
   }
   return Dir::Max;
 }
-const Dirs StepMapWall::convertDirsKnown(const Dirs src,
-                                         const WallIndex start) {
+const Dirs
+StepMapWall::convertWallIndexDirsToVectorDirs(const Dirs src,
+                                              const WallIndex start) {
   Dirs dirs;
+  dirs.push_back(Dir::North);
   auto i = start;
   for (const auto d : src) {
-    i = i.next(d);
     dirs.push_back(convertDir(d, i));
+    i = i.next(d);
   }
   return dirs;
 }
-bool StepMapWall::calcShortestDirs(const Maze &maze, Dirs &shortestDirs,
+bool StepMapWall::calcShortestDirs(const Maze &maze, Dirs &shortest_dirs,
                                    const bool known_only, const bool simple) {
   /* 目的地を作成 */
   WallIndexes dest = convertDestinations(maze, maze.getGoals());
   update(maze, dest, known_only, simple);
   WallIndex end;
-  shortestDirs =
-      calcStepDownDirs(maze, WallIndex(0, 0, 1), end, false, known_only);
-  if (getStep(end) == 0)
-    return true;
-  return false;
+  shortest_dirs =
+      calcDirsStepDown(maze, WallIndex(0, 0, 1), end, false, known_only);
+  if (getStep(end) != 0)
+    return false; /*< ゴールに到達していない */
+  return true;
 }
 
 static step_t gen_cost_impl(const int i, const float am, const float vs,
@@ -221,7 +223,7 @@ void StepMapWall::calcStraightStepTable() {
     step_table_diag[i] += turn_cost;
   }
 }
-const Dirs StepMapWall::calcStepDownDirs(const Maze &maze,
+const Dirs StepMapWall::calcDirsStepDown(const Maze &maze,
                                          const WallIndex start,
                                          WallIndex &focus,
                                          const bool break_unknown,

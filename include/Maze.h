@@ -62,9 +62,8 @@ static constexpr int MAZE_SIZE_BIT = std::log2(MAZE_SIZE);
 #endif
 
 /**
- * @brief 迷路上の方向を定義
+ * @brief 迷路上の方向を表す．実体は1Byte．絶対or相対の8方位を表す．
  * 実体は 8bit の整数
- * コンストラクタによって確実に 0-7 の整数になる．
  */
 struct Dir {
 public:
@@ -164,6 +163,11 @@ public:
    */
   Vector(int8_t x, int8_t y) : x(x), y(y) {}
   Vector() : all(0) {}
+  /**
+   * @brief 迷路区画内の通し番号となるIDを取得する
+   *
+   * @return uint16_t 通し番号ID
+   */
   operator uint16_t() const { return (x << MAZE_SIZE_BIT) | y; }
   /**
    * @brief 演算子のオーバーロード
@@ -194,7 +198,7 @@ public:
   }
   /**
    * @brief 座標を回転変換する
-   * @param d 回転角度
+   * @param d 回転角度, 4方位
    * @return const Vector
    */
   const Vector rotate(const Dir d) const;
@@ -267,6 +271,9 @@ public:
     if (d == Dir::South)
       y--;
   }
+  /**
+   * @brief Getters
+   */
   const Dir getDir() const { return z == 0 ? Dir::East : Dir::North; }
   const Vector getVector() const { return Vector(x, y); }
   /**

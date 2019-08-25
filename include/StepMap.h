@@ -81,8 +81,17 @@ public:
    * @return true 成功
    * @return false 失敗
    */
-  bool calcShortestDirs(const Maze &maze, Dirs &shortestDirs,
+  bool calcShortestDirs(const Maze &maze, Dirs &shortest_dirs,
                         const bool known_only, const bool simple);
+  /**
+   * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
+   *
+   * @param maze 迷路の参照
+   * @param shortest_dirs 追記元の方向列
+   * @param diag_enabled 斜めありなし
+   */
+  static void appendStraightDirs(const Maze &maze, Dirs &shortest_dirs,
+                                 const bool diag_enabled);
 
 private:
   step_t step_map[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
@@ -97,9 +106,9 @@ private:
    * @brief ステップマップにより次に行くべき方向列を生成する
    * @return true:成功, false:失敗(迷子)
    */
-  const Dirs calcNextDirsKnown(const Maze &maze, const VecDir start,
-                               VecDir &focus, const bool break_unknown,
-                               const bool known_only) const;
+  const Dirs calcNextDirsStepDown(const Maze &maze, const VecDir start,
+                                  VecDir &focus, const bool break_unknown,
+                                  const bool known_only) const;
   /**
    * @brief 引数区画の周囲の未知壁の確認優先順位を生成する関数
    *

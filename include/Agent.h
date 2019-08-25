@@ -86,7 +86,7 @@ public:
    * @return true: 成功, false: 失敗
    */
   bool calcShortestDirs(const bool diag_enabled) {
-    return searchAlgorithm.calcShortestDirs(shortestDirs, diag_enabled);
+    return searchAlgorithm.calcShortestDirs(shortest_dirs, diag_enabled);
   }
   /**
    * @brief 探索を中止してスタート区画へ強制的に戻る
@@ -131,7 +131,7 @@ public:
   /**
    * @brief 最短経路の方向配列の計算結果を取得
    */
-  const Dirs &getShortestDirs() const { return shortestDirs; }
+  const Dirs &getShortestDirs() const { return shortest_dirs; }
   /**
    * @brief 迷路を取得
    */
@@ -153,8 +153,8 @@ public:
    * @brief 最短経路の表示
    */
   void printPath() const {
-    maze.printPath(maze.getStart(), shortestDirs);
-    std::cout << "Shortest Step: " << shortestDirs.size() << std::endl;
+    maze.printPath(maze.getStart(), shortest_dirs);
+    std::cout << "Shortest Step: " << shortest_dirs.size() << std::endl;
   }
 
 protected:
@@ -171,7 +171,7 @@ private:
   SearchAlgorithm searchAlgorithm; /**< 探索器 */
   Dirs nextDirsKnown;              /**< 次に行く既知方向配列 */
   Dirs nextDirCandidates; /**< 次に行く未知方向候補の優先順 */
-  Dirs shortestDirs;      /**< 最短経路の方向配列 */
+  Dirs shortest_dirs;     /**< 最短経路の方向配列 */
   int matchCount = 0;     /**< 自己位置同定の候補数，表示用 */
 };
 

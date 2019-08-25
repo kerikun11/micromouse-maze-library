@@ -453,7 +453,7 @@ private:
   const Maze &maze; /**< @brief 使用する迷路の参照 */
   const EdgeCost edge_cost;
   const Index index_start =
-      Index(0, 0, Dir::Max, Dir::North); /**< @brief スタート */
+      Index(0, 0, Dir::Max, Dir::North); /**< @brief start */
 
   std::function<bool(const Index i1, const Index i2)> greater;
   std::array<Index, Index::Max> from_map;
@@ -464,6 +464,6 @@ private:
 public:
   int max_open_list_size = 0;
   int max_iteration_size = 0;
-}; // namespace MazeLib
+};
 
 } // namespace MazeLib

@@ -40,25 +40,20 @@ bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
                                  const bool left, const bool front,
                                  const bool right, const bool back) {
   bool result = true;
-  result = result & updateWall(state, v, d + Dir::Left, left);   // left wall
-  result = result & updateWall(state, v, d + Dir::Front, front); // front wall
-  result = result & updateWall(state, v, d + Dir::Right, right); // right wall
-  result = result & updateWall(state, v, d + Dir::Back, back);   // back wall
+  result = result & updateWall(state, v, d + Dir::Left, left);   //< left wall
+  result = result & updateWall(state, v, d + Dir::Front, front); //< front wall
+  result = result & updateWall(state, v, d + Dir::Right, right); //< right wall
+  result = result & updateWall(state, v, d + Dir::Back, back);   //< back wall
   return result;
 }
 bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
                                  const bool b) {
-  bool result;
-  if (state == IDENTIFYING_POSITION)
-    result = idMaze.updateWall(v, d, b);
-  else
-    result = maze.updateWall(v, d, b);
-  return result;
+  auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
+  return m.updateWall(v, d, b);
 }
 void SearchAlgorithm::resetLastWall(const State state, const int num) {
-  if (state == IDENTIFYING_POSITION)
-    return idMaze.resetLastWall(num);
-  return maze.resetLastWall(num);
+  auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
+  return m.resetLastWall(num);
 }
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
     State &state, Vector &curVec, Dir &curDir, Dirs &nextDirs,
@@ -153,8 +148,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
 bool SearchAlgorithm::findNextDir(const State state, const Vector v,
                                   const Dir d, const Dirs &nextDirCandidates,
                                   Dir &nextDir) const {
-  return findNextDir(state == IDENTIFYING_POSITION ? idMaze : maze, v, d,
-                     nextDirCandidates, nextDir);
+  const auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
+  return findNextDir(m, v, d, nextDirCandidates, nextDir);
 }
 bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
                                   const Dir d __attribute__((unused)),
@@ -169,55 +164,21 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
   nextDir = *it;
   return true;
 }
-bool SearchAlgorithm::calcShortestDirs(Dirs &shortestDirs,
+bool SearchAlgorithm::calcShortestDirs(Dirs &shortest_dirs,
                                        const bool diag_enabled) {
   const bool known_only = true;
   Indexes path;
   if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
     return false; /* failed */
-  shortestDirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
-  /* ゴール区画までたどる */
-  auto v = maze.getStart();
-  for (const auto d : shortestDirs)
-    v = v.next(d);
-  if (shortestDirs.size() < 2)
-    return true;
-  auto prev_dir = shortestDirs[shortestDirs.size() - 1 - 1];
-  auto dir = shortestDirs[shortestDirs.size() - 1];
-  /* ゴール区画内を行けるところまで直進(斜め考慮)する */
-  bool loop = true;
-  while (loop) {
-    loop = false;
-    // 斜めを考慮した進行方向を列挙する
-    Dirs dirs;
-    const auto rel_dir = Dir(dir - prev_dir);
-    if (diag_enabled && rel_dir == Dir::Left)
-      dirs = {Dir(dir + Dir::Right), dir};
-    else if (diag_enabled && rel_dir == Dir::Right)
-      dirs = {Dir(dir + Dir::Left), dir};
-    else
-      dirs = {dir};
-    // 行ける方向に行く
-    for (const auto d : dirs) {
-      if (maze.canGo(v, d)) {
-        shortestDirs.push_back(d);
-        v = v.next(d);
-        prev_dir = dir;
-        dir = d;
-        loop = true;
-        break;
-      }
-    }
-  }
+  shortest_dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
+  StepMap::appendStraightDirs(maze, shortest_dirs, diag_enabled);
   return true; /* 成功 */
 }
 
 void SearchAlgorithm::printMap(const State state, const Vector vec,
                                const Dir dir) const {
-  if (state == IDENTIFYING_POSITION)
-    step_map.print(idMaze, vec, dir);
-  else
-    step_map.print(maze, vec, dir);
+  const auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
+  step_map.print(m, vec, dir);
 }
 
 bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
@@ -245,6 +206,9 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
     Dirs shortest_dirs;
     if (!step_map.calcShortestDirs(maze, shortest_dirs, false, simple))
       return false; /*< 失敗 */
+    /* ゴール区画内を行けるところまで直進する */
+    StepMap::appendStraightDirs(maze, shortest_dirs, false);
+    /* 経路中の未知壁区画を訪問候補に追加 */
     auto i = maze.getStart();
     for (const auto d : shortest_dirs) {
       if (!maze.isKnown(i, d))
@@ -257,6 +221,20 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
     Dirs shortest_dirs;
     if (!step_map_wall.calcShortestDirs(maze, shortest_dirs, false, simple))
       return false; /*< 失敗 */
+
+    // shortest_dirs = StepMapWall::convertWallIndexDirsToVectorDirs(
+    //     shortest_dirs, WallIndex(0, 0, 1));
+    // /* ゴール区画内を行けるところまで直進する */
+    // StepMap::appendStraightDirs(maze, shortest_dirs, true);
+    // /* 経路中の未知壁区画を訪問候補に追加 */
+    // auto i = maze.getStart();
+    // for (const auto d : shortest_dirs) {
+    //   if (!maze.isKnown(i, d))
+    //     candidates.push_back(i);
+    //   i = i.next(d);
+    // }
+
+    /* 経路中の未知壁区画を訪問候補に追加 */
     auto i = WallIndex(0, 0, 1);
     for (const auto d : shortest_dirs) {
       i = i.next(d);
@@ -265,25 +243,20 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
         candidates.push_back(i.getVector().next(i.getDir()));
       }
     }
-  }
-  return true; /*< 成功 */
-#if 0
-  /* 新アルゴリズム */
-  candidates.clear();
-  for (const auto diag_enabled : {true, false}) {
-    Indexes path;
-    const bool known_only = false;
-    if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
-      return false; /*< 失敗 */
-    const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
-    auto v = maze.getStart();
-    for (const auto d : dirs) {
-      v = v.next(d);
-      if (maze.unknownCount(v))
-        candidates.push_back(v);
+    /* ゴール区画内を行けるところまで直進する */
+    if (shortest_dirs.size() < 1)
+      return true;
+    const auto d = shortest_dirs.back();
+    while (1) {
+      i = i.next(d);
+      if (maze.isWall(i))
+        break;
+      if (!maze.isKnown(i)) {
+        candidates.push_back(i.getVector());
+        candidates.push_back(i.getVector().next(i.getDir()));
+      }
     }
   }
-#endif
   return true; /*< 成功 */
 }
 int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
@@ -336,12 +309,11 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
     }
   return cnt;
 }
-const Dirs
-SearchAlgorithm::findMatchDirCandidates(const Vector cur_v,
-                                        const Vector target_v) const {
+const Dirs SearchAlgorithm::findMatchDirCandidates(const Vector cur_v,
+                                                   const VecDir target) const {
   Dirs result_dirs;
   for (const auto offset_d : Dir::ENWS()) {
-    const auto offset_v = target_v - (cur_v - idOffset).rotate(offset_d);
+    const auto offset_v = target.first - (cur_v - idOffset).rotate(offset_d);
     int diffs = 0; /*< 既知壁との食い違い数を数える */
     for (const auto wl : idMaze.getWallLogs()) {
       const auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
@@ -360,12 +332,8 @@ SearchAlgorithm::findMatchDirCandidates(const Vector cur_v,
     if (diffs > 0)
       continue;
     /* 一致 */
-    result_dirs.push_back(Dir::South - offset_d);
+    result_dirs.push_back(target.second - offset_d);
   }
-  // std::cout << cv << " Dirs: ";
-  // for (auto d : result_dirs)
-  //   std::cout << d << " ";
-  // std::cout << "        " << std::endl;
   return result_dirs;
 }
 SearchAlgorithm::Result
@@ -473,7 +441,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
     for (const auto wl : tmp)
       idMaze.updateWall(Vector(wl) + offset_diff, wl.d, wl.b);
   }
-  /* 自己位置同定 */
+  /* 自己位置同定処理 */
   VecDir ans;
   const int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
   matchCount = cnt;
@@ -485,12 +453,11 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
     return Error;
   }
   /* 探索方向の決定 */
-  /* min max */
   int8_t min_x = std::max(idMaze.getMinX() - 1, 0);
   int8_t min_y = std::max(idMaze.getMinY() - 1, 0);
   int8_t max_x = std::min(idMaze.getMaxX() + 2, MAZE_SIZE);
   int8_t max_y = std::min(idMaze.getMaxY() + 2, MAZE_SIZE);
-  /* modify idMaze */
+  /* スタート区画への訪問を避けるため，idMazeを編集する */
   WallLogs tmp;
   /* make candidates */
   Vectors candidates;
@@ -501,7 +468,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
       for (int8_t y = min_y; y < max_y; ++y) {
         const auto v = Vector(x, y);
         /* スタート区画を避ける */
-        const auto forbidden = findMatchDirCandidates(v, Vector(0, 1));
+        const auto forbidden =
+            findMatchDirCandidates(v, {Vector(0, 1), Dir::South});
         for (const auto d : forbidden) {
           tmp.push_back(WallLog(v, d, idMaze.isWall(v, d)));
           idMaze.setWall(v, d, true);
@@ -510,9 +478,6 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
         if (forbidden.empty() && idMaze.unknownCount(v))
           candidates.push_back(v);
       }
-  /* 現在地の背後は壁なしにしないと移動できなくなることがある */
-  tmp.push_back(WallLog(cv, cd + Dir::Back, idMaze.isWall(cv, cd + Dir::Back)));
-  idMaze.setWall(cv, cd + Dir::Back, false);
   /* スタート区画を避けて導出 */
   step_map.calcNextDirsAdv(idMaze, candidates, cv, cd, nextDirsKnown,
                            nextDirCandidates);

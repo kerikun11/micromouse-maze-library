@@ -33,12 +33,13 @@ public:
              std::ostream &os = std::cout) const;
   void update(const Maze &maze, const WallIndexes &dest, const bool known_only,
               const bool simple);
-  bool calcShortestDirs(const Maze &maze, Dirs &shortestDirs,
+  bool calcShortestDirs(const Maze &maze, Dirs &shortest_dirs,
                         const bool known_only, const bool simple);
   static const WallIndexes convertDestinations(const Maze &maze,
                                                const Vectors vectors);
   static const Dir convertDir(const Dir d, const WallIndex i);
-  static const Dirs convertDirsKnown(const Dirs src, const WallIndex start);
+  static const Dirs convertWallIndexDirsToVectorDirs(const Dirs src,
+                                                     const WallIndex start);
 
 private:
   step_t step_map[WallIndex::SIZE]; /**< @brief ステップ数*/
@@ -46,7 +47,7 @@ private:
   step_t step_table_diag[MAZE_SIZE * 2]; /**< @brief 加速を考慮したステップ */
 
   void calcStraightStepTable();
-  const Dirs calcStepDownDirs(const Maze &maze, const WallIndex start,
+  const Dirs calcDirsStepDown(const Maze &maze, const WallIndex start,
                               WallIndex &focus, const bool break_unknown,
                               const bool known_only) const;
   const Dirs calcNextDirCandidates(const Maze &maze, const WallIndex focus,
