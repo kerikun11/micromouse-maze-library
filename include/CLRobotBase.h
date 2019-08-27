@@ -108,10 +108,10 @@ protected:
 
   virtual void findWall(bool &left, bool &front, bool &right,
                         bool &back) override {
-    left = maze_target.isWall(real.first, real.second + Dir::Left);
-    front = maze_target.isWall(real.first, real.second + Dir::Front);
-    right = maze_target.isWall(real.first, real.second + Dir::Right);
-    back = maze_target.isWall(real.first, real.second + Dir::Back);
+    left = !maze_target.canGo(real.first, real.second + Dir::Left);
+    front = !maze_target.canGo(real.first, real.second + Dir::Front);
+    right = !maze_target.canGo(real.first, real.second + Dir::Right);
+    back = !maze_target.canGo(real.first, real.second + Dir::Back);
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
@@ -150,15 +150,13 @@ protected:
   }
   virtual void discrepancyWithKnownWall() override {
     if (getState() != SearchAlgorithm::IDENTIFYING_POSITION) {
-      printInfo();
-      std::cout
-          << "There was a discrepancy with known information! CurVecDir:\t"
-          << VecDir{getCurVec(), getCurDir()} << std::endl;
+      logw << "There was a discrepancy with known information! CurVecDir:\t"
+           << VecDir{getCurVec(), getCurDir()} << std::endl;
     }
   }
   virtual void crashed() {
-    std::cerr << "The robot crashed into the wall! fake_offset:\t"
-              << fake_offset << "\treal:\t" << real << std::endl;
+    loge << "The robot crashed into the wall! fake_offset:\t" << fake_offset
+         << "\treal:\t" << real << std::endl;
   }
   virtual void queueAction(const Action action) override {
     cost += getTimeCost(action);

@@ -365,8 +365,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
 #endif
 }
 
-void ShortestAlgorithm::printPath(const Indexes indexes,
-                                  std::ostream &os) const {
+void ShortestAlgorithm::print(const Indexes indexes, std::ostream &os) const {
   int steps[MAZE_SIZE][MAZE_SIZE] = {0};
   int counter = 1;
   for (const auto i : indexes) {

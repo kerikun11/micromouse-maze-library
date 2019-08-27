@@ -46,9 +46,9 @@ public:
   static const char *stateString(const State s);
 
 public:
-  SearchAlgorithm(Maze &maze) : maze(maze), shortestAlgorithm(maze) {}
+  SearchAlgorithm(Maze &maze) : maze(maze) {}
   bool isComplete();
-  void positionIdentifyingInit(Vector *pVector, Dir *pDir);
+  void positionIdentifyingInit(Vector &cv, Dir &cd);
   bool updateWall(const State state, const Vector v, const Dir d,
                   const bool left, const bool front, const bool right,
                   const bool back);
@@ -63,6 +63,9 @@ public:
   bool findNextDir(const Maze &maze, const Vector v, const Dir d,
                    const Dirs &nextDirCandidates, Dir &nextDir) const;
   bool calcShortestDirs(Dirs &shortest_dirs, const bool diag_enabled = true);
+  StepMapSlalom::cost_t getShortestCost() const {
+    return getStepMapSlalom().getShortestCost();
+  }
   void printMap(const State state, const Vector vec, const Dir dir) const;
 
   /**
@@ -71,16 +74,14 @@ public:
   const Maze &getMaze() const { return maze; }
   const StepMap &getStepMap() const { return step_map; }
   const StepMapWall &getStepMapWall() const { return step_map_wall; }
-  const ShortestAlgorithm &getShortestAlgorithm() const {
-    return shortestAlgorithm;
-  }
+  const StepMapSlalom &getStepMapSlalom() const { return step_map_slalom; }
   const Maze &getIdMaze() const { return idMaze; }
 
 protected:
-  Maze &maze;                          /**< 使用する迷路の参照 */
-  StepMap step_map;                    /**< 使用するステップマップ */
-  StepMapWall step_map_wall;           /**< 使用するステップマップ */
-  ShortestAlgorithm shortestAlgorithm; /**< 最短経路導出器 */
+  Maze &maze;                    /**< 使用する迷路の参照 */
+  StepMap step_map;              /**< 使用するステップマップ */
+  StepMapWall step_map_wall;     /**< 使用するステップマップ */
+  StepMapSlalom step_map_slalom; /**< 使用するステップマップ */
 
 private:
   Maze idMaze;     /**< 自己位置同定に使用する迷路 */

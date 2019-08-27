@@ -83,125 +83,106 @@ int main(void) {
 #if 1
   /* Shortest Algorithm */
   for (const auto diag_enabled : {false, true}) {
-    const int n = 1000;
+    const int n = 100;
     const bool known_only = 0;
-    // Maze maze = Maze((mazedata_dir + filename).c_str());
-    Maze maze = Maze({
-        Vector(MAZE_SIZE - 2, MAZE_SIZE - 2),
-        // Vector(MAZE_SIZE - 2, MAZE_SIZE - 3),
-        // Vector(MAZE_SIZE - 3, MAZE_SIZE - 2),
-        // Vector(MAZE_SIZE - 3, MAZE_SIZE - 3),
-    });
+    const Maze &maze = maze_target;
     const auto p_sa = std::make_unique<ShortestAlgorithm>(maze);
     ShortestAlgorithm &sa = *p_sa;
     Indexes path;
     std::chrono::microseconds sum{0};
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
-      sa.calcShortestPath(path, known_only, diag_enabled);
-      // sa.update(maze, EdgeCost(),
-      //           ShortestAlgorithm::convertDestinations(maze.getGoals()),
-      //           known_only, diag_enabled);
-      // sa.genPathWithFromMap(path);
+      if (!sa.calcShortestPath(path, known_only, diag_enabled))
+        loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
       sum += us;
     }
-    std::cout << "Shortest " << (diag_enabled ? "diag" : "along") << ":\t"
+    std::cout << "Shortest " << (diag_enabled ? "diag" : "no_d") << ":\t"
               << sum.count() / n << "\t[us]" << std::endl;
-    // sa.printPath(path);
+    std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
+              << sa.getShortestPathCost() << "\t[ms]" << std::endl;
+    // sa.print(path);
   }
 #endif
 
-#if 0
-  // StepMapWall map;
-  StepMap map;
-  Dirs shortest_dirs;
-  // Maze &maze = maze_target;
-  const Maze &maze = robot.getMaze();
-  const bool known_only = false;
-  // map.calcShortestDirs(maze, shortest_dirs, true, false);
-  map.update(maze, maze.getGoals(), known_only, false);
-  // map.print(maze, shortest_dirs);
-  map.printFull(maze);
-#endif
-
-#if 0
+#if 1
   /* StepMap */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
-    Maze maze = Maze(Vectors{Vector(MAZE_SIZE - 1, MAZE_SIZE - 1)});
-    // Maze &maze = maze_target;
+    const Maze &maze = maze_target;
     const auto p = std::make_unique<StepMap>();
     StepMap &map = *p;
     std::chrono::microseconds sum{0};
-    const int n = 1000;
+    const int n = 100;
+    Dirs shortest_dirs;
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
-      map.update(maze, maze.getGoals(), known_only, simple);
+      if (!map.calcShortestDirs(maze, shortest_dirs, known_only, simple))
+        loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
       sum += us;
     }
-    std::cout << "StepMap::update() " << (simple ? "simple" : "normal") << ":\t"
+    std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
               << sum.count() / n << "\t[us]" << std::endl;
+    map.print(maze, shortest_dirs);
   }
 #endif
 
-#if 0
+#if 1
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
-    Maze maze = Maze(Vectors{Vector(MAZE_SIZE - 1, MAZE_SIZE - 1)});
-    // Maze &maze = maze_target;
-    WallIndexes dest = StepMapWall::convertDestinations(maze, maze.getGoals());
+    const Maze &maze = maze_target;
     const auto p = std::make_unique<StepMapWall>();
     StepMapWall &map = *p;
     std::chrono::microseconds sum{0};
-    const int n = 1000;
+    const int n = 100;
+    Dirs shortest_dirs;
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
-      map.update(maze, dest, known_only, simple);
+      if (!map.calcShortestDirs(maze, shortest_dirs, known_only, simple))
+        loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
       sum += us;
     }
-    std::cout << "StepMapWall::update() " << (simple ? "simple" : "normal")
-              << ":\t" << sum.count() / n << "\t[us]" << std::endl;
-    // Dirs dirs;
-    // map.calcShortestDirs(maze, dirs, known_only, simple);
-    // map.print(maze, dirs);
+    std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t"
+              << sum.count() / n << "\t[us]" << std::endl;
+    map.print(maze, shortest_dirs);
   }
 #endif
 
-#if 0
+#if 1
   /* StepMapSlalom */
-  {
+  for (const auto diag_enabled : {false, true}) {
     const bool known_only = 0;
-    Maze maze = Maze(Vectors{Vector(MAZE_SIZE - 1, MAZE_SIZE - 1)});
-    // Maze &maze = maze_target;
+    const Maze &maze = maze_target;
     const auto p = std::make_unique<StepMapSlalom>();
     StepMapSlalom &map = *p;
     std::chrono::microseconds sum{0};
-    const int n = 1000;
+    const int n = 100;
     StepMapSlalom::Indexes path;
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
       map.update(maze, StepMapSlalom::EdgeCost(),
                  StepMapSlalom::convertDestinations(maze.getGoals()),
-                 known_only);
+                 known_only, diag_enabled);
       map.genPathFromMap(path);
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
       sum += us;
     }
-    std::cout << "StepMapSlalom::update() \t" << sum.count() / n << "\t[us]"
-              << std::endl;
-    // map.print(maze, path);
+    std::cout << "StepMapSlalom\t" << sum.count() / n << "\t[us]" << std::endl;
+    map.print(maze, path);
+    auto shortest_dirs = map.indexes2dirs(path, diag_enabled);
+    StepMap::appendStraightDirs(maze, shortest_dirs, diag_enabled);
+    maze.printPath(shortest_dirs);
   }
 #endif
 

@@ -39,7 +39,7 @@ public:
     };
 
   public:
-    EdgeCost(const struct RunParameter rp = RunParameter()) : rp(rp) {
+    EdgeCost(const RunParameter rp = RunParameter()) : rp(rp) {
       genCostTable();
     }
     cost_t getEdgeCost(const Pattern p, const int n = 1) const {
@@ -74,8 +74,9 @@ public:
     RunParameter rp;
     std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
     std::array<cost_t, MAZE_SIZE * 2> cost_table_diag;
-    cost_t gen_cost_impl(const int i, const float am, const float vs,
-                         const float vm, const float seg) {
+
+    static cost_t gen_cost_impl(const int i, const float am, const float vs,
+                                const float vm, const float seg) {
       const auto d = seg * (i + 1); /*< (i+1) 区画分の走行距離 */
       /* グラフの面積から時間を求める */
       const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
@@ -264,20 +265,34 @@ public:
 
 public:
   StepMapSlalom() {}
-  static const Indexes convertDestinations(const Vectors src) {
-    Indexes dest;
-    for (const auto v : src)
-      for (const auto nd : Dir::ENWS())
-        dest.push_back(Index(v, nd));
-    return dest;
+  bool calcShortestDirs(const Maze &maze, const EdgeCost &edge_cost,
+                        Dirs &shortest_dirs, const bool known_only,
+                        const bool diag_enabled) {
+    const auto dest = convertDestinations(maze.getGoals());
+    update(maze, edge_cost, dest, known_only, diag_enabled);
+    StepMapSlalom::Indexes path;
+    if (!genPathFromMap(path))
+      return false;
+    shortest_dirs = indexes2dirs(path, diag_enabled);
+    return true;
   }
   void update(const Maze &maze, const EdgeCost &edge_cost, const Indexes &dest,
-              const bool known_only) {
+              const bool known_only, const bool diag_enabled) {
     /* 全ノードのコストを最大値に設定 */
     for (auto &f : cost_map)
       f = CostMax;
-    /* 更新予約のキュー */
+      /* 更新予約のキュー */
+#define STEP_MAP_USE_PRIORITY_QUEUE 0
+#if STEP_MAP_USE_PRIORITY_QUEUE == 1
+    std::function<bool(const Index, const Index)> greater =
+        [&](const Index i1, const Index i2) {
+          return cost_map[i1] > cost_map[i2];
+        };
+    std::priority_queue<Index, std::vector<Index>, decltype(greater)> q(
+        greater);
+#else
     std::queue<Index> q;
+#endif
     /* dest のコストを0とする */
     for (const auto i : dest) {
       cost_map[i] = 0;
@@ -291,7 +306,11 @@ public:
     };
     /* 更新がなくなるまで更新 */
     while (!q.empty()) {
+#if STEP_MAP_USE_PRIORITY_QUEUE
+      const auto focus = q.top();
+#else
       const auto focus = q.front();
+#endif
       q.pop();
       const auto focus_cost = cost_map[focus];
       /* キューに追加する関数を用意 */
@@ -318,34 +337,42 @@ public:
             break;
           i = next;
         }
-        /* ターン */
-        for (const auto nd_rel_45 : {Dir::Left45, Dir::Right45}) {
-          const auto d45 = nd + nd_rel_45;
-          const auto d90 = nd + nd_rel_45 * 2;
-          const auto d135 = nd + nd_rel_45 * 3;
-          const auto d180 = nd + nd_rel_45 * 4;
-          /* 横壁 */
-          const auto i45 = focus.next(d45);
-          if (canGo(i45)) {
-            /* 45 */
-            if (canGo(i45.next(i45.getNodeDir())))
-              pushAndContinue(i45, edge_cost.getEdgeCost(F45));
-            /* 90 */
-            const auto v90 = focus.getVector().next(nd).next(d90);
-            pushAndContinue(Index(v90, d90), edge_cost.getEdgeCost(F90));
-            /* 135 and 180 */
-            const auto i135 = i45.next(d135);
-            if (canGo(i135)) {
-              /* 135 */
-              if (canGo(i135.next(i135.getNodeDir())))
-                pushAndContinue(i135, edge_cost.getEdgeCost(F135));
-              /* 180 */
-              pushAndContinue(Index(v90.next(d180), d180),
-                              edge_cost.getEdgeCost(F180));
+        if (diag_enabled) {
+          /* ターン */
+          for (const auto nd_rel_45 : {Dir::Left45, Dir::Right45}) {
+            const auto d45 = nd + nd_rel_45;
+            const auto d90 = nd + nd_rel_45 * 2;
+            const auto d135 = nd + nd_rel_45 * 3;
+            const auto d180 = nd + nd_rel_45 * 4;
+            /* 横壁 */
+            const auto i45 = focus.next(d45);
+            if (canGo(i45)) {
+              /* 45 */
+              if (canGo(i45.next(i45.getNodeDir())))
+                pushAndContinue(i45, edge_cost.getEdgeCost(F45));
+              /* 90 */
+              const auto v90 = focus.getVector().next(nd).next(d90);
+              pushAndContinue(Index(v90, d90), edge_cost.getEdgeCost(F90));
+              /* 135 and 180 */
+              const auto i135 = i45.next(d135);
+              if (canGo(i135)) {
+                /* 135 */
+                if (canGo(i135.next(i135.getNodeDir())))
+                  pushAndContinue(i135, edge_cost.getEdgeCost(F135));
+                /* 180 */
+                pushAndContinue(Index(v90.next(d180), d180),
+                                edge_cost.getEdgeCost(F180));
+              }
             }
           }
+        } else {
+          /* 斜めなしのターン */
+          const auto v_f = focus.getVector().next(nd); //< i.e. vector front
+          for (const auto d90 : {nd + Dir::Left, nd + Dir::Right})
+            if (canGo(WallIndex(v_f, d90))) //< 90度方向の壁
+              pushAndContinue(Index(v_f, d90), edge_cost.getEdgeCost(FS90));
         }
-      } else { /* 壁の中央 */
+      } else { /* 壁の中央（斜めありの場合しかありえない） */
         /* 直前の壁 */
         const auto i_f = focus.next(nd);
         if (!canGo(i_f)) {
@@ -381,7 +408,7 @@ public:
       }
     }
   }
-  bool genPathFromMap(Indexes &path) {
+  bool genPathFromMap(Indexes &path) const {
     path.clear();
     auto i = index_start.opposite();
     while (1) {
@@ -436,7 +463,24 @@ public:
       os << std::endl;
     }
   }
-  const Dirs indexes2dirs(const Indexes &path) {
+  static const Indexes convertDestinations(const Vectors &src) {
+    Indexes dest;
+    for (const auto v : src)
+      for (const auto nd : Dir::ENWS())
+        dest.push_back(Index(v, nd));
+    return dest;
+  }
+  static const Dirs indexes2dirs(const Indexes &path, const bool diag_enabled) {
+    if (!diag_enabled) {
+      Dirs dirs;
+      for (int i = 1; i < (int)path.size(); ++i) {
+        const auto nd = path[i].getNodeDir();
+        const auto v = path[i - 1].getVector() - path[i].getVector();
+        for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
+          dirs.push_back(nd);
+      }
+      return dirs;
+    }
     Dirs dirs;
     for (int i = 0; i < (int)path.size() - 1; ++i) {
       const auto nd = path[i].getNodeDir();
@@ -523,6 +567,7 @@ public:
     }
     return dirs;
   }
+  cost_t getShortestCost() const { return cost_map[index_start.opposite()]; }
 
 private:
   const Index index_start = Index(Vector(0, 0), Dir::North);

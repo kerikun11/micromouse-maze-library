@@ -489,7 +489,7 @@ public:
    *  @param dirs 移動方向の配列
    *  @param of output-stream
    */
-  void printPath(const Vector start, const Dirs &dirs,
+  void printPath(const Dirs &dirs, const Vector start = Vector(0, 0),
                  std::ostream &os = std::cout) const;
 
   /**

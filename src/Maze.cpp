@@ -249,7 +249,7 @@ bool Maze::parse(std::istream &is) {
   }
   return true;
 }
-void Maze::printPath(const Vector start, const Dirs &dirs,
+void Maze::printPath(const Dirs &dirs, const Vector start,
                      std::ostream &os) const {
   uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {0};
   Vector v = start;

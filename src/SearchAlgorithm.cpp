@@ -30,10 +30,10 @@ bool SearchAlgorithm::isComplete() {
   findShortestCandidates(candidates, false);
   return candidates.empty();
 }
-void SearchAlgorithm::positionIdentifyingInit(Vector *pVector, Dir *pDir) {
+void SearchAlgorithm::positionIdentifyingInit(Vector &cv, Dir &cd) {
   idOffset = Vector(MAZE_SIZE / 2, MAZE_SIZE / 2);
-  *pVector = idOffset;
-  *pDir = Dir::East;
+  cv = idOffset;
+  cd = Dir::East;
   idMaze.reset(false); /*< reset without setting start cell */
 }
 bool SearchAlgorithm::updateWall(const State state, const Vector v, const Dir d,
@@ -168,10 +168,14 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortest_dirs,
                                        const bool diag_enabled) {
   const bool known_only = true;
-  Indexes path;
-  if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
+  // Indexes path;
+  // if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
+  //   return false; /* failed */
+  // shortest_dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
+  StepMapSlalom::EdgeCost edge_cost;
+  if (!step_map_slalom.calcShortestDirs(maze, edge_cost, shortest_dirs,
+                                        known_only, diag_enabled))
     return false; /* failed */
-  shortest_dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
   StepMap::appendStraightDirs(maze, shortest_dirs, diag_enabled);
   return true; /* 成功 */
 }
@@ -490,7 +494,6 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirsPositionIdentification(
   step_map.calcNextDirsAdv(idMaze, candidates, cv, cd, nextDirsKnown,
                            nextDirCandidates);
   /* restore idMaze */
-  std::reverse(tmp.begin(), tmp.end());
   for (const auto wl : tmp)
     idMaze.setWall(Vector(wl), wl.d, wl.b);
   /* 既知壁がスタート候補でどこにも行けなくなるバグ対策 */

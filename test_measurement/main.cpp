@@ -31,6 +31,7 @@ int test_measurement() {
            "16MM2017CX_pre.maze",   "16MM2017CX.maze",
            "16MM2016C_Chubu.maze",  "16MM2016CX.maze",
            "16MM2013CX.maze",       "08MM2016CF_pre.maze",
+           //  "32MazeUnknown.maze",
        }) {
     std::cout << std::endl;
     std::cout << "Maze File: \t" << filename << std::endl;
@@ -39,7 +40,7 @@ int test_measurement() {
     /* Maze Target */
     const auto p_maze_target =
         std::make_unique<Maze>((mazedata_dir + filename).c_str());
-    const Maze &maze_target = *p_maze_target;
+    Maze &maze_target = *p_maze_target;
 
 #if 1
     /* Search Run */
@@ -56,33 +57,30 @@ int test_measurement() {
     csv << "," << robot.step << "," << robot.f << "," << robot.l << ","
         << robot.r << "," << robot.b;
     std::cout << "Max Calc Time:\t" << robot.max_usec << "\t[us]" << std::endl;
-    // std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
+    std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
     csv << "," << robot.max_usec;
     csv << "," << us.count();
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirs(diag_enabled))
         loge << "Failed to Find a Shortest Path! "
              << (diag_enabled ? "diag" : "no_diag") << std::endl;
+      const auto path_cost = robot.getSearchAlgorithm().getShortestCost();
+      std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
+                << path_cost << "\t[ms]" << std::endl;
+      csv << "," << path_cost;
       robot.fastRun(diag_enabled);
       // robot.printPath();
       robot.endFastRunBackingToStartRun();
       /* Shortest Path Comparison */
-      Maze maze = maze_target;
-      const auto p_at = std::make_unique<Agent>(maze);
+      const auto p_at = std::make_unique<Agent>(maze_target);
       Agent &at = *p_at;
       at.calcShortestDirs(diag_enabled);
       if (at.getShortestDirs() != robot.getShortestDirs()) {
         logw << "searched path is not shortest! "
              << (diag_enabled ? "diag" : "no_diag") << std::endl;
         // at.printPath(); robot.printPath();
-        logi << "target: "
-             << at.getSearchAlgorithm()
-                    .getShortestAlgorithm()
-                    .getShortestPathCost()
-             << " search: "
-             << robot.getSearchAlgorithm()
-                    .getShortestAlgorithm()
-                    .getShortestPathCost()
+        logi << "target: " << at.getSearchAlgorithm().getShortestCost()
+             << " search: " << robot.getSearchAlgorithm().getShortestCost()
              << std::endl;
       }
     }
@@ -138,13 +136,11 @@ int test_measurement() {
       }
       std::cout << "Shortest " << (diag_enabled ? "diag" : "no_d") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
-      std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
-                << sa.getShortestPathCost() << "\t[ms]" << std::endl;
       // sa.printPath(path);
     }
 #endif
 
-#if 0
+#if 1
     /* StepMap */
     for (const auto simple : {true, false}) {
       const bool known_only = 0;
@@ -165,11 +161,11 @@ int test_measurement() {
       }
       std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
-      map.print(maze, shortest_dirs);
+      // map.print(maze, shortest_dirs);
     }
 #endif
 
-#if 0
+#if 1
     /* StepMapWall */
     for (const auto simple : {true, false}) {
       const bool known_only = 0;
@@ -190,13 +186,13 @@ int test_measurement() {
       }
       std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
-      map.print(maze, shortest_dirs);
+      // map.print(maze, shortest_dirs);
     }
 #endif
 
-#if 0
+#if 1
     /* StepMapSlalom */
-    {
+    for (const auto diag_enabled : {false, true}) {
       const bool known_only = 0;
       const Maze &maze = maze_target;
       const auto p = std::make_unique<StepMapSlalom>();
@@ -204,20 +200,24 @@ int test_measurement() {
       std::chrono::microseconds sum{0};
       const int n = 100;
       StepMapSlalom::Indexes path;
+      StepMapSlalom::EdgeCost edge_cost;
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
-        map.update(maze, StepMapSlalom::EdgeCost(),
+        map.update(maze, edge_cost,
                    StepMapSlalom::convertDestinations(maze.getGoals()),
-                   known_only);
+                   known_only, diag_enabled);
         map.genPathFromMap(path);
         const auto t_e = std::chrono::system_clock().now();
         const auto us =
             std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
         sum += us;
       }
-      std::cout << "StepMapSlalom\t" << sum.count() / n << "\t[us]"
-                << std::endl;
-      map.print(maze, path);
+      std::cout << "StepSla " << (diag_enabled ? "diag" : "no_d") << ":\t"
+                << sum.count() / n << "\t[us]" << std::endl;
+      // map.print(maze, path);
+      // auto shortest_dirs = map.indexes2dirs(path, diag_enabled);
+      // StepMap::appendStraightDirs(maze, shortest_dirs, diag_enabled);
+      // maze.printPath(shortest_dirs);
     }
 #endif
 

@@ -439,7 +439,7 @@ public:
    * @param indexes path
    * @param os out stream
    */
-  void printPath(const Indexes indexes, std::ostream &os = std::cout) const;
+  void print(const Indexes indexes, std::ostream &os = std::cout) const;
   /**
    * @brief convert from indexes to dirs
    *

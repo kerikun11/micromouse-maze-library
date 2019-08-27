@@ -103,7 +103,7 @@ public:
    * @brief 自己位置同定モードに設定する
    */
   void positionIdentify() {
-    searchAlgorithm.positionIdentifyingInit(&curVec, &curDir);
+    searchAlgorithm.positionIdentifyingInit(curVec, curDir);
     state = SearchAlgorithm::IDENTIFYING_POSITION;
     isPositionIdentifying = true;
     calcNextDirs(); /*< 時間がかかる処理！ */
@@ -152,10 +152,7 @@ public:
   /**
    * @brief 最短経路の表示
    */
-  void printPath() const {
-    maze.printPath(maze.getStart(), shortest_dirs);
-    std::cout << "Shortest Step: " << shortest_dirs.size() << std::endl;
-  }
+  void printPath() const { maze.printPath(shortest_dirs, maze.getStart()); }
 
 protected:
   Maze &maze; /**< 使用する迷路の参照 */
