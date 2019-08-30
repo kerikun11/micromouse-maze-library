@@ -43,7 +43,6 @@ bool StepMap::setStep(const int8_t x, const int8_t y, const step_t step) {
   return true;
 }
 void StepMap::printFull(const Maze &maze, std::ostream &os) const {
-  os << std::endl;
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
@@ -67,7 +66,6 @@ void StepMap::printFull(const Maze &maze, std::ostream &os) const {
 }
 void StepMap::print(const Maze &maze, const Vector v, const Dir d,
                     std::ostream &os) const {
-  os << std::endl;
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';

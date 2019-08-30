@@ -28,10 +28,6 @@ make
 - Maze
 
 - StepMap
-- ShortestAlgorithm
-  - RunParameter
-  - EdgeCost
-  - Index
 - SearchAlgorithm
 - Agent
 - RobotBase

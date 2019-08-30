@@ -57,7 +57,7 @@ const char mazeData_MM2017Tashiro[16 + 1][16 + 1] = {
     "dfca9fca9fcaaa9f",
 };
 
-const char MM2016C_chubu[16 + 1][16 + 1] = {
+const std::vector<std::vector<char>> MM2016C_chubu = {
     {14, 6, 6, 4, 6, 4, 5, 12, 4, 6, 6, 6, 6, 6, 6, 5},
     {12, 4, 6, 3, 13, 9, 11, 9, 9, 12, 5, 12, 5, 12, 5, 9},
     {9, 10, 6, 6, 1, 10, 5, 9, 10, 3, 10, 3, 9, 9, 9, 9},
@@ -78,28 +78,29 @@ const char MM2016C_chubu[16 + 1][16 + 1] = {
 int main(void) {
   std::cout << "Maze File Generator" << std::endl;
   /* parameter */
-  const auto maze_data = mazeData_MM2018HX;
+  const auto maze_data = MM2016C_chubu;
+  const int maze_size = 16;
   const std::string output_filename = "output.maze";
-#define BIT_ORDER 0
+#define BIT_ORDER 2
 #if BIT_ORDER == 0
   std::array<Dir, 4> bit_order = {Dir::East, Dir::North, Dir::West, Dir::South};
 #elif BIT_ORDER == 1
   std::array<Dir, 4> bit_order = {Dir::North, Dir::East, Dir::South, Dir::West};
 #elif BIT_ORDER == 2
   std::array<Dir, 4> bit_order = {Dir::North, Dir::East, Dir::West, Dir::South};
+#elif BIT_ORDER == 3
+  std::array<Dir, 4> bit_order = {Dir::East, Dir::West, Dir::South, Dir::North};
 #endif
   const Vectors goals = {
       Vector(7, 7), Vector(8, 7), Vector(7, 8), Vector(8, 8),
-      // Vector(12, 12),
-      // Vector(13, 12),
-      // Vector(12, 13),
-      // Vector(13, 13),
+      // Vector(12, 12), Vector(13, 12), Vector(12, 13), Vector(13, 13),
   };
   /* process */
-  Maze sample(maze_data, bit_order);
-  sample.setGoals(goals);
+  Maze sample;
   std::ofstream of(output_filename);
-  sample.print(of);
-  sample.print();
+  sample.parse(maze_data, bit_order, maze_size);
+  sample.setGoals(goals);
+  sample.print(of, maze_size);
+  sample.print(std::cout, maze_size);
   return 0;
 }

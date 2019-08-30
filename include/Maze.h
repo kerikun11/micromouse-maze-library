@@ -339,6 +339,9 @@ union __attribute__((__packed__)) WallLog {
     unsigned int b : 1; /**< @brief 壁の有無 */
   };
   unsigned int all : 16; /**< @brief 全フラグ参照用 */
+  /**
+   * @brief Construct a new Wall Log object
+   */
   WallLog() {}
   WallLog(const Vector v, const Dir d, const bool b)
       : x(v.x), y(v.y), d(d), b(b) {}
@@ -356,7 +359,7 @@ using WallLogs = std::vector<WallLog>;
 
 /**
  * @brief 迷路の壁情報を管理するクラス
- * 実体は，壁情報とスタート位置とゴール位置s
+ * 実体は，壁情報とスタート位置とゴール位置の集合
  */
 class Maze {
 public:
@@ -369,14 +372,6 @@ public:
    *  @param filename ファイル名
    */
   Maze(const char *filename) { parse(filename); }
-  /**
-   *  @brief 配列から迷路を読み込むコンストラクタ
-   *  @param data 各区画16進表記の文字列配列
-   *  例：{"abaf", "1234", "abab", "aaff"}
-   */
-  Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
-       const std::array<Dir, 4> bit_to_dir_map = {Dir::East, Dir::North,
-                                                  Dir::West, Dir::South});
   /**
    *  @brief 迷路の初期化．壁を削除し，スタート区画を既知に
    *  @param set_start_wall スタート区画の East と North の壁を設定するかどうか
@@ -437,7 +432,7 @@ public:
    *  @return true:既知かつ壁なし，false:それ以外
    */
   bool canGo(const Vector v, const Dir d) const {
-    return isKnown(v, d) && !isWall(v, d);
+    return canGo(WallIndex(v, d));
   }
   bool canGo(const WallIndex i) const { return isKnown(i) && !isWall(i); }
   /**
@@ -471,7 +466,8 @@ public:
    *  @brief 迷路の表示
    *  @param of output-stream
    */
-  void print(std::ostream &os = std::cout) const;
+  void print(std::ostream &os = std::cout,
+             const int maze_size = MAZE_SIZE) const;
   /**
    *  @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
    *  @param is input-stream
@@ -484,6 +480,14 @@ public:
     return parse(ifs);
   }
   /**
+   *  @brief 配列から迷路を読み込むパーサ
+   *  @param data 各区画16進表記の文字列配列
+   *  例：{"abaf", "1234", "abab", "aaff"}
+   */
+  bool parse(const std::vector<std::vector<char>> data,
+             const std::array<Dir, 4> bit_to_dir_map,
+             const int maze_size = MAZE_SIZE);
+  /**
    *  @brief パス付の迷路の表示
    *  @param start パスのスタート座標
    *  @param dirs 移動方向の配列
@@ -491,7 +495,6 @@ public:
    */
   void printPath(const Dirs &dirs, const Vector start = Vector(0, 0),
                  std::ostream &os = std::cout) const;
-
   /**
    * @brief Set the Goals object
    */
@@ -512,6 +515,9 @@ public:
    * @brief Get the Wall Logs object
    */
   const WallLogs &getWallLogs() const { return wallLogs; }
+  /**
+   * @brief 既知迷路のサイズを返す
+   */
   int8_t getMinX() const { return min_x; }
   int8_t getMinY() const { return min_y; }
   int8_t getMaxX() const { return max_x; }

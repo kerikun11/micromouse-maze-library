@@ -1,7 +1,7 @@
 /**
- * @file StepMapWall.h
+ * @file StepMapSlalom.h
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
- * @brief 壁ベースのステップマップを表現するクラス
+ * @brief スラロームのコストベースのステップマップを表現するクラス
  * @date 2019-08-17
  */
 #pragma once
@@ -433,7 +433,6 @@ public:
                    return i.getVector() == ii.getVector();
                  }) != indexes.cend();
     };
-    os << std::endl;
     for (int8_t y = MAZE_SIZE - 1; y >= -1; --y) {
       for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
         os << "+";
@@ -459,8 +458,8 @@ public:
                        ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
                        : (C_RE "." C_NO));
         }
+        os << std::endl;
       }
-      os << std::endl;
     }
   }
   static const Indexes convertDestinations(const Vectors &src) {

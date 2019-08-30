@@ -57,21 +57,13 @@ public:
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
-                (int)max_usec);
+    // std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
+    //             (int)max_usec);
   }
   void printResult() const {
     std::printf("Estimated Seaching Time: %2d:%02d, Step: %4d, Forward: %3d, "
                 "Left: %3d, Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    // std::cout << "Max List:\t"
-    //           <<
-    //           getSearchAlgorithm().getShortestAlgorithm().max_open_list_size
-    //           << std::endl;
-    // std::cout << "Max Iteration:\t"
-    //           <<
-    //           getSearchAlgorithm().getShortestAlgorithm().max_iteration_size
-    //           << std::endl;
   }
   bool endFastRunBackingToStartRun() {
     /* エラー処理 */
@@ -116,7 +108,7 @@ protected:
     /* 前1区画先の壁を読める場合 */
     if (!front)
       updateWall(curVec.next(curDir), curDir,
-                 maze_target.isWall(real.first.next(real.second), real.second));
+                 !maze_target.canGo(real.first.next(real.second), real.second));
 #endif
   }
   virtual void calcNextDirsPreCallback() override {

@@ -90,27 +90,6 @@ std::ostream &operator<<(std::ostream &os, const WallLog &obj) {
 }
 
 /* Maze */
-Maze::Maze(const char data[MAZE_SIZE + 1][MAZE_SIZE + 1],
-           const std::array<Dir, 4> bit_to_dir_map) {
-  for (int8_t y = 0; y < MAZE_SIZE; ++y)
-    for (int8_t x = 0; x < MAZE_SIZE; ++x) {
-      const char c = data[MAZE_SIZE - y - 1][x];
-      // const char c = data[x][y];
-      uint8_t h = 0;
-      if ('0' <= c && c <= '9')
-        h = c - '0';
-      else if ('a' <= c && c <= 'f')
-        h = c - 'a' + 10;
-      else if ('A' <= c && c <= 'F')
-        h = c - 'A' + 10;
-      else if (0 <= c && c <= 15)
-        h = c;
-      updateWall(Vector(x, y), bit_to_dir_map[0], h & 0x01, false);
-      updateWall(Vector(x, y), bit_to_dir_map[1], h & 0x02, false);
-      updateWall(Vector(x, y), bit_to_dir_map[2], h & 0x04, false);
-      updateWall(Vector(x, y), bit_to_dir_map[3], h & 0x08, false);
-    }
-}
 void Maze::reset(const bool set_start_wall) {
   wall.reset();
   known.reset();
@@ -179,35 +158,11 @@ void Maze::resetLastWall(const int num) {
   }
   return;
 }
-void Maze::print(std::ostream &os) const {
-  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
-    if (y != MAZE_SIZE) {
-      os << '|';
-      for (int8_t x = 0; x < MAZE_SIZE; ++x) {
-        const auto v = Vector(x, y);
-        if (v == start)
-          os << " S ";
-        else if (std::find(goals.cbegin(), goals.cend(), v) != goals.cend())
-          os << " G ";
-        else
-          os << "   ";
-        os << (isKnown(x, y, Dir::East) ? (isWall(x, y, Dir::East) ? "|" : " ")
-                                        : ".");
-      }
-      os << std::endl;
-    }
-    for (int8_t x = 0; x < MAZE_SIZE; ++x)
-      os << "+"
-         << (isKnown(x, y, Dir::South)
-                 ? (isWall(x, y, Dir::South) ? "---" : "   ")
-                 : " . ");
-    os << "+" << std::endl;
-  }
-}
 bool Maze::parse(std::istream &is) {
   is.seekg(0, std::ios_base::end);
   int file_size = is.tellg();
   is.seekg(0, std::ios_base::beg);
+  /* 迷路サイズの決定 */
   int maze_size = 0;
   if (file_size > 8000)
     maze_size = 32;
@@ -215,6 +170,7 @@ bool Maze::parse(std::istream &is) {
     maze_size = 16;
   else
     maze_size = 8;
+  /* 初期化 */
   reset();
   goals.clear();
   for (int8_t y = maze_size; y >= 0; --y) {
@@ -247,6 +203,53 @@ bool Maze::parse(std::istream &is) {
         Maze::updateWall(Vector(x, y), Dir::South, false);
     }
   }
+  return true;
+}
+void Maze::print(std::ostream &os, const int maze_size) const {
+  for (int8_t y = maze_size; y >= 0; --y) {
+    if (y != maze_size) {
+      os << '|';
+      for (int8_t x = 0; x < maze_size; ++x) {
+        const auto v = Vector(x, y);
+        if (v == start)
+          os << " S ";
+        else if (std::find(goals.cbegin(), goals.cend(), v) != goals.cend())
+          os << " G ";
+        else
+          os << "   ";
+        os << (isKnown(x, y, Dir::East) ? (isWall(x, y, Dir::East) ? "|" : " ")
+                                        : ".");
+      }
+      os << std::endl;
+    }
+    for (int8_t x = 0; x < maze_size; ++x)
+      os << "+"
+         << (isKnown(x, y, Dir::South)
+                 ? (isWall(x, y, Dir::South) ? "---" : "   ")
+                 : " . ");
+    os << "+" << std::endl;
+  }
+}
+bool Maze::parse(const std::vector<std::vector<char>> data,
+                 const std::array<Dir, 4> bit_to_dir_map, const int maze_size) {
+  for (int8_t y = 0; y < maze_size; ++y)
+    for (int8_t x = 0; x < maze_size; ++x) {
+      // const char c = data[x][maze_size - y - 1];
+      const char c = data[x][y];
+      uint8_t h = 0;
+      if ('0' <= c && c <= '9')
+        h = c - '0';
+      else if ('a' <= c && c <= 'f')
+        h = c - 'a' + 10;
+      else if ('A' <= c && c <= 'F')
+        h = c - 'A' + 10;
+      else if (0 <= c && c <= 15)
+        h = c;
+      updateWall(Vector(x, y), bit_to_dir_map[0], h & 0x01, false);
+      updateWall(Vector(x, y), bit_to_dir_map[1], h & 0x02, false);
+      updateWall(Vector(x, y), bit_to_dir_map[2], h & 0x04, false);
+      updateWall(Vector(x, y), bit_to_dir_map[3], h & 0x08, false);
+    }
   return true;
 }
 void Maze::printPath(const Dirs &dirs, const Vector start,

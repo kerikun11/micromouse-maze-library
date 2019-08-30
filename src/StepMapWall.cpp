@@ -25,7 +25,6 @@ void StepMapWall::reset(const step_t step) {
         setStep(WallIndex(x, y, z), step); //< ステップをクリア
 }
 void StepMapWall::print(const Maze &maze, std::ostream &os) const {
-  os << std::endl;
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
@@ -55,7 +54,6 @@ void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
   const auto exists = [&](const WallIndex i) {
     return std::find(indexes.cbegin(), indexes.cend(), i) != indexes.cend();
   };
-  os << std::endl;
   for (int8_t y = MAZE_SIZE - 1; y >= -1; --y) {
     for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
       os << "+";
@@ -78,8 +76,8 @@ void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
                      ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
                      : (C_RE "." C_NO));
       }
+      os << std::endl;
     }
-    os << std::endl;
   }
 }
 void StepMapWall::print(const Maze &maze, const Dirs &shortest_dirs,
