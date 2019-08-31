@@ -12,7 +12,7 @@
 
 namespace MazeLib {
 
-using step_t = uint16_t; /**< @brief ステップマップの型*/
+using step_t = uint16_t; /**< @brief ステップの型 */
 static constexpr step_t STEP_MAX =
     std::numeric_limits<step_t>::max(); /**< @brief 最大ステップ値 */
 
@@ -21,6 +21,9 @@ static constexpr step_t STEP_MAX =
  */
 class StepMap {
 public:
+  /**
+   * @brief Construct a new Step Map object
+   */
   StepMap();
   /**
    * @brief ステップマップを初期化する関数
@@ -28,9 +31,9 @@ public:
    */
   void reset(const step_t step = STEP_MAX);
   /**
-   * @param ステップへの参照の取得，書き込み可能
+   * @param ステップの取得
    * @param v 区画の座標
-   * @return ステップメモリの参照
+   * @return ステップ
    */
   step_t getStep(const Vector v) const { return getStep(v.x, v.y); }
   step_t getStep(const int8_t x, const int8_t y) const;

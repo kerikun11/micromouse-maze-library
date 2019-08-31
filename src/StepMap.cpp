@@ -157,7 +157,7 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
     q.pop();
     const auto focus_step = getStep(focus);
     /* 周辺を走査 */
-    for (const auto d : Dir::ENWS()) {
+    for (const auto d : Dir::getAlong4()) {
       auto next = focus;
       /* 直線で行けるところまで更新する */
       for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {

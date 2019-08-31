@@ -96,31 +96,22 @@ const Dir Index::arrow_diag_to_along_45() const {
   return Dir::Max;
 }
 const Index Index::next() const {
-  switch (nd) {
-  /* 区画の中央 */
+  switch (getNodeDir()) {
   case Dir::East:
   case Dir::North:
   case Dir::West:
   case Dir::South:
-    return Index(Vector(x, y).next(nd), Dir::Max, nd);
-  /* 壁の中央 */
+    return getNodeDir().isAlong()
+               ? Index(getVector().next(nd), nd)
+               : Index(WallIndex(x, y, getNodeDir()).next(nd), nd);
   case Dir::NorthEast:
-    return z == 0 ? Index(Vector(x + 1, y), Dir::North, nd)
-                  : Index(Vector(x, y + 1), Dir::East, nd);
   case Dir::NorthWest:
-    return z == 0 ? Index(Vector(x, y), Dir::North, nd)
-                  : Index(Vector(x - 1, y + 1), Dir::East, nd);
   case Dir::SouthWest:
-    return z == 0 ? Index(Vector(x, y - 1), Dir::North, nd)
-                  : Index(Vector(x - 1, y), Dir::East, nd);
   case Dir::SouthEast:
-    return z == 0 ? Index(Vector(x + 1, y - 1), Dir::North, nd)
-                  : Index(Vector(x, y), Dir::East, nd);
-  default:
-    break;
+    return Index(WallIndex(x, y, z).next(nd), nd);
   }
   logw << "Invalid Dir: " << nd << std::endl;
-  return Index();
+  return Index(x, y, z, nd);
 }
 const std::vector<std::pair<Index, cost_t>>
 Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
@@ -152,8 +143,7 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
     /* 直進で行けるところまで行く */
     int8_t n = 1;
     for (auto v_st = v.next(nd); canGo(v_st, nd); v_st = v_st.next(nd), ++n)
-      succs.push_back(
-          {Index(v_st, Dir::Max, nd), edge_cost.getEdgeCost(ST_ALONG, n)});
+      succs.push_back({Index(v_st, nd), edge_cost.getEdgeCost(ST_ALONG, n)});
     if (diag_enabled) {
       /* 斜めありのターン */
       const auto d_f = nd;          //< i.e. dir front
@@ -165,15 +155,14 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
         const auto nd_135 = nd + nd_rel_45 * 3;
         const auto nd_180 = nd + nd_rel_45 * 4;
         /* 横壁 */
-        const auto d_l = nd_90;            //< 左方向
+        const Dir d_l = nd_90;             //< 左方向
         if (canGo(v_f, d_l)) {             //< 45度方向の壁
           const auto v_fl = v_f.next(d_l); //< 前左の区画
           if (canGo(v_fl, d_f))            //< 45度先の壁
             succs.push_back(
                 {Index(v_f, d_l, nd_45), edge_cost.getEdgeCost(F45)});
           if (canGo(v_fl, d_l)) //< 90度先の壁
-            succs.push_back(
-                {Index(v_fl, Dir::Max, nd_90), edge_cost.getEdgeCost(F90)});
+            succs.push_back({Index(v_fl, nd_90), edge_cost.getEdgeCost(F90)});
           const auto d_b = d_f + Dir::Back;    //< 後方向
           if (canGo(v_fl, d_b)) {              //< 135度の壁
             const auto v_fll = v_fl.next(d_b); //< 前左左の区画
@@ -181,8 +170,8 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
               succs.push_back(
                   {Index(v_fll, d_f, nd_135), edge_cost.getEdgeCost(F135)});
             if (canGo(v_fll, d_b)) //< 180度行先の壁
-              succs.push_back({Index(v_fll, Dir::Max, nd_180),
-                               edge_cost.getEdgeCost(F180)});
+              succs.push_back(
+                  {Index(v_fll, nd_180), edge_cost.getEdgeCost(F180)});
           }
         }
       }
@@ -192,7 +181,7 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
       for (const auto d_turn : {Dir::Left, Dir::Right})
         if (canGo(v_f, nd + d_turn)) //< 90度方向の壁
           succs.push_back(
-              {Index(v_f, Dir::Max, nd + d_turn), edge_cost.getEdgeCost(FS90)});
+              {Index(v_f, nd + d_turn), edge_cost.getEdgeCost(FS90)});
     }
   } else {
     /* 壁の中央（斜めありの場合しかありえない） */
@@ -212,25 +201,23 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
       i_st = i_ff;
     }
     /* ターン */
-    auto nd_r45 = arrow_diag_to_along_45();
-    auto d_45 = nd + nd_r45;
-    auto nd_90 = nd + nd_r45 * 2;
-    auto d_135 = nd + nd_r45 * 3;
-    auto v_45 = i_f.arrow_to();
+    const auto nd_r45 = arrow_diag_to_along_45();
+    const auto d_45 = nd + nd_r45;
+    const auto nd_90 = nd + nd_r45 * 2;
+    const Dir d_135 = nd + nd_r45 * 3;
+    const auto v_45 = i_f.arrow_to();
     /* 45度方向 */
     if (canGo(v_45, d_45))
-      succs.push_back(
-          {Index(v_45, Dir::Max, d_45), edge_cost.getEdgeCost(F45)});
+      succs.push_back({Index(v_45, d_45), edge_cost.getEdgeCost(F45)});
     /* V90方向, 135度方向*/
     if (canGo(v_45, d_135)) {
       /* V90方向, 135度方向*/
-      auto v_135 = v_45.next(d_135);
+      const auto v_135 = v_45.next(d_135);
       if (canGo(v_135, d_45))
         succs.push_back(
             {Index(v_45, d_135, nd_90), edge_cost.getEdgeCost(FV90)});
       if (canGo(v_135, d_135))
-        succs.push_back(
-            {Index(v_135, Dir::Max, d_135), edge_cost.getEdgeCost(F135)});
+        succs.push_back({Index(v_135, d_135), edge_cost.getEdgeCost(F135)});
     }
   }
   return succs;
@@ -259,15 +246,13 @@ Index::getPredecessors(const Maze &maze, const EdgeCost &edge_cost,
     /* 直進で行けるところまで行く */
     int8_t n = 1;
     for (auto v_st = v_b.next(d_b); canGo(v_st, nd); v_st = v_st.next(d_b), ++n)
-      preds.push_back(
-          {Index(v_st, Dir::Max, nd), edge_cost.getEdgeCost(ST_ALONG, n)});
+      preds.push_back({Index(v_st, nd), edge_cost.getEdgeCost(ST_ALONG, n)});
     /* ここからはターン */
     /* 左右を一般化 */
     for (const auto d_turn : {Dir::Left, Dir::Right})
       if (canGo(v_b, nd + d_turn)) //< 90度方向の壁
-        preds.push_back(
-            {Index(v_b.next(nd + d_turn), Dir::Max, nd + d_turn + Dir::Back),
-             edge_cost.getEdgeCost(FS90)});
+        preds.push_back({Index(v_b.next(nd + d_turn), nd + d_turn + Dir::Back),
+                         edge_cost.getEdgeCost(FS90)});
     return preds; /* 終了 */
   }
   /* それ以外 */
@@ -282,10 +267,6 @@ Index::getPredecessors(const Maze &maze, const EdgeCost &edge_cost,
 
 bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
                                          const bool diag_enabled) {
-  const auto dest = convertDestinations(maze.getGoals());
-  update(maze, edge_cost, dest, known_only, diag_enabled);
-  return genPathFromMap(path);
-#if 0
   /* min max */
   int8_t max_x = maze.getMaxX();
   int8_t max_y = maze.getMaxY();
@@ -302,8 +283,8 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     f = CostMax;
   /* push the goal indexes */
   for (const auto v : maze.getGoals())
-    for (const auto nd : Dir::ENWS()) {
-      const auto i = Index(v, Dir::Max, nd);
+    for (const auto nd : Dir::getAlong4()) {
+      const auto i = Index(v, nd);
       f_map[i] = 0;
       in_map[i] = true;
       open_list.push_back(i);
@@ -321,6 +302,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     std::pop_heap(open_list.begin(), open_list.end(), greater);
     const auto index = open_list.back();
     open_list.pop_back();
+    // logi << index << std::endl;
     /* breaking condition */
     if (index == index_start.opposite())
       break;
@@ -362,7 +344,6 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     i = from_map[i];
   }
   return true;
-#endif
 }
 
 void ShortestAlgorithm::print(const Indexes indexes, std::ostream &os) const {

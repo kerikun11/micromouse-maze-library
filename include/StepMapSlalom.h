@@ -465,7 +465,7 @@ public:
   static const Indexes convertDestinations(const Vectors &src) {
     Indexes dest;
     for (const auto v : src)
-      for (const auto nd : Dir::ENWS())
+      for (const auto nd : Dir::getAlong4())
         dest.push_back(Index(v, nd));
     return dest;
   }

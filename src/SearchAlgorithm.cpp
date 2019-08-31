@@ -223,8 +223,8 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
   }
   /* diag */
   {
-    Dirs shortest_dirs;
-    if (!step_map_wall.calcShortestDirs(maze, shortest_dirs, false, simple))
+    Dirs shortest_dirs = step_map_wall.calcShortestDirs(maze, false, simple);
+    if (shortest_dirs.empty())
       return false; /*< 失敗 */
 
     // shortest_dirs = StepMapWall::convertWallIndexDirsToVectorDirs(
@@ -280,7 +280,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
   for (int8_t x = 0; x < max_x; ++x)
     for (int8_t y = 0; y < max_y; ++y) {
       const auto offset_v = Vector(x, y);
-      for (const auto offset_d : Dir::ENWS()) {
+      for (const auto offset_d : Dir::getAlong4()) {
         int unknown = 0; /*< 未知壁数 */
         int diffs = 0;   /*< 既知壁との食い違い数を数える */
         for (const auto wl : idWallLogs) {
@@ -317,7 +317,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
 const Dirs SearchAlgorithm::findMatchDirCandidates(const Vector cur_v,
                                                    const VecDir target) const {
   Dirs result_dirs;
-  for (const auto offset_d : Dir::ENWS()) {
+  for (const auto offset_d : Dir::getAlong4()) {
     const auto offset_v = target.first - (cur_v - idOffset).rotate(offset_d);
     int diffs = 0; /*< 既知壁との食い違い数を数える */
     for (const auto wl : idMaze.getWallLogs()) {

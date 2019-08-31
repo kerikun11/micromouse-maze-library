@@ -93,7 +93,7 @@ int test_measurement() {
     step_map.update(maze_target, maze_target.getGoals(), false, false);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
-        for (const auto d : Dir::ENWS()) {
+        for (const auto d : Dir::getAlong4()) {
           const auto v = Vector(x, y);
           if (step_map.getStep(v) == STEP_MAX)
             continue; /*< そもそも行けない区画は除外 */
@@ -136,7 +136,7 @@ int test_measurement() {
       }
       std::cout << "Shortest " << (diag_enabled ? "diag" : "no_d") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
-      // sa.printPath(path);
+      // sa.print(path);
     }
 #endif
 
@@ -177,7 +177,8 @@ int test_measurement() {
       Dirs shortest_dirs;
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
-        if (!map.calcShortestDirs(maze, shortest_dirs, known_only, simple))
+        shortest_dirs = map.calcShortestDirs(maze, known_only, simple);
+        if (shortest_dirs.empty())
           loge << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
         const auto us =

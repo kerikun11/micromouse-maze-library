@@ -62,8 +62,14 @@ static constexpr int MAZE_SIZE_BIT = std::log2(MAZE_SIZE);
 #endif
 
 /**
- * @brief 迷路上の方向を表す．実体は1Byte．絶対or相対の8方位を表す．
- * 実体は 8bit の整数
+ * @brief 迷路上の方向を表す．
+ * 実体は 8bit の整数．
+ * 絶対方向 or 相対方向の8方位を表現することができる．
+ * コンストラクタにより8方位(0-7)に自動的に収められるので，
+ * 加法，減法により相対方向を計算することができる．
+ * 例: Dir(Dir::East + Dir::Left) == Dir::North
+ * 例: Dir(Dir::East - Dir::West) == Dir::Back
+ * 例: Dir(-Dir::Left) == Dir::Right
  */
 struct Dir {
 public:
@@ -94,14 +100,13 @@ public:
     Right45,
   };
   /**
-   * @brief 方向の総数
+   * @brief 方向の総数．for文などで使える．
    */
   static constexpr int8_t Max = 8;
 
 public:
   /**
    * @brief Construct a new Dir object
-   * @param d Direction
    */
   Dir(const AbsoluteDir d = East) : d(d) {} /**< enum ならそのまま格納 */
   Dir(const int8_t d) : d(d & 7) {} /**< @brief 定義範囲内に直す */
@@ -109,16 +114,17 @@ public:
   operator int8_t() const { return d; }
   /** @brief 表示用char型へのキャスト */
   char toChar() const { return ">'^`<,v.X"[d]; }
+  /** @brief 斜めかどうかの判定 */
   bool isAlong() const { return (d & 1) == 0; }
   bool isDiag() const { return (d & 1) == 1; }
   /**
    *  @brief 方向配列を生成する静的関数
    */
-  static const std::array<Dir, 4> &ENWS() {
+  static const std::array<Dir, 4> &getAlong4() {
     static const std::array<Dir, 4> ds{East, North, West, South};
     return ds;
   }
-  static const std::array<Dir, 4> &Diag4() {
+  static const std::array<Dir, 4> &getDiag4() {
     static const std::array<Dir, 4> ds{NorthEast, NorthWest, SouthWest,
                                        SouthEast};
     return ds;
@@ -151,8 +157,8 @@ public:
   static constexpr int SIZE = MAZE_SIZE * MAZE_SIZE;
   /* @brief 座標の構造体を定義 */
   struct {
-    int8_t x; /**< @brief 迷路の区画座標 */
-    int8_t y; /**< @brief 迷路の区画座標 */
+    int8_t x; /**< @brief 迷路区画のx座標成分 */
+    int8_t y; /**< @brief 迷路区画のy座標成分 */
   };
   uint16_t all; /**< @brief まとめて扱うとき用 */
 
@@ -165,7 +171,6 @@ public:
   Vector() : all(0) {}
   /**
    * @brief 迷路区画内の通し番号となるIDを取得する
-   *
    * @return uint16_t 通し番号ID
    */
   operator uint16_t() const { return (x << MAZE_SIZE_BIT) | y; }
@@ -180,10 +185,10 @@ public:
   }
   bool operator==(const Vector v) const { return this->all == v.all; }
   bool operator!=(const Vector v) const { return this->all != v.all; }
-  /** @function next
-   *  @brief 自分の引数方向に隣接した区画のVectorを返す
-   *  @param 隣接方向
-   *  @return 隣接座標
+  /**
+   * @brief 自分の引数方向に隣接した区画のVectorを返す
+   * @param 隣接方向
+   * @return 隣接座標
    */
   const Vector next(const Dir d) const;
   /**
@@ -192,13 +197,13 @@ public:
    * @return false フィールド内
    */
   bool isOutsideofField() const {
+    // return x < 0 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE;
     /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
     return ((x | y) & (0x100 - MAZE_SIZE));
-    // return x < 0 || x >= MAZE_SIZE || y < 0 || y >= MAZE_SIZE;
   }
   /**
    * @brief 座標を回転変換する
-   * @param d 回転角度, 4方位
+   * @param d 回転角度, 4方位のみ
    * @return const Vector
    */
   const Vector rotate(const Dir d) const;
@@ -228,6 +233,13 @@ std::ostream &operator<<(std::ostream &os, const VecDir &obj);
 /**
  * @brief 区画ベースではなく，壁ベースの管理ID
  * uint16_t にキャストすると，全部の壁が通し番号になったIDを取得できるのが特徴
+ * 迷路内部の壁の総数 WallIndex::SIZE 個の配列を確保しておけば，
+ * 取得したIDをインデックスとして使える．そのとき， WallIndex が
+ * 迷路の内部にあるかどうか確認すること．(配列の範囲外アクセス防止)
+ * isInsideOfField() 関数により迷路の内部に位置するか確認できる．
+ * 最初から全部が通し番号のIDで保持してしまうと，
+ * 迷路の範囲外の壁を表現できなくなってしまうため，
+ * 必要に応じてIDを生成するようになっている．
  */
 union __attribute__((__packed__)) WallIndex {
   /**
