@@ -22,16 +22,18 @@ int test_measurement() {
   std::ofstream csv("measurement.csv");
   const std::string mazedata_dir = "../mazedata/";
   for (const auto filename : {
-           "32MM2018HX.maze",       "32MM2017HX.maze",
-           "32MM2016HX.maze",       "32MM2015HX.maze",
-           "32MM2014HX.maze",       "32MM2013HX.maze",
-           "32MM2012HX.maze",       "16MM2019H_kanazawa.maze",
-           "16MM2019H_kansai.maze", "16MM2018C.maze",
-           "16MM2018H_semi.maze",   "16MM2017C_East.maze",
-           "16MM2017H_Cheese.maze", "16MM2017H_Tashiro.maze",
-           "16MM2017CX_pre.maze",   "16MM2017CX.maze",
-           "16MM2016C_Chubu.maze",  "16MM2016CX.maze",
-           "16MM2013CX.maze",       "08MM2016CF_pre.maze",
+           "32MM2018HX.maze",         "32MM2017HX.maze",
+           "32MM2016HX.maze",         "32MM2015HX.maze",
+           "32MM2014HX.maze",         "32MM2013HX.maze",
+           "32MM2012HX.maze",         "16MM2019H_kansai.maze",
+           "16MM2019H_kanazawa.maze", "16MM2018H_semi.maze",
+           "16MM2018H_Chubu.maze",    "16MM2018C.maze",
+           "16MM2017H_Tashiro.maze",  "16MM2017H_Chubu.maze",
+           "16MM2017H_Cheese.maze",   "16MM2017CX.maze",
+           "16MM2017CX_pre.maze",     "16MM2017C_East.maze",
+           "16MM2017C_Chubu.maze",    "16MM2016CX.maze",
+           "16MM2016C_Chubu.maze",    "16MM2015C_Chubu.maze",
+           "16MM2013CX.maze",         "08MM2016CF_pre.maze",
            //  "32MazeUnknown.maze",
        }) {
     std::cout << std::endl;

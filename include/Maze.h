@@ -347,7 +347,7 @@ using WallIndexes = std::vector<WallIndex>;
 union WallLog {
   struct __attribute__((__packed__)) {
     int x : 6;          /**< @brief 区画のx座標 */
-    int y : 6;          /**< @brief 区画のx座標 */
+    int y : 6;          /**< @brief 区画のy座標 */
     unsigned int d : 3; /**< @brief 壁の方向 */
     unsigned int b : 1; /**< @brief 壁の有無 */
   };
@@ -387,18 +387,18 @@ public:
     reset();
   }
   /**
-   *  @brief 迷路ファイルから迷路情報をパースするコンストラクタ
-   *  @param filename ファイル名
+   * @brief 迷路ファイルから迷路情報をパースするコンストラクタ
+   * @param filename ファイル名
    */
   Maze(const char *filename) { parse(filename); }
   /**
-   *  @brief 迷路の初期化．壁を削除し，スタート区画を既知に
-   *  @param set_start_wall スタート区画の East と North の壁を設定するかどうか
+   * @brief 迷路の初期化．壁を削除し，スタート区画を既知に
+   * @param set_start_wall スタート区画の East と North の壁を設定するかどうか
    */
   void reset(const bool set_start_wall = true);
   /**
-   *  @brief 壁の有無を返す
-   *  @return true: 壁あり，false: 壁なし
+   * @brief 壁の有無を返す
+   * @return true: 壁あり，false: 壁なし
    */
   bool isWall(const WallIndex i) const { return isWallBase(wall, i); }
   bool isWall(const Vector v, const Dir d) const {
@@ -408,8 +408,8 @@ public:
     return isWallBase(wall, WallIndex(x, y, d));
   }
   /**
-   *  @brief 壁を更新をする
-   *  @param b 壁の有無 true:壁あり，false:壁なし
+   * @brief 壁を更新をする
+   * @param b 壁の有無 true:壁あり，false:壁なし
    */
   void setWall(const WallIndex i, const bool b) {
     return setWallBase(wall, i, b);
@@ -421,8 +421,8 @@ public:
     return setWallBase(wall, WallIndex(x, y, d), b);
   }
   /**
-   *  @brief 壁が探索済みかを返す
-   *  @return true: 探索済み，false: 未探索
+   * @brief 壁が探索済みかを返す
+   * @return true: 探索済み，false: 未探索
    */
   bool isKnown(const WallIndex i) const { return isWallBase(known, i); }
   bool isKnown(const Vector v, const Dir d) const {
@@ -432,8 +432,8 @@ public:
     return isWallBase(known, WallIndex(x, y, d));
   }
   /**
-   *  @brief 壁の既知を更新する
-   *  @param b 壁の未知既知 true:既知，false:未知
+   * @brief 壁の既知を更新する
+   * @param b 壁の未知既知 true:既知，false:未知
    */
   void setKnown(const WallIndex i, const bool b) {
     return setWallBase(known, i, b);
@@ -445,20 +445,20 @@ public:
     return setWallBase(known, WallIndex(x, y, d), b);
   }
   /**
-   *  @brief 通過可能かどうかを返す
-   *  @return true:既知かつ壁なし，false:それ以外
+   * @brief 通過可能かどうかを返す
+   * @return true:既知かつ壁なし，false:それ以外
    */
   bool canGo(const WallIndex i) const { return isKnown(i) && !isWall(i); }
   bool canGo(const Vector v, const Dir d) const {
     return canGo(WallIndex(v, d));
   }
   /**
-   *  @brief 既知の壁情報と照らしあわせながら，壁を更新する関数
-   *         既知の壁と非一致した場合，未知壁にして return する
-   *  @param v 区画の座標
-   *  @param d 壁の方向
-   *  @param b 壁の有無
-   *  @return true: 正常に更新された, false: 既知の情報と不一致だった
+   * @brief 既知の壁情報と照らしあわせながら，壁を更新する関数
+   *        既知の壁と非一致した場合，未知壁にして return する
+   * @param v 区画の座標
+   * @param d 壁の方向
+   * @param b 壁の有無
+   * @return true: 正常に更新された, false: 既知の情報と不一致だった
    */
   bool updateWall(const Vector v, const Dir d, const bool b,
                   const bool pushLog = true);
@@ -468,25 +468,33 @@ public:
    */
   void resetLastWall(const int num);
   /**
-   *  @brief 引数区画の壁の数を返す
-   *  @param v 区画の座標
-   *  @return 壁の数 0~4
+   * @brief 引数区画の壁の数を返す
+   * @param v 区画の座標
+   * @return 壁の数 0~4
    */
   int8_t wallCount(const Vector v) const;
   /**
-   *  @brief 引数区画に隣接する未知壁の数を返す
-   *  @param v 区画の座標
-   *  @return 既知壁の数 0~4
+   * @brief 引数区画に隣接する未知壁の数を返す
+   * @param v 区画の座標
+   * @return 既知壁の数 0~4
    */
   int8_t unknownCount(const Vector v) const;
   /**
-   *  @brief 迷路の表示
+   * @brief 迷路の表示
    */
   void print(std::ostream &os = std::cout,
              const int maze_size = MAZE_SIZE) const;
   /**
-   *  @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
-   *  @param is *.maze 形式のファイルの input-stream
+   * @brief パス付の迷路の表示
+   * @param start パスのスタート座標
+   * @param dirs 移動方向の配列
+   * @param of output-stream
+   */
+  void printPath(const Dirs &dirs, const Vector start = Vector(0, 0),
+                 std::ostream &os = std::cout) const;
+  /**
+   * @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
+   * @param is *.maze 形式のファイルの input-stream
    */
   bool parse(std::istream &is);
   bool parse(std::string filepath) {
@@ -496,51 +504,83 @@ public:
     return parse(ifs);
   }
   /**
-   *  @brief 配列から迷路を読み込むパーサ
-   *  @param data 各区画16進表記の文字列配列
-   *  例：{"abaf", "1234", "abab", "aaff"}
+   * @brief 配列から迷路を読み込むパーサ
+   * @param data 各区画16進表記の文字列配列
+   * 例：{"abaf", "1234", "abab", "aaff"}
    */
-  bool parse(const std::vector<std::vector<char>> data,
-             const std::array<Dir, 4> bit_to_dir_map,
-             const int maze_size = MAZE_SIZE);
+  bool parse(const std::vector<std::string> data, const int maze_size);
   /**
-   * @brief Set the Goals object
+   * @brief ゴール区画の集合を更新
    */
   void setGoals(const Vectors &goals) { this->goals = goals; }
   /**
-   * @brief Set the Start object
+   * @brief スタート区画を更新
    */
   void setStart(const Vector start) { this->start = start; }
   /**
-   * @brief Get the Goals object
+   * @brief ゴール区画の集合を取得
    */
   const Vectors &getGoals() const { return goals; }
   /**
-   * @brief Get the Start object
+   * @brief スタート区画を取得
    */
   const Vector &getStart() const { return start; }
   /**
-   * @brief Get the Wall Logs object
+   * @brief 壁ログを取得
    */
   const WallLogs &getWallLogs() const { return wallLogs; }
   /**
-   * @brief 既知迷路のサイズを返す
+   * @brief 既知部分の迷路サイズを返す．計算量を減らすために使用．
    */
   int8_t getMinX() const { return min_x; }
   int8_t getMinY() const { return min_y; }
   int8_t getMaxX() const { return max_x; }
   int8_t getMaxY() const { return max_y; }
-
-  /* 便利関数 */
-public:
   /**
-   *  @brief パス付の迷路の表示
-   *  @param start パスのスタート座標
-   *  @param dirs 移動方向の配列
-   *  @param of output-stream
+   * @brief 壁ログをファイルに保存する関数
    */
-  void printPath(const Dirs &dirs, const Vector start = Vector(0, 0),
-                 std::ostream &os = std::cout) const;
+  bool backupWallLogsFromFile(const std::string filepath) {
+    std::ifstream fs(filepath, std::ifstream::ate);
+    const auto size = static_cast<size_t>(fs.tellg());
+    if (size / sizeof(WallLog) > getWallLogs().size()) {
+      std::remove(filepath.c_str());
+      backup_counter = 0;
+    }
+    std::ofstream of(filepath, std::ios::binary | std::ios::app);
+    if (of.fail()) {
+      loge << "failed to open file! " << filepath << std::endl;
+      return false;
+    }
+    const auto &wallLog = getWallLogs();
+    while (backup_counter < wallLog.size()) {
+      const auto &wl = wallLog[backup_counter];
+      of.write((const char *)&wl, sizeof(wl));
+      backup_counter++;
+    }
+    return true;
+  }
+  /**
+   * @brief 壁ログファイルから壁情報を復元する関数
+   */
+  bool restoreWallLogsFromFile(const std::string filepath) {
+    std::ifstream f(filepath, std::ios::binary);
+    if (f.fail()) {
+      loge << "failed to open file! " << filepath << std::endl;
+      return false;
+    }
+    backup_counter = 0;
+    reset();
+    while (!f.eof()) {
+      WallLog wl;
+      f.read((char *)(&wl), sizeof(WallLog));
+      Vector v = Vector(wl.x, wl.y);
+      Dir d = Dir(wl.d);
+      bool b = wl.b;
+      updateWall(v, d, b);
+      backup_counter++;
+    }
+    return true;
+  }
   /**
    * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
    * @param maze 迷路の参照
@@ -560,6 +600,7 @@ private:
   int8_t min_y;                       /**< @brief 既知壁の最小区画 */
   int8_t max_x;                       /**< @brief 既知壁の最大区画 */
   int8_t max_y;                       /**< @brief 既知壁の最大区画 */
+  size_t backup_counter; /**< 壁ログバックアップのカウンタ */
 
   /**
    * @brief 壁の確認のベース関数

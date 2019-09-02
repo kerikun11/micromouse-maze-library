@@ -96,6 +96,7 @@ void Maze::reset(const bool set_start_wall) {
   min_y = MAZE_SIZE - 1;
   max_x = 0;
   max_y = 0;
+  backup_counter = 0;
   if (set_start_wall) {
     updateWall(Vector(0, 0), Dir::East, true);   //< start cell
     updateWall(Vector(0, 0), Dir::North, false); //< start cell
@@ -204,27 +205,50 @@ bool Maze::parse(std::istream &is) {
   }
   return true;
 }
-bool Maze::parse(const std::vector<std::vector<char>> data,
-                 const std::array<Dir, 4> bit_to_dir_map, const int maze_size) {
-  for (int8_t y = 0; y < maze_size; ++y)
-    for (int8_t x = 0; x < maze_size; ++x) {
-      // const char c = data[x][maze_size - y - 1];
-      const char c = data[x][y];
-      uint8_t h = 0;
-      if ('0' <= c && c <= '9')
-        h = c - '0';
-      else if ('a' <= c && c <= 'f')
-        h = c - 'a' + 10;
-      else if ('A' <= c && c <= 'F')
-        h = c - 'A' + 10;
-      else if (0 <= c && c <= 15)
-        h = c;
-      updateWall(Vector(x, y), bit_to_dir_map[0], h & 0x01, false);
-      updateWall(Vector(x, y), bit_to_dir_map[1], h & 0x02, false);
-      updateWall(Vector(x, y), bit_to_dir_map[2], h & 0x04, false);
-      updateWall(Vector(x, y), bit_to_dir_map[3], h & 0x08, false);
-    }
-  return true;
+bool Maze::parse(const std::vector<std::string> data, const int maze_size) {
+  for (const auto xr : {true, false})
+    for (const auto yr : {true, false})
+      for (const auto xy : {true, false})
+        for (const auto b0 : Dir::getAlong4())
+          for (const auto b1 : Dir::getAlong4())
+            for (const auto b2 : Dir::getAlong4())
+              for (const auto b3 : Dir::getAlong4()) {
+                const std::array<Dir, 4> bit_to_dir_map{b0, b1, b2, b3};
+                reset(false);
+                int diffs = 0;
+                for (int8_t y = 0; y < maze_size; ++y) {
+                  for (int8_t x = 0; x < maze_size; ++x) {
+                    const int8_t xd = xr ? x : (maze_size - x - 1);
+                    const int8_t yd = yr ? y : (maze_size - y - 1);
+                    const char c = xy ? data[xd][yd] : data[yd][xd];
+                    uint8_t h = 0;
+                    if ('0' <= c && c <= '9')
+                      h = c - '0';
+                    else if ('a' <= c && c <= 'f')
+                      h = c - 'a' + 10;
+                    else if ('A' <= c && c <= 'F')
+                      h = c - 'A' + 10;
+                    else if (0 <= c && c <= 15)
+                      h = c;
+                    if (!updateWall(Vector(x, y), bit_to_dir_map[0], h & 0x01,
+                                    false))
+                      ++diffs;
+                    if (!updateWall(Vector(x, y), bit_to_dir_map[1], h & 0x02,
+                                    false))
+                      ++diffs;
+                    if (!updateWall(Vector(x, y), bit_to_dir_map[2], h & 0x04,
+                                    false))
+                      ++diffs;
+                    if (!updateWall(Vector(x, y), bit_to_dir_map[3], h & 0x08,
+                                    false))
+                      ++diffs;
+                  }
+                }
+                if (diffs < MAZE_SIZE && isWall(0, 0, Dir::East) &&
+                    !isWall(0, 0, Dir::North))
+                  return true;
+              }
+  return false;
 }
 void Maze::print(std::ostream &os, const int maze_size) const {
   for (int8_t y = maze_size; y >= 0; --y) {
