@@ -1,3 +1,10 @@
+/**
+ * @file RobotBase.cpp
+ * @brief ロボットのベース
+ * @author KERI (Github: kerikun11)
+ * @url https://kerikeri.top/
+ * @date 2017.10.30
+ */
 #include "RobotBase.h"
 
 namespace MazeLib {

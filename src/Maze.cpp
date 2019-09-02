@@ -7,9 +7,8 @@
  */
 #include "Maze.h"
 
-#include <algorithm>
-#include <cstdio>
-#include <iomanip> //< for std::setw()
+#include <algorithm> //< for std::find(), std::count_if()
+#include <iomanip>   //< for std::setw()
 
 namespace MazeLib {
 
@@ -205,6 +204,28 @@ bool Maze::parse(std::istream &is) {
   }
   return true;
 }
+bool Maze::parse(const std::vector<std::vector<char>> data,
+                 const std::array<Dir, 4> bit_to_dir_map, const int maze_size) {
+  for (int8_t y = 0; y < maze_size; ++y)
+    for (int8_t x = 0; x < maze_size; ++x) {
+      // const char c = data[x][maze_size - y - 1];
+      const char c = data[x][y];
+      uint8_t h = 0;
+      if ('0' <= c && c <= '9')
+        h = c - '0';
+      else if ('a' <= c && c <= 'f')
+        h = c - 'a' + 10;
+      else if ('A' <= c && c <= 'F')
+        h = c - 'A' + 10;
+      else if (0 <= c && c <= 15)
+        h = c;
+      updateWall(Vector(x, y), bit_to_dir_map[0], h & 0x01, false);
+      updateWall(Vector(x, y), bit_to_dir_map[1], h & 0x02, false);
+      updateWall(Vector(x, y), bit_to_dir_map[2], h & 0x04, false);
+      updateWall(Vector(x, y), bit_to_dir_map[3], h & 0x08, false);
+    }
+  return true;
+}
 void Maze::print(std::ostream &os, const int maze_size) const {
   for (int8_t y = maze_size; y >= 0; --y) {
     if (y != maze_size) {
@@ -230,28 +251,6 @@ void Maze::print(std::ostream &os, const int maze_size) const {
     os << "+" << std::endl;
   }
 }
-bool Maze::parse(const std::vector<std::vector<char>> data,
-                 const std::array<Dir, 4> bit_to_dir_map, const int maze_size) {
-  for (int8_t y = 0; y < maze_size; ++y)
-    for (int8_t x = 0; x < maze_size; ++x) {
-      // const char c = data[x][maze_size - y - 1];
-      const char c = data[x][y];
-      uint8_t h = 0;
-      if ('0' <= c && c <= '9')
-        h = c - '0';
-      else if ('a' <= c && c <= 'f')
-        h = c - 'a' + 10;
-      else if ('A' <= c && c <= 'F')
-        h = c - 'A' + 10;
-      else if (0 <= c && c <= 15)
-        h = c;
-      updateWall(Vector(x, y), bit_to_dir_map[0], h & 0x01, false);
-      updateWall(Vector(x, y), bit_to_dir_map[1], h & 0x02, false);
-      updateWall(Vector(x, y), bit_to_dir_map[2], h & 0x04, false);
-      updateWall(Vector(x, y), bit_to_dir_map[3], h & 0x08, false);
-    }
-  return true;
-}
 void Maze::printPath(const Dirs &dirs, const Vector start,
                      std::ostream &os) const {
   uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {0};
@@ -259,7 +258,7 @@ void Maze::printPath(const Dirs &dirs, const Vector start,
   int counter = 1;
   for (const auto d : dirs) {
     v = v.next(d);
-    if (v.isOutsideofField()) {
+    if (!v.isInsideOfField()) {
       loge << "Out of Field! " << v << std::endl;
       continue;
     }
@@ -284,6 +283,42 @@ void Maze::printPath(const Dirs &dirs, const Vector start,
                  ? (isWall(x, y, Dir::South) ? "---" : "   ")
                  : (C_RE " . " C_NO));
     os << "+" << std::endl;
+  }
+}
+void Maze::appendStraightDirs(const Maze &maze, Dirs &shortest_dirs,
+                              const bool diag_enabled) {
+  /* ゴール区画までたどる */
+  auto v = maze.getStart();
+  for (const auto d : shortest_dirs)
+    v = v.next(d);
+  if (shortest_dirs.size() < 2)
+    return;
+  auto prev_dir = shortest_dirs[shortest_dirs.size() - 1 - 1];
+  auto dir = shortest_dirs[shortest_dirs.size() - 1];
+  /* ゴール区画内を行けるところまで直進(斜め考慮)する */
+  bool loop = true;
+  while (loop) {
+    loop = false;
+    // 斜めを考慮した進行方向を列挙する
+    Dirs dirs;
+    const auto rel_dir = Dir(dir - prev_dir);
+    if (diag_enabled && rel_dir == Dir::Left)
+      dirs = {Dir(dir + Dir::Right), dir};
+    else if (diag_enabled && rel_dir == Dir::Right)
+      dirs = {Dir(dir + Dir::Left), dir};
+    else
+      dirs = {dir};
+    // 行ける方向に行く
+    for (const auto d : dirs) {
+      if (maze.canGo(v, d)) {
+        shortest_dirs.push_back(d);
+        v = v.next(d);
+        prev_dir = dir;
+        dir = d;
+        loop = true;
+        break;
+      }
+    }
   }
 }
 

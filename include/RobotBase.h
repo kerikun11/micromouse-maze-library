@@ -1,9 +1,9 @@
 /**
- *  @file RobotBase.h
- *  @brief ロボットのベース
- *  @author KERI (Github: kerikun11)
- *  @url https://kerikeri.top/
- *  @date 2017.10.30
+ * @file RobotBase.h
+ * @brief ロボットのベース
+ * @author KERI (Github: kerikun11)
+ * @url https://kerikeri.top/
+ * @date 2017.10.30
  */
 #pragma once
 

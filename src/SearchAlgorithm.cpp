@@ -168,15 +168,11 @@ bool SearchAlgorithm::findNextDir(const Maze &maze, const Vector v,
 bool SearchAlgorithm::calcShortestDirs(Dirs &shortest_dirs,
                                        const bool diag_enabled) {
   const bool known_only = true;
-  // Indexes path;
-  // if (!shortestAlgorithm.calcShortestPath(path, known_only, diag_enabled))
-  //   return false; /* failed */
-  // shortest_dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
   StepMapSlalom::EdgeCost edge_cost;
   if (!step_map_slalom.calcShortestDirs(maze, edge_cost, shortest_dirs,
                                         known_only, diag_enabled))
     return false; /* failed */
-  StepMap::appendStraightDirs(maze, shortest_dirs, diag_enabled);
+  Maze::appendStraightDirs(maze, shortest_dirs, diag_enabled);
   return true; /* 成功 */
 }
 
@@ -208,11 +204,12 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
   candidates.clear();
   /* no diag */
   {
-    Dirs shortest_dirs;
-    if (!step_map.calcShortestDirs(maze, shortest_dirs, false, simple))
+    /* 最短経路の導出 */
+    Dirs shortest_dirs = step_map.calcShortestDirs(maze, false, simple);
+    if (shortest_dirs.empty())
       return false; /*< 失敗 */
     /* ゴール区画内を行けるところまで直進する */
-    StepMap::appendStraightDirs(maze, shortest_dirs, false);
+    Maze::appendStraightDirs(maze, shortest_dirs, false);
     /* 経路中の未知壁区画を訪問候補に追加 */
     auto i = maze.getStart();
     for (const auto d : shortest_dirs) {
@@ -223,22 +220,10 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
   }
   /* diag */
   {
+    /* 最短経路の導出 */
     Dirs shortest_dirs = step_map_wall.calcShortestDirs(maze, false, simple);
     if (shortest_dirs.empty())
       return false; /*< 失敗 */
-
-    // shortest_dirs = StepMapWall::convertWallIndexDirsToVectorDirs(
-    //     shortest_dirs, WallIndex(0, 0, 1));
-    // /* ゴール区画内を行けるところまで直進する */
-    // StepMap::appendStraightDirs(maze, shortest_dirs, true);
-    // /* 経路中の未知壁区画を訪問候補に追加 */
-    // auto i = maze.getStart();
-    // for (const auto d : shortest_dirs) {
-    //   if (!maze.isKnown(i, d))
-    //     candidates.push_back(i);
-    //   i = i.next(d);
-    // }
-
     /* 経路中の未知壁区画を訪問候補に追加 */
     auto i = WallIndex(0, 0, 1);
     for (const auto d : shortest_dirs) {
@@ -249,16 +234,16 @@ bool SearchAlgorithm::findShortestCandidates(Vectors &candidates,
       }
     }
     /* ゴール区画内を行けるところまで直進する */
-    if (shortest_dirs.size() < 1)
-      return true;
-    const auto d = shortest_dirs.back();
-    while (1) {
-      i = i.next(d);
-      if (maze.isWall(i))
-        break;
-      if (!maze.isKnown(i)) {
-        candidates.push_back(i.getVector());
-        candidates.push_back(i.getVector().next(i.getDir()));
+    if (shortest_dirs.size()) {
+      const auto d = shortest_dirs.back();
+      while (1) {
+        i = i.next(d);
+        if (maze.isWall(i))
+          break;
+        if (!maze.isKnown(i)) {
+          candidates.push_back(i.getVector());
+          candidates.push_back(i.getVector().next(i.getDir()));
+        }
       }
     }
   }
@@ -287,7 +272,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
           const auto maze_v =
               (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
           const auto maze_d = wl.d + offset_d;
-          if (maze_v.isOutsideofField()) {
+          if (!maze_v.isInsideOfField()) {
             diffs = many;
             break;
           }
@@ -323,7 +308,7 @@ const Dirs SearchAlgorithm::findMatchDirCandidates(const Vector cur_v,
     for (const auto wl : idMaze.getWallLogs()) {
       const auto maze_v = (Vector(wl) - idOffset).rotate(offset_d) + offset_v;
       const auto maze_d = wl.d + offset_d;
-      if (maze_v.isOutsideofField()) {
+      if (!maze_v.isInsideOfField()) {
         diffs = 9999;
         break;
       }
@@ -406,6 +391,13 @@ SearchAlgorithm::Result
 SearchAlgorithm::calcNextDirsBackingToStart(const Vector cv, const Dir cd,
                                             Dirs &nextDirsKnown,
                                             Dirs &nextDirCandidates) {
+  /* 最短経路で帰れる場合はそれで帰る */
+  nextDirCandidates.clear();
+  nextDirsKnown =
+      step_map.calcShortestDirs(maze, cv, {maze.getStart()}, true, false);
+  if (!nextDirsKnown.empty())
+    return Reached;
+  /* 行程に未知壁がある */
   const auto v = step_map.calcNextDirsAdv(maze, {maze.getStart()}, cv, cd,
                                           nextDirsKnown, nextDirCandidates);
   if (v == maze.getStart())

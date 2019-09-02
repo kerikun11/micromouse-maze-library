@@ -1,9 +1,9 @@
 /**
- *  @file StepMap.h
- *  @brief マイクロマウスの迷路のステップマップを扱うクラス
- *  @author KERI (Github: kerikun11)
- *  @url https://kerikeri.top/
- *  @date 2017.11.05
+ * @file StepMap.h
+ * @brief マイクロマウスの迷路のステップマップを扱うクラス
+ * @author KERI (Github: kerikun11)
+ * @url https://kerikeri.top/
+ * @date 2017.11.05
  */
 #pragma once
 
@@ -22,7 +22,7 @@ static constexpr step_t STEP_MAX =
 class StepMap {
 public:
   /**
-   * @brief Construct a new Step Map object
+   * @brief コンストラクタ
    */
   StepMap();
   /**
@@ -35,27 +35,26 @@ public:
    * @param v 区画の座標
    * @return ステップ
    */
-  step_t getStep(const Vector v) const { return getStep(v.x, v.y); }
   step_t getStep(const int8_t x, const int8_t y) const;
+  step_t getStep(const Vector v) const { return getStep(v.x, v.y); }
   /**
    * @param ステップへの参照の取得，書き込み可能
    * @param v 区画の座標
-   * @return ステップメモリの参照
    */
-  bool setStep(const Vector v, const step_t step) {
+  void setStep(const int8_t x, const int8_t y, const step_t step);
+  void setStep(const Vector v, const step_t step) {
     return setStep(v.x, v.y, step);
   }
-  bool setStep(const int8_t x, const int8_t y, const step_t step);
   /**
    * @brief ステップの表示
    * @param v ハイライト区画
    */
-  void printFull(const Maze &maze, std::ostream &os = std::cout) const;
   void print(const Maze &maze, const Vector v = Vector(-1, -1),
              const Dir d = Dir::Max, std::ostream &os = std::cout) const;
   void print(const Maze &maze, const Dirs &dirs,
              const Vector start = Vector(0, 0),
              std::ostream &os = std::cout) const;
+  void printFull(const Maze &maze, std::ostream &os = std::cout) const;
   /**
    * @brief ステップマップの更新
    * @param dest ステップを0とする区画の配列
@@ -79,22 +78,25 @@ public:
                                const Vector vec, const Dir dir,
                                Dirs &nextDirsKnown, Dirs &nextDirCandidates);
   /**
-   * @brief 最短経路を導出する関数
-   *
-   * @return true 成功
-   * @return false 失敗
-   */
-  bool calcShortestDirs(const Maze &maze, Dirs &shortest_dirs,
-                        const bool known_only, const bool simple);
-  /**
-   * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
-   *
+   * @brief 与えられた区画間の最短経路を導出する関数
    * @param maze 迷路の参照
-   * @param shortest_dirs 追記元の方向列
-   * @param diag_enabled 斜めありなし
+   * @param start 始点区画
+   * @param goals ゴール区画の集合
+   * @param known_only 既知壁のみモードかどうか
+   * @return const Dirs スタートからゴールへの最短経路の方向列．
+   *                    経路がない場合は空配列となる．
    */
-  static void appendStraightDirs(const Maze &maze, Dirs &shortest_dirs,
-                                 const bool diag_enabled);
+  const Dirs calcShortestDirs(const Maze &maze, const Vector start,
+                              const Vectors &dest, const bool known_only,
+                              const bool simple);
+  /**
+   * @brief スタートからゴールまでの最短経路を導出する関数
+   */
+  const Dirs calcShortestDirs(const Maze &maze, const bool known_only,
+                              const bool simple) {
+    return calcShortestDirs(maze, maze.getStart(), maze.getGoals(), known_only,
+                            simple);
+  }
 
 private:
   step_t step_map[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
@@ -107,16 +109,12 @@ private:
   void calcStraightStepTable();
   /**
    * @brief ステップマップにより次に行くべき方向列を生成する
-   * @return true:成功, false:失敗(迷子)
    */
   const Dirs calcNextDirsStepDown(const Maze &maze, const VecDir start,
-                                  VecDir &focus, const bool break_unknown,
-                                  const bool known_only) const;
+                                  VecDir &focus, const bool known_only,
+                                  const bool break_unknown) const;
   /**
    * @brief 引数区画の周囲の未知壁の確認優先順位を生成する関数
-   *
-   * @param maze
-   * @param focus
    * @return const Dirs 確認すべき優先順位
    */
   const Dirs calcNextDirCandidates(const Maze &maze, const VecDir focus) const;

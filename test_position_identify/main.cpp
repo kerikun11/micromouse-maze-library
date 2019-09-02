@@ -51,7 +51,7 @@ protected:
 int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = "32MM2014HX.maze";
+  const std::string filename = "32MM2017HX.maze";
   Maze maze_target = Maze((mazedata_dir + filename).c_str());
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;

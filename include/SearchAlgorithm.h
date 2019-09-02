@@ -8,7 +8,6 @@
 #pragma once
 
 #include "Maze.h"
-#include "ShortestAlgorithm.h"
 #include "StepMap.h"
 #include "StepMapSlalom.h"
 #include "StepMapWall.h"

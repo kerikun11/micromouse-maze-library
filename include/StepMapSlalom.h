@@ -8,10 +8,14 @@
 
 #include "Maze.h"
 
+#include <algorithm> /*< for std::find_if, etc. */
+#include <iomanip>   /*< for std::setw() */
+#include <queue>
+
 namespace MazeLib {
 
 /**
- * @brief 壁ベースのステップマップを表現するクラス
+ * @brief スラロームのコストベースのステップマップを表現するクラス
  */
 class StepMapSlalom {
 public:

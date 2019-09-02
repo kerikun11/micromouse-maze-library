@@ -4,7 +4,6 @@
  * @brief 壁ベースのステップマップを表現するクラス
  * @date 2019-08-17
  */
-
 #include "StepMapWall.h"
 
 #include <algorithm> /*< for std::sort */

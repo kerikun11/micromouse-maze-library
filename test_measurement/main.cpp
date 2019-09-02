@@ -1,4 +1,5 @@
 #include "CLRobotBase.h"
+#include "ShortestAlgorithm.h"
 
 using namespace MazeLib;
 
@@ -152,7 +153,8 @@ int test_measurement() {
       Dirs shortest_dirs;
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
-        if (!map.calcShortestDirs(maze, shortest_dirs, known_only, simple))
+        shortest_dirs = map.calcShortestDirs(maze, known_only, simple);
+        if (shortest_dirs.empty())
           loge << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
         const auto us =

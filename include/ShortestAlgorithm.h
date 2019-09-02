@@ -18,9 +18,6 @@
 #include <iomanip> /*< for std::setw() */
 #include <limits>  /*< for std::numeric_limits */
 
-#include <cmath>
-#include <queue>
-
 namespace MazeLib {
 
 using cost_t = uint16_t; /**< @brief 時間コストの型 [ms] */

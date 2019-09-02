@@ -10,13 +10,11 @@
  */
 #include "ShortestAlgorithm.h"
 
-#include <cmath>   /*< for std::sqrt */
-#include <utility> /*< for std::index_sequence */
+#include <cmath> /*< for std::sqrt */
 
 namespace MazeLib {
 
 /* union Index */
-
 void Index::uniquify(const Dir d) {
   switch (d) {
   case Dir::East:
@@ -264,7 +262,6 @@ Index::getPredecessors(const Maze &maze, const EdgeCost &edge_cost,
 }
 
 /* ShortestAlgorithm */
-
 bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
                                          const bool diag_enabled) {
   /* min max */
@@ -315,7 +312,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
         index.getSuccessors(maze, edge_cost, known_only, diag_enabled);
     for (const auto &s : succs) {
       const auto v = s.first.getVector();
-      if (v.isOutsideofField())
+      if (!v.isInsideOfField())
         loge << "Out of Range! " << s.first << std::endl;
       if (v.x > max_x + 1 || v.y > max_y + 1)
         continue;
@@ -345,7 +342,6 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   }
   return true;
 }
-
 void ShortestAlgorithm::print(const Indexes indexes, std::ostream &os) const {
   int steps[MAZE_SIZE][MAZE_SIZE] = {0};
   int counter = 1;
@@ -375,7 +371,6 @@ void ShortestAlgorithm::print(const Indexes indexes, std::ostream &os) const {
     os << "+" << std::endl;
   }
 }
-
 const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
                                            const bool diag_enabled) {
   if (!diag_enabled) {

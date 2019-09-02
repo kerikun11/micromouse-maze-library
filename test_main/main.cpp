@@ -80,7 +80,7 @@ int main(void) {
   // robot.endFastRunBackingToStartRun();
 #endif
 
-#if 1
+#if 0
   /* Shortest Algorithm */
   for (const auto diag_enabled : {false, true}) {
     const int n = 100;
@@ -107,7 +107,7 @@ int main(void) {
   }
 #endif
 
-#if 1
+#if 0
   /* StepMap */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
@@ -119,7 +119,9 @@ int main(void) {
     Dirs shortest_dirs;
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
-      if (!map.calcShortestDirs(maze, shortest_dirs, known_only, simple))
+      shortest_dirs = map.calcShortestDirs(maze, maze.getStart(),
+                                           maze.getGoals(), known_only, simple);
+      if (shortest_dirs.empty())
         loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
@@ -132,7 +134,7 @@ int main(void) {
   }
 #endif
 
-#if 1
+#if 0
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
@@ -158,7 +160,7 @@ int main(void) {
   }
 #endif
 
-#if 1
+#if 0
   /* StepMapSlalom */
   for (const auto diag_enabled : {false, true}) {
     const bool known_only = 0;
