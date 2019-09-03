@@ -107,28 +107,123 @@ void StepMap::print(const Maze &maze, const Dirs &dirs, const Vector start,
     os << "+" << std::endl;
   }
 }
-void StepMap::printFull(const Maze &maze, std::ostream &os) const {
+void StepMap::printFull(const Maze &maze, const Vector v, const Dir d,
+                        std::ostream &os) const {
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
       for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
-        os << C_CY << std::setw(5) << std::min(getStep(x, y), (step_t)99999)
+        os << C_CY << std::setw(5) << std::min((int)getStep(x, y), 99999)
            << C_NO;
-        os << (maze.isKnown(x, y, Dir::East)
-                   ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
-                   : (C_RE "." C_NO));
+        if ((v == Vector(x, y) && d == Dir::West) ||
+            (v == Vector(x, y).next(Dir::East) && d == Dir::East))
+          os << C_YE << d.toChar() << C_NO;
+        else
+          os << (maze.isKnown(x, y, Dir::East)
+                     ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+                     : (C_RE "." C_NO));
       }
       os << std::endl;
     }
     for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
       os << "+";
-      os << (maze.isKnown(x, y, Dir::South)
-                 ? (maze.isWall(x, y, Dir::South) ? "-----" : "     ")
-                 : (C_RE " . . " C_NO));
+      if ((v == Vector(x, y) && d == Dir::North) ||
+          (v == Vector(x, y).next(Dir::South) && d == Dir::South))
+        os << "  " << C_YE << d.toChar() << C_NO << "  ";
+      else
+        os << (maze.isKnown(x, y, Dir::South)
+                   ? (maze.isWall(x, y, Dir::South) ? "-----" : "     ")
+                   : (C_RE " . . " C_NO));
     }
     os << "+" << std::endl;
   }
 }
+void StepMap::printFull(const Maze &maze, const Dirs &dirs, const Vector start,
+                        std::ostream &os) const {
+  std::vector<VecDir> path;
+  Vector v = start;
+  for (const auto d : dirs) {
+    v = v.next(d);
+    path.push_back({v, d});
+  }
+  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
+    if (y != MAZE_SIZE) {
+      os << '|';
+      for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+        os << C_CY << std::setw(5) << std::min((int)getStep(x, y), 99999)
+           << C_NO;
+        bool found = false;
+        for (const auto vd : path) {
+          const auto v = vd.first;
+          const auto d = vd.second;
+          if ((v == Vector(x, y) && d == Dir::West) ||
+              (v == Vector(x, y).next(Dir::East) && d == Dir::East)) {
+            os << C_YE << d.toChar() << C_NO;
+            found = true;
+            break;
+          }
+        }
+        if (!found)
+          os << (maze.isKnown(x, y, Dir::East)
+                     ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+                     : (C_RE "." C_NO));
+      }
+      os << std::endl;
+    }
+    for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+      os << "+";
+      bool found = false;
+      for (const auto vd : path) {
+        const auto v = vd.first;
+        const auto d = vd.second;
+        if ((v == Vector(x, y) && d == Dir::North) ||
+            (v == Vector(x, y).next(Dir::South) && d == Dir::South)) {
+          os << "  " << C_YE << d.toChar() << C_NO << "  ";
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+        os << (maze.isKnown(x, y, Dir::South)
+                   ? (maze.isWall(x, y, Dir::South) ? "-----" : "     ")
+                   : (C_RE " . . " C_NO));
+    }
+    os << "+" << std::endl;
+  }
+}
+// void StepMap::printFull(const Maze &maze, const Dirs &dirs, const Vector
+// start,
+//                         std::ostream &os) const {
+//   Vectors path;
+//   Vector v = start;
+//   path.push_back(v);
+//   for (const auto d : dirs) {
+//     v = v.next(d);
+//     path.push_back(v);
+//   }
+//   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
+//     if (y != MAZE_SIZE) {
+//       os << '|';
+//       for (int8_t x = 0; x < MAZE_SIZE; ++x) {
+//         if (std::find(path.cbegin(), path.cend(), Vector(x, y)) !=
+//         path.cend())
+//           os << C_YE << std::setw(5) << getStep(x, y) << C_NO;
+//         else
+//           os << C_CY << std::setw(5) << getStep(x, y) << C_NO;
+//         os << (maze.isKnown(x, y, Dir::East)
+//                    ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+//                    : (C_RE "." C_NO));
+//       }
+//       os << std::endl;
+//     }
+//     for (int8_t x = 0; x < MAZE_SIZE; ++x)
+//       os << "+"
+//          << (maze.isKnown(x, y, Dir::South)
+//                  ? (maze.isWall(x, y, Dir::South) ? "-----" : "     ")
+//                  : (C_RE " . . " C_NO));
+//     os << "+" << std::endl;
+//   }
+// }
 void StepMap::update(const Maze &maze, const Vectors &dest,
                      const bool known_only, const bool simple) {
   /* 迷路の大きさを決定 */

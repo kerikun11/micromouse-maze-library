@@ -54,7 +54,11 @@ public:
   void print(const Maze &maze, const Dirs &dirs,
              const Vector start = Vector(0, 0),
              std::ostream &os = std::cout) const;
-  void printFull(const Maze &maze, std::ostream &os = std::cout) const;
+  void printFull(const Maze &maze, const Vector v = Vector(-1, -1),
+                 const Dir d = Dir::Max, std::ostream &os = std::cout) const;
+  void printFull(const Maze &maze, const Dirs &dirs,
+                 const Vector start = Vector(0, 0),
+                 std::ostream &os = std::cout) const;
   /**
    * @brief ステップマップの更新
    * @param dest ステップを0とする区画の配列
@@ -88,7 +92,7 @@ public:
    */
   const Dirs calcShortestDirs(const Maze &maze, const Vector start,
                               const Vectors &dest, const bool known_only,
-                              const bool simple);
+                              const bool simple = true);
   /**
    * @brief スタートからゴールまでの最短経路を導出する関数
    */
