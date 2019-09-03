@@ -28,7 +28,7 @@ void StepMap::reset(const step_t step) {
 step_t StepMap::getStep(const int8_t x, const int8_t y) const {
   /* (x, y) がフィールド内か確認 */
   if (x < 0 || y < 0 || x > MAZE_SIZE - 1 || y > MAZE_SIZE - 1) {
-    logw << "referred to out of field: " << Vector(x, y) << std::endl;
+    logw << "referred to out of field: " << Position(x, y) << std::endl;
     return STEP_MAX;
   }
   return step_map[y][x];
@@ -36,12 +36,12 @@ step_t StepMap::getStep(const int8_t x, const int8_t y) const {
 void StepMap::setStep(const int8_t x, const int8_t y, const step_t step) {
   /* (x, y) がフィールド内か確認 */
   if (x < 0 || y < 0 || x >= MAZE_SIZE || y >= MAZE_SIZE) {
-    logw << "referred to out of field: " << Vector(x, y) << std::endl;
+    logw << "referred to out of field: " << Position(x, y) << std::endl;
     return;
   }
   step_map[y][x] = step;
 }
-void StepMap::print(const Maze &maze, const Vector v, const Dir d,
+void StepMap::print(const Maze &maze, const Position p, const Direction d,
                     std::ostream &os) const {
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
@@ -49,41 +49,41 @@ void StepMap::print(const Maze &maze, const Vector v, const Dir d,
       for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
         os << C_CY << std::setw(3) << std::min(getStep(x, y), (step_t)999)
            << C_NO;
-        if ((v == Vector(x, y) && d == Dir::West) ||
-            (v == Vector(x, y).next(Dir::East) && d == Dir::East))
+        if ((p == Position(x, y) && d == Direction::West) ||
+            (p == Position(x, y).next(Direction::East) && d == Direction::East))
           os << C_YE << d.toChar() << C_NO;
         else
-          os << (maze.isKnown(x, y, Dir::East)
-                     ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+          os << (maze.isKnown(x, y, Direction::East)
+                     ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
                      : (C_RE "." C_NO));
       }
       os << std::endl;
     }
     for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
       os << "+";
-      if ((v == Vector(x, y) && d == Dir::North) ||
-          (v == Vector(x, y).next(Dir::South) && d == Dir::South))
+      if ((p == Position(x, y) && d == Direction::North) ||
+          (p == Position(x, y).next(Direction::South) && d == Direction::South))
         os << " " << C_YE << d.toChar() << C_NO << " ";
       else
-        os << (maze.isKnown(x, y, Dir::South)
-                   ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
+        os << (maze.isKnown(x, y, Direction::South)
+                   ? (maze.isWall(x, y, Direction::South) ? "---" : "   ")
                    : (C_RE " . " C_NO));
     }
     os << "+" << std::endl;
   }
 }
-void StepMap::print(const Maze &maze, const Dirs &dirs, const Vector start,
-                    std::ostream &os) const {
+void StepMap::print(const Maze &maze, const Directions &dirs,
+                    const Position start, std::ostream &os) const {
   uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {{0}};
-  Vector v = start;
+  Position p = start;
   int counter = 1;
   for (const auto d : dirs) {
-    v = v.next(d);
-    if (!v.isInsideOfField()) {
-      loge << "Out of Field! " << v << std::endl;
+    p = p.next(d);
+    if (!p.isInsideOfField()) {
+      loge << "Out of Field! " << p << std::endl;
       continue;
     }
-    steps[v.y][v.x] = counter++;
+    steps[p.y][p.x] = counter++;
   }
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
@@ -93,21 +93,21 @@ void StepMap::print(const Maze &maze, const Dirs &dirs, const Vector start,
           os << C_YE << std::setw(3) << steps[y][x] << C_NO;
         else
           os << "   ";
-        os << (maze.isKnown(x, y, Dir::East)
-                   ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+        os << (maze.isKnown(x, y, Direction::East)
+                   ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
                    : (C_RE "." C_NO));
       }
       os << std::endl;
     }
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       os << "+"
-         << (maze.isKnown(x, y, Dir::South)
-                 ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
+         << (maze.isKnown(x, y, Direction::South)
+                 ? (maze.isWall(x, y, Direction::South) ? "---" : "   ")
                  : (C_RE " . " C_NO));
     os << "+" << std::endl;
   }
 }
-void StepMap::printFull(const Maze &maze, const Vector v, const Dir d,
+void StepMap::printFull(const Maze &maze, const Position p, const Direction d,
                         std::ostream &os) const {
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
@@ -115,36 +115,36 @@ void StepMap::printFull(const Maze &maze, const Vector v, const Dir d,
       for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
         os << C_CY << std::setw(5) << std::min((int)getStep(x, y), 99999)
            << C_NO;
-        if ((v == Vector(x, y) && d == Dir::West) ||
-            (v == Vector(x, y).next(Dir::East) && d == Dir::East))
+        if ((p == Position(x, y) && d == Direction::West) ||
+            (p == Position(x, y).next(Direction::East) && d == Direction::East))
           os << C_YE << d.toChar() << C_NO;
         else
-          os << (maze.isKnown(x, y, Dir::East)
-                     ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+          os << (maze.isKnown(x, y, Direction::East)
+                     ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
                      : (C_RE "." C_NO));
       }
       os << std::endl;
     }
     for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
       os << "+";
-      if ((v == Vector(x, y) && d == Dir::North) ||
-          (v == Vector(x, y).next(Dir::South) && d == Dir::South))
+      if ((p == Position(x, y) && d == Direction::North) ||
+          (p == Position(x, y).next(Direction::South) && d == Direction::South))
         os << "  " << C_YE << d.toChar() << C_NO << "  ";
       else
-        os << (maze.isKnown(x, y, Dir::South)
-                   ? (maze.isWall(x, y, Dir::South) ? "-----" : "     ")
+        os << (maze.isKnown(x, y, Direction::South)
+                   ? (maze.isWall(x, y, Direction::South) ? "-----" : "     ")
                    : (C_RE " . . " C_NO));
     }
     os << "+" << std::endl;
   }
 }
-void StepMap::printFull(const Maze &maze, const Dirs &dirs, const Vector start,
-                        std::ostream &os) const {
-  std::vector<VecDir> path;
-  Vector v = start;
+void StepMap::printFull(const Maze &maze, const Directions &dirs,
+                        const Position start, std::ostream &os) const {
+  std::vector<Pose> path;
+  Position p = start;
   for (const auto d : dirs) {
-    v = v.next(d);
-    path.push_back({v, d});
+    p = p.next(d);
+    path.push_back({p, d});
   }
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
@@ -153,19 +153,20 @@ void StepMap::printFull(const Maze &maze, const Dirs &dirs, const Vector start,
         os << C_CY << std::setw(5) << std::min((int)getStep(x, y), 99999)
            << C_NO;
         bool found = false;
-        for (const auto vd : path) {
-          const auto v = vd.first;
-          const auto d = vd.second;
-          if ((v == Vector(x, y) && d == Dir::West) ||
-              (v == Vector(x, y).next(Dir::East) && d == Dir::East)) {
+        for (const auto pose : path) {
+          const auto p = pose.first;
+          const auto d = pose.second;
+          if ((p == Position(x, y) && d == Direction::West) ||
+              (p == Position(x, y).next(Direction::East) &&
+               d == Direction::East)) {
             os << C_YE << d.toChar() << C_NO;
             found = true;
             break;
           }
         }
         if (!found)
-          os << (maze.isKnown(x, y, Dir::East)
-                     ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+          os << (maze.isKnown(x, y, Direction::East)
+                     ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
                      : (C_RE "." C_NO));
       }
       os << std::endl;
@@ -173,85 +174,86 @@ void StepMap::printFull(const Maze &maze, const Dirs &dirs, const Vector start,
     for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
       os << "+";
       bool found = false;
-      for (const auto vd : path) {
-        const auto v = vd.first;
-        const auto d = vd.second;
-        if ((v == Vector(x, y) && d == Dir::North) ||
-            (v == Vector(x, y).next(Dir::South) && d == Dir::South)) {
+      for (const auto pose : path) {
+        const auto p = pose.first;
+        const auto d = pose.second;
+        if ((p == Position(x, y) && d == Direction::North) ||
+            (p == Position(x, y).next(Direction::South) &&
+             d == Direction::South)) {
           os << "  " << C_YE << d.toChar() << C_NO << "  ";
           found = true;
           break;
         }
       }
       if (!found)
-        os << (maze.isKnown(x, y, Dir::South)
-                   ? (maze.isWall(x, y, Dir::South) ? "-----" : "     ")
+        os << (maze.isKnown(x, y, Direction::South)
+                   ? (maze.isWall(x, y, Direction::South) ? "-----" : "     ")
                    : (C_RE " . . " C_NO));
     }
     os << "+" << std::endl;
   }
 }
-// void StepMap::printFull(const Maze &maze, const Dirs &dirs, const Vector
-// start,
+// void StepMap::printFull(const Maze &maze, const Directions &dirs, const
+// Position start,
 //                         std::ostream &os) const {
-//   Vectors path;
-//   Vector v = start;
-//   path.push_back(v);
+//   Positions path;
+//   Position p = start;
+//   path.push_back(p);
 //   for (const auto d : dirs) {
-//     v = v.next(d);
-//     path.push_back(v);
+//     p = p.next(d);
+//     path.push_back(p);
 //   }
 //   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
 //     if (y != MAZE_SIZE) {
 //       os << '|';
 //       for (int8_t x = 0; x < MAZE_SIZE; ++x) {
-//         if (std::find(path.cbegin(), path.cend(), Vector(x, y)) !=
+//         if (std::find(path.cbegin(), path.cend(), Position(x, y)) !=
 //         path.cend())
 //           os << C_YE << std::setw(5) << getStep(x, y) << C_NO;
 //         else
 //           os << C_CY << std::setw(5) << getStep(x, y) << C_NO;
-//         os << (maze.isKnown(x, y, Dir::East)
-//                    ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+//         os << (maze.isKnown(x, y, Direction::East)
+//                    ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
 //                    : (C_RE "." C_NO));
 //       }
 //       os << std::endl;
 //     }
 //     for (int8_t x = 0; x < MAZE_SIZE; ++x)
 //       os << "+"
-//          << (maze.isKnown(x, y, Dir::South)
-//                  ? (maze.isWall(x, y, Dir::South) ? "-----" : "     ")
+//          << (maze.isKnown(x, y, Direction::South)
+//                  ? (maze.isWall(x, y, Direction::South) ? "-----" : "     ")
 //                  : (C_RE " . . " C_NO));
 //     os << "+" << std::endl;
 //   }
 // }
-void StepMap::update(const Maze &maze, const Vectors &dest,
+void StepMap::update(const Maze &maze, const Positions &dest,
                      const bool known_only, const bool simple) {
   /* 迷路の大きさを決定 */
   int8_t min_x = maze.getMinX();
   int8_t max_x = maze.getMaxX();
   int8_t min_y = maze.getMinY();
   int8_t max_y = maze.getMaxY();
-  for (const auto v : dest) { /*< ゴールを含めないと導出不可能になる */
-    min_x = std::min(v.x, min_x);
-    max_x = std::max(v.x, max_x);
-    min_y = std::min(v.y, min_y);
-    max_y = std::max(v.y, max_y);
+  for (const auto p : dest) { /*< ゴールを含めないと導出不可能になる */
+    min_x = std::min(p.x, min_x);
+    max_x = std::max(p.x, max_x);
+    min_y = std::min(p.y, min_y);
+    max_y = std::max(p.y, max_y);
   }
   /* 全区画のステップを最大値に設定 */
   reset();
   /* ステップの更新予約のキュー */
-  std::queue<Vector> q;
+  std::queue<Position> q;
   /* destのステップを0とする */
-  for (const auto v : dest)
-    setStep(v, 0), q.push(v);
+  for (const auto p : dest)
+    setStep(p, 0), q.push(p);
   /* ステップの更新がなくなるまで更新処理 */
   while (!q.empty()) {
     /* 注目する区画を取得 */
-    const Vector focus = q.front();
+    const Position focus = q.front();
     q.pop();
     const auto focus_step = getStep(focus);
     /* 周辺を走査 */
-    for (const auto d : Dir::getAlong4()) {
+    for (const auto d : Direction::getAlong4()) {
       auto next = focus;
       /* 直線で行けるところまで更新する */
       for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
@@ -273,22 +275,24 @@ void StepMap::update(const Maze &maze, const Vectors &dest,
     }
   }
 }
-const Dirs StepMap::calcShortestDirs(const Maze &maze, const Vector start,
-                                     const Vectors &dest, const bool known_only,
-                                     const bool simple) {
+const Directions StepMap::calcShortestDirections(const Maze &maze,
+                                                 const Position start,
+                                                 const Positions &dest,
+                                                 const bool known_only,
+                                                 const bool simple) {
   /* ステップマップを更新 */
   update(maze, dest, known_only, simple);
   /* 最短経路となるスタートからの方向列 */
-  Dirs shortest_dirs;
+  Directions shortest_dirs;
   /* start から順にステップマップを下る */
   auto focus = start;
   while (1) {
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
-    auto min_d = Dir::Max;
+    auto min_d = Direction::Max;
     auto min_step = STEP_MAX;
     auto min_i = focus;
     /* 周辺を走査 */
-    for (const auto d : Dir::getAlong4()) {
+    for (const auto d : Direction::getAlong4()) {
       auto next = focus; /*< 隣接 */
       /* 直線で行けるところまで更新する */
       for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
@@ -319,70 +323,74 @@ const Dirs StepMap::calcShortestDirs(const Maze &maze, const Vector start,
     return {}; //< 失敗
   return shortest_dirs;
 }
-const Vector StepMap::calcNextDirs(const Maze &maze, const Vector start_v,
-                                   const Dir start_d, Dirs &nextDirsKnown,
-                                   Dirs &nextDirCandidates) const {
-  VecDir end;
-  nextDirsKnown =
-      calcNextDirsStepDown(maze, {start_v, start_d}, end, false, true);
-  nextDirCandidates = calcNextDirCandidates(maze, end);
+const Position
+StepMap::calcNextDirections(const Maze &maze, const Position start_p,
+                            const Direction start_d,
+                            Directions &nextDirectionsKnown,
+                            Directions &nextDirectionCandidates) const {
+  Pose end;
+  nextDirectionsKnown =
+      calcNextDirectionsStepDown(maze, {start_p, start_d}, end, false, true);
+  nextDirectionCandidates = calcNextDirectionCandidates(maze, end);
   return end.first;
 }
-const Vector StepMap::calcNextDirsAdv(Maze &maze, const Vectors &dest,
-                                      const Vector vec, const Dir dir,
-                                      Dirs &nextDirsKnown,
-                                      Dirs &nextDirCandidates) {
+const Position StepMap::calcNextDirectionsAdv(
+    Maze &maze, const Positions &dest, const Position vec, const Direction dir,
+    Directions &nextDirectionsKnown, Directions &nextDirectionCandidates) {
   /* ステップマップの更新 */
   update(maze, dest, false, false);
   /* 事前に進む候補を決定する */
-  const auto v = calcNextDirs(maze, vec, dir, nextDirsKnown, nextDirCandidates);
-  Dirs ndcs; //< Next Dir Candidates
+  const auto p = calcNextDirections(maze, vec, dir, nextDirectionsKnown,
+                                    nextDirectionCandidates);
+  Directions ndcs; //< Next Direction Candidates
   WallLogs cache;
   while (1) {
-    if (nextDirCandidates.empty())
+    if (nextDirectionCandidates.empty())
       break;
-    const Dir d = nextDirCandidates[0]; //< 行きたい方向
-    ndcs.push_back(d);                  //< 候補に入れる
-    if (maze.isKnown(v, d))
+    const Direction d = nextDirectionCandidates[0]; //< 行きたい方向
+    ndcs.push_back(d);                              //< 候補に入れる
+    if (maze.isKnown(p, d))
       break;                               //< 既知なら終わり
-    cache.push_back(WallLog(v, d, false)); //< 壁をたてるのでキャッシュしておく
-    maze.setWall(v, d, true);  //< 壁をたてる
-    maze.setKnown(v, d, true); //< 既知とする
-    Dirs tmp_nds;
+    cache.push_back(WallLog(p, d, false)); //< 壁をたてるのでキャッシュしておく
+    maze.setWall(p, d, true);  //< 壁をたてる
+    maze.setKnown(p, d, true); //< 既知とする
+    Directions tmp_nds;
     // 行く方向を計算しなおす
     update(maze, dest, false, false);
-    calcNextDirs(maze, v, d, tmp_nds, nextDirCandidates);
+    calcNextDirections(maze, p, d, tmp_nds, nextDirectionCandidates);
     if (!tmp_nds.empty())
-      nextDirCandidates = tmp_nds; //< 既知区間になった場合
+      nextDirectionCandidates = tmp_nds; //< 既知区間になった場合
   }
   // キャッシュを復活
   for (const auto wl : cache) {
-    maze.setWall(Vector(wl), wl.d, false);
-    maze.setKnown(Vector(wl), wl.d, false);
+    maze.setWall(Position(wl), wl.d, false);
+    maze.setKnown(Position(wl), wl.d, false);
   }
-  nextDirCandidates = ndcs;
-  return v;
+  nextDirectionCandidates = ndcs;
+  return p;
 }
-const Dirs StepMap::calcNextDirsStepDown(const Maze &maze, const VecDir start,
-                                         VecDir &focus, const bool known_only,
-                                         const bool break_unknown) const {
+const Directions
+StepMap::calcNextDirectionsStepDown(const Maze &maze, const Pose start,
+                                    Pose &focus, const bool known_only,
+                                    const bool break_unknown) const {
   /* ステップマップから既知区間進行方向列を生成 */
-  Dirs nextDirsKnown;
+  Directions nextDirectionsKnown;
   /* start から順にステップマップを下って行く */
   focus = start;
   while (1) {
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
-    auto min_d = Dir::Max;
+    auto min_d = Direction::Max;
     auto min_step = STEP_MAX;
-    for (const auto d : {focus.second + Dir::Front, focus.second + Dir::Left,
-                         focus.second + Dir::Right, focus.second + Dir::Back}) {
+    for (const auto d :
+         {focus.second + Direction::Front, focus.second + Direction::Left,
+          focus.second + Direction::Right, focus.second + Direction::Back}) {
       /* 壁あり or 既知壁のみで未知壁 ならば次へ */
       if (maze.isWall(focus.first, d) ||
           (known_only && !maze.isKnown(focus.first, d)))
         continue;
       /* break_unknown で未知壁ならば既知区間は終了 */
       if (break_unknown && !maze.isKnown(focus.first, d))
-        return nextDirsKnown;
+        return nextDirectionsKnown;
       /* min_step よりステップが小さければ更新 (同じなら更新しない) */
       const auto next = focus.first.next(d);
       const auto next_step = getStep(next);
@@ -394,32 +402,35 @@ const Dirs StepMap::calcNextDirsStepDown(const Maze &maze, const VecDir start,
     /* focus_step より大きかったらなんかおかしい */
     if (getStep(focus.first) <= min_step)
       break;                               //< 永遠ループ防止
-    nextDirsKnown.push_back(min_d);        //< 既知区間移動
+    nextDirectionsKnown.push_back(min_d);  //< 既知区間移動
     focus.first = focus.first.next(min_d); //< 位置を更新
     focus.second = min_d;
   }
-  return nextDirsKnown;
+  return nextDirectionsKnown;
 }
-const Dirs StepMap::calcNextDirCandidates(const Maze &maze,
-                                          const VecDir focus) const {
+const Directions StepMap::calcNextDirectionCandidates(const Maze &maze,
+                                                      const Pose focus) const {
   /* 方向の候補を抽出 */
-  Dirs dirs;
-  for (const auto d : {focus.second + Dir::Front, focus.second + Dir::Left,
-                       focus.second + Dir::Right, focus.second + Dir::Back}) {
+  Directions dirs;
+  for (const auto d :
+       {focus.second + Direction::Front, focus.second + Direction::Left,
+        focus.second + Direction::Right, focus.second + Direction::Back}) {
     const auto next = focus.first.next(d);
     if (!maze.isWall(focus.first, d) && getStep(next) != STEP_MAX)
       dirs.push_back(d);
   }
   /* ステップが小さい順に並べ替え */
-  std::sort(dirs.begin(), dirs.end(), [&](const Dir d1, const Dir d2) {
-    return getStep(focus.first.next(d1)) <
-           getStep(focus.first.next(d2)); /*< 低コスト優先 */
-  });
-  /* 未知壁優先で並べ替え, これがないと探索時間増大 */
   std::sort(dirs.begin(), dirs.end(),
-            [&](const Dir d1 __attribute__((unused)), const Dir d2) {
-              return !maze.unknownCount(focus.first.next(d2));
+            [&](const Direction d1, const Direction d2) {
+              return getStep(focus.first.next(d1)) <
+                     getStep(focus.first.next(d2)); /*< 低コスト優先 */
             });
+  /* 未知壁優先で並べ替え, これがないと探索時間増大 */
+  std::sort(
+      dirs.begin(), dirs.end(),
+      [&](const Direction d1 __attribute__((unused)), const Direction d2) {
+        return !maze.unknownCount(focus.first.next(d2));
+      });
   return dirs;
 }
 static step_t gen_cost_impl(const int i, const float am, const float vs,

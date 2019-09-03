@@ -15,9 +15,9 @@ public:
 
 protected:
   virtual void
-  calcNextDirsPostCallback(SearchAlgorithm::State prevState,
-                           SearchAlgorithm::State newState) override {
-    CLRobotBase::calcNextDirsPostCallback(prevState, newState);
+  calcNextDirectionsPostCallback(SearchAlgorithm::State prevState,
+                                 SearchAlgorithm::State newState) override {
+    CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
     if (newState == prevState)
       return;
     /* State Change has occurred */
@@ -61,14 +61,14 @@ int test_position_identify() {
 #if 0
   /* Position Identification Run */
   robot.display = 1;
-  robot.fake_offset.second = robot.real.second = Dir::South;
-  robot.fake_offset.first = robot.real.first = Vector(0, 2);
+  robot.fake_offset.second = robot.real.second = Direction::South;
+  robot.fake_offset.first = robot.real.first = Position(0, 2);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
     std::cout << std::endl
               << "Failed to Identify! offset:\t"
-              << VecDir{robot.fake_offset.first, robot.fake_offset.second}
+              << Pose{robot.fake_offset.first, robot.fake_offset.second}
               << std::endl;
     getc(stdin);
   }
@@ -80,13 +80,13 @@ int test_position_identify() {
   step_map.update(maze_target, maze_target.getGoals(), false, false);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
-      for (const auto d : Dir::getAlong4()) {
-        const auto v = Vector(x, y);
-        if (step_map.getStep(v) == STEP_MAX)
+      for (const auto d : Direction::getAlong4()) {
+        const auto p = Position(x, y);
+        if (step_map.getStep(p) == STEP_MAX)
           continue;
-        if (v == Vector(0, 0) || v == Vector(0, 1))
+        if (p == Position(0, 0) || p == Position(0, 1))
           continue;
-        robot.real.first = robot.fake_offset.first = Vector(x, y);
+        robot.real.first = robot.fake_offset.first = Position(x, y);
         robot.real.second = robot.fake_offset.second = d;
         robot.display = 1;
         bool res = robot.positionIdentifyRun();
@@ -94,7 +94,7 @@ int test_position_identify() {
           robot.printInfo();
           std::cout << std::endl
                     << "Failed to Identify! offset:\t"
-                    << VecDir{robot.fake_offset.first, robot.fake_offset.second}
+                    << Pose{robot.fake_offset.first, robot.fake_offset.second}
                     << std::endl;
           getc(stdin);
         }

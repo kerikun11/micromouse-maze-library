@@ -42,13 +42,13 @@ struct Action {
     FS90,
     SlalomMax,
   };
-  enum Dir {
+  enum Direction {
     Left,
     Right,
   };
   Type type;
   int index;
-  Dir dir;
+  Direction dir;
 };
 
 struct RunParameter {
@@ -165,19 +165,21 @@ public:
   /**
    * @brief Construct a new Index object
    */
-  Index(const int8_t x, const int8_t y, const uint8_t z, const Dir nd)
+  Index(const int8_t x, const int8_t y, const uint8_t z, const Direction nd)
       : x(x), y(y), z(z), nd(nd) {}
-  Index(const int8_t x, const int8_t y, const Dir d, const Dir nd)
+  Index(const int8_t x, const int8_t y, const Direction d, const Direction nd)
       : x(x), y(y), nd(nd) {
     uniquify(d);
   }
-  Index(const Vector v, const Dir d, const Dir nd) : x(v.x), y(v.y), nd(nd) {
+  Index(const Position p, const Direction d, const Direction nd)
+      : x(p.x), y(p.y), nd(nd) {
     uniquify(d);
   }
-  Index(const int8_t x, const int8_t y, const Dir nd)
+  Index(const int8_t x, const int8_t y, const Direction nd)
       : x(x), y(y), z(0), nd(nd) {}
-  Index(const WallIndex i, const Dir nd) : x(i.x), y(i.y), z(i.z), nd(nd) {}
-  Index(const Vector v, const Dir nd) : x(v.x), y(v.y), z(0), nd(nd) {}
+  Index(const WallIndex i, const Direction nd)
+      : x(i.x), y(i.y), z(i.z), nd(nd) {}
+  Index(const Position p, const Direction nd) : x(p.x), y(p.y), z(0), nd(nd) {}
   Index() : all(0) {}
   /**
    * @brief unique な ID を返す
@@ -201,31 +203,35 @@ public:
    * @brief 座標の冗長を一意にする．
    * d を East or North のどちらかにそろえる
    */
-  void uniquify(const Dir d);
+  void uniquify(const Direction d);
   /**
    * @brief Getters
    */
-  const Dir getDir() const { return z == 0 ? Dir::East : Dir::North; }
-  const Dir getNodeDir() const { return nd; }
-  const Vector getVector() const { return Vector(x, y); }
+  const Direction getDirection() const {
+    return z == 0 ? Direction::East : Direction::North;
+  }
+  const Direction getNodeDirection() const { return nd; }
+  const Position getPosition() const { return Position(x, y); }
   friend std::ostream &operator<<(std::ostream &os, const Index i) {
     return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
-              << (int)i.y << ", " << i.getDir().toChar() << ", "
-              << i.getNodeDir().toChar() << ")";
+              << (int)i.y << ", " << i.getDirection().toChar() << ", "
+              << i.getNodeDirection().toChar() << ")";
   }
-  const Vector arrow_from() const;
-  const Vector arrow_to() const;
+  const Position arrow_from() const;
+  const Position arrow_to() const;
   /**
    * @brief 斜め方向に向いているときの区画への相対方向(±45度)を返す
-   * @return const Dir Dir::Left45 or Dir::Right45
+   * @return const Direction Direction::Left45 or Direction::Right45
    */
-  const Dir arrow_diag_to_along_45() const;
+  const Direction arrow_diag_to_along_45() const;
   /**
-   * @brief NodeDir が向いている方向の隣の Index を返す
+   * @brief NodeDirection が向いている方向の隣の Index を返す
    * @return const Index
    */
   const Index next() const;
-  const Index opposite() const { return Index(x, y, getDir(), nd + Dir::Back); }
+  const Index opposite() const {
+    return Index(x, y, getDirection(), nd + Direction::Back);
+  }
   const std::vector<std::pair<Index, cost_t>>
   getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
                 const bool known_only, const bool diag_enabled) const;
@@ -257,9 +263,9 @@ public:
   }
   cost_t getHeuristic(const Index i, const Index s) const {
     // return 0;
-    const auto v = i.getVector() - s.getVector();
-    // const auto d = std::sqrt(v.x * v.x + v.y * v.y);
-    const auto d = std::max(std::abs(v.x), std::abs(v.y));
+    const auto p = i.getPosition() - s.getPosition();
+    // const auto d = std::sqrt(p.x * p.x + p.y * p.y);
+    const auto d = std::max(std::abs(p.x), std::abs(p.y));
     return edge_cost.getEdgeCost(ST_DIAG, d);
   }
   /**
@@ -272,11 +278,11 @@ public:
    */
   bool calcShortestPath(Indexes &path, const bool known_only,
                         const bool diag_enabled);
-  static const Indexes convertDestinations(const Vectors src) {
+  static const Indexes convertDestinations(const Positions src) {
     Indexes dest;
-    for (const auto v : src)
-      for (const auto nd : Dir::getAlong4())
-        dest.push_back(Index(v, nd));
+    for (const auto p : src)
+      for (const auto nd : Direction::getAlong4())
+        dest.push_back(Index(p, nd));
     return dest;
   }
   bool genPathFromMap(Indexes &path) {
@@ -311,15 +317,16 @@ public:
    *
    * @param path
    * @param diag_enabled
-   * @return const Dirs
+   * @return const Directions
    */
-  static const Dirs indexes2dirs(const Indexes &path, const bool diag_enabled);
+  static const Directions indexes2dirs(const Indexes &path,
+                                       const bool diag_enabled);
 
 private:
   const Maze &maze; /**< @brief 使用する迷路の参照 */
   const EdgeCost edge_cost;
   const Index index_start =
-      Index(0, 0, Dir::Max, Dir::North); /**< @brief start */
+      Index(0, 0, Direction::Max, Direction::North); /**< @brief start */
 
   std::function<bool(const Index i1, const Index i2)> greater;
   std::array<Index, Index::Max> from_map;

@@ -85,16 +85,16 @@ protected:
   virtual void stopDequeue() {}
   virtual void startDequeue() {}
   virtual void calibration() {}
-  virtual void calcNextDirsPreCallback() {}
-  virtual void calcNextDirsPostCallback(SearchAlgorithm::State prevState
-                                        __attribute__((unused)),
-                                        SearchAlgorithm::State newState
-                                        __attribute__((unused))) {}
+  virtual void calcNextDirectionsPreCallback() {}
+  virtual void calcNextDirectionsPostCallback(SearchAlgorithm::State prevState
+                                              __attribute__((unused)),
+                                              SearchAlgorithm::State newState
+                                              __attribute__((unused))) {}
   virtual void discrepancyWithKnownWall() {}
 
 private:
   void turnbackSave();
-  void queueNextDirs(const Dirs &nextDirs);
+  void queueNextDirections(const Directions &nextDirections);
   bool generalSearchRun();
 
   /**

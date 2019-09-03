@@ -15,23 +15,23 @@
 namespace MazeLib {
 
 /* union Index */
-void Index::uniquify(const Dir d) {
+void Index::uniquify(const Direction d) {
   switch (d) {
-  case Dir::East:
+  case Direction::East:
     z = 0;
     break;
-  case Dir::North:
+  case Direction::North:
     z = 1;
     break;
-  case Dir::West:
+  case Direction::West:
     z = 0;
     x--;
     break;
-  case Dir::South:
+  case Direction::South:
     z = 1;
     y--;
     break;
-  case Dir::Max:
+  case Direction::Max:
     z = 0;
     break;
   default:
@@ -39,77 +39,77 @@ void Index::uniquify(const Dir d) {
     break;
   }
 }
-const Vector Index::arrow_from() const {
+const Position Index::arrow_from() const {
   switch (nd) {
-  case Dir::East:
-  case Dir::North:
-  case Dir::West:
-  case Dir::South:
-    return Vector(x, y);
-  case Dir::NorthEast:
-    return Vector(x, y);
-  case Dir::NorthWest:
-    return z == 0 ? Vector(x + 1, y) : Vector(x, y);
-  case Dir::SouthWest:
-    return z == 0 ? Vector(x + 1, y) : Vector(x, y + 1);
-  case Dir::SouthEast:
-    return z == 0 ? Vector(x, y) : Vector(x, y + 1);
+  case Direction::East:
+  case Direction::North:
+  case Direction::West:
+  case Direction::South:
+    return Position(x, y);
+  case Direction::NorthEast:
+    return Position(x, y);
+  case Direction::NorthWest:
+    return z == 0 ? Position(x + 1, y) : Position(x, y);
+  case Direction::SouthWest:
+    return z == 0 ? Position(x + 1, y) : Position(x, y + 1);
+  case Direction::SouthEast:
+    return z == 0 ? Position(x, y) : Position(x, y + 1);
   default:
     break;
   }
-  logw << "Invalid Dir: " << nd << std::endl;
-  return Vector(x, y);
+  logw << "Invalid Direction: " << nd << std::endl;
+  return Position(x, y);
 }
-const Vector Index::arrow_to() const {
+const Position Index::arrow_to() const {
   switch (nd) {
-  case Dir::East:
-  case Dir::North:
-  case Dir::West:
-  case Dir::South:
-    return Vector(x, y).next(nd);
-  case Dir::NorthEast:
-    return z == 0 ? Vector(x + 1, y) : Vector(x, y + 1);
-  case Dir::NorthWest:
-    return z == 0 ? Vector(x, y) : Vector(x, y + 1);
-  case Dir::SouthWest:
-    return Vector(x, y);
-  case Dir::SouthEast:
-    return z == 0 ? Vector(x + 1, y) : Vector(x, y);
+  case Direction::East:
+  case Direction::North:
+  case Direction::West:
+  case Direction::South:
+    return Position(x, y).next(nd);
+  case Direction::NorthEast:
+    return z == 0 ? Position(x + 1, y) : Position(x, y + 1);
+  case Direction::NorthWest:
+    return z == 0 ? Position(x, y) : Position(x, y + 1);
+  case Direction::SouthWest:
+    return Position(x, y);
+  case Direction::SouthEast:
+    return z == 0 ? Position(x + 1, y) : Position(x, y);
   default:
     break;
   }
-  logw << "Invalid Dir: " << nd << std::endl;
-  return Vector(x, y);
+  logw << "Invalid Direction: " << nd << std::endl;
+  return Position(x, y);
 }
-const Dir Index::arrow_diag_to_along_45() const {
+const Direction Index::arrow_diag_to_along_45() const {
   switch (nd) {
-  case Dir::NorthEast:
-  case Dir::SouthWest:
-    return z == 0 ? Dir::Left45 : Dir::Right45;
-  case Dir::NorthWest:
-  case Dir::SouthEast:
-    return z == 1 ? Dir::Left45 : Dir::Right45;
+  case Direction::NorthEast:
+  case Direction::SouthWest:
+    return z == 0 ? Direction::Left45 : Direction::Right45;
+  case Direction::NorthWest:
+  case Direction::SouthEast:
+    return z == 1 ? Direction::Left45 : Direction::Right45;
   default:
-    logw << "Invalid Dir: " << nd << std::endl;
-    return Dir::Max;
+    logw << "Invalid Direction: " << nd << std::endl;
+    return Direction::Max;
   }
 }
 const Index Index::next() const {
-  switch (getNodeDir()) {
-  case Dir::East:
-  case Dir::North:
-  case Dir::West:
-  case Dir::South:
-    return getNodeDir().isAlong()
-               ? Index(getVector().next(nd), nd)
-               : Index(WallIndex(x, y, getNodeDir()).next(nd), nd);
-  case Dir::NorthEast:
-  case Dir::NorthWest:
-  case Dir::SouthWest:
-  case Dir::SouthEast:
+  switch (getNodeDirection()) {
+  case Direction::East:
+  case Direction::North:
+  case Direction::West:
+  case Direction::South:
+    return getNodeDirection().isAlong()
+               ? Index(getPosition().next(nd), nd)
+               : Index(WallIndex(x, y, getNodeDirection()).next(nd), nd);
+  case Direction::NorthEast:
+  case Direction::NorthWest:
+  case Direction::SouthWest:
+  case Direction::SouthEast:
     return Index(WallIndex(x, y, z).next(nd), nd);
   default:
-    logw << "Invalid Dir: " << nd << std::endl;
+    logw << "Invalid Direction: " << nd << std::endl;
     return Index(x, y, z, nd);
   }
 }
@@ -120,9 +120,9 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
   std::vector<std::pair<Index, cost_t>> succs;
   succs.reserve(MAZE_SIZE * 2);
   /* known_only を考慮した壁の判定式を用意 */
-  const auto canGo = [&](const Vector vec, const Dir dir) {
+  const auto canGo = [&](const Position vec, const Direction dir) {
     /* スタートは袋小路なので例外処理 */
-    if (vec == Vector(0, 0) && dir == Dir::South)
+    if (vec == Position(0, 0) && dir == Direction::South)
       return true;
     if (maze.isWall(vec, dir))
       return false;
@@ -130,64 +130,64 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
       return false;
     return true;
   };
-  const auto nd = getNodeDir();
-  const auto v = Vector(x, y);
+  const auto nd = getNodeDirection();
+  const auto p = Position(x, y);
   if (nd.isAlong()) {
     /* 区画の中央 */
     /* 直前の壁 */
-    if (!canGo(v, nd)) {
+    if (!canGo(p, nd)) {
       /* ゴール区画だけあり得る */
       // loge << "FWE: " << *this << std::endl;
       return succs;
     }
     /* 直進で行けるところまで行く */
     int8_t n = 1;
-    for (auto v_st = v.next(nd); canGo(v_st, nd); v_st = v_st.next(nd), ++n)
-      succs.push_back({Index(v_st, nd), edge_cost.getEdgeCost(ST_ALONG, n)});
+    for (auto p_st = p.next(nd); canGo(p_st, nd); p_st = p_st.next(nd), ++n)
+      succs.push_back({Index(p_st, nd), edge_cost.getEdgeCost(ST_ALONG, n)});
     if (diag_enabled) {
       /* 斜めありのターン */
       const auto d_f = nd;          //< i.e. dir front
-      const auto v_f = v.next(d_f); //< i.e. vector front
+      const auto p_f = p.next(d_f); //< i.e. vector front
       /* 左右を一般化 */
-      for (const auto nd_rel_45 : {Dir::Left45, Dir::Right45}) {
+      for (const auto nd_rel_45 : {Direction::Left45, Direction::Right45}) {
         const auto nd_45 = nd + nd_rel_45;
         const auto nd_90 = nd + nd_rel_45 * 2;
         const auto nd_135 = nd + nd_rel_45 * 3;
         const auto nd_180 = nd + nd_rel_45 * 4;
         /* 横壁 */
-        const Dir d_l = nd_90;             //< 左方向
-        if (canGo(v_f, d_l)) {             //< 45度方向の壁
-          const auto v_fl = v_f.next(d_l); //< 前左の区画
-          if (canGo(v_fl, d_f))            //< 45度先の壁
+        const Direction d_l = nd_90;       //< 左方向
+        if (canGo(p_f, d_l)) {             //< 45度方向の壁
+          const auto p_fl = p_f.next(d_l); //< 前左の区画
+          if (canGo(p_fl, d_f))            //< 45度先の壁
             succs.push_back(
-                {Index(v_f, d_l, nd_45), edge_cost.getEdgeCost(F45)});
-          if (canGo(v_fl, d_l)) //< 90度先の壁
-            succs.push_back({Index(v_fl, nd_90), edge_cost.getEdgeCost(F90)});
-          const auto d_b = d_f + Dir::Back;    //< 後方向
-          if (canGo(v_fl, d_b)) {              //< 135度の壁
-            const auto v_fll = v_fl.next(d_b); //< 前左左の区画
-            if (canGo(v_fll, d_l))             //< 135度行先
+                {Index(p_f, d_l, nd_45), edge_cost.getEdgeCost(F45)});
+          if (canGo(p_fl, d_l)) //< 90度先の壁
+            succs.push_back({Index(p_fl, nd_90), edge_cost.getEdgeCost(F90)});
+          const auto d_b = d_f + Direction::Back; //< 後方向
+          if (canGo(p_fl, d_b)) {                 //< 135度の壁
+            const auto p_fll = p_fl.next(d_b);    //< 前左左の区画
+            if (canGo(p_fll, d_l))                //< 135度行先
               succs.push_back(
-                  {Index(v_fll, d_f, nd_135), edge_cost.getEdgeCost(F135)});
-            if (canGo(v_fll, d_b)) //< 180度行先の壁
+                  {Index(p_fll, d_f, nd_135), edge_cost.getEdgeCost(F135)});
+            if (canGo(p_fll, d_b)) //< 180度行先の壁
               succs.push_back(
-                  {Index(v_fll, nd_180), edge_cost.getEdgeCost(F180)});
+                  {Index(p_fll, nd_180), edge_cost.getEdgeCost(F180)});
           }
         }
       }
     } else {
       /* 斜めなしのターン */
-      const auto v_f = v.next(nd); //< i.e. vector front
-      for (const auto d_turn : {Dir::Left, Dir::Right})
-        if (canGo(v_f, nd + d_turn)) //< 90度方向の壁
+      const auto p_f = p.next(nd); //< i.e. vector front
+      for (const auto d_turn : {Direction::Left, Direction::Right})
+        if (canGo(p_f, nd + d_turn)) //< 90度方向の壁
           succs.push_back(
-              {Index(v_f, nd + d_turn), edge_cost.getEdgeCost(FS90)});
+              {Index(p_f, nd + d_turn), edge_cost.getEdgeCost(FS90)});
     }
   } else {
     /* 壁の中央（斜めありの場合しかありえない） */
     /* 直前の壁 */
     const auto i_f = next(); //< i.e. index front
-    if (!canGo(i_f.getVector(), i_f.getDir())) {
+    if (!canGo(i_f.getPosition(), i_f.getDirection())) {
       // loge << "FWE: " << *this << std::endl;
       return succs;
     }
@@ -195,7 +195,7 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
     auto i_st = i_f; //< i.e. index straight
     for (int8_t n = 1;; ++n) {
       auto i_ff = i_st.next(); //< 行先の壁
-      if (!canGo(i_ff.getVector(), i_ff.getDir()))
+      if (!canGo(i_ff.getPosition(), i_ff.getDirection()))
         break;
       succs.push_back({i_st, edge_cost.getEdgeCost(ST_DIAG, n)});
       i_st = i_ff;
@@ -204,20 +204,20 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
     const auto nd_r45 = arrow_diag_to_along_45();
     const auto d_45 = nd + nd_r45;
     const auto nd_90 = nd + nd_r45 * 2;
-    const Dir d_135 = nd + nd_r45 * 3;
-    const auto v_45 = i_f.arrow_to();
+    const Direction d_135 = nd + nd_r45 * 3;
+    const auto p_45 = i_f.arrow_to();
     /* 45度方向 */
-    if (canGo(v_45, d_45))
-      succs.push_back({Index(v_45, d_45), edge_cost.getEdgeCost(F45)});
+    if (canGo(p_45, d_45))
+      succs.push_back({Index(p_45, d_45), edge_cost.getEdgeCost(F45)});
     /* V90方向, 135度方向*/
-    if (canGo(v_45, d_135)) {
+    if (canGo(p_45, d_135)) {
       /* V90方向, 135度方向*/
-      const auto v_135 = v_45.next(d_135);
-      if (canGo(v_135, d_45))
+      const auto p_135 = p_45.next(d_135);
+      if (canGo(p_135, d_45))
         succs.push_back(
-            {Index(v_45, d_135, nd_90), edge_cost.getEdgeCost(FV90)});
-      if (canGo(v_135, d_135))
-        succs.push_back({Index(v_135, d_135), edge_cost.getEdgeCost(F135)});
+            {Index(p_45, d_135, nd_90), edge_cost.getEdgeCost(FV90)});
+      if (canGo(p_135, d_135))
+        succs.push_back({Index(p_135, d_135), edge_cost.getEdgeCost(F135)});
     }
   }
   return succs;
@@ -232,8 +232,8 @@ Index::getPredecessors(const Maze &maze, const EdgeCost &edge_cost,
     std::vector<std::pair<Index, cost_t>> preds;
     preds.reserve(MAZE_SIZE * 2);
     /* known_only を考慮した壁の判定式を用意 */
-    const auto canGo = [&](const Vector vec, const Dir dir) {
-      // if (vec == Vector(0, 0) && dir == Dir::South)
+    const auto canGo = [&](const Position vec, const Direction dir) {
+      // if (vec == Position(0, 0) && dir == Direction::South)
       //   return true;
       if (maze.isWall(vec, dir))
         return false;
@@ -241,18 +241,19 @@ Index::getPredecessors(const Maze &maze, const EdgeCost &edge_cost,
         return false;
       return true;
     };
-    const auto v_b = arrow_from();   //< i.e. vector back
-    const auto d_b = nd + Dir::Back; //< i.e. dir back
+    const auto p_b = arrow_from();         //< i.e. vector back
+    const auto d_b = nd + Direction::Back; //< i.e. dir back
     /* 直進で行けるところまで行く */
     int8_t n = 1;
-    for (auto v_st = v_b.next(d_b); canGo(v_st, nd); v_st = v_st.next(d_b), ++n)
-      preds.push_back({Index(v_st, nd), edge_cost.getEdgeCost(ST_ALONG, n)});
+    for (auto p_st = p_b.next(d_b); canGo(p_st, nd); p_st = p_st.next(d_b), ++n)
+      preds.push_back({Index(p_st, nd), edge_cost.getEdgeCost(ST_ALONG, n)});
     /* ここからはターン */
     /* 左右を一般化 */
-    for (const auto d_turn : {Dir::Left, Dir::Right})
-      if (canGo(v_b, nd + d_turn)) //< 90度方向の壁
-        preds.push_back({Index(v_b.next(nd + d_turn), nd + d_turn + Dir::Back),
-                         edge_cost.getEdgeCost(FS90)});
+    for (const auto d_turn : {Direction::Left, Direction::Right})
+      if (canGo(p_b, nd + d_turn)) //< 90度方向の壁
+        preds.push_back(
+            {Index(p_b.next(nd + d_turn), nd + d_turn + Direction::Back),
+             edge_cost.getEdgeCost(FS90)});
     return preds; /* 終了 */
   }
   /* それ以外 */
@@ -269,9 +270,9 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   /* min max */
   int8_t max_x = maze.getMaxX();
   int8_t max_y = maze.getMaxY();
-  for (const auto v : maze.getGoals()) {
-    max_x = std::max(v.x, max_x);
-    max_y = std::max(v.y, max_y);
+  for (const auto p : maze.getGoals()) {
+    max_x = std::max(p.x, max_x);
+    max_y = std::max(p.y, max_y);
   }
   /* clear open_list */
   open_list.clear();
@@ -281,9 +282,9 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   for (auto &f : f_map)
     f = CostMax;
   /* push the goal indexes */
-  for (const auto v : maze.getGoals())
-    for (const auto nd : Dir::getAlong4()) {
-      const auto i = Index(v, nd);
+  for (const auto p : maze.getGoals())
+    for (const auto nd : Direction::getAlong4()) {
+      const auto i = Index(p, nd);
       f_map[i] = 0;
       in_map[i] = true;
       open_list.push_back(i);
@@ -313,10 +314,10 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
     const auto succs =
         index.getSuccessors(maze, edge_cost, known_only, diag_enabled);
     for (const auto &s : succs) {
-      const auto v = s.first.getVector();
-      if (!v.isInsideOfField())
+      const auto p = s.first.getPosition();
+      if (!p.isInsideOfField())
         loge << "Out of Range! " << s.first << std::endl;
-      if (v.x > max_x + 1 || v.y > max_y + 1)
+      if (p.x > max_x + 1 || p.y > max_y + 1)
         continue;
       const auto f_p_new =
           f_map[index] - getHeuristic(index) + getHeuristic(s.first) + s.second;
@@ -348,8 +349,8 @@ void ShortestAlgorithm::print(const Indexes indexes, std::ostream &os) const {
   int steps[MAZE_SIZE][MAZE_SIZE] = {{0}};
   int counter = 1;
   for (const auto i : indexes) {
-    auto v = i.getVector();
-    steps[v.y][v.x] = counter++;
+    auto p = i.getPosition();
+    steps[p.y][p.x] = counter++;
   }
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
@@ -359,77 +360,78 @@ void ShortestAlgorithm::print(const Indexes indexes, std::ostream &os) const {
           os << C_YE << std::setw(3) << steps[y][x] << C_NO;
         else
           os << "   ";
-        os << (maze.isKnown(x, y, Dir::East)
-                   ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+        os << (maze.isKnown(x, y, Direction::East)
+                   ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
                    : (C_RE "." C_NO));
       }
       os << std::endl;
     }
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       os << "+"
-         << (maze.isKnown(x, y, Dir::South)
-                 ? (maze.isWall(x, y, Dir::South) ? "---" : "   ")
+         << (maze.isKnown(x, y, Direction::South)
+                 ? (maze.isWall(x, y, Direction::South) ? "---" : "   ")
                  : (C_RE " . " C_NO));
     os << "+" << std::endl;
   }
 }
-const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
-                                           const bool diag_enabled) {
+const Directions ShortestAlgorithm::indexes2dirs(const Indexes &path,
+                                                 const bool diag_enabled) {
   if (!diag_enabled) {
-    Dirs dirs;
+    Directions dirs;
     for (int i = 1; i < (int)path.size(); ++i) {
-      const auto nd = path[i].getNodeDir();
-      const auto v = path[i - 1].getVector() - path[i].getVector();
-      for (int j = 0; j < std::abs(v.x) + std::abs(v.y); ++j)
+      const auto nd = path[i].getNodeDirection();
+      const auto p = path[i - 1].getPosition() - path[i].getPosition();
+      for (int j = 0; j < std::abs(p.x) + std::abs(p.y); ++j)
         dirs.push_back(nd);
     }
     return dirs;
   }
-  Dirs dirs;
+  Directions dirs;
   for (int i = 0; i < (int)path.size() - 1; ++i) {
-    const auto nd = path[i].getNodeDir();
-    const auto rel_v = path[i + 1].getVector() - path[i].getVector();
-    const auto rel_nd = Dir(path[i + 1].getNodeDir() - path[i].getNodeDir());
+    const auto nd = path[i].getNodeDirection();
+    const auto rel_p = path[i + 1].getPosition() - path[i].getPosition();
+    const auto rel_nd =
+        Direction(path[i + 1].getNodeDirection() - path[i].getNodeDirection());
     if (nd.isAlong()) {
       switch (rel_nd) {
-      case Dir::Front:
-        for (int j = 0; j < std::abs(rel_v.x) + std::abs(rel_v.y); ++j)
+      case Direction::Front:
+        for (int j = 0; j < std::abs(rel_p.x) + std::abs(rel_p.y); ++j)
           dirs.push_back(nd);
         break;
-      case Dir::Left45:
+      case Direction::Left45:
         dirs.push_back(nd);
-        dirs.push_back(nd + Dir::Left);
+        dirs.push_back(nd + Direction::Left);
         break;
-      case Dir::Right45:
+      case Direction::Right45:
         dirs.push_back(nd);
-        dirs.push_back(nd + Dir::Right);
+        dirs.push_back(nd + Direction::Right);
         break;
-      case Dir::Left:
+      case Direction::Left:
         dirs.push_back(nd);
-        dirs.push_back(nd + Dir::Left);
+        dirs.push_back(nd + Direction::Left);
         break;
-      case Dir::Right:
+      case Direction::Right:
         dirs.push_back(nd);
-        dirs.push_back(nd + Dir::Right);
+        dirs.push_back(nd + Direction::Right);
         break;
-      case Dir::Left135:
+      case Direction::Left135:
         dirs.push_back(nd);
-        dirs.push_back(nd + Dir::Left);
-        dirs.push_back(nd + Dir::Back);
+        dirs.push_back(nd + Direction::Left);
+        dirs.push_back(nd + Direction::Back);
         break;
-      case Dir::Right135:
+      case Direction::Right135:
         dirs.push_back(nd);
-        dirs.push_back(nd + Dir::Right);
-        dirs.push_back(nd + Dir::Back);
+        dirs.push_back(nd + Direction::Right);
+        dirs.push_back(nd + Direction::Back);
         break;
-      case Dir::Back:
+      case Direction::Back:
         dirs.push_back(nd);
-        if (rel_v.rotate(-nd).y > 0) {
-          dirs.push_back(nd + Dir::Left);
-          dirs.push_back(nd + Dir::Back);
+        if (rel_p.rotate(-nd).y > 0) {
+          dirs.push_back(nd + Direction::Left);
+          dirs.push_back(nd + Direction::Back);
         } else {
-          dirs.push_back(nd + Dir::Right);
-          dirs.push_back(nd + Dir::Back);
+          dirs.push_back(nd + Direction::Right);
+          dirs.push_back(nd + Direction::Back);
         }
         break;
       default:
@@ -438,35 +440,35 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
       }
     } else {
       switch (rel_nd) {
-      case Dir::Front:
+      case Direction::Front:
         for (auto index = path[i]; index != path[i + 1]; index = index.next()) {
           const auto nd_45 = index.arrow_diag_to_along_45();
-          dirs.push_back(index.getNodeDir() + nd_45);
+          dirs.push_back(index.getNodeDirection() + nd_45);
         }
         break;
-      case Dir::Left45:
-        dirs.push_back(nd + Dir::Left45);
+      case Direction::Left45:
+        dirs.push_back(nd + Direction::Left45);
         break;
-      case Dir::Right45:
-        dirs.push_back(nd + Dir::Right45);
+      case Direction::Right45:
+        dirs.push_back(nd + Direction::Right45);
         break;
-      case Dir::Left:
+      case Direction::Left:
         /* V90 */
-        dirs.push_back(nd + Dir::Left45);
-        dirs.push_back(nd + Dir::Left135);
+        dirs.push_back(nd + Direction::Left45);
+        dirs.push_back(nd + Direction::Left135);
         break;
-      case Dir::Right:
+      case Direction::Right:
         /* V90 */
-        dirs.push_back(nd + Dir::Right45);
-        dirs.push_back(nd + Dir::Right135);
+        dirs.push_back(nd + Direction::Right45);
+        dirs.push_back(nd + Direction::Right135);
         break;
-      case Dir::Left135:
-        dirs.push_back(nd + Dir::Left45);
-        dirs.push_back(nd + Dir::Left135);
+      case Direction::Left135:
+        dirs.push_back(nd + Direction::Left45);
+        dirs.push_back(nd + Direction::Left135);
         break;
-      case Dir::Right135:
-        dirs.push_back(nd + Dir::Right45);
-        dirs.push_back(nd + Dir::Right135);
+      case Direction::Right135:
+        dirs.push_back(nd + Direction::Right45);
+        dirs.push_back(nd + Direction::Right135);
         break;
       default:
         logw << "invalid direction" << std::endl;

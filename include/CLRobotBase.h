@@ -24,22 +24,22 @@ public:
 
   void printInfo(bool showMaze = true) {
     RobotBase::printInfo(showMaze);
-    const auto nextDirs = getNextDirs();
+    const auto nextDirections = getNextDirections();
     std::string path;
-    auto prev_d = curDir;
-    for (int i = 0; i < (int)nextDirs.size(); ++i) {
-      const auto next_d = nextDirs[i];
-      switch (Dir(next_d - prev_d)) {
-      case Dir::Front:
+    auto prev_d = current_direction;
+    for (int i = 0; i < (int)nextDirections.size(); ++i) {
+      const auto next_d = nextDirections[i];
+      switch (Direction(next_d - prev_d)) {
+      case Direction::Front:
         path += RobotBase::Action::ST_FULL;
         break;
-      case Dir::Left:
+      case Direction::Left:
         path += RobotBase::Action::TURN_L;
         break;
-      case Dir::Right:
+      case Direction::Right:
         path += RobotBase::Action::TURN_R;
         break;
-      case Dir::Back:
+      case Direction::Back:
         path += RobotBase::Action::ST_HALF_STOP;
         path += RobotBase::Action::ROTATE_180;
         path += RobotBase::Action::ST_HALF;
@@ -50,9 +50,9 @@ public:
       }
       prev_d = next_d;
     }
-    std::cout << "NextDirsKnown:     \x1b[0K";
+    std::cout << "NextDirectionsKnown:     \x1b[0K";
     std::cout << path << std::endl;
-    std::cout << "NextDirsKnownFast: \x1b[0K";
+    std::cout << "NextDirectionsKnownFast: \x1b[0K";
     std::cout << RobotBase::pathConvertSearchToKnown(path) << std::endl;
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
@@ -67,15 +67,15 @@ public:
   }
   bool endFastRunBackingToStartRun() {
     /* エラー処理 */
-    if (getShortestDirs().empty()) {
-      logw << "ShortestDirs are empty!" << std::endl;
+    if (getShortestDirections().empty()) {
+      logw << "ShortestDirections are empty!" << std::endl;
       return false;
     }
     /* real を最短後の位置に移す */
-    Vector v = maze.getStart();
-    for (const auto d : getShortestDirs())
-      v = v.next(d);
-    real = VecDir(v, getShortestDirs().back());
+    Position p = maze.getStart();
+    for (const auto d : getShortestDirections())
+      p = p.next(d);
+    real = Pose(p, getShortestDirections().back());
     /* 基底関数を呼ぶ */
     return RobotBase::endFastRunBackingToStartRun();
   }
@@ -92,32 +92,31 @@ public:
 
 public:
   const Maze &maze_target;
-  VecDir fake_offset;
-  VecDir real;
+  Pose fake_offset;
+  Pose real;
 
 protected:
   Maze maze;
 
   virtual void findWall(bool &left, bool &front, bool &right,
                         bool &back) override {
-    left = !maze_target.canGo(real.first, real.second + Dir::Left);
-    front = !maze_target.canGo(real.first, real.second + Dir::Front);
-    right = !maze_target.canGo(real.first, real.second + Dir::Right);
-    back = !maze_target.canGo(real.first, real.second + Dir::Back);
+    left = !maze_target.canGo(real.first, real.second + Direction::Left);
+    front = !maze_target.canGo(real.first, real.second + Direction::Front);
+    right = !maze_target.canGo(real.first, real.second + Direction::Right);
+    back = !maze_target.canGo(real.first, real.second + Direction::Back);
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
-      updateWall(curVec.next(curDir), curDir,
+      updateWall(current_position.next(current_direction), current_direction,
                  !maze_target.canGo(real.first.next(real.second), real.second));
 #endif
   }
-  virtual void calcNextDirsPreCallback() override {
+  virtual void calcNextDirectionsPreCallback() override {
     start = std::chrono::system_clock::now();
   }
-  virtual void calcNextDirsPostCallback(SearchAlgorithm::State prevState
-                                        __attribute__((unused)),
-                                        SearchAlgorithm::State newState
-                                        __attribute__((unused))) override {
+  virtual void calcNextDirectionsPostCallback(
+      SearchAlgorithm::State prevState __attribute__((unused)),
+      SearchAlgorithm::State newState __attribute__((unused))) override {
     end = std::chrono::system_clock::now();
     usec = std::chrono::duration_cast<std::chrono::microseconds>(end - start)
                .count();
@@ -142,8 +141,8 @@ protected:
   }
   virtual void discrepancyWithKnownWall() override {
     if (getState() != SearchAlgorithm::IDENTIFYING_POSITION) {
-      logw << "There was a discrepancy with known information! CurVecDir:\t"
-           << VecDir{getCurVec(), getCurDir()} << std::endl;
+      logw << "There was a discrepancy with known information! CurrentPose:\t"
+           << Pose{getCurrentPosition(), getCurrentDirection()} << std::endl;
     }
   }
   virtual void crashed() {
@@ -155,8 +154,8 @@ protected:
     step++;
     switch (action) {
     case RobotBase::START_STEP:
-      real.first = Vector(0, 1);
-      real.second = Dir::North;
+      real.first = Position(0, 1);
+      real.second = Direction::North;
       f++;
       break;
     case RobotBase::START_INIT:
@@ -164,21 +163,21 @@ protected:
     case RobotBase::ST_HALF_STOP:
       break;
     case RobotBase::TURN_L:
-      real.second = real.second + Dir::Left;
+      real.second = real.second + Direction::Left;
       if (!maze_target.canGo(real.first, real.second))
         crashed();
       real.first = real.first.next(real.second);
       l++;
       break;
     case RobotBase::TURN_R:
-      real.second = real.second + Dir::Right;
+      real.second = real.second + Direction::Right;
       if (!maze_target.canGo(real.first, real.second))
         crashed();
       real.first = real.first.next(real.second);
       r++;
       break;
     case RobotBase::ROTATE_180:
-      real.second = real.second + Dir::Back;
+      real.second = real.second + Direction::Back;
       if (!maze_target.canGo(real.first, real.second))
         crashed();
       real.first = real.first.next(real.second);

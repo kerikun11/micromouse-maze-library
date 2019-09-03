@@ -47,25 +47,33 @@ public:
 public:
   SearchAlgorithm(Maze &maze) : maze(maze) {}
   bool isComplete();
-  void positionIdentifyingInit(Vector &cv, Dir &cd);
-  bool updateWall(const State state, const Vector v, const Dir d,
+  void positionIdentifyingInit(Position &cp, Direction &cd);
+  bool updateWall(const State state, const Position p, const Direction d,
                   const bool left, const bool front, const bool right,
                   const bool back);
-  bool updateWall(const State state, const Vector v, const Dir d, const bool b);
+  bool updateWall(const State state, const Position p, const Direction d,
+                  const bool b);
   void resetLastWall(const State state, const int num = 1);
-  Result calcNextDirs(State &state, Vector &curVec, Dir &curDir, Dirs &nextDirs,
-                      Dirs &nextDirCandidates, bool &isPositionIdentifying,
-                      bool &isForceBackToStart, bool &isForceGoingToGoal,
-                      int &matchCount);
-  bool findNextDir(const State state, const Vector v, const Dir d,
-                   const Dirs &nextDirCandidates, Dir &nextDir) const;
-  bool findNextDir(const Maze &maze, const Vector v, const Dir d,
-                   const Dirs &nextDirCandidates, Dir &nextDir) const;
-  bool calcShortestDirs(Dirs &shortest_dirs, const bool diag_enabled = true);
+  Result calcNextDirections(State &state, Position &current_position,
+                            Direction &current_direction,
+                            Directions &nextDirections,
+                            Directions &nextDirectionCandidates,
+                            bool &isPositionIdentifying,
+                            bool &isForceBackToStart, bool &isForceGoingToGoal,
+                            int &matchCount);
+  bool findNextDirection(const State state, const Position p, const Direction d,
+                         const Directions &nextDirectionCandidates,
+                         Direction &nextDirection) const;
+  bool findNextDirection(const Maze &maze, const Position p, const Direction d,
+                         const Directions &nextDirectionCandidates,
+                         Direction &nextDirection) const;
+  bool calcShortestDirections(Directions &shortest_dirs,
+                              const bool diag_enabled = true);
   StepMapSlalom::cost_t getShortestCost() const {
     return getStepMapSlalom().getShortestCost();
   }
-  void printMap(const State state, const Vector vec, const Dir dir) const;
+  void printMap(const State state, const Position vec,
+                const Direction dir) const;
 
   /**
    * @brief Getters
@@ -83,13 +91,13 @@ protected:
   StepMapSlalom step_map_slalom; /**< 使用するステップマップ */
 
 private:
-  Maze idMaze;     /**< 自己位置同定に使用する迷路 */
-  Vector idOffset; /**< 自己位置同定迷路の始点位置 */
+  Maze idMaze;       /**< 自己位置同定に使用する迷路 */
+  Position idOffset; /**< 自己位置同定迷路の始点位置 */
 
   /**
    * @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
-  bool findShortestCandidates(Vectors &candidates, const bool simple);
+  bool findShortestCandidates(Positions &candidates, const bool simple);
   /**
    * @brief 自己位置同定のパターンにマッチする候補をカウントする
    *
@@ -97,37 +105,38 @@ private:
    * @param ans マッチした解のひとつ
    * @return int マッチ数, 0: 失敗, 1: 特定, 2-: 複数マッチ
    */
-  int countIdentityCandidates(const WallLogs &idWallLogs, VecDir &ans) const;
+  int countIdentityCandidates(const WallLogs &idWallLogs, Pose &ans) const;
   /**
    * @brief 特定の区画にマッチする方向を返す
    * スタート区画への訪問を避けるために使用する関数
    *
-   * @param cur_v 注目する区画
+   * @param cur_p 注目する区画
    * @param target 検索対象の区画と方向
-   * @return const Dirs 注目する区画からの方向
+   * @return const Directions 注目する区画からの方向
    */
-  const Dirs findMatchDirCandidates(const Vector cur_v,
-                                    const VecDir target) const;
+  const Directions findMatchDirectionCandidates(const Position cur_p,
+                                                const Pose target) const;
 
   /**
    * @brief 各状態での進行方向列導出関数
    */
-  Result calcNextDirsSearchForGoal(const Vector cv, const Dir cd,
-                                   Dirs &nextDirsKnown,
-                                   Dirs &nextDirCandidates);
-  Result calcNextDirsSearchAdditionally(const Vector cv, const Dir cd,
-                                        Dirs &nextDirsKnown,
-                                        Dirs &nextDirCandidates);
-  Result calcNextDirsBackingToStart(const Vector cv, const Dir cd,
-                                    Dirs &nextDirsKnown,
-                                    Dirs &nextDirCandidates);
-  Result calcNextDirsGoingToGoal(const Vector cv, const Dir cd,
-                                 Dirs &nextDirsKnown, Dirs &nextDirCandidates);
-  Result calcNextDirsPositionIdentification(Vector &cv, Dir &cd,
-                                            Dirs &nextDirsKnown,
-                                            Dirs &nextDirCandidates,
-                                            bool &isForceGoingToGoal,
-                                            int &matchCount);
+  Result calcNextDirectionsSearchForGoal(const Position cp, const Direction cd,
+                                         Directions &nextDirectionsKnown,
+                                         Directions &nextDirectionCandidates);
+  Result
+  calcNextDirectionsSearchAdditionally(const Position cp, const Direction cd,
+                                       Directions &nextDirectionsKnown,
+                                       Directions &nextDirectionCandidates);
+  Result calcNextDirectionsBackingToStart(const Position cp, const Direction cd,
+                                          Directions &nextDirectionsKnown,
+                                          Directions &nextDirectionCandidates);
+  Result calcNextDirectionsGoingToGoal(const Position cp, const Direction cd,
+                                       Directions &nextDirectionsKnown,
+                                       Directions &nextDirectionCandidates);
+  Result calcNextDirectionsPositionIdentification(
+      Position &cp, Direction &cd, Directions &nextDirectionsKnown,
+      Directions &nextDirectionCandidates, bool &isForceGoingToGoal,
+      int &matchCount);
 };
 
 } // namespace MazeLib

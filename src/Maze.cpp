@@ -12,81 +12,81 @@
 
 namespace MazeLib {
 
-/* Vector */
-const Vector Vector::next(const Dir d) const {
+/* Position */
+const Position Position::next(const Direction d) const {
   switch (d) {
-  case Dir::East:
-    return Vector(x + 1, y);
-  case Dir::North:
-    return Vector(x, y + 1);
-  case Dir::West:
-    return Vector(x - 1, y);
-  case Dir::South:
-    return Vector(x, y - 1);
+  case Direction::East:
+    return Position(x + 1, y);
+  case Direction::North:
+    return Position(x, y + 1);
+  case Direction::West:
+    return Position(x - 1, y);
+  case Direction::South:
+    return Position(x, y - 1);
   default:
-    logw << "Invalid Dir: " << d << std::endl;
+    logw << "Invalid Direction: " << d << std::endl;
     return *this;
   }
 }
-const Vector Vector::rotate(const Dir d) const {
+const Position Position::rotate(const Direction d) const {
   switch (d) {
-  case Dir::East:
-    return Vector(x, y);
-  case Dir::North:
-    return Vector(-y, x);
-  case Dir::West:
-    return Vector(-x, -y);
-  case Dir::South:
-    return Vector(y, -x);
+  case Direction::East:
+    return Position(x, y);
+  case Direction::North:
+    return Position(-y, x);
+  case Direction::West:
+    return Position(-x, -y);
+  case Direction::South:
+    return Position(y, -x);
   default:
-    logw << "Invalid Dir: " << d << std::endl;
+    logw << "Invalid Direction: " << d << std::endl;
     return *this;
   }
 }
-std::ostream &operator<<(std::ostream &os, const Vector v) {
-  return os << "(" << std::setw(2) << (int)v.x << ", " << std::setw(2)
-            << (int)v.y << ")";
+std::ostream &operator<<(std::ostream &os, const Position p) {
+  return os << "(" << std::setw(2) << (int)p.x << ", " << std::setw(2)
+            << (int)p.y << ")";
 }
 
-/* VecDir */
-std::ostream &operator<<(std::ostream &os, const VecDir &obj) {
+/* Pose */
+std::ostream &operator<<(std::ostream &os, const Pose &obj) {
   return os << "( " << std::setw(2) << (int)obj.first.x << ", " << std::setw(2)
             << (int)obj.first.y << ", " << obj.second.toChar() << ")";
 }
 
 /* WallIndex */
-const WallIndex WallIndex::next(const Dir d) const {
+const WallIndex WallIndex::next(const Direction d) const {
   switch (d) {
-  case Dir::East:
+  case Direction::East:
     return WallIndex(x + 1, y, z);
-  case Dir::NorthEast:
+  case Direction::NorthEast:
     return WallIndex(x + (1 - z), y + z, 1 - z);
-  case Dir::North:
+  case Direction::North:
     return WallIndex(x, y + 1, z);
-  case Dir::NorthWest:
+  case Direction::NorthWest:
     return WallIndex(x - z, y + z, 1 - z);
-  case Dir::West:
+  case Direction::West:
     return WallIndex(x - 1, y, z);
-  case Dir::SouthWest:
+  case Direction::SouthWest:
     return WallIndex(x - z, y - (1 - z), 1 - z);
-  case Dir::South:
+  case Direction::South:
     return WallIndex(x, y - 1, z);
-  case Dir::SouthEast:
+  case Direction::SouthEast:
     return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
   default:
-    logw << "Invalid Dir: " << d << std::endl;
+    logw << "Invalid Direction: " << d << std::endl;
     return WallIndex(x, y, z);
   }
 }
 std::ostream &operator<<(std::ostream &os, const WallIndex i) {
   return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
-            << (int)i.y << ", " << i.getDir().toChar() << ")";
+            << (int)i.y << ", " << i.getDirection().toChar() << ")";
 }
 
 /* WallLog */
 std::ostream &operator<<(std::ostream &os, const WallLog &obj) {
   return os << "( " << std::setw(2) << (int)obj.x << ", " << std::setw(2)
-            << (int)obj.y << ", " << Dir(obj).toChar() << ", "
+            << (int)obj.y << ", " << Direction(obj).toChar() << ", "
             << (obj.b ? "true" : "false") << ")";
 }
 
@@ -100,52 +100,52 @@ void Maze::reset(const bool set_start_wall) {
   max_y = 0;
   backup_counter = 0;
   if (set_start_wall) {
-    updateWall(Vector(0, 0), Dir::East, true);   //< start cell
-    updateWall(Vector(0, 0), Dir::North, false); //< start cell
+    updateWall(Position(0, 0), Direction::East, true);   //< start cell
+    updateWall(Position(0, 0), Direction::North, false); //< start cell
   }
   wallLogs.clear();
 }
-int8_t Maze::wallCount(const Vector v) const {
-  auto dirs = Dir::getAlong4();
+int8_t Maze::wallCount(const Position p) const {
+  auto dirs = Direction::getAlong4();
   return std::count_if(dirs.cbegin(), dirs.cend(),
-                       [&](const Dir d) { return isWall(v, d); });
+                       [&](const Direction d) { return isWall(p, d); });
 }
-int8_t Maze::unknownCount(const Vector v) const {
-  const auto dirs = Dir::getAlong4();
+int8_t Maze::unknownCount(const Position p) const {
+  const auto dirs = Direction::getAlong4();
   return std::count_if(dirs.cbegin(), dirs.cend(),
-                       [&](const Dir d) { return !isKnown(v, d); });
+                       [&](const Direction d) { return !isKnown(p, d); });
 }
-bool Maze::updateWall(const Vector v, const Dir d, const bool b,
+bool Maze::updateWall(const Position p, const Direction d, const bool b,
                       const bool pushLog) {
   /* 既知の壁と食い違いがあったら未知壁としてreturn */
-  if (isKnown(v, d) && isWall(v, d) != b) {
-    setWall(v, d, false);
-    setKnown(v, d, false);
+  if (isKnown(p, d) && isWall(p, d) != b) {
+    setWall(p, d, false);
+    setKnown(p, d, false);
     /* ログに追加 */
     if (pushLog)
-      wallLogs.push_back(WallLog(v, d, b));
+      wallLogs.push_back(WallLog(p, d, b));
     /* ログから消去 */
     // const auto it =
     //     std::find_if(wallLogs.cbegin(), wallLogs.cend(), [&](const auto w)
     //     {
-    //       return Vector(w) == v && Dir(w) == d;
+    //       return Position(w) == p && Direction(w) == d;
     //     });
     // if (it != wallLogs.end())
     //   wallLogs.erase(it);
     return false;
   }
   /* 未知壁なら壁情報を更新 */
-  if (!isKnown(v, d)) {
-    setWall(v, d, b);
-    setKnown(v, d, true);
+  if (!isKnown(p, d)) {
+    setWall(p, d, b);
+    setKnown(p, d, true);
     /* ログに追加 */
     if (pushLog)
-      wallLogs.push_back(WallLog(v, d, b));
+      wallLogs.push_back(WallLog(p, d, b));
     /* 最大最小区画を更新 */
-    min_x = std::min(v.x, min_x);
-    min_y = std::min(v.y, min_y);
-    max_x = std::max(v.x, max_x);
-    max_y = std::max(v.y, max_y);
+    min_x = std::min(p.x, min_x);
+    min_y = std::min(p.y, min_y);
+    max_x = std::max(p.x, max_x);
+    max_y = std::max(p.y, max_y);
   }
   return true;
 }
@@ -154,8 +154,8 @@ void Maze::resetLastWall(const int num) {
     if (wallLogs.empty())
       return;
     const auto wl = wallLogs.back();
-    setWall(Vector(wl), wl.d, false);
-    setKnown(Vector(wl), wl.d, false);
+    setWall(Position(wl), wl.d, false);
+    setKnown(Position(wl), wl.d, false);
     wallLogs.pop_back();
   }
   return;
@@ -182,15 +182,15 @@ bool Maze::parse(std::istream &is) {
         is.ignore(1); //< " " 空欄分をスキップ
         char c = is.get();
         if (c == 'S')
-          start = Vector(x, y);
+          start = Position(x, y);
         else if (c == 'G')
-          goals.push_back(Vector(x, y));
+          goals.push_back(Position(x, y));
         is.ignore(1); //< " " 空欄分をスキップ
         c = is.get();
         if (c == '|')
-          Maze::updateWall(Vector(x, y), Dir::East, true);
+          Maze::updateWall(Position(x, y), Direction::East, true);
         else if (c == ' ')
-          Maze::updateWall(Vector(x, y), Dir::East, false);
+          Maze::updateWall(Position(x, y), Direction::East, false);
       }
     }
     for (uint8_t x = 0; x < maze_size; ++x) {
@@ -200,9 +200,9 @@ bool Maze::parse(std::istream &is) {
       s += (char)is.get();
       s += (char)is.get();
       if (s == "---")
-        Maze::updateWall(Vector(x, y), Dir::South, true);
+        Maze::updateWall(Position(x, y), Direction::South, true);
       else if (s == "   ")
-        Maze::updateWall(Vector(x, y), Dir::South, false);
+        Maze::updateWall(Position(x, y), Direction::South, false);
     }
   }
   return true;
@@ -211,11 +211,11 @@ bool Maze::parse(const std::vector<std::string> data, const int maze_size) {
   for (const auto xr : {true, false})
     for (const auto yr : {true, false})
       for (const auto xy : {true, false})
-        for (const auto b0 : Dir::getAlong4())
-          for (const auto b1 : Dir::getAlong4())
-            for (const auto b2 : Dir::getAlong4())
-              for (const auto b3 : Dir::getAlong4()) {
-                const std::array<Dir, 4> bit_to_dir_map{{b0, b1, b2, b3}};
+        for (const auto b0 : Direction::getAlong4())
+          for (const auto b1 : Direction::getAlong4())
+            for (const auto b2 : Direction::getAlong4())
+              for (const auto b3 : Direction::getAlong4()) {
+                const std::array<Direction, 4> bit_to_dir_map{{b0, b1, b2, b3}};
                 reset(false);
                 int diffs = 0;
                 for (int8_t y = 0; y < maze_size; ++y) {
@@ -232,22 +232,22 @@ bool Maze::parse(const std::vector<std::string> data, const int maze_size) {
                       h = c - 'A' + 10;
                     else if (0 <= c && c <= 15)
                       h = c;
-                    if (!updateWall(Vector(x, y), bit_to_dir_map[0], h & 0x01,
+                    if (!updateWall(Position(x, y), bit_to_dir_map[0], h & 0x01,
                                     false))
                       ++diffs;
-                    if (!updateWall(Vector(x, y), bit_to_dir_map[1], h & 0x02,
+                    if (!updateWall(Position(x, y), bit_to_dir_map[1], h & 0x02,
                                     false))
                       ++diffs;
-                    if (!updateWall(Vector(x, y), bit_to_dir_map[2], h & 0x04,
+                    if (!updateWall(Position(x, y), bit_to_dir_map[2], h & 0x04,
                                     false))
                       ++diffs;
-                    if (!updateWall(Vector(x, y), bit_to_dir_map[3], h & 0x08,
+                    if (!updateWall(Position(x, y), bit_to_dir_map[3], h & 0x08,
                                     false))
                       ++diffs;
                   }
                 }
-                if (diffs < MAZE_SIZE && isWall(0, 0, Dir::East) &&
-                    !isWall(0, 0, Dir::North))
+                if (diffs < MAZE_SIZE && isWall(0, 0, Direction::East) &&
+                    !isWall(0, 0, Direction::North))
                   return true;
               }
   return false;
@@ -257,38 +257,39 @@ void Maze::print(std::ostream &os, const int maze_size) const {
     if (y != maze_size) {
       os << '|';
       for (int8_t x = 0; x < maze_size; ++x) {
-        const auto v = Vector(x, y);
-        if (v == start)
+        const auto p = Position(x, y);
+        if (p == start)
           os << " S ";
-        else if (std::find(goals.cbegin(), goals.cend(), v) != goals.cend())
+        else if (std::find(goals.cbegin(), goals.cend(), p) != goals.cend())
           os << " G ";
         else
           os << "   ";
-        os << (isKnown(x, y, Dir::East) ? (isWall(x, y, Dir::East) ? "|" : " ")
-                                        : ".");
+        os << (isKnown(x, y, Direction::East)
+                   ? (isWall(x, y, Direction::East) ? "|" : " ")
+                   : ".");
       }
       os << std::endl;
     }
     for (int8_t x = 0; x < maze_size; ++x)
       os << "+"
-         << (isKnown(x, y, Dir::South)
-                 ? (isWall(x, y, Dir::South) ? "---" : "   ")
+         << (isKnown(x, y, Direction::South)
+                 ? (isWall(x, y, Direction::South) ? "---" : "   ")
                  : " . ");
     os << "+" << std::endl;
   }
 }
-void Maze::printPath(const Dirs &dirs, const Vector start,
+void Maze::printPath(const Directions &dirs, const Position start,
                      std::ostream &os) const {
   uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {{0}};
-  Vector v = start;
+  Position p = start;
   int counter = 1;
   for (const auto d : dirs) {
-    v = v.next(d);
-    if (!v.isInsideOfField()) {
-      loge << "Out of Field! " << v << std::endl;
+    p = p.next(d);
+    if (!p.isInsideOfField()) {
+      loge << "Out of Field! " << p << std::endl;
       continue;
     }
-    steps[v.y][v.x] = counter++;
+    steps[p.y][p.x] = counter++;
   }
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
@@ -298,25 +299,26 @@ void Maze::printPath(const Dirs &dirs, const Vector start,
           os << C_YE << std::setw(3) << steps[y][x] << C_NO;
         else
           os << "   ";
-        os << (isKnown(x, y, Dir::East) ? (isWall(x, y, Dir::East) ? "|" : " ")
-                                        : (C_RE "." C_NO));
+        os << (isKnown(x, y, Direction::East)
+                   ? (isWall(x, y, Direction::East) ? "|" : " ")
+                   : (C_RE "." C_NO));
       }
       os << std::endl;
     }
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       os << "+"
-         << (isKnown(x, y, Dir::South)
-                 ? (isWall(x, y, Dir::South) ? "---" : "   ")
+         << (isKnown(x, y, Direction::South)
+                 ? (isWall(x, y, Direction::South) ? "---" : "   ")
                  : (C_RE " . " C_NO));
     os << "+" << std::endl;
   }
 }
-void Maze::appendStraightDirs(const Maze &maze, Dirs &shortest_dirs,
-                              const bool diag_enabled) {
+void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
+                                    const bool diag_enabled) {
   /* ゴール区画までたどる */
-  auto v = maze.getStart();
+  auto p = maze.getStart();
   for (const auto d : shortest_dirs)
-    v = v.next(d);
+    p = p.next(d);
   if (shortest_dirs.size() < 2)
     return;
   auto prev_dir = shortest_dirs[shortest_dirs.size() - 1 - 1];
@@ -326,19 +328,19 @@ void Maze::appendStraightDirs(const Maze &maze, Dirs &shortest_dirs,
   while (loop) {
     loop = false;
     // 斜めを考慮した進行方向を列挙する
-    Dirs dirs;
-    const auto rel_dir = Dir(dir - prev_dir);
-    if (diag_enabled && rel_dir == Dir::Left)
-      dirs = {Dir(dir + Dir::Right), dir};
-    else if (diag_enabled && rel_dir == Dir::Right)
-      dirs = {Dir(dir + Dir::Left), dir};
+    Directions dirs;
+    const auto rel_dir = Direction(dir - prev_dir);
+    if (diag_enabled && rel_dir == Direction::Left)
+      dirs = {Direction(dir + Direction::Right), dir};
+    else if (diag_enabled && rel_dir == Direction::Right)
+      dirs = {Direction(dir + Direction::Left), dir};
     else
       dirs = {dir};
     // 行ける方向に行く
     for (const auto d : dirs) {
-      if (maze.canGo(v, d)) {
+      if (maze.canGo(p, d)) {
         shortest_dirs.push_back(d);
-        v = v.next(d);
+        p = p.next(d);
         prev_dir = dir;
         dir = d;
         loop = true;

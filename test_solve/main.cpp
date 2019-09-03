@@ -9,8 +9,9 @@ public:
 protected:
   virtual void discrepancyWithKnownWall() override {
     printInfo();
-    std::cout << "There was a discrepancy with known information! CurVecDir:\t"
-              << VecDir{getCurVec(), getCurDir()} << std::endl;
+    std::cout
+        << "There was a discrepancy with known information! CurrentPose:\t"
+        << Pose{getCurrentPosition(), getCurrentDirection()} << std::endl;
     getc(stdin);
   }
   virtual void crashed() override {

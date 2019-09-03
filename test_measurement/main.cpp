@@ -64,7 +64,7 @@ int test_measurement() {
     csv << "," << robot.max_usec;
     csv << "," << us.count();
     for (const auto diag_enabled : {false, true}) {
-      if (!robot.calcShortestDirs(diag_enabled))
+      if (!robot.calcShortestDirections(diag_enabled))
         loge << "Failed to Find a Shortest Path! "
              << (diag_enabled ? "diag" : "no_diag") << std::endl;
       const auto path_cost = robot.getSearchAlgorithm().getShortestCost();
@@ -77,8 +77,8 @@ int test_measurement() {
       /* Shortest Path Comparison */
       const auto p_at = std::make_unique<Agent>(maze_target);
       Agent &at = *p_at;
-      at.calcShortestDirs(diag_enabled);
-      if (at.getShortestDirs() != robot.getShortestDirs()) {
+      at.calcShortestDirections(diag_enabled);
+      if (at.getShortestDirections() != robot.getShortestDirections()) {
         logw << "searched path is not shortest! "
              << (diag_enabled ? "diag" : "no_diag") << std::endl;
         // at.printPath(); robot.printPath();
@@ -96,16 +96,16 @@ int test_measurement() {
     step_map.update(maze_target, maze_target.getGoals(), false, false);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
-        for (const auto d : Dir::getAlong4()) {
-          const auto v = Vector(x, y);
-          if (step_map.getStep(v) == STEP_MAX)
+        for (const auto d : Direction::getAlong4()) {
+          const auto p = Position(x, y);
+          if (step_map.getStep(p) == STEP_MAX)
             continue; /*< そもそも行けない区画は除外 */
-          if (maze_target.isWall(v, d))
+          if (maze_target.isWall(p, d))
             continue; /*< 壁上からは除外 */
-          if (v == Vector(0, 0) || v == Vector(0, 1))
+          if (p == Position(0, 0) || p == Position(0, 1))
             continue;
           /* set fake offset */
-          robot.real = robot.fake_offset = VecDir{Vector(x, y), d};
+          robot.real = robot.fake_offset = Pose{Position(x, y), d};
           bool res = robot.positionIdentifyRun();
           if (!res) {
             std::cout << std::endl
@@ -152,10 +152,10 @@ int test_measurement() {
       StepMap &map = *p;
       std::chrono::microseconds sum{0};
       const int n = 100;
-      Dirs shortest_dirs;
+      Directions shortest_dirs;
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
-        shortest_dirs = map.calcShortestDirs(maze, known_only, simple);
+        shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
         if (shortest_dirs.empty())
           loge << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
@@ -178,10 +178,10 @@ int test_measurement() {
       StepMapWall &map = *p;
       std::chrono::microseconds sum{0};
       const int n = 100;
-      Dirs shortest_dirs;
+      Directions shortest_dirs;
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
-        shortest_dirs = map.calcShortestDirs(maze, known_only, simple);
+        shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
         if (shortest_dirs.empty())
           loge << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
@@ -221,7 +221,7 @@ int test_measurement() {
                 << sum.count() / n << "\t[us]" << std::endl;
       // map.print(maze, path);
       // auto shortest_dirs = map.indexes2dirs(path, diag_enabled);
-      // StepMap::appendStraightDirs(maze, shortest_dirs, diag_enabled);
+      // Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);
       // maze.printPath(shortest_dirs);
     }
 #endif

@@ -33,16 +33,16 @@ void StepMapWall::print(const Maze &maze, std::ostream &os) const {
         os << " ";
         os << C_CY << std::setw(3)
            << std::min(getStep(WallIndex(x, y, 0)), (step_t)999) << C_NO;
-        os << (maze.isKnown(x, y, Dir::East)
-                   ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+        os << (maze.isKnown(x, y, Direction::East)
+                   ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
                    : (C_RE "." C_NO));
       }
       os << std::endl;
     }
     for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
       os << "+";
-      os << (maze.isKnown(x, y, Dir::South)
-                 ? (maze.isWall(x, y, Dir::South) ? "-------" : "       ")
+      os << (maze.isKnown(x, y, Direction::South)
+                 ? (maze.isWall(x, y, Direction::South) ? "-------" : "       ")
                  : (C_RE "  . .  " C_NO));
     }
     os << "+" << std::endl;
@@ -59,8 +59,8 @@ void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
       if (exists(WallIndex(x, y, 1)))
         os << C_YE << " X " << C_NO;
       else
-        os << (maze.isKnown(x, y, Dir::North)
-                   ? (maze.isWall(x, y, Dir::North) ? "---" : "   ")
+        os << (maze.isKnown(x, y, Direction::North)
+                   ? (maze.isWall(x, y, Direction::North) ? "---" : "   ")
                    : (C_RE " . " C_NO));
     }
     os << "+" << std::endl;
@@ -71,15 +71,15 @@ void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
         if (exists(WallIndex(x, y, 0)))
           os << C_YE << "X" << C_NO;
         else
-          os << (maze.isKnown(x, y, Dir::East)
-                     ? (maze.isWall(x, y, Dir::East) ? "|" : " ")
+          os << (maze.isKnown(x, y, Direction::East)
+                     ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
                      : (C_RE "." C_NO));
       }
       os << std::endl;
     }
   }
 }
-void StepMapWall::print(const Maze &maze, const Dirs &shortest_dirs,
+void StepMapWall::print(const Maze &maze, const Directions &shortest_dirs,
                         const WallIndex start, std::ostream &os) const {
   auto i = start;
   WallIndexes shortest_indexes;
@@ -97,11 +97,11 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
   int8_t max_x = maze.getMaxX();
   int8_t min_y = maze.getMinY();
   int8_t max_y = maze.getMaxY();
-  for (const auto v : dest) { /*< ゴールを含めないと導出不可能になる */
-    min_x = std::min(v.x, min_x);
-    max_x = std::max(v.x, max_x);
-    min_y = std::min(v.y, min_y);
-    max_y = std::max(v.y, max_y);
+  for (const auto p : dest) { /*< ゴールを含めないと導出不可能になる */
+    min_x = std::min(p.x, min_x);
+    max_x = std::max(p.x, max_x);
+    min_y = std::min(p.y, min_y);
+    max_y = std::max(p.y, max_y);
   }
   /* 全区画のステップを最大値に設定 */
   reset();
@@ -117,7 +117,7 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
     q.pop();
     const step_t focus_step = getStep(focus);
     /* 周辺を走査 */
-    for (const auto d : focus.getNextDir6()) {
+    for (const auto d : focus.getNextDirection6()) {
       auto next = focus;
       /* 直線で行けるところまで更新する */
       for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
@@ -140,24 +140,24 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
     }
   }
 }
-const Dirs StepMapWall::calcShortestDirs(const Maze &maze,
-                                         const WallIndex start,
-                                         const WallIndexes &dest,
-                                         const bool known_only,
-                                         const bool simple) {
+const Directions StepMapWall::calcShortestDirections(const Maze &maze,
+                                                     const WallIndex start,
+                                                     const WallIndexes &dest,
+                                                     const bool known_only,
+                                                     const bool simple) {
   /* ステップマップを更新 */
   update(maze, dest, known_only, simple);
   /* 最短経路となるスタートからの方向列 */
-  Dirs shortest_dirs;
+  Directions shortest_dirs;
   /* start から順にステップマップを下る */
   auto focus = start;
   while (1) {
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
-    auto min_d = Dir::Max;
+    auto min_d = Direction::Max;
     auto min_step = STEP_MAX;
     auto min_i = focus;
     /* 周辺を走査 */
-    for (const auto d : focus.getNextDir6()) {
+    for (const auto d : focus.getNextDirection6()) {
       auto next = focus; /*< 隣接 */
       /* 直線で行けるところまで更新する */
       for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
@@ -189,42 +189,42 @@ const Dirs StepMapWall::calcShortestDirs(const Maze &maze,
   return shortest_dirs;
 }
 const WallIndexes StepMapWall::convertDestinations(const Maze &maze,
-                                                   const Vectors vectors) {
+                                                   const Positions positions) {
   WallIndexes dest;
-  for (const auto v : vectors)
-    for (const auto d : Dir::getAlong4())
-      if (!maze.isWall(v, d))
-        dest.push_back(WallIndex(v, d));
+  for (const auto p : positions)
+    for (const auto d : Direction::getAlong4())
+      if (!maze.isWall(p, d))
+        dest.push_back(WallIndex(p, d));
   return dest;
 }
-const Dir StepMapWall::convertDir(const Dir d, const WallIndex i) {
+const Direction StepMapWall::convertDirection(const Direction d,
+                                              const WallIndex i) {
   switch (d) {
-  case Dir::East:
-  case Dir::North:
-  case Dir::West:
-  case Dir::South:
+  case Direction::East:
+  case Direction::North:
+  case Direction::West:
+  case Direction::South:
     return d;
-  case Dir::NorthEast:
-    return i.z == 0 ? Dir::North : Dir::East;
-  case Dir::SouthWest:
-    return i.z == 0 ? Dir::South : Dir::West;
-  case Dir::NorthWest:
-    return i.z == 0 ? Dir::North : Dir::West;
-  case Dir::SouthEast:
-    return i.z == 0 ? Dir::South : Dir::East;
+  case Direction::NorthEast:
+    return i.z == 0 ? Direction::North : Direction::East;
+  case Direction::SouthWest:
+    return i.z == 0 ? Direction::South : Direction::West;
+  case Direction::NorthWest:
+    return i.z == 0 ? Direction::North : Direction::West;
+  case Direction::SouthEast:
+    return i.z == 0 ? Direction::South : Direction::East;
   default:
     logw << "invalid direction" << std::endl;
-    return Dir::Max;
+    return Direction::Max;
   }
 }
-const Dirs
-StepMapWall::convertWallIndexDirsToVectorDirs(const Dirs src,
-                                              const WallIndex start) {
-  Dirs dirs;
-  dirs.push_back(Dir::North);
+const Directions StepMapWall::convertWallIndexDirectionsToPositionDirections(
+    const Directions src, const WallIndex start) {
+  Directions dirs;
+  dirs.push_back(Direction::North);
   auto i = start;
   for (const auto d : src) {
-    dirs.push_back(convertDir(d, i));
+    dirs.push_back(convertDirection(d, i));
     i = i.next(d);
   }
   return dirs;

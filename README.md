@@ -22,8 +22,8 @@ make
 
 ## Class Design
 
-- Dir
-- Vector
+- Direction
+- Position
 - WallLog
 - Maze
 

@@ -17,7 +17,7 @@ bool RobotBase::searchRun() {
   setForceGoingToGoal();
   /* スタートのアクションをキュー */
   queueAction(START_STEP);
-  updateCurVecDir(Vector(0, 1), Dir::North);
+  updateCurrentPose(Position(0, 1), Direction::North);
   /* 走行開始 */
   return generalSearchRun();
 }
@@ -33,25 +33,26 @@ bool RobotBase::positionIdentifyRun() {
 }
 bool RobotBase::endFastRunBackingToStartRun() {
   /* エラー処理 */
-  if (getShortestDirs().empty()) {
-    logw << "ShortestDirs are empty!" << std::endl;
+  if (getShortestDirections().empty()) {
+    logw << "ShortestDirections are empty!" << std::endl;
     return false;
   }
   /* 現在位置を最短後の位置に移す */
-  Vector v = maze.getStart();
-  for (const auto d : getShortestDirs())
-    v = v.next(d);
-  updateCurVecDir(v, getShortestDirs().back());
+  Position p = maze.getStart();
+  for (const auto d : getShortestDirections())
+    p = p.next(d);
+  updateCurrentPose(p, getShortestDirections().back());
   /* 最短後は区画の中央にいるので，区画の切り替わり位置に移動 */
-  updateCurVecDir(getCurVec().next(getCurDir() + Dir::Back),
-                  getCurDir() + Dir::Back);
+  updateCurrentPose(
+      getCurrentPosition().next(getCurrentDirection() + Direction::Back),
+      getCurrentDirection() + Direction::Back);
   queueAction(ROTATE_180);
   queueAction(ST_HALF);
   /* 走行開始 */
   return generalSearchRun();
 }
 bool RobotBase::fastRun(const bool diag_enabled) {
-  if (!calcShortestDirs(diag_enabled)) {
+  if (!calcShortestDirections(diag_enabled)) {
     loge << "Failed to find shortest path!" << std::endl;
     return false;
   }
@@ -70,26 +71,26 @@ void RobotBase::turnbackSave() {
   queueAction(ST_HALF);
   startDequeue();
 }
-void RobotBase::queueNextDirs(const Dirs &nextDirs) {
-  for (const auto nextDir : nextDirs) {
-    const auto nextVec = getCurVec().next(nextDir);
-    switch (Dir(nextDir - getCurDir())) {
-    case Dir::Front:
+void RobotBase::queueNextDirections(const Directions &nextDirections) {
+  for (const auto nextDirection : nextDirections) {
+    const auto nextPosition = getCurrentPosition().next(nextDirection);
+    switch (Direction(nextDirection - getCurrentDirection())) {
+    case Direction::Front:
       queueAction(ST_FULL);
       break;
-    case Dir::Left:
+    case Direction::Left:
       queueAction(TURN_L);
       break;
-    case Dir::Right:
+    case Direction::Right:
       queueAction(TURN_R);
       break;
-    case Dir::Back:
+    case Direction::Back:
       turnbackSave();
       break;
     default:
       logw << "invalid direction" << std::endl;
     }
-    updateCurVecDir(nextVec, nextDir);
+    updateCurrentPose(nextPosition, nextDirection);
   }
 }
 bool RobotBase::generalSearchRun() {
@@ -98,16 +99,16 @@ bool RobotBase::generalSearchRun() {
   /* 走行開始 */
   startDequeue();
   while (1) {
-    const auto &v = getCurVec();
-    const auto &d = getCurDir();
+    const auto &p = getCurrentPosition();
+    const auto &d = getCurrentDirection();
     /* 既知区間の走行中に最短経路を導出 */
-    calcNextDirsPreCallback();
+    calcNextDirectionsPreCallback();
     const auto prevState = getState();
-    const auto status = calcNextDirs(); /*< 時間がかかる処理！ */
+    const auto status = calcNextDirections(); /*< 時間がかかる処理！ */
     const auto newState = getState();
-    calcNextDirsPostCallback(prevState, newState);
+    calcNextDirectionsPostCallback(prevState, newState);
     /* 既知区間移動をキューにつめる */
-    queueNextDirs(getNextDirs());
+    queueNextDirections(getNextDirections());
     /* 最短経路導出結果を確認 */
     if (status == SearchAlgorithm::Reached)
       break;
@@ -120,22 +121,22 @@ bool RobotBase::generalSearchRun() {
     /* 壁を確認 */
     bool left, front, right, back;
     findWall(left, front, right, back);
-    if (!updateWall(v, d, left, front, right, back))
+    if (!updateWall(p, d, left, front, right, back))
       discrepancyWithKnownWall();
     /* 壁のない方向へ1マス移動 */
-    Dir nextDir;
-    if (!findNextDir(v, d, nextDir)) {
+    Direction nextDirection;
+    if (!findNextDirection(p, d, nextDirection)) {
       loge << "I can't go anywhere!" << std::endl;
       stopDequeue();
       return false;
     }
-    queueNextDirs({nextDir});
+    queueNextDirections({nextDirection});
   }
   /* スタート区画特有の処理 */
   queueAction(ST_HALF_STOP);
   queueAction(START_INIT);
-  updateCurVecDir(Vector(0, 0), Dir::North);
-  calcNextDirs(); /*< 時間がかかる処理！ */
+  updateCurrentPose(Position(0, 0), Direction::North);
+  calcNextDirections(); /*< 時間がかかる処理！ */
   waitForEndAction();
   stopDequeue();
   backupMazeToFlash();

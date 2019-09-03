@@ -99,11 +99,12 @@ int main(void) {
   const auto maze_data = mazeData_MM2018H_Chubu;
   const int maze_size = 16;
   const std::string output_filename = "output.maze";
-  const Vectors goals = {
-      //   Vector(7, 7), Vector(8, 7), Vector(7, 8), Vector(8, 8),
-      Vector(9, 9), Vector(10, 9), Vector(9, 10), Vector(10, 10),
-      //   Vector(5, 6), Vector(6, 6), Vector(5, 7), Vector(6, 7),
-      //   Vector(12, 12), Vector(13, 12), Vector(12, 13), Vector(13, 13),
+  const Positions goals = {
+      //   Position(7, 7), Position(8, 7), Position(7, 8), Position(8, 8),
+      Position(9, 9), Position(10, 9), Position(9, 10), Position(10, 10),
+      //   Position(5, 6), Position(6, 6), Position(5, 7), Position(6, 7),
+      //   Position(12, 12), Position(13, 12), Position(12, 13), Position(13,
+      //   13),
   };
   /* process */
   Maze sample;

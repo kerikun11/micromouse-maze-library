@@ -32,32 +32,34 @@ public:
   void reset(const step_t step = STEP_MAX);
   /**
    * @param ステップの取得
-   * @param v 区画の座標
+   * @param p 区画の座標
    * @return ステップ
    */
   step_t getStep(const int8_t x, const int8_t y) const;
-  step_t getStep(const Vector v) const { return getStep(v.x, v.y); }
+  step_t getStep(const Position p) const { return getStep(p.x, p.y); }
   /**
    * @param ステップへの参照の取得，書き込み可能
-   * @param v 区画の座標
+   * @param p 区画の座標
    */
   void setStep(const int8_t x, const int8_t y, const step_t step);
-  void setStep(const Vector v, const step_t step) {
-    return setStep(v.x, v.y, step);
+  void setStep(const Position p, const step_t step) {
+    return setStep(p.x, p.y, step);
   }
   /**
    * @brief ステップの表示
-   * @param v ハイライト区画
+   * @param p ハイライト区画
    */
-  void print(const Maze &maze, const Vector v = Vector(-1, -1),
-             const Dir d = Dir::Max, std::ostream &os = std::cout) const;
-  void print(const Maze &maze, const Dirs &dirs,
-             const Vector start = Vector(0, 0),
+  void print(const Maze &maze, const Position p = Position(-1, -1),
+             const Direction d = Direction::Max,
              std::ostream &os = std::cout) const;
-  void printFull(const Maze &maze, const Vector v = Vector(-1, -1),
-                 const Dir d = Dir::Max, std::ostream &os = std::cout) const;
-  void printFull(const Maze &maze, const Dirs &dirs,
-                 const Vector start = Vector(0, 0),
+  void print(const Maze &maze, const Directions &dirs,
+             const Position start = Position(0, 0),
+             std::ostream &os = std::cout) const;
+  void printFull(const Maze &maze, const Position p = Position(-1, -1),
+                 const Direction d = Direction::Max,
+                 std::ostream &os = std::cout) const;
+  void printFull(const Maze &maze, const Directions &dirs,
+                 const Position start = Position(0, 0),
                  std::ostream &os = std::cout) const;
   /**
    * @brief ステップマップの更新
@@ -65,41 +67,46 @@ public:
    * @param known_only
    *        true:未知の壁は通過不可能とする，false:未知の壁はないものとする
    */
-  void update(const Maze &maze, const Vectors &dest, const bool known_only,
+  void update(const Maze &maze, const Positions &dest, const bool known_only,
               const bool simple);
   /**
    * @brief ステップマップから次に行くべき方向を計算する関数
    * @return 既知区間の最終区画
    */
-  const Vector calcNextDirs(const Maze &maze, const Vector start_v,
-                            const Dir start_d, Dirs &nextDirsKnown,
-                            Dirs &nextDirCandidates) const;
+  const Position calcNextDirections(const Maze &maze, const Position start_p,
+                                    const Direction start_d,
+                                    Directions &nextDirectionsKnown,
+                                    Directions &nextDirectionCandidates) const;
   /**
    * @brief 迷路を編集してさらに優先順の精度を向上させる関数
    * @return 既知区間の最終区画
    */
-  const Vector calcNextDirsAdv(Maze &maze, const Vectors &dest,
-                               const Vector vec, const Dir dir,
-                               Dirs &nextDirsKnown, Dirs &nextDirCandidates);
+  const Position calcNextDirectionsAdv(Maze &maze, const Positions &dest,
+                                       const Position vec, const Direction dir,
+                                       Directions &nextDirectionsKnown,
+                                       Directions &nextDirectionCandidates);
   /**
    * @brief 与えられた区画間の最短経路を導出する関数
    * @param maze 迷路の参照
    * @param start 始点区画
    * @param goals ゴール区画の集合
    * @param known_only 既知壁のみモードかどうか
-   * @return const Dirs スタートからゴールへの最短経路の方向列．
+   * @return const Directions スタートからゴールへの最短経路の方向列．
    *                    経路がない場合は空配列となる．
    */
-  const Dirs calcShortestDirs(const Maze &maze, const Vector start,
-                              const Vectors &dest, const bool known_only,
-                              const bool simple = true);
+  const Directions calcShortestDirections(const Maze &maze,
+                                          const Position start,
+                                          const Positions &dest,
+                                          const bool known_only,
+                                          const bool simple = true);
   /**
    * @brief スタートからゴールまでの最短経路を導出する関数
    */
-  const Dirs calcShortestDirs(const Maze &maze, const bool known_only,
-                              const bool simple) {
-    return calcShortestDirs(maze, maze.getStart(), maze.getGoals(), known_only,
-                            simple);
+  const Directions calcShortestDirections(const Maze &maze,
+                                          const bool known_only,
+                                          const bool simple) {
+    return calcShortestDirections(maze, maze.getStart(), maze.getGoals(),
+                                  known_only, simple);
   }
 
 private:
@@ -114,14 +121,16 @@ private:
   /**
    * @brief ステップマップにより次に行くべき方向列を生成する
    */
-  const Dirs calcNextDirsStepDown(const Maze &maze, const VecDir start,
-                                  VecDir &focus, const bool known_only,
-                                  const bool break_unknown) const;
+  const Directions calcNextDirectionsStepDown(const Maze &maze,
+                                              const Pose start, Pose &focus,
+                                              const bool known_only,
+                                              const bool break_unknown) const;
   /**
    * @brief 引数区画の周囲の未知壁の確認優先順位を生成する関数
-   * @return const Dirs 確認すべき優先順位
+   * @return const Directions 確認すべき優先順位
    */
-  const Dirs calcNextDirCandidates(const Maze &maze, const VecDir focus) const;
+  const Directions calcNextDirectionCandidates(const Maze &maze,
+                                               const Pose focus) const;
 };
 
 } // namespace MazeLib

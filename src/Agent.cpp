@@ -12,7 +12,8 @@
 
 namespace MazeLib {
 
-void Agent::printInfo(const bool showMaze, const Vector vec, const Dir dir,
+void Agent::printInfo(const bool showMaze, const Position vec,
+                      const Direction dir,
                       const SearchAlgorithm::State state) const {
   /* 迷路を表示 */
   if (showMaze) {
@@ -20,16 +21,16 @@ void Agent::printInfo(const bool showMaze, const Vector vec, const Dir dir,
     searchAlgorithm.printMap(state, vec, dir);
   }
   /* 詳細を表示 */
-  std::cout << "Cur: " << VecDir{vec, dir}
+  std::cout << "Cur: " << Pose{vec, dir}
             << ", State: " << SearchAlgorithm::stateString(state) << std::endl;
   std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
-  std::cout << "nextDirsKnown: ";
-  for (const auto d : getNextDirs())
+  std::cout << "nextDirectionsKnown: ";
+  for (const auto d : getNextDirections())
     std::cout << d.toChar();
   std::cout << "    " << std::endl;
   std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
-  std::cout << "nextDirCandidates: ";
-  for (const auto d : getNextDirCandidates())
+  std::cout << "nextDirectionCandidates: ";
+  for (const auto d : getNextDirectionCandidates())
     std::cout << d.toChar();
   std::cout << std::endl;
   // std::cout << "Match Count: " << matchCount << "    " << std::endl;

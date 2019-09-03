@@ -24,8 +24,8 @@ public:
   void reset() {
     maze.reset();
     state = SearchAlgorithm::START;
-    curDir = Dir::North;
-    curVec = Vector(0, 0);
+    current_direction = Direction::North;
+    current_position = Position(0, 0);
     isPositionIdentifying = false;
     isForceBackToStart = false;
     isForceGoingToGoal = false;
@@ -33,38 +33,40 @@ public:
   /**
    * @brief ゴール区画を変更する関数
    */
-  void replaceGoals(const Vectors &goals) { maze.setGoals(goals); }
+  void replaceGoals(const Positions &goals) { maze.setGoals(goals); }
   /**
    * @brief 探索が完了しているかどうかを返す関数
    */
   bool isComplete() { return searchAlgorithm.isComplete(); }
   /**
    * @brief 現在地を更新
-   * @param v 区画座標
+   * @param p 区画座標
    * @param d 絶対方向
    */
-  void updateCurVecDir(const Vector v, const Dir d) {
-    curVec = v;
-    curDir = d;
+  void updateCurrentPose(const Position p, const Direction d) {
+    current_position = p;
+    current_direction = d;
   }
   /**
    * @brief 次に行くべき方向を取得する
    */
-  bool findNextDir(const Vector v, const Dir d, Dir &nextDir) const {
-    return searchAlgorithm.findNextDir(state, v, d, nextDirCandidates, nextDir);
+  bool findNextDirection(const Position p, const Direction d,
+                         Direction &nextDirection) const {
+    return searchAlgorithm.findNextDirection(
+        state, p, d, nextDirectionCandidates, nextDirection);
   }
   /**
    * @brief 絶対座標絶対方向で壁の1枚更新
-   * @param v 区画座標
+   * @param p 区画座標
    * @param d 絶対方向
    * @param b 壁の有無
    */
-  bool updateWall(const Vector v, const Dir d, const bool left,
+  bool updateWall(const Position p, const Direction d, const bool left,
                   const bool front, const bool right, const bool back) {
-    return searchAlgorithm.updateWall(state, v, d, left, front, right, back);
+    return searchAlgorithm.updateWall(state, p, d, left, front, right, back);
   }
-  bool updateWall(const Vector v, const Dir d, const bool b) {
-    return searchAlgorithm.updateWall(state, v, d, b);
+  bool updateWall(const Position p, const Direction d, const bool b) {
+    return searchAlgorithm.updateWall(state, p, d, b);
   }
   void resetLastWall(const int num = 1) {
     return searchAlgorithm.resetLastWall(state, num);
@@ -74,19 +76,19 @@ public:
    * 注意: 処理に時間がかかる場合あり
    * @return 探索状態
    */
-  SearchAlgorithm::Result calcNextDirs() {
-    return searchAlgorithm.calcNextDirs(
-        state, curVec, curDir, nextDirsKnown, nextDirCandidates,
-        isPositionIdentifying, isForceBackToStart, isForceGoingToGoal,
-        matchCount);
+  SearchAlgorithm::Result calcNextDirections() {
+    return searchAlgorithm.calcNextDirections(
+        state, current_position, current_direction, nextDirectionsKnown,
+        nextDirectionCandidates, isPositionIdentifying, isForceBackToStart,
+        isForceGoingToGoal, matchCount);
   }
   /**
    * @brief 最短経路を導出
    * @param diagonal true: 斜めあり, false: 斜めなし
    * @return true: 成功, false: 失敗
    */
-  bool calcShortestDirs(const bool diag_enabled) {
-    return searchAlgorithm.calcShortestDirs(shortest_dirs, diag_enabled);
+  bool calcShortestDirections(const bool diag_enabled) {
+    return searchAlgorithm.calcShortestDirections(shortest_dirs, diag_enabled);
   }
   /**
    * @brief 探索を中止してスタート区画へ強制的に戻る
@@ -103,10 +105,11 @@ public:
    * @brief 自己位置同定モードに設定する
    */
   void positionIdentify() {
-    searchAlgorithm.positionIdentifyingInit(curVec, curDir);
+    searchAlgorithm.positionIdentifyingInit(current_position,
+                                            current_direction);
     state = SearchAlgorithm::IDENTIFYING_POSITION;
     isPositionIdentifying = true;
-    calcNextDirs(); /*< 時間がかかる処理！ */
+    calcNextDirections(); /*< 時間がかかる処理！ */
   }
   /**
    * @brief 探索状態の取得
@@ -115,23 +118,25 @@ public:
   /**
    * @brief 次に行くべき方向配列の計算結果を取得
    */
-  const Dirs &getNextDirs() const { return nextDirsKnown; }
+  const Directions &getNextDirections() const { return nextDirectionsKnown; }
   /**
    * @brief 次に行くべき方向配列の計算結果を取得
    */
-  const Dirs &getNextDirCandidates() const { return nextDirCandidates; }
+  const Directions &getNextDirectionCandidates() const {
+    return nextDirectionCandidates;
+  }
   /**
    * @brief 現在区画を取得
    */
-  const Vector &getCurVec() const { return curVec; }
+  const Position &getCurrentPosition() const { return current_position; }
   /**
    * @brief 現在の方向を取得
    */
-  const Dir &getCurDir() const { return curDir; }
+  const Direction &getCurrentDirection() const { return current_direction; }
   /**
    * @brief 最短経路の方向配列の計算結果を取得
    */
-  const Dirs &getShortestDirs() const { return shortest_dirs; }
+  const Directions &getShortestDirections() const { return shortest_dirs; }
   /**
    * @brief 迷路を取得
    */
@@ -145,9 +150,9 @@ public:
    * @param showMaze true:迷路も表示, false:迷路は非表示
    */
   void printInfo(const bool showMaze = true) const {
-    printInfo(showMaze, curVec, curDir, state);
+    printInfo(showMaze, current_position, current_direction, state);
   }
-  void printInfo(const bool showMaze, const Vector vec, const Dir dir,
+  void printInfo(const bool showMaze, const Position vec, const Direction dir,
                  const SearchAlgorithm::State state) const;
   /**
    * @brief 最短経路の表示
@@ -158,18 +163,18 @@ protected:
   Maze &maze; /**< 使用する迷路の参照 */
   SearchAlgorithm::State state =
       SearchAlgorithm::START;         /**< 現在の探索状態を保持 */
-  Vector curVec;                      /**< 現在の区画座標 */
-  Dir curDir;                         /**< 現在向いている方向 */
+  Position current_position;          /**< 現在の区画座標 */
+  Direction current_direction;        /**< 現在向いている方向 */
   bool isForceBackToStart = false;    /**< 強制帰還モード */
   bool isForceGoingToGoal = false;    /**< 強制終点訪問モード */
   bool isPositionIdentifying = false; /**< 自己位置同定モード */
 
 private:
   SearchAlgorithm searchAlgorithm; /**< 探索器 */
-  Dirs nextDirsKnown;              /**< 次に行く既知方向配列 */
-  Dirs nextDirCandidates; /**< 次に行く未知方向候補の優先順 */
-  Dirs shortest_dirs;     /**< 最短経路の方向配列 */
-  int matchCount = 0;     /**< 自己位置同定の候補数，表示用 */
+  Directions nextDirectionsKnown;  /**< 次に行く既知方向配列 */
+  Directions nextDirectionCandidates; /**< 次に行く未知方向候補の優先順 */
+  Directions shortest_dirs;           /**< 最短経路の方向配列 */
+  int matchCount = 0; /**< 自己位置同定の候補数，表示用 */
 };
 
 } // namespace MazeLib

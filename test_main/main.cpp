@@ -1,4 +1,5 @@
 #include "CLRobotBase.h"
+#include "ShortestAlgorithm.h"
 
 using namespace MazeLib;
 
@@ -13,12 +14,12 @@ public:
 
 protected:
   virtual void
-  calcNextDirsPostCallback(SearchAlgorithm::State prevState,
-                           SearchAlgorithm::State newState) override {
-    CLRobotBase::calcNextDirsPostCallback(prevState, newState);
+  calcNextDirectionsPostCallback(SearchAlgorithm::State prevState,
+                                 SearchAlgorithm::State newState) override {
+    CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
 #if 0
     /* 既知区間観測用 */
-    if (getNextDirs().size() > 0) {
+    if (getNextDirections().size() > 0) {
       printInfo();
       getc(stdin);
     }
@@ -80,7 +81,7 @@ int main(void) {
   // robot.endFastRunBackingToStartRun();
 #endif
 
-#if 0
+#if 1
   /* Shortest Algorithm */
   for (const auto diag_enabled : {false, true}) {
     const int n = 100;
@@ -107,7 +108,7 @@ int main(void) {
   }
 #endif
 
-#if 0
+#if 1
   /* StepMap */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
@@ -116,11 +117,11 @@ int main(void) {
     StepMap &map = *p;
     std::chrono::microseconds sum{0};
     const int n = 100;
-    Dirs shortest_dirs;
+    Directions shortest_dirs;
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
-      shortest_dirs = map.calcShortestDirs(maze, maze.getStart(),
-                                           maze.getGoals(), known_only, simple);
+      shortest_dirs = map.calcShortestDirections(
+          maze, maze.getStart(), maze.getGoals(), known_only, simple);
       if (shortest_dirs.empty())
         loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
@@ -134,7 +135,7 @@ int main(void) {
   }
 #endif
 
-#if 0
+#if 1
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
@@ -143,10 +144,10 @@ int main(void) {
     StepMapWall &map = *p;
     std::chrono::microseconds sum{0};
     const int n = 100;
-    Dirs shortest_dirs;
+    Directions shortest_dirs;
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
-      shortest_dirs = map.calcShortestDirs(maze, known_only, simple);
+      shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
       if (shortest_dirs.empty())
         loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
@@ -160,7 +161,7 @@ int main(void) {
   }
 #endif
 
-#if 0
+#if 1
   /* StepMapSlalom */
   for (const auto diag_enabled : {false, true}) {
     const bool known_only = 0;
@@ -184,7 +185,7 @@ int main(void) {
     std::cout << "StepMapSlalom\t" << sum.count() / n << "\t[us]" << std::endl;
     map.print(maze, path);
     auto shortest_dirs = map.indexes2dirs(path, diag_enabled);
-    StepMap::appendStraightDirs(maze, shortest_dirs, diag_enabled);
+    Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);
     maze.printPath(shortest_dirs);
   }
 #endif
