@@ -74,7 +74,7 @@ void StepMap::print(const Maze &maze, const Vector v, const Dir d,
 }
 void StepMap::print(const Maze &maze, const Dirs &dirs, const Vector start,
                     std::ostream &os) const {
-  uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {0};
+  uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {{0}};
   Vector v = start;
   int counter = 1;
   for (const auto d : dirs) {

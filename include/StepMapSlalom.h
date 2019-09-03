@@ -64,9 +64,10 @@ public:
         return rp.t_FV90; /*< [ms] */
       case FS90:
         return rp.t_FS90; /*< [ms] */
+      default:
+        std::cerr << "Unknown Pattern" << std::endl;
+        return 0;
       }
-      std::cerr << "Unknown Pattern" << std::endl;
-      return 0;
     }
     const RunParameter &getRunParameter() const { return rp; }
     void setRunParameter(const RunParameter &rp) {
@@ -189,9 +190,10 @@ public:
       case Dir::NorthWest:
       case Dir::SouthEast:
         return z == 1 ? Dir::Left45 : Dir::Right45;
+      default:
+        logw << "Invalid Dir: " << nd << std::endl;
+        return Dir::Max;
       }
-      logw << "Invalid Dir: " << nd << std::endl;
-      return Dir::Max;
     }
     /**
      * @brief NodeDir が向いている方向の隣の Index を返す
@@ -531,6 +533,9 @@ public:
             dirs.push_back(nd + Dir::Back);
           }
           break;
+        default:
+          logw << "invalid Dir" << std::endl;
+          break;
         }
       } else {
         switch (rel_nd) {
@@ -564,6 +569,9 @@ public:
         case Dir::Right135:
           dirs.push_back(nd + Dir::Right45);
           dirs.push_back(nd + Dir::Right135);
+          break;
+        default:
+          logw << "invalid Dir" << std::endl;
           break;
         }
       }

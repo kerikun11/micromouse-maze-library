@@ -122,12 +122,12 @@ public:
   bool isDiag() const { return (d & 1) == 1; }
   /** @brief 方向配列を生成する静的関数 */
   static const std::array<Dir, 4> &getAlong4() {
-    static const std::array<Dir, 4> ds{East, North, West, South};
+    static const std::array<Dir, 4> ds{{East, North, West, South}};
     return ds;
   }
   static const std::array<Dir, 4> &getDiag4() {
-    static const std::array<Dir, 4> ds{NorthEast, NorthWest, SouthWest,
-                                       SouthEast};
+    static const std::array<Dir, 4> ds{
+        {NorthEast, NorthWest, SouthWest, SouthEast}};
     return ds;
   }
   /** @brief 表示用char型へのキャスト */
@@ -322,8 +322,8 @@ public:
    */
   const std::array<Dir, 6> getNextDir6() const {
     const auto d = getDir();
-    return {d + Dir::Front,   d + Dir::Back,    d + Dir::Left45,
-            d + Dir::Right45, d + Dir::Left135, d + Dir::Right135};
+    return {{d + Dir::Front, d + Dir::Back, d + Dir::Left45, d + Dir::Right45,
+             d + Dir::Left135, d + Dir::Right135}};
   }
   /**
    * @brief 引数方向の Front Left45 Right 方向に隣接する WallIndex を取得
@@ -331,7 +331,7 @@ public:
    * @return const std::array<Dir, 3>
    */
   const std::array<Dir, 3> getNextDir3(const Dir d) const {
-    return {d + Dir::Front, d + Dir::Left45, d + Dir::Right45};
+    return {{d + Dir::Front, d + Dir::Left45, d + Dir::Right45}};
   }
 };
 static_assert(sizeof(WallIndex) == 2, "size error"); /**< size check */

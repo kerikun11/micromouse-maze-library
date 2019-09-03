@@ -23,9 +23,10 @@ const Vector Vector::next(const Dir d) const {
     return Vector(x - 1, y);
   case Dir::South:
     return Vector(x, y - 1);
+  default:
+    logw << "Invalid Dir: " << d << std::endl;
+    return *this;
   }
-  logw << "Invalid Dir: " << d << std::endl;
-  return *this;
 }
 const Vector Vector::rotate(const Dir d) const {
   switch (d) {
@@ -37,9 +38,10 @@ const Vector Vector::rotate(const Dir d) const {
     return Vector(-x, -y);
   case Dir::South:
     return Vector(y, -x);
+  default:
+    logw << "Invalid Dir: " << d << std::endl;
+    return *this;
   }
-  logw << "Invalid Dir: " << d << std::endl;
-  return *this;
 }
 std::ostream &operator<<(std::ostream &os, const Vector v) {
   return os << "(" << std::setw(2) << (int)v.x << ", " << std::setw(2)
@@ -213,7 +215,7 @@ bool Maze::parse(const std::vector<std::string> data, const int maze_size) {
           for (const auto b1 : Dir::getAlong4())
             for (const auto b2 : Dir::getAlong4())
               for (const auto b3 : Dir::getAlong4()) {
-                const std::array<Dir, 4> bit_to_dir_map{b0, b1, b2, b3};
+                const std::array<Dir, 4> bit_to_dir_map{{b0, b1, b2, b3}};
                 reset(false);
                 int diffs = 0;
                 for (int8_t y = 0; y < maze_size; ++y) {
@@ -277,7 +279,7 @@ void Maze::print(std::ostream &os, const int maze_size) const {
 }
 void Maze::printPath(const Dirs &dirs, const Vector start,
                      std::ostream &os) const {
-  uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {0};
+  uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {{0}};
   Vector v = start;
   int counter = 1;
   for (const auto d : dirs) {

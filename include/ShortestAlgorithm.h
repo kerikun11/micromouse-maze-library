@@ -96,9 +96,10 @@ public:
       return rp.t_FV90; /*< [ms] */
     case FS90:
       return rp.t_FS90; /*< [ms] */
+    default:
+      logw << "Unknown Pattern" << std::endl;
+      return 0;
     }
-    std::cerr << "Unknown Pattern" << std::endl;
-    return 0;
   }
   const RunParameter &getRunParameter() const { return rp; }
   void setRunParameter(const RunParameter &rp) {

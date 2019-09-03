@@ -89,9 +89,10 @@ const Dir Index::arrow_diag_to_along_45() const {
   case Dir::NorthWest:
   case Dir::SouthEast:
     return z == 1 ? Dir::Left45 : Dir::Right45;
+  default:
+    logw << "Invalid Dir: " << nd << std::endl;
+    return Dir::Max;
   }
-  logw << "Invalid Dir: " << nd << std::endl;
-  return Dir::Max;
 }
 const Index Index::next() const {
   switch (getNodeDir()) {
@@ -107,9 +108,10 @@ const Index Index::next() const {
   case Dir::SouthWest:
   case Dir::SouthEast:
     return Index(WallIndex(x, y, z).next(nd), nd);
+  default:
+    logw << "Invalid Dir: " << nd << std::endl;
+    return Index(x, y, z, nd);
   }
-  logw << "Invalid Dir: " << nd << std::endl;
-  return Index(x, y, z, nd);
 }
 const std::vector<std::pair<Index, cost_t>>
 Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
@@ -343,7 +345,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
   return true;
 }
 void ShortestAlgorithm::print(const Indexes indexes, std::ostream &os) const {
-  int steps[MAZE_SIZE][MAZE_SIZE] = {0};
+  int steps[MAZE_SIZE][MAZE_SIZE] = {{0}};
   int counter = 1;
   for (const auto i : indexes) {
     auto v = i.getVector();
@@ -430,6 +432,9 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
           dirs.push_back(nd + Dir::Back);
         }
         break;
+      default:
+        logw << "invalid direction" << std::endl;
+        break;
       }
     } else {
       switch (rel_nd) {
@@ -462,6 +467,9 @@ const Dirs ShortestAlgorithm::indexes2dirs(const Indexes &path,
       case Dir::Right135:
         dirs.push_back(nd + Dir::Right45);
         dirs.push_back(nd + Dir::Right135);
+        break;
+      default:
+        logw << "invalid direction" << std::endl;
         break;
       }
     }

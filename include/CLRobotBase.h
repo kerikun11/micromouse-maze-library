@@ -192,6 +192,9 @@ protected:
       break;
     case RobotBase::ST_HALF:
       break;
+    default:
+      logw << "invalid action" << std::endl;
+      break;
     }
   }
   virtual float getTimeCost(const Action action) {
@@ -214,8 +217,10 @@ protected:
       return segment / velocity;
     case RobotBase::ST_HALF:
       return segment / 2 / velocity;
+    default:
+      logw << "invalid action" << std::endl;
+      return 0;
     }
-    return 0;
   }
 };
 

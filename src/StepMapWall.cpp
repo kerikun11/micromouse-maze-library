@@ -212,8 +212,10 @@ const Dir StepMapWall::convertDir(const Dir d, const WallIndex i) {
     return i.z == 0 ? Dir::North : Dir::West;
   case Dir::SouthEast:
     return i.z == 0 ? Dir::South : Dir::East;
+  default:
+    logw << "invalid direction" << std::endl;
+    return Dir::Max;
   }
-  return Dir::Max;
 }
 const Dirs
 StepMapWall::convertWallIndexDirsToVectorDirs(const Dirs src,

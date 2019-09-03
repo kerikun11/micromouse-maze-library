@@ -84,6 +84,9 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
       break; /*< go to next state */
     case SearchAlgorithm::Error:
       return result;
+    default:
+      logw << "invalid result" << std::endl;
+      break;
     }
   }
   /* search for goal */
@@ -98,6 +101,9 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
       break; /*< go to next state */
     case SearchAlgorithm::Error:
       return result;
+    default:
+      logw << "invalid result" << std::endl;
+      break;
     }
   }
   /* search additionally */
@@ -112,6 +118,9 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
       break; /*< go to next state */
     case SearchAlgorithm::Error:
       return result;
+    default:
+      logw << "invalid result" << std::endl;
+      break;
     }
   }
   /* force going to goal */
@@ -127,6 +136,9 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
       break; /*< go to next state */
     case SearchAlgorithm::Error:
       return result;
+    default:
+      logw << "invalid result" << std::endl;
+      break;
     }
   }
   /* backing to start */
@@ -141,6 +153,9 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirs(
     break; /*< go to next state */
   case SearchAlgorithm::Error:
     return result;
+  default:
+    logw << "invalid result" << std::endl;
+    break;
   }
   /* reached start */
   state = REACHED_START;

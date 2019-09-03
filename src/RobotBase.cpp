@@ -86,6 +86,8 @@ void RobotBase::queueNextDirs(const Dirs &nextDirs) {
     case Dir::Back:
       turnbackSave();
       break;
+    default:
+      logw << "invalid direction" << std::endl;
     }
     updateCurVecDir(nextVec, nextDir);
   }
