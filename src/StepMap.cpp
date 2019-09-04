@@ -43,6 +43,7 @@ void StepMap::setStep(const int8_t x, const int8_t y, const step_t step) {
 }
 void StepMap::print(const Maze &maze, const Position p, const Direction d,
                     std::ostream &os) const {
+  os << std::endl;
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
@@ -85,6 +86,7 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
     }
     steps[p.y][p.x] = counter++;
   }
+  os << std::endl;
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
@@ -109,6 +111,7 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
 }
 void StepMap::printFull(const Maze &maze, const Position p, const Direction d,
                         std::ostream &os) const {
+  os << std::endl;
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
@@ -146,6 +149,7 @@ void StepMap::printFull(const Maze &maze, const Directions &dirs,
     p = p.next(d);
     path.push_back({p, d});
   }
+  os << std::endl;
   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
     if (y != MAZE_SIZE) {
       os << '|';
@@ -193,39 +197,6 @@ void StepMap::printFull(const Maze &maze, const Directions &dirs,
     os << "+" << std::endl;
   }
 }
-// void StepMap::printFull(const Maze &maze, const Directions &dirs, const
-// Position start,
-//                         std::ostream &os) const {
-//   Positions path;
-//   Position p = start;
-//   path.push_back(p);
-//   for (const auto d : dirs) {
-//     p = p.next(d);
-//     path.push_back(p);
-//   }
-//   for (int8_t y = MAZE_SIZE; y >= 0; --y) {
-//     if (y != MAZE_SIZE) {
-//       os << '|';
-//       for (int8_t x = 0; x < MAZE_SIZE; ++x) {
-//         if (std::find(path.cbegin(), path.cend(), Position(x, y)) !=
-//         path.cend())
-//           os << C_YE << std::setw(5) << getStep(x, y) << C_NO;
-//         else
-//           os << C_CY << std::setw(5) << getStep(x, y) << C_NO;
-//         os << (maze.isKnown(x, y, Direction::East)
-//                    ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
-//                    : (C_RE "." C_NO));
-//       }
-//       os << std::endl;
-//     }
-//     for (int8_t x = 0; x < MAZE_SIZE; ++x)
-//       os << "+"
-//          << (maze.isKnown(x, y, Direction::South)
-//                  ? (maze.isWall(x, y, Direction::South) ? "-----" : "     ")
-//                  : (C_RE " . . " C_NO));
-//     os << "+" << std::endl;
-//   }
-// }
 void StepMap::update(const Maze &maze, const Positions &dest,
                      const bool known_only, const bool simple) {
   /* 迷路の大きさを決定 */

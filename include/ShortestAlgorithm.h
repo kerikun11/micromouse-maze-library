@@ -28,12 +28,20 @@ static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
 enum Pattern : int8_t { ST_ALONG, ST_DIAG, F45, F90, F135, F180, FV90, FS90 };
 
 struct Action {
-  enum Type {
+  enum Type : int8_t {
     Straight,
     Slalom,
     TypeMax,
   };
-  enum Slalom {
+  enum StraightDirection : int8_t {
+    Along,
+    Diag,
+  };
+  enum SlalomDirection : int8_t {
+    Left,
+    Right,
+  };
+  enum SlalomIndex : int8_t {
     F45,
     F90,
     F135,
@@ -42,13 +50,9 @@ struct Action {
     FS90,
     SlalomMax,
   };
-  enum Direction {
-    Left,
-    Right,
-  };
   Type type;
-  int index;
-  Direction dir;
+  int8_t direction;
+  int8_t index;
 };
 
 struct RunParameter {

@@ -48,9 +48,9 @@ if(CROSS_COMPILING)
 else()
   add_subdirectory(test_main)
   add_subdirectory(test_measurement)
-  add_subdirectory(test_solve)
   add_subdirectory(test_position_identify)
   add_subdirectory(test_gen_maze)
+  add_subdirectory(test_study)
 
   ## custom target
   add_custom_target(main
@@ -68,14 +68,14 @@ else()
     DEPENDS test_position_identify mazelib
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
-  add_custom_target(solve
-    COMMAND clear && ${CMAKE_BINARY_DIR}/test_solve/test_solve
-    DEPENDS test_solve mazelib
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  )
   add_custom_target(gen
     COMMAND clear && ${CMAKE_BINARY_DIR}/test_gen_maze/test_gen_maze
     DEPENDS test_gen_maze mazelib
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  add_custom_target(study
+    COMMAND clear && ${CMAKE_BINARY_DIR}/test_study/test_study
+    DEPENDS test_study mazelib
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
 endif()
