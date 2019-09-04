@@ -142,9 +142,9 @@ public:
       pen.setWidth(2);
       scene->addLine(p1.x() + cell2posX(p.x) + wall_unit_px / 2,
                      p1.y() + cell2posY(p.y) - wall_unit_px / 2,
-                     p2.x() + cell2posX(np.x) + wall_unit_px / 2,
-                     p2.y() + cell2posY(np.y) - wall_unit_px / 2, pen);
-      p = nv;
+                     p2.x() + cell2posX(next_p.x) + wall_unit_px / 2,
+                     p2.y() + cell2posY(next_p.y) - wall_unit_px / 2, pen);
+      p = next_p;
     }
     return true;
   }

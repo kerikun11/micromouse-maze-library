@@ -26,7 +26,7 @@ void MainWindow::on_fileSelectButton_clicked()
 {
     QFileInfo fileinfo = QFileDialog::getOpenFileName(nullptr, "Select a Maze File", "../mazedata");
     /* get Relative Path */
-    QDirection pwd(".");
+    QDir pwd(".");
     QString s = pwd.relativeFilePath(fileinfo.filePath());
     ui->fileSeectEdit->setText(s);
     /* draw */

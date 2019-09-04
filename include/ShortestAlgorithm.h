@@ -27,11 +27,13 @@ static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
  */
 enum Pattern : int8_t { ST_ALONG, ST_DIAG, F45, F90, F135, F180, FV90, FS90 };
 
+/**
+ * @brief 最短走行アクション
+ */
 struct Action {
   enum Type : int8_t {
     Straight,
     Slalom,
-    TypeMax,
   };
   enum StraightDirection : int8_t {
     Along,
