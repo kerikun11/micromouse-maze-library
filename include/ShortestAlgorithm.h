@@ -235,9 +235,7 @@ public:
    * @return const Index
    */
   const Index next() const;
-  const Index opposite() const {
-    return Index(x, y, getDirection(), nd + Direction::Back);
-  }
+  const Index opposite() const { return Index(x, y, z, nd + Direction::Back); }
   const std::vector<std::pair<Index, cost_t>>
   getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
                 const bool known_only, const bool diag_enabled) const;
@@ -329,10 +327,9 @@ public:
                                        const bool diag_enabled);
 
 private:
-  const Maze &maze; /**< @brief 使用する迷路の参照 */
+  const Maze &maze;
   const EdgeCost edge_cost;
-  const Index index_start =
-      Index(0, 0, Direction::Max, Direction::North); /**< @brief start */
+  const Index index_start = Index(0, 0, Direction::North);
 
   std::function<bool(const Index i1, const Index i2)> greater;
   std::array<Index, Index::Max> from_map;

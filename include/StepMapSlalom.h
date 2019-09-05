@@ -124,32 +124,37 @@ public:
 
   public:
     /**
-     * @brief Construct a new Index object
+     * @brief デフォルトコンストラクタ
+     *
      */
+    Index() : all(0) {}
+    /** @brief 成分を受け取ってそのまま代入するコンストラクタ */
     Index(const int8_t x, const int8_t y, const uint8_t z, const Direction nd)
         : x(x), y(y), z(z), nd(nd) {}
-    Index(const int8_t x, const int8_t y, const Direction d, const Direction nd)
-        : x(x), y(y), nd(nd) {
-      uniquify(d);
-    }
+    /** @brief 冗長性を除去するコンストラクタ */
     Index(const Position p, const Direction d, const Direction nd)
         : x(p.x), y(p.y), nd(nd) {
       uniquify(d);
     }
+    // Index(const int8_t x, const int8_t y, const Direction d, const Direction
+    // nd)
+    //     : x(x), y(y), nd(nd) {
+    //   uniquify(d);
+    // }
+    /** @brief 区画中央のコンストラクタ */
     Index(const int8_t x, const int8_t y, const Direction nd)
         : x(x), y(y), z(0), nd(nd) {}
-    Index(const WallIndex i, const Direction nd)
-        : x(i.x), y(i.y), z(i.z), nd(nd) {}
     Index(const Position p, const Direction nd)
         : x(p.x), y(p.y), z(0), nd(nd) {}
-    Index() : all(0) {}
+    /** @brief 壁上のコンストラクタ */
+    Index(const WallIndex i, const Direction nd)
+        : x(i.x), y(i.y), z(i.z), nd(nd) {}
+    /** @brief WallIndex へのキャスト */
     operator WallIndex() const {
       const auto nd = getNodeDirection();
-      return nd.isAlong() ? WallIndex(x, y, nd) : WallIndex(x, y, z);
+      return nd.isAlong() ? WallIndex(Position(x, y), nd) : WallIndex(x, y, z);
     }
-    /**
-     * @brief unique な ID を返す
-     */
+    /** @brief unique な ID を返す */
     operator uint16_t() const {
       return (((~nd) & 1) << (2 * MAZE_SIZE_BIT + 3)) |
              (z << (2 * MAZE_SIZE_BIT + 2)) |
@@ -170,11 +175,15 @@ public:
     /**
      * @brief Getters
      */
+    const Position getPosition() const { return Position(x, y); }
     const Direction getDirection() const {
       return z == 0 ? Direction::East : Direction::North;
     }
     const Direction getNodeDirection() const { return nd; }
-    const Position getPosition() const { return Position(x, y); }
+    const WallIndex getWallIndex() const {
+      const auto nd = getNodeDirection();
+      return nd.isAlong() ? WallIndex(Position(x, y), nd) : WallIndex(x, y, z);
+    }
     friend std::ostream &operator<<(std::ostream &os, const Index i) {
       if (i.getNodeDirection().isAlong())
         return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
@@ -210,9 +219,8 @@ public:
       case Direction::North:
       case Direction::West:
       case Direction::South:
-        return nd.isAlong()
-                   ? Index(getPosition().next(nd), nd)
-                   : Index(WallIndex(x, y, getNodeDirection()).next(nd), nd);
+        return nd.isAlong() ? Index(getPosition().next(nd), nd)
+                            : Index(getWallIndex().next(nd), nd);
       case Direction::NorthEast:
         switch (nd) {
         case Direction::East:
@@ -444,7 +452,7 @@ public:
                                 ii.getNodeDirection().isAlong())
                               return false;
                             if (i.getNodeDirection().isDiag())
-                              return WallIndex(i) == WallIndex(ii);
+                              return i.getWallIndex() == ii.getWallIndex();
                             return i.getPosition() == ii.getPosition();
                           }) != indexes.cend();
     };

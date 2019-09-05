@@ -248,14 +248,17 @@ union __attribute__((__packed__)) WallIndex {
   struct {
     int8_t x : 7;  /**< @brief 区画座標のx成分 */
     int8_t y : 7;  /**< @brief 区画座標のy成分 */
-    uint8_t z : 1; /**< @brief 区画内の壁の位置．0:East,1:North */
+    uint8_t z : 1; /**< @brief 区画内の壁の位置．0:East, 1:North */
   };
 
 public:
   /**
    * @brief デフォルトコンストラクタ
    */
-  WallIndex() {}
+  WallIndex() : x(0), y(0), z(0) {}
+  /**
+   * @brief 成分を受け取ってそのまま格納するコンストラクタ
+   */
   WallIndex(const int8_t x, const int8_t y, const uint8_t z)
       : x(x), y(y), z(z) {}
   /**
@@ -266,9 +269,9 @@ public:
   WallIndex(const Position p, const Direction d) : x(p.x), y(p.y) {
     uniquify(d);
   }
-  WallIndex(const int8_t x, const int8_t y, const Direction d) : x(x), y(y) {
-    uniquify(d);
-  }
+  // WallIndex(const int8_t x, const int8_t y, const Direction d) : x(x), y(y) {
+  //   uniquify(d);
+  // }
   /**
    * @brief 迷路中の壁をuniqueな通し番号として表現したID
    * @return uint16_t ID
@@ -276,6 +279,12 @@ public:
   operator uint16_t() const {
     return (z << (2 * MAZE_SIZE_BIT)) | (y << MAZE_SIZE_BIT) | x;
   }
+  /**
+   * @brief IDを使って初期化するコンストラクタ
+   * @param i ID
+   */
+  WallIndex(const uint16_t i)
+      : x(i), y(i >> MAZE_SIZE_BIT), z(i >> (2 * MAZE_SIZE_BIT)) {}
   /**
    * @brief 方向の冗長性を除去してユニークにする関数
    * 基本的にコンストラクタで使われるので，ユーザーが使うことはない．
@@ -305,14 +314,15 @@ public:
    * @return true フィールド内
    * @return false フィールド外(外周上を含む)
    */
-  bool isInsideOfFiled() const {
+  bool isInsideOfField() const {
     /* x,y が フィールド内かつ，外周上にいない */
     // return !(x < 0 || y < 0 || x >= MAZE_SIZE || y >= MAZE_SIZE ||
-    //          (z == 0 && x == MAZE_SIZE - 1) || (z == 1 && y == MAZE_SIZE -
-    //          1));
+    //          (z == 0 && (x == MAZE_SIZE - 1)) ||
+    //          (z == 1 && (y == MAZE_SIZE - 1)));
     /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
     return !(((x | y) & (0x100 - MAZE_SIZE)) ||
-             (z == 0 && x == MAZE_SIZE - 1) || (z == 1 && y == MAZE_SIZE - 1));
+             (z == 0 && (x == MAZE_SIZE - 1)) ||
+             (z == 1 && (y == MAZE_SIZE - 1)));
   }
   /**
    * @brief 引数方向の WallIndex を取得する関数
@@ -326,9 +336,14 @@ public:
    */
   const std::array<Direction, 6> getNextDirection6() const {
     const auto d = getDirection();
-    return {{d + Direction::Front, d + Direction::Back, d + Direction::Left45,
-             d + Direction::Right45, d + Direction::Left135,
-             d + Direction::Right135}};
+    return {{
+        d + Direction::Front,
+        d + Direction::Back,
+        d + Direction::Left45,
+        d + Direction::Right45,
+        d + Direction::Left135,
+        d + Direction::Right135,
+    }};
   }
   /**
    * @brief 引数方向の Front Left45 Right 方向に隣接する WallIndex を取得
@@ -359,12 +374,14 @@ union WallLog {
   };
   /** @brief コンストラクタ */
   WallLog() {}
-  WallLog(const Position p, const Direction d, const bool b)
-      : x(p.x), y(p.y), d(d), b(b) {}
   WallLog(const int8_t x, const int8_t y, const Direction d, const bool b)
       : x(x), y(y), d(d), b(b) {}
+  WallLog(const Position p, const Direction d, const bool b)
+      : x(p.x), y(p.y), d(d), b(b) {}
+  /** @brief getters */
   operator Position() const { return Position(x, y); }
   operator Direction() const { return d; }
+  /** @brief 表示 */
   friend std::ostream &operator<<(std::ostream &os, const WallLog &obj);
 };
 static_assert(sizeof(WallLog) == 2, "size error"); /**< size check */
@@ -412,7 +429,7 @@ public:
     return isWallBase(wall, WallIndex(p, d));
   }
   bool isWall(const int8_t x, const int8_t y, const Direction d) const {
-    return isWallBase(wall, WallIndex(x, y, d));
+    return isWallBase(wall, WallIndex(Position(x, y), d));
   }
   /**
    * @brief 壁を更新をする
@@ -426,7 +443,7 @@ public:
   }
   void setWall(const int8_t x, const int8_t y, const Direction d,
                const bool b) {
-    return setWallBase(wall, WallIndex(x, y, d), b);
+    return setWallBase(wall, WallIndex(Position(x, y), d), b);
   }
   /**
    * @brief 壁が探索済みかを返す
@@ -437,7 +454,7 @@ public:
     return isWallBase(known, WallIndex(p, d));
   }
   bool isKnown(const int8_t x, const int8_t y, const Direction d) const {
-    return isWallBase(known, WallIndex(x, y, d));
+    return isWallBase(known, WallIndex(Position(x, y), d));
   }
   /**
    * @brief 壁の既知を更新する
@@ -451,7 +468,7 @@ public:
   }
   void setKnown(const int8_t x, const int8_t y, const Direction d,
                 const bool b) {
-    return setWallBase(known, WallIndex(x, y, d), b);
+    return setWallBase(known, WallIndex(Position(x, y), d), b);
   }
   /**
    * @brief 通過可能かどうかを返す
@@ -617,14 +634,14 @@ private:
    */
   bool isWallBase(const std::bitset<WallIndex::SIZE> &wall,
                   const WallIndex i) const {
-    return i.isInsideOfFiled() ? wall[i] : true; /*< 配列範囲外アクセスの防止 */
+    return i.isInsideOfField() ? wall[i] : true; /*< 配列範囲外アクセスの防止 */
   }
   /**
    * @brief 壁の更新のベース関数
    */
   void setWallBase(std::bitset<WallIndex::SIZE> &wall, const WallIndex i,
                    const bool b) const {
-    if (i.isInsideOfFiled()) /*< 配列の範囲外アクセスの防止 */
+    if (i.isInsideOfField()) /*< 配列の範囲外アクセスの防止 */
       wall[i] = b;
   }
 };

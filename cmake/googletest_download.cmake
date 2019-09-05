@@ -10,6 +10,7 @@ ExternalProject_Add(googletest
   BINARY_DIR        "${CMAKE_BINARY_DIR}/googletest-build"
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     ""
+  UPDATE_COMMAND      ""
   INSTALL_COMMAND   ""
   TEST_COMMAND      ""
 )

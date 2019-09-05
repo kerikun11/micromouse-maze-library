@@ -19,10 +19,10 @@ public:
   StepMapWall();
   void reset(const step_t step = STEP_MAX);
   step_t getStep(const WallIndex i) const {
-    return i.isInsideOfFiled() ? step_map[i] : STEP_MAX;
+    return i.isInsideOfField() ? step_map[i] : STEP_MAX;
   }
   void setStep(const WallIndex i, const step_t step) {
-    if (i.isInsideOfFiled())
+    if (i.isInsideOfField())
       step_map[i] = step;
   }
   void print(const Maze &maze, std::ostream &os = std::cout) const;

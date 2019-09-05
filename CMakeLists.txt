@@ -61,6 +61,11 @@ add_subdirectory(test_search)
 ##
 ## custom target
 ##
+add_custom_target(gt
+  COMMAND clear && ${CMAKE_BINARY_DIR}/test/test_mazelib
+  DEPENDS test_mazelib mazelib
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
 add_custom_target(main
   COMMAND clear && ${CMAKE_BINARY_DIR}/test_main/test_main
   DEPENDS test_main mazelib

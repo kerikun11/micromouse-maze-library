@@ -102,7 +102,8 @@ const Index Index::next() const {
   case Direction::South:
     return getNodeDirection().isAlong()
                ? Index(getPosition().next(nd), nd)
-               : Index(WallIndex(x, y, getNodeDirection()).next(nd), nd);
+               : Index(WallIndex(Position(x, y), getNodeDirection()).next(nd),
+                       nd);
   case Direction::NorthEast:
   case Direction::NorthWest:
   case Direction::SouthWest:
