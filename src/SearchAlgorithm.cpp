@@ -532,10 +532,7 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     idMaze.setWall(wl.getPosition(), wl.d, wl.b);
   /*< 復元終了 */
   /* 既知情報からではスタート区画を避けられない場合 */
-  if (step_map.getStep(current_pose.p) == STEP_MAX ||
-      step_map.getStep(current_pose.p.next(current_pose.d + Direction::Back)) ==
-          STEP_MAX)
-    // if (step_map.getStep(current_pose.p) == STEP_MAX)
+  if (step_map.getStep(current_pose.p) == STEP_MAX)
     step_map.calcNextDirectionsAdv(idMaze, candidates, current_pose.p,
                                    current_pose.d, nextDirectionsKnown,
                                    nextDirectionCandidates);

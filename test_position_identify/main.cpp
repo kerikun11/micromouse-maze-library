@@ -48,7 +48,8 @@ int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
   // const std::string filename = "32MM2013HX.maze";
-  const std::string filename = "16MM2019H_kansai.maze";
+  // const std::string filename = "16MM2019H_kansai.maze";
+  const std::string filename = "16MM2019H_kanazawa.maze";
   Maze maze_target = Maze((mazedata_dir + filename).c_str());
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;
@@ -59,7 +60,7 @@ int test_position_identify() {
 #if 1
   /* Position Identification Run */
   robot.display = 1;
-  robot.fake_offset = robot.real = Pose(Position(0, 2), Direction::North);
+  robot.fake_offset = robot.real = Pose(Position(1, 1), Direction::East);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
