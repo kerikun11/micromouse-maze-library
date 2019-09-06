@@ -100,15 +100,15 @@ protected:
 
   virtual void findWall(bool &left, bool &front, bool &right,
                         bool &back) override {
-    left = !maze_target.canGo(real.first, real.second + Direction::Left);
-    front = !maze_target.canGo(real.first, real.second + Direction::Front);
-    right = !maze_target.canGo(real.first, real.second + Direction::Right);
-    back = !maze_target.canGo(real.first, real.second + Direction::Back);
+    left = !maze_target.canGo(real.p, real.d + Direction::Left);
+    front = !maze_target.canGo(real.p, real.d + Direction::Front);
+    right = !maze_target.canGo(real.p, real.d + Direction::Right);
+    back = !maze_target.canGo(real.p, real.d + Direction::Back);
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
       updateWall(current_position.next(current_direction), current_direction,
-                 !maze_target.canGo(real.first.next(real.second), real.second));
+                 !maze_target.canGo(real.p.next(real.d), real.d));
 #endif
   }
   virtual void calcNextDirectionsPreCallback() override {
@@ -154,8 +154,8 @@ protected:
     step++;
     switch (action) {
     case RobotBase::START_STEP:
-      real.first = Position(0, 1);
-      real.second = Direction::North;
+      real.p = Position(0, 1);
+      real.d = Direction::North;
       f++;
       break;
     case RobotBase::START_INIT:
@@ -163,30 +163,30 @@ protected:
     case RobotBase::ST_HALF_STOP:
       break;
     case RobotBase::TURN_L:
-      real.second = real.second + Direction::Left;
-      if (!maze_target.canGo(real.first, real.second))
+      real.d = real.d + Direction::Left;
+      if (!maze_target.canGo(real.p, real.d))
         crashed();
-      real.first = real.first.next(real.second);
+      real.p = real.p.next(real.d);
       l++;
       break;
     case RobotBase::TURN_R:
-      real.second = real.second + Direction::Right;
-      if (!maze_target.canGo(real.first, real.second))
+      real.d = real.d + Direction::Right;
+      if (!maze_target.canGo(real.p, real.d))
         crashed();
-      real.first = real.first.next(real.second);
+      real.p = real.p.next(real.d);
       r++;
       break;
     case RobotBase::ROTATE_180:
-      real.second = real.second + Direction::Back;
-      if (!maze_target.canGo(real.first, real.second))
+      real.d = real.d + Direction::Back;
+      if (!maze_target.canGo(real.p, real.d))
         crashed();
-      real.first = real.first.next(real.second);
+      real.p = real.p.next(real.d);
       b++;
       break;
     case RobotBase::ST_FULL:
-      if (!maze_target.canGo(real.first, real.second))
+      if (!maze_target.canGo(real.p, real.d))
         crashed();
-      real.first = real.first.next(real.second);
+      real.p = real.p.next(real.d);
       f++;
       break;
     case RobotBase::ST_HALF:

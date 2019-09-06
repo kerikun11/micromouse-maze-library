@@ -50,8 +50,8 @@ std::ostream &operator<<(std::ostream &os, const Position p) {
 
 /* Pose */
 std::ostream &operator<<(std::ostream &os, const Pose &obj) {
-  return os << "( " << std::setw(2) << (int)obj.first.x << ", " << std::setw(2)
-            << (int)obj.first.y << ", " << obj.second.toChar() << ")";
+  return os << "( " << std::setw(2) << (int)obj.p.x << ", " << std::setw(2)
+            << (int)obj.p.y << ", " << obj.d.toChar() << ")";
 }
 
 /* WallIndex */
@@ -287,13 +287,13 @@ void Maze::print(const Directions &dirs, const Position start, std::ostream &os,
         /* Vertical Wall */
         const auto it =
             std::find_if(path.cbegin(), path.cend(), [&](const Pose pose) {
-              return WallIndex(pose.first, pose.second) ==
+              return WallIndex(pose.p, pose.d) ==
                      WallIndex(Position(x, y), Direction::West);
             });
         const auto w = maze.isWall(x, y, Direction::West);
         const auto k = maze.isKnown(x, y, Direction::West);
         if (it != path.cend())
-          os << C_YE << it->second << C_NO;
+          os << C_YE << it->d << C_NO;
         else
           os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
         /* Breaking Condition */
@@ -316,13 +316,13 @@ void Maze::print(const Directions &dirs, const Position start, std::ostream &os,
       /* Horizontal Wall */
       const auto it =
           std::find_if(path.cbegin(), path.cend(), [&](const Pose pose) {
-            return WallIndex(pose.first, pose.second) ==
+            return WallIndex(pose.p, pose.d) ==
                    WallIndex(Position(x, y), Direction::South);
           });
       const auto w = maze.isWall(x, y, Direction::South);
       const auto k = maze.isKnown(x, y, Direction::South);
       if (it != path.cend())
-        os << C_YE << " " << it->second << " " << C_NO;
+        os << C_YE << " " << it->d << " " << C_NO;
       else
         os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
     }

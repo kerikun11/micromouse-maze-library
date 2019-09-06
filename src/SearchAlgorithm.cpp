@@ -317,8 +317,8 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
         if (diffs > min_diff || unknown * 5 > (int)idWallLogs.size() * 4)
           continue;
         /* 一致 */
-        ans.first = offset_p;
-        ans.second = offset_d;
+        ans.p = offset_p;
+        ans.d = offset_d;
         ++cnt;
         /* 打ち切り */
         if (cnt > 1)
@@ -332,7 +332,7 @@ SearchAlgorithm::findMatchDirectionCandidates(const Position cur_p,
                                               const Pose target) const {
   Directions result_dirs;
   for (const auto offset_d : Direction::getAlong4()) {
-    const auto offset_p = target.first - (cur_p - idOffset).rotate(offset_d);
+    const auto offset_p = target.p - (cur_p - idOffset).rotate(offset_d);
     int diffs = 0; /*< 既知壁との食い違い数を数える */
     for (const auto wl : idMaze.getWallLogs()) {
       const auto maze_p =
@@ -352,7 +352,7 @@ SearchAlgorithm::findMatchDirectionCandidates(const Position cur_p,
     if (diffs > 0)
       continue;
     /* 一致 */
-    result_dirs.push_back(target.second - offset_d);
+    result_dirs.push_back(target.d - offset_d);
   }
   return result_dirs;
 }
@@ -473,11 +473,11 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   matchCount = cnt;
   if (cnt == 1) {
     /* 自己位置を修正する */
-    cp = (cp - idOffset).rotate(ans.second) + ans.first;
-    cd = cd + ans.second;
+    cp = (cp - idOffset).rotate(ans.d) + ans.p;
+    cd = cd + ans.d;
     /* 自己位置同定中にゴール区画訪問済みなら，ゴール区画訪問をfalseにする */
     for (const auto maze_p : maze.getGoals()) {
-      const auto id_p = (maze_p - ans.first).rotate(-ans.second) + idOffset;
+      const auto id_p = (maze_p - ans.p).rotate(-ans.d) + idOffset;
       if (idMaze.unknownCount(id_p) == 0)
         isForceGoingToGoal = false;
     }

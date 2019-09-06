@@ -220,8 +220,26 @@ using Positions = std::vector<Position>;
 
 /**
  * @brief Position と Direction をまとめた型
+ * 位置姿勢は，区画に向かう方向を表す．
+ * 現在区画から出る方向ではないことに注意する．
+ * +---+---+---+ 例
+ * |   <       | <--- (0, 2, West)
+ * +   +---+ ^ + <--- (2, 2, North)
+ * |   >       | <--- (1, 1, East)
+ * +   +---+ v + <--- (2, 0, South)
+ * | S |       | <--- (0, 0)
+ * +---+---+---+
  */
-using Pose = std::pair<Position, Direction>;
+struct Pose {
+public:
+  Pose() {}
+  Pose(const Position p, const Direction d) : p(p), d(d) {}
+  Position p;
+  Direction d;
+  const Pose next(const Direction next_direction) const {
+    return Pose(p.next(d), next_direction);
+  }
+};
 /** @brief stream での表示 */
 std::ostream &operator<<(std::ostream &os, const Pose &obj);
 

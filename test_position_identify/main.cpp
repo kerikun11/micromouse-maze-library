@@ -39,7 +39,7 @@ protected:
     }
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
-        real.first == maze.getStart() && action != ST_HALF_STOP) {
+        real.p == maze.getStart() && action != ST_HALF_STOP) {
       logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
       // getc(stdin);
     }
@@ -58,17 +58,16 @@ int test_position_identify() {
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
 
-#if 0
+#if 1
   /* Position Identification Run */
   robot.display = 1;
-  robot.fake_offset.second = robot.real.second = Direction::South;
-  robot.fake_offset.first = robot.real.first = Position(0, 2);
+  robot.fake_offset.d = robot.real.d = Direction::South;
+  robot.fake_offset.p = robot.real.p = Position(0, 2);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
     std::cout << std::endl
-              << "Failed to Identify! offset:\t"
-              << Pose{robot.fake_offset.first, robot.fake_offset.second}
+              << "Failed to Identify! offset:\t" << robot.fake_offset
               << std::endl;
     getc(stdin);
   }
@@ -86,15 +85,14 @@ int test_position_identify() {
           continue;
         if (p == Position(0, 0) || p == Position(0, 1))
           continue;
-        robot.real.first = robot.fake_offset.first = Position(x, y);
-        robot.real.second = robot.fake_offset.second = d;
+        robot.real.p = robot.fake_offset.p = Position(x, y);
+        robot.real.d = robot.fake_offset.d = d;
         robot.display = 1;
         bool res = robot.positionIdentifyRun();
         if (!res) {
           robot.printInfo();
           std::cout << std::endl
-                    << "Failed to Identify! offset:\t"
-                    << Pose{robot.fake_offset.first, robot.fake_offset.second}
+                    << "Failed to Identify! offset:\t" << robot.fake_offset
                     << std::endl;
           getc(stdin);
         }

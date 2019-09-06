@@ -46,7 +46,7 @@ protected:
     }
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
-        real.first == maze.getStart())
+        real.p == maze.getStart())
       logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
 #endif
     CLRobotBase::queueAction(action);
