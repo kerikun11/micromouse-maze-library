@@ -298,7 +298,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
         int diffs = 0;   /*< 既知壁との食い違い数を数える */
         for (const auto wl : idWallLogs) {
           const auto maze_p =
-              (Position(wl) - idOffset).rotate(offset_d) + offset_p;
+              (wl.getPosition() - idOffset).rotate(offset_d) + offset_p;
           const auto maze_d = wl.d + offset_d;
           if (!maze_p.isInsideOfField()) {
             diffs = many;
@@ -335,7 +335,8 @@ SearchAlgorithm::findMatchDirectionCandidates(const Position cur_p,
     const auto offset_p = target.first - (cur_p - idOffset).rotate(offset_d);
     int diffs = 0; /*< 既知壁との食い違い数を数える */
     for (const auto wl : idMaze.getWallLogs()) {
-      const auto maze_p = (Position(wl) - idOffset).rotate(offset_d) + offset_p;
+      const auto maze_p =
+          (wl.getPosition() - idOffset).rotate(offset_d) + offset_p;
       const auto maze_d = wl.d + offset_d;
       if (!maze_p.isInsideOfField()) {
         diffs = 9999;
@@ -464,7 +465,7 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     WallLogs tmp = idMaze.getWallLogs();
     idMaze.reset(false);
     for (const auto wl : tmp)
-      idMaze.updateWall(Position(wl) + offset_diff, wl.d, wl.b);
+      idMaze.updateWall(wl.getPosition() + offset_diff, wl.d, wl.b);
   }
   /* 自己位置同定処理 */
   Pose ans;
@@ -480,6 +481,16 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
       if (idMaze.unknownCount(id_p) == 0)
         isForceGoingToGoal = false;
     }
+    /* 自己位置同定中に未知壁を見ていたら更新する */
+    // for (const auto wi : idMaze.getWallLogs()) {
+    //   const auto maze_p =
+    //       (Position(wi) - idOffset).rotate(ans.second) + ans.first;
+    //   const auto maze_d = wi.d + ans.second;
+    //   const auto maze_i = WallIndex(maze_p, maze_d);
+    //   if (maze.isKnown(maze_i) && maze.isKnown(maze_i) != wi.b)
+    //     break;
+    //   maze.updateWall(maze_i, wi.b);
+    // }
     return Reached;
   } else if (cnt == 0) {
     return Error;
@@ -515,7 +526,7 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
                                  nextDirectionsKnown, nextDirectionCandidates);
   /* restore idMaze */
   for (const auto wl : tmp)
-    idMaze.setWall(Position(wl), wl.d, wl.b);
+    idMaze.setWall(wl.getPosition(), wl.d, wl.b);
   /* 既知壁がスタート候補でどこにも行けなくなるバグ対策 */
   nextDirectionCandidates.push_back(cd + Direction::Back);
   /* 既知情報からではスタート区画が避けられない場合は普通に導出 */

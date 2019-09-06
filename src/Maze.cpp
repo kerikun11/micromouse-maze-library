@@ -84,9 +84,9 @@ std::ostream &operator<<(std::ostream &os, const WallIndex i) {
 }
 
 /* WallLog */
-std::ostream &operator<<(std::ostream &os, const WallLog &obj) {
+std::ostream &operator<<(std::ostream &os, const WallLog obj) {
   return os << "( " << std::setw(2) << (int)obj.x << ", " << std::setw(2)
-            << (int)obj.y << ", " << Direction(obj).toChar() << ", "
+            << (int)obj.y << ", " << obj.getDirection().toChar() << ", "
             << (obj.b ? "true" : "false") << ")";
 }
 
@@ -124,14 +124,6 @@ bool Maze::updateWall(const Position p, const Direction d, const bool b,
     /* ログに追加 */
     if (pushLog)
       wallLogs.push_back(WallLog(p, d, b));
-    /* ログから消去 */
-    // const auto it =
-    //     std::find_if(wallLogs.cbegin(), wallLogs.cend(), [&](const auto w)
-    //     {
-    //       return Position(w) == p && Direction(w) == d;
-    //     });
-    // if (it != wallLogs.end())
-    //   wallLogs.erase(it);
     return false;
   }
   /* 未知壁なら壁情報を更新 */
@@ -154,8 +146,9 @@ void Maze::resetLastWall(const int num) {
     if (wallLogs.empty())
       return;
     const auto wl = wallLogs.back();
-    setWall(Position(wl), wl.d, false);
-    setKnown(Position(wl), wl.d, false);
+    const auto wl_p = wl.getPosition();
+    setWall(wl_p, wl.d, false);
+    setKnown(wl_p, wl.d, false);
     wallLogs.pop_back();
   }
   return;
@@ -278,38 +271,62 @@ void Maze::print(std::ostream &os, const int maze_size) const {
     os << "+" << std::endl;
   }
 }
-void Maze::printPath(const Directions &dirs, const Position start,
-                     std::ostream &os) const {
-  uint16_t steps[MAZE_SIZE][MAZE_SIZE] = {{0}};
+void Maze::print(const Directions &dirs, const Position start, std::ostream &os,
+                 const size_t maze_size) const {
+  /* preparation */
+  std::vector<Pose> path;
   Position p = start;
-  int counter = 1;
-  for (const auto d : dirs) {
-    p = p.next(d);
-    if (!p.isInsideOfField()) {
-      loge << "Out of Field! " << p << std::endl;
-      continue;
-    }
-    steps[p.y][p.x] = counter++;
-  }
-  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
-    if (y != MAZE_SIZE) {
-      os << '|';
-      for (int8_t x = 0; x < MAZE_SIZE; ++x) {
-        if (steps[y][x] != 0)
-          os << C_YE << std::setw(3) << steps[y][x] << C_NO;
+  for (const auto d : dirs)
+    path.push_back({p, d}), p = p.next(d);
+  const auto &maze = *this;
+  /* start to draw maze */
+  os << std::endl;
+  for (int8_t y = maze_size; y >= 0; --y) {
+    if (y != (int)maze_size) {
+      for (uint8_t x = 0; x <= maze_size; ++x) {
+        /* Vertical Wall */
+        const auto it =
+            std::find_if(path.cbegin(), path.cend(), [&](const Pose pose) {
+              return WallIndex(pose.first, pose.second) ==
+                     WallIndex(Position(x, y), Direction::West);
+            });
+        const auto w = maze.isWall(x, y, Direction::West);
+        const auto k = maze.isKnown(x, y, Direction::West);
+        if (it != path.cend())
+          os << C_YE << it->second << C_NO;
+        else
+          os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
+        /* Breaking Condition */
+        if (x == maze_size)
+          break;
+        /* Cell */
+        const auto p = Position(x, y);
+        if (p == start)
+          os << C_BL << " S " << C_NO;
+        else if (std::find(goals.cbegin(), goals.cend(), p) != goals.cend())
+          os << C_BL << " G " << C_NO;
         else
           os << "   ";
-        os << (isKnown(x, y, Direction::East)
-                   ? (isWall(x, y, Direction::East) ? "|" : " ")
-                   : (C_RE "." C_NO));
       }
       os << std::endl;
     }
-    for (int8_t x = 0; x < MAZE_SIZE; ++x)
-      os << "+"
-         << (isKnown(x, y, Direction::South)
-                 ? (isWall(x, y, Direction::South) ? "---" : "   ")
-                 : (C_RE " . " C_NO));
+    for (uint8_t x = 0; x < maze_size; ++x) {
+      /* Pillar */
+      os << "+";
+      /* Horizontal Wall */
+      const auto it =
+          std::find_if(path.cbegin(), path.cend(), [&](const Pose pose) {
+            return WallIndex(pose.first, pose.second) ==
+                   WallIndex(Position(x, y), Direction::South);
+          });
+      const auto w = maze.isWall(x, y, Direction::South);
+      const auto k = maze.isKnown(x, y, Direction::South);
+      if (it != path.cend())
+        os << C_YE << " " << it->second << " " << C_NO;
+      else
+        os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
+    }
+    /* Last Pillar */
     os << "+" << std::endl;
   }
 }

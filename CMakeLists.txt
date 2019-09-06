@@ -82,8 +82,8 @@ add_custom_target(pi
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 add_custom_target(gen
-  COMMAND clear && ${CMAKE_BINARY_DIR}/test_gen_maze/test_gen_maze
-  DEPENDS test_gen_maze mazelib
+  COMMAND clear && ${CMAKE_BINARY_DIR}/test_generate/test_generate
+  DEPENDS test_generate mazelib
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 add_custom_target(search

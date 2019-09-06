@@ -186,7 +186,7 @@ int main(void) {
     map.print(maze, path);
     auto shortest_dirs = map.indexes2dirs(path, diag_enabled);
     Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);
-    maze.printPath(shortest_dirs);
+    maze.print(shortest_dirs);
   }
 #endif
 

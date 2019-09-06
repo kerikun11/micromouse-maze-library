@@ -269,9 +269,12 @@ public:
   WallIndex(const Position p, const Direction d) : x(p.x), y(p.y) {
     uniquify(d);
   }
-  // WallIndex(const int8_t x, const int8_t y, const Direction d) : x(x), y(y) {
-  //   uniquify(d);
-  // }
+  /**
+   * @brief IDを使って初期化するコンストラクタ
+   * @param i ID
+   */
+  WallIndex(const uint16_t i)
+      : x(i), y(i >> MAZE_SIZE_BIT), z(i >> (2 * MAZE_SIZE_BIT)) {}
   /**
    * @brief 迷路中の壁をuniqueな通し番号として表現したID
    * @return uint16_t ID
@@ -279,12 +282,6 @@ public:
   operator uint16_t() const {
     return (z << (2 * MAZE_SIZE_BIT)) | (y << MAZE_SIZE_BIT) | x;
   }
-  /**
-   * @brief IDを使って初期化するコンストラクタ
-   * @param i ID
-   */
-  WallIndex(const uint16_t i)
-      : x(i), y(i >> MAZE_SIZE_BIT), z(i >> (2 * MAZE_SIZE_BIT)) {}
   /**
    * @brief 方向の冗長性を除去してユニークにする関数
    * 基本的にコンストラクタで使われるので，ユーザーが使うことはない．
@@ -298,11 +295,12 @@ public:
     if (d == Direction::South)
       y--;
   }
-  /** @brief Getters */
+  /** @brief 位置の取得 */
+  const Position getPosition() const { return Position(x, y); }
+  /** @brief 方向の取得 */
   const Direction getDirection() const {
     return z == 0 ? Direction::East : Direction::North;
   }
-  const Position getPosition() const { return Position(x, y); }
   /**
    * @brief 表示用演算子のオーバーロード． ( x, y, d) の形式
    */
@@ -379,10 +377,10 @@ union WallLog {
   WallLog(const Position p, const Direction d, const bool b)
       : x(p.x), y(p.y), d(d), b(b) {}
   /** @brief getters */
-  operator Position() const { return Position(x, y); }
-  operator Direction() const { return d; }
+  const Position getPosition() const { return Position(x, y); }
+  const Direction getDirection() const { return d; }
   /** @brief 表示 */
-  friend std::ostream &operator<<(std::ostream &os, const WallLog &obj);
+  friend std::ostream &operator<<(std::ostream &os, const WallLog obj);
 };
 static_assert(sizeof(WallLog) == 2, "size error"); /**< size check */
 
@@ -412,9 +410,9 @@ public:
   }
   /**
    * @brief 迷路ファイルから迷路情報をパースするコンストラクタ
-   * @param filename ファイル名
+   * @param filepath ファイル名
    */
-  Maze(const char *filename) { parse(filename); }
+  Maze(const char *filepath) { parse(filepath); }
   /**
    * @brief 迷路の初期化．壁を削除し，スタート区画を既知に
    * @param set_start_wall スタート区画の East と North の壁を設定するかどうか
@@ -516,8 +514,9 @@ public:
    * @param dirs 移動方向の配列
    * @param of output-stream
    */
-  void printPath(const Directions &dirs, const Position start = Position(0, 0),
-                 std::ostream &os = std::cout) const;
+  void print(const Directions &dirs, const Position start = Position(0, 0),
+             std::ostream &os = std::cout,
+             const size_t maze_size = MAZE_SIZE) const;
   /**
    * @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
    * @param is *.maze 形式のファイルの input-stream

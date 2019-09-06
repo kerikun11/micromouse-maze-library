@@ -123,10 +123,7 @@ public:
     static constexpr int SIZE = MAZE_SIZE * MAZE_SIZE * 12;
 
   public:
-    /**
-     * @brief デフォルトコンストラクタ
-     *
-     */
+    /** @brief デフォルトコンストラクタ */
     Index() : all(0) {}
     /** @brief 成分を受け取ってそのまま代入するコンストラクタ */
     Index(const int8_t x, const int8_t y, const uint8_t z, const Direction nd)

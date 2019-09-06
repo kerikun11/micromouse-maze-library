@@ -157,7 +157,7 @@ public:
   /**
    * @brief 最短経路の表示
    */
-  void printPath() const { maze.printPath(shortest_dirs, maze.getStart()); }
+  void printPath() const { maze.print(shortest_dirs, maze.getStart()); }
 
 protected:
   Maze &maze; /**< 使用する迷路の参照 */
