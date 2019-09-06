@@ -59,9 +59,9 @@ int test_measurement() {
     robot.printResult();
     csv << "," << robot.step << "," << robot.f << "," << robot.l << ","
         << robot.r << "," << robot.b;
-    std::cout << "Max Calc Time:\t" << robot.max_usec << "\t[us]" << std::endl;
+    std::cout << "Max Calc Time:\t" << robot.t_dur_max << "\t[us]" << std::endl;
     std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
-    csv << "," << robot.max_usec;
+    csv << "," << robot.t_dur_max;
     csv << "," << us.count();
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirections(diag_enabled))
@@ -91,29 +91,33 @@ int test_measurement() {
 
 #if 1
     /* Position Identification Run */
-    robot.max_usec = 0;
+    robot.t_dur_max = 0;
     StepMap step_map;
-    step_map.update(maze_target, maze_target.getGoals(), false, false);
+    const Maze &maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
+    step_map.update(maze_target, maze_target.getGoals(), true, true);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
         for (const auto d : Direction::getAlong4()) {
           const auto p = Position(x, y);
           if (step_map.getStep(p) == STEP_MAX)
-            continue; /*< そもそも行けない区画は除外 */
-          if (maze_target.isWall(p, d))
+            continue; /*< そもそも迷路的に行けない区画は除外 */
+          if (maze_target.isWall(p, d + Direction::Back))
             continue; /*< 壁上からは除外 */
           if (p == Position(0, 0) || p == Position(0, 1))
             continue;
           /* set fake offset */
-          robot.real = robot.fake_offset = Pose{Position(x, y), d};
+          robot.fake_offset = robot.real = Pose(Position(x, y), d);
+          robot.setMaze(maze_pi);
           bool res = robot.positionIdentifyRun();
           if (!res) {
+            // robot.printInfo();
             std::cout << std::endl
                       << "Failed to Identify! fake_offset:\t"
                       << robot.fake_offset << std::endl;
+            // getc(stdin);
           }
         }
-    std::cout << "Max P.I. Time:\t" << robot.max_usec << "\t[us]" << std::endl;
+    std::cout << "Max P.I. Time:\t" << robot.t_dur_max << "\t[us]" << std::endl;
     std::cout << "P.I. wall:\t" << robot.min_id_wall << "\t"
               << robot.max_id_wall << std::endl;
 #endif

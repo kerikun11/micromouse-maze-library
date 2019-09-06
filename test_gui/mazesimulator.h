@@ -166,7 +166,7 @@ public:
   }
   void drawStatus() {
     std::stringstream ss;
-    ss << "State: " << SearchAlgorithm::stateString(getState());
+    ss << "State: " << SearchAlgorithm::getStateString(getState());
     ss << "\t";
     ss << "Pos: " << Pose{getCurrentPosition(), getCurrentDirection()};
     ui->statusBar->showMessage(ss.str().c_str());
@@ -185,7 +185,7 @@ protected:
   Pose fake_offset;
   Pose real = {Position(0, 0), Direction::North};
 
-  virtual void findWall(bool &left, bool &front, bool &right,
+  virtual void senseWalls(bool &left, bool &front, bool &right,
                         bool &back) override {
     left = maze_target.isWall(real.first, real.second + Direction::Left);
     front = maze_target.isWall(real.first, real.second + Direction::Front);

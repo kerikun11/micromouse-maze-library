@@ -24,7 +24,7 @@ protected:
       getc(stdin);
     }
 #endif
-    csv << usec << std::endl;
+    csv << t_dur << std::endl;
     if (newState == prevState)
       return;
     /* State Change has occurred */
@@ -44,11 +44,6 @@ protected:
       printInfo();
       // getc(stdin);
     }
-#if 1
-    if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
-        real.p == maze.getStart())
-      logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
-#endif
     CLRobotBase::queueAction(action);
   }
 };
@@ -104,7 +99,7 @@ int main(void) {
               << sum.count() / n << "\t[us]" << std::endl;
     std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
               << sa.getShortestPathCost() << "\t[ms]" << std::endl;
-    // sa.print(path);
+    sa.print(path);
   }
 #endif
 

@@ -237,11 +237,11 @@ public:
   Position p;
   Direction d;
   const Pose next(const Direction next_direction) const {
-    return Pose(p.next(d), next_direction);
+    return Pose(p.next(next_direction), next_direction);
   }
 };
 /** @brief stream での表示 */
-std::ostream &operator<<(std::ostream &os, const Pose &obj);
+std::ostream &operator<<(std::ostream &os, const Pose &pose);
 
 /**
  * @brief 区画ベースではなく，壁ベースの管理ID

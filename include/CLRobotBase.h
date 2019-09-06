@@ -24,9 +24,10 @@ public:
 
   void printInfo(bool showMaze = true) {
     RobotBase::printInfo(showMaze);
+    /* 既知区間斜めの変換 */
     const auto nextDirections = getNextDirections();
     std::string path;
-    auto prev_d = current_direction;
+    auto prev_d = getCurrentPose().d;
     for (int i = 0; i < (int)nextDirections.size(); ++i) {
       const auto next_d = nextDirections[i];
       switch (Direction(next_d - prev_d)) {
@@ -50,6 +51,7 @@ public:
       }
       prev_d = next_d;
     }
+    /* 表示 */
     std::cout << "NextDirectionsKnown:     \x1b[0K";
     std::cout << path << std::endl;
     std::cout << "NextDirectionsKnownFast: \x1b[0K";
@@ -57,8 +59,7 @@ public:
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    // std::printf("It took %5d [us], the max is %5d [us]\n", (int)usec,
-    //             (int)max_usec);
+    // std::printf("It took %5d [us], the max is %5d [us]\n", t_dur, t_dur_max);
   }
   void printResult() const {
     std::printf("Estimated Seaching Time: %2d:%02d, Step: %4d, Forward: %3d, "
@@ -79,16 +80,17 @@ public:
     /* 基底関数を呼ぶ */
     return RobotBase::endFastRunBackingToStartRun();
   }
+  void setMaze(const Maze &new_maze) { maze = new_maze; }
 
 public:
   int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
-  float cost = 0;
-  int max_usec = 0;
-  int usec = 0;
+  float cost = 0;                           /*< 探索時間 [秒] */
   size_t max_id_wall = 0;
   size_t min_id_wall = MAZE_SIZE * MAZE_SIZE * 4;
-  std::chrono::system_clock::time_point start;
-  std::chrono::system_clock::time_point end;
+  int t_s;
+  int t_e;
+  int t_dur = 0;
+  int t_dur_max = 0;
 
 public:
   const Maze &maze_target;
@@ -98,12 +100,12 @@ public:
 protected:
   Maze maze;
 
-  virtual void findWall(bool &left, bool &front, bool &right,
-                        bool &back) override {
+  virtual void senseWalls(bool &left, bool &front, bool &right) override {
     left = !maze_target.canGo(real.p, real.d + Direction::Left);
     front = !maze_target.canGo(real.p, real.d + Direction::Front);
     right = !maze_target.canGo(real.p, real.d + Direction::Right);
-    back = !maze_target.canGo(real.p, real.d + Direction::Back);
+    // updateWall(current_pose.p, current_pose.d + Direction::Back,
+    //            !maze_target.canGo(real.p, real.d + Direction::Back));
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
@@ -112,15 +114,16 @@ protected:
 #endif
   }
   virtual void calcNextDirectionsPreCallback() override {
-    start = std::chrono::system_clock::now();
+    const auto now = std::chrono::steady_clock::now().time_since_epoch();
+    t_s = std::chrono::duration_cast<std::chrono::microseconds>(now).count();
   }
   virtual void calcNextDirectionsPostCallback(
       SearchAlgorithm::State prevState __attribute__((unused)),
       SearchAlgorithm::State newState __attribute__((unused))) override {
-    end = std::chrono::system_clock::now();
-    usec = std::chrono::duration_cast<std::chrono::microseconds>(end - start)
-               .count();
-    max_usec = std::max(max_usec, usec);
+    const auto now = std::chrono::steady_clock::now().time_since_epoch();
+    t_e = std::chrono::duration_cast<std::chrono::microseconds>(now).count();
+    t_dur = t_e - t_s;
+    t_dur_max = std::max(t_dur_max, t_dur);
     if (newState == prevState)
       return;
     /* State Change has occurred */
@@ -130,19 +133,11 @@ protected:
       max_id_wall = std::max(
           max_id_wall, getSearchAlgorithm().getIdMaze().getWallLogs().size());
     }
-    if (newState == SearchAlgorithm::IDENTIFYING_POSITION) {
-    }
-    if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
-    }
-    if (newState == SearchAlgorithm::BACKING_TO_START) {
-    }
-    if (newState == SearchAlgorithm::REACHED_START) {
-    }
   }
   virtual void discrepancyWithKnownWall() override {
     if (getState() != SearchAlgorithm::IDENTIFYING_POSITION) {
-      logw << "There was a discrepancy with known information! CurrentPose:\t"
-           << Pose{getCurrentPosition(), getCurrentDirection()} << std::endl;
+      logw << "There was a discrepancy with known information! "
+           << getCurrentPose() << std::endl;
     }
   }
   virtual void crashed() {

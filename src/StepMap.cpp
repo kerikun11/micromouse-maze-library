@@ -71,7 +71,9 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
             });
         const auto w = maze.isWall(x, y, Direction::West);
         const auto k = maze.isKnown(x, y, Direction::West);
-        if (it != path.cend())
+        if (w)
+          os << "|";
+        else if (it != path.cend())
           os << C_YE << it->d << C_NO;
         else
           os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));

@@ -17,13 +17,13 @@ bool RobotBase::searchRun() {
   setForceGoingToGoal();
   /* スタートのアクションをキュー */
   queueAction(START_STEP);
-  updateCurrentPose(Position(0, 1), Direction::North);
+  updateCurrentPose(Pose(Position(0, 1), Direction::North));
   /* 走行開始 */
   return generalSearchRun();
 }
 bool RobotBase::positionIdentifyRun() {
   /* 自己位置同定の初期化 */
-  positionIdentify();
+  setPositionIdentifying();
   /* ゴール区画への訪問を指定 */
   setForceGoingToGoal();
   /* 最初のアクションをキュー */
@@ -41,11 +41,11 @@ bool RobotBase::endFastRunBackingToStartRun() {
   Position p = maze.getStart();
   for (const auto d : getShortestDirections())
     p = p.next(d);
-  updateCurrentPose(p, getShortestDirections().back());
+  updateCurrentPose({p, getShortestDirections().back()});
   /* 最短後は区画の中央にいるので，区画の切り替わり位置に移動 */
-  updateCurrentPose(
-      getCurrentPosition().next(getCurrentDirection() + Direction::Back),
-      getCurrentDirection() + Direction::Back);
+  const auto next_d = getCurrentPose().d + Direction::Back;
+  const auto next_p = getCurrentPose().p.next(next_d);
+  updateCurrentPose(Pose(next_p, next_d));
   queueAction(ROTATE_180);
   queueAction(ST_HALF);
   /* 走行開始 */
@@ -73,8 +73,8 @@ void RobotBase::turnbackSave() {
 }
 void RobotBase::queueNextDirections(const Directions &nextDirections) {
   for (const auto nextDirection : nextDirections) {
-    const auto nextPosition = getCurrentPosition().next(nextDirection);
-    switch (Direction(nextDirection - getCurrentDirection())) {
+    const auto relative_d = Direction(nextDirection - current_pose.d);
+    switch (relative_d) {
     case Direction::Front:
       queueAction(ST_FULL);
       break;
@@ -90,7 +90,7 @@ void RobotBase::queueNextDirections(const Directions &nextDirections) {
     default:
       logw << "invalid direction" << std::endl;
     }
-    updateCurrentPose(nextPosition, nextDirection);
+    updateCurrentPose(current_pose.next(nextDirection));
   }
 }
 bool RobotBase::generalSearchRun() {
@@ -99,8 +99,6 @@ bool RobotBase::generalSearchRun() {
   /* 走行開始 */
   startDequeue();
   while (1) {
-    const auto &p = getCurrentPosition();
-    const auto &d = getCurrentDirection();
     /* 既知区間の走行中に最短経路を導出 */
     calcNextDirectionsPreCallback();
     const auto prevState = getState();
@@ -119,14 +117,14 @@ bool RobotBase::generalSearchRun() {
     /* 走行が終わるのを待つ */
     waitForEndAction();
     /* 壁を確認 */
-    bool left, front, right, back;
-    findWall(left, front, right, back);
-    if (!updateWall(p, d, left, front, right, back))
+    bool left, front, right;
+    senseWalls(left, front, right);
+    if (!updateWall(current_pose, left, front, right))
       discrepancyWithKnownWall();
     /* 壁のない方向へ1マス移動 */
     Direction nextDirection;
-    if (!findNextDirection(p, d, nextDirection)) {
-      loge << "I can't go anywhere!" << std::endl;
+    if (!findNextDirection(current_pose, nextDirection)) {
+      loge << "I can't go anywhere! " << std::endl;
       stopDequeue();
       return false;
     }
@@ -135,7 +133,7 @@ bool RobotBase::generalSearchRun() {
   /* スタート区画特有の処理 */
   queueAction(ST_HALF_STOP);
   queueAction(START_INIT);
-  updateCurrentPose(Position(0, 0), Direction::North);
+  updateCurrentPose({Position(0, 0), Direction::North});
   calcNextDirections(); /*< 時間がかかる処理！ */
   waitForEndAction();
   stopDequeue();

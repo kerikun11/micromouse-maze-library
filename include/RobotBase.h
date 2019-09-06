@@ -77,10 +77,9 @@ protected:
    */
   virtual void waitForEndAction() {}
   virtual void queueAction(const Action action __attribute__((unused))) {}
-  virtual void findWall(bool &left __attribute__((unused)),
-                        bool &front __attribute__((unused)),
-                        bool &right __attribute__((unused)),
-                        bool &back __attribute__((unused))) {}
+  virtual void senseWalls(bool &left __attribute__((unused)),
+                          bool &front __attribute__((unused)),
+                          bool &right __attribute__((unused))) {}
   virtual void backupMazeToFlash() {}
   virtual void stopDequeue() {}
   virtual void startDequeue() {}

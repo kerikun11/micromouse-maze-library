@@ -24,8 +24,7 @@ public:
   void reset() {
     maze.reset();
     state = SearchAlgorithm::START;
-    current_direction = Direction::North;
-    current_position = Position(0, 0);
+    current_pose = Pose(Position(0, 1), Direction::North);
     isPositionIdentifying = false;
     isForceBackToStart = false;
     isForceGoingToGoal = false;
@@ -43,31 +42,27 @@ public:
    * @param p 区画座標
    * @param d 絶対方向
    */
-  void updateCurrentPose(const Position p, const Direction d) {
-    current_position = p;
-    current_direction = d;
-  }
+  void updateCurrentPose(const Pose &new_pose) { current_pose = new_pose; }
   /**
    * @brief 次に行くべき方向を取得する
    */
-  bool findNextDirection(const Position p, const Direction d,
-                         Direction &nextDirection) const {
+  bool findNextDirection(const Pose &pose, Direction &nextDirection) const {
     return searchAlgorithm.findNextDirection(
-        state, p, d, nextDirectionCandidates, nextDirection);
+        state, pose, nextDirectionCandidates, nextDirection);
   }
   /**
-   * @brief 絶対座標絶対方向で壁の1枚更新
-   * @param p 区画座標
-   * @param d 絶対方向
-   * @param b 壁の有無
+   * @brief 壁を更新
    */
-  bool updateWall(const Position p, const Direction d, const bool left,
-                  const bool front, const bool right, const bool back) {
-    return searchAlgorithm.updateWall(state, p, d, left, front, right, back);
+  bool updateWall(const Pose &pose, const bool left, const bool front,
+                  const bool right) {
+    return searchAlgorithm.updateWall(state, pose, left, front, right);
   }
   bool updateWall(const Position p, const Direction d, const bool b) {
     return searchAlgorithm.updateWall(state, p, d, b);
   }
+  /**
+   * @brief 壁を削除
+   */
   void resetLastWall(const int num = 1) {
     return searchAlgorithm.resetLastWall(state, num);
   }
@@ -78,9 +73,9 @@ public:
    */
   SearchAlgorithm::Result calcNextDirections() {
     return searchAlgorithm.calcNextDirections(
-        state, current_position, current_direction, nextDirectionsKnown,
-        nextDirectionCandidates, isPositionIdentifying, isForceBackToStart,
-        isForceGoingToGoal, matchCount);
+        state, current_pose, nextDirectionsKnown, nextDirectionCandidates,
+        isPositionIdentifying, isForceBackToStart, isForceGoingToGoal,
+        matchCount);
   }
   /**
    * @brief 最短経路を導出
@@ -104,9 +99,8 @@ public:
   /**
    * @brief 自己位置同定モードに設定する
    */
-  void positionIdentify() {
-    searchAlgorithm.positionIdentifyingInit(current_position,
-                                            current_direction);
+  void setPositionIdentifying() {
+    searchAlgorithm.positionIdentifyingInit(current_pose);
     state = SearchAlgorithm::IDENTIFYING_POSITION;
     isPositionIdentifying = true;
     calcNextDirections(); /*< 時間がかかる処理！ */
@@ -126,13 +120,9 @@ public:
     return nextDirectionCandidates;
   }
   /**
-   * @brief 現在区画を取得
+   * @brief 現在姿勢を取得
    */
-  const Position &getCurrentPosition() const { return current_position; }
-  /**
-   * @brief 現在の方向を取得
-   */
-  const Direction &getCurrentDirection() const { return current_direction; }
+  const Pose &getCurrentPose() const { return current_pose; }
   /**
    * @brief 最短経路の方向配列の計算結果を取得
    */
@@ -150,9 +140,9 @@ public:
    * @param showMaze true:迷路も表示, false:迷路は非表示
    */
   void printInfo(const bool showMaze = true) const {
-    printInfo(showMaze, current_position, current_direction, state);
+    printInfo(showMaze, current_pose, state);
   }
-  void printInfo(const bool showMaze, const Position vec, const Direction dir,
+  void printInfo(const bool showMaze, const Pose &pose,
                  const SearchAlgorithm::State state) const;
   /**
    * @brief 最短経路の表示
@@ -163,8 +153,7 @@ protected:
   Maze &maze; /**< 使用する迷路の参照 */
   SearchAlgorithm::State state =
       SearchAlgorithm::START;         /**< 現在の探索状態を保持 */
-  Position current_position;          /**< 現在の区画座標 */
-  Direction current_direction;        /**< 現在向いている方向 */
+  Pose current_pose;                  /**< 現在の姿勢 */
   bool isForceBackToStart = false;    /**< 強制帰還モード */
   bool isForceGoingToGoal = false;    /**< 強制終点訪問モード */
   bool isPositionIdentifying = false; /**< 自己位置同定モード */

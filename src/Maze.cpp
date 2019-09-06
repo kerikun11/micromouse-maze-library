@@ -49,9 +49,9 @@ std::ostream &operator<<(std::ostream &os, const Position p) {
 }
 
 /* Pose */
-std::ostream &operator<<(std::ostream &os, const Pose &obj) {
-  return os << "( " << std::setw(2) << (int)obj.p.x << ", " << std::setw(2)
-            << (int)obj.p.y << ", " << obj.d.toChar() << ")";
+std::ostream &operator<<(std::ostream &os, const Pose &pose) {
+  return os << "( " << std::setw(2) << (int)pose.p.x << ", " << std::setw(2)
+            << (int)pose.p.y << ", " << pose.d.toChar() << ")";
 }
 
 /* WallIndex */
@@ -280,7 +280,6 @@ void Maze::print(const Directions &dirs, const Position start, std::ostream &os,
     path.push_back({p, d}), p = p.next(d);
   const auto &maze = *this;
   /* start to draw maze */
-  os << std::endl;
   for (int8_t y = maze_size; y >= 0; --y) {
     if (y != (int)maze_size) {
       for (uint8_t x = 0; x <= maze_size; ++x) {
