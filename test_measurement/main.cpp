@@ -92,8 +92,11 @@ int test_measurement() {
 #if 1
     /* Position Identification Run */
     robot.t_dur_max = 0;
-    StepMap step_map;
-    const Maze &maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
+    const auto p_step_map = std::make_unique<StepMap>();
+    StepMap &step_map = *p_step_map;
+    const auto p_maze_pi = std::make_unique<Maze>();
+    Maze &maze_pi = *p_maze_pi;
+    maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
     step_map.update(maze_target, maze_target.getGoals(), true, true);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
@@ -107,7 +110,7 @@ int test_measurement() {
             continue;
           /* set fake offset */
           robot.fake_offset = robot.real = Pose(Position(x, y), d);
-          robot.setMaze(maze_pi);
+          // robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
           bool res = robot.positionIdentifyRun();
           if (!res) {
             // robot.printInfo();

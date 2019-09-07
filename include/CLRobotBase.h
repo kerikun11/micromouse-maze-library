@@ -55,7 +55,7 @@ public:
     std::cout << "NextDirectionsKnown:     \x1b[0K";
     std::cout << path << std::endl;
     std::cout << "NextDirectionsKnownFast: \x1b[0K";
-    std::cout << RobotBase::pathConvertSearchToKnown(path) << std::endl;
+    std::cout << RobotBase::pathConvertSearchToKnown(path, true) << std::endl;
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
