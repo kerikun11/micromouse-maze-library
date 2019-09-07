@@ -54,7 +54,8 @@ public:
     src = (char)F_ST_HALF + src + (char)F_ST_HALF;
     return replaceStringSearchToFast(src, diag_enabled);
   }
-  static std::string pathConvertSearchToKnown(std::string src) {
+  static std::string pathConvertSearchToKnown(std::string src,
+                                              const bool diag_enabled) {
     replace(src, "S", "ss");
     /* 初手ターンを防ぐ */
     auto f = src.find_first_of(F_ST_HALF, 1); /*< 最初の直線を探す */
@@ -62,7 +63,8 @@ public:
     if (f >= b)
       return src;                       /*< 直線なし */
     auto fb = src.substr(f, b - f + 1); /*< 直線に挟まれた区間を抽出 */
-    fb = replaceStringSearchToFast(fb, true); /*< 最短走行パターンに変換 */
+    fb = replaceStringSearchToFast(fb,
+                                   diag_enabled); /*< 最短走行パターンに変換 */
     /* 最初の直線前と最後の直線後を連結して完了 */
     return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
   }
