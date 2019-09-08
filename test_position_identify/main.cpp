@@ -8,6 +8,7 @@ public:
   bool display = 0;
   void printInfo() {
     CLRobotBase::printInfo();
+    std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
     std::cout << "P.I. wall:\t"
               << getSearchAlgorithm().getIdMaze().getWallLogs().size() << "    "
               << std::endl;
@@ -22,7 +23,7 @@ protected:
       return;
     /* state change has occurred */
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      // display = 0;
+      display = 0;
     }
   }
   virtual void crashed() override {
@@ -33,7 +34,7 @@ protected:
   virtual void queueAction(const Action action) override {
     if (display) {
       printInfo();
-      getc(stdin);
+      // getc(stdin);
     }
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
@@ -47,7 +48,7 @@ protected:
 int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = "32MM2017HX.maze";
+  const std::string filename = "32MM2016HX.maze";
   // const std::string filename = "16MM2019H_kansai.maze";
   // const std::string filename = "16MM2019H_kanazawa.maze";
   Maze maze_target = Maze((mazedata_dir + filename).c_str());
@@ -57,12 +58,12 @@ int test_position_identify() {
   robot.searchRun();
   // robot.printInfo();
 
-#if 1
+#if 0
   /* Position Identification Run */
   robot.display = 1;
   robot.fake_offset = robot.real =
       Pose(Position(1, 1), Direction::East); /*< kanazawa */
-  robot.fake_offset = robot.real = Pose(Position(15, 0), Direction::East);
+  robot.fake_offset = robot.real = Pose(Position(18, 15), Direction::South);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
@@ -73,30 +74,39 @@ int test_position_identify() {
   }
 #endif
 
-#if 0
+#if 1
   /* Position Identification Run */
-  StepMap step_map;
-  step_map.update(maze_target, maze_target.getGoals(), false, false);
+  const auto p_step_map = std::make_unique<StepMap>();
+  StepMap &step_map = *p_step_map;
+  const auto p_maze_pi = std::make_unique<Maze>();
+  Maze &maze_pi = *p_maze_pi;
+  maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
+  // maze_pi.print();
+  /* 迷路的に行き得る区画を洗い出す */
+  step_map.update(maze_target, {maze_target.getStart()}, true, true);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
       for (const auto d : Direction::getAlong4()) {
         const auto p = Position(x, y);
         if (step_map.getStep(p) == STEP_MAX)
-          continue;
-        if (p == Position(0, 0) || p == Position(0, 1))
-          continue;
+          continue; /*< そもそも迷路的に行き得ない区画は除外 */
+        if (maze_target.isWall(p, d + Direction::Back))
+          continue; /*< 壁上からは除外 */
+        if (p == Position(0, 0))
+          continue; /*< スタートは除外 */
+        /* set fake offset */
         robot.fake_offset = robot.real = Pose(Position(x, y), d);
+        robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
         robot.display = 1;
         bool res = robot.positionIdentifyRun();
         if (!res) {
           robot.printInfo();
           std::cout << std::endl
-                    << "Failed to Identify! offset:\t" << robot.fake_offset
+                    << "Failed to Identify! fake_offset:\t" << robot.fake_offset
                     << std::endl;
           getc(stdin);
         }
       }
-  std::cout << "P.I. Max Time:\t" << robot.t_dur_max << "\t[us]" << std::endl;
 #endif
   std::cout << std::endl << "End" << std::endl;
 

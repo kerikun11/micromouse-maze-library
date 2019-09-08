@@ -52,19 +52,22 @@ public:
       prev_d = next_d;
     }
     /* 表示 */
-    std::cout << "NextDirectionsKnown:     \x1b[0K";
-    std::cout << path << std::endl;
-    std::cout << "NextDirectionsKnownFast: \x1b[0K";
-    std::cout << RobotBase::pathConvertSearchToKnown(path, true) << std::endl;
+    // std::cout << "NextDirectionsKnown:     \x1b[0K";
+    // std::cout << path << std::endl;
+    // std::cout << "NextDirectionsKnownFast: \x1b[0K";
+    // std::cout << RobotBase::pathConvertSearchToKnown(path, true) <<
+    // std::endl;
+    std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     // std::printf("It took %5d [us], the max is %5d [us]\n", t_dur, t_dur_max);
   }
   void printResult() const {
-    std::printf("Estimated Seaching Time: %2d:%02d, Step: %4d, Forward: %3d, "
+    std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, "
                 "Left: %3d, Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
+    std::cout << "Walls:    \t" << maze.getWallLogs().size() << std::endl;
   }
   bool endFastRunBackingToStartRun() {
     /* エラー処理 */
@@ -79,6 +82,10 @@ public:
     real = Pose(p, getShortestDirections().back());
     /* 基底関数を呼ぶ */
     return RobotBase::endFastRunBackingToStartRun();
+  }
+  bool positionIdentifyRun() {
+    step = f = l = r = b = cost = 0;
+    return RobotBase::positionIdentifyRun();
   }
   void setMaze(const Maze &new_maze) { maze = new_maze; }
 
@@ -104,12 +111,10 @@ protected:
     left = !maze_target.canGo(real.p, real.d + Direction::Left);
     front = !maze_target.canGo(real.p, real.d + Direction::Front);
     right = !maze_target.canGo(real.p, real.d + Direction::Right);
-    // updateWall(current_pose.p, current_pose.d + Direction::Back,
-    //            !maze_target.canGo(real.p, real.d + Direction::Back));
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
-      updateWall(current_position.next(current_direction), current_direction,
+      updateWall(current_pose.p.next(current_pose.d), current_pose.d,
                  !maze_target.canGo(real.p.next(real.d), real.d));
 #endif
   }
@@ -142,7 +147,7 @@ protected:
   }
   virtual void crashed() {
     loge << "The robot crashed into the wall! fake_offset:\t" << fake_offset
-         << "\treal:\t" << real << std::endl;
+         << "\tcur:\t" << current_pose << "\treal:\t" << real << std::endl;
   }
   virtual void queueAction(const Action action) override {
     cost += getTimeCost(action);
@@ -206,7 +211,7 @@ protected:
     case RobotBase::TURN_R:
       return 71 / velocity;
     case RobotBase::ROTATE_180:
-      return 2.0f;
+      return 3.0f;
     case RobotBase::ST_FULL:
       return segment / velocity;
     case RobotBase::ST_HALF:

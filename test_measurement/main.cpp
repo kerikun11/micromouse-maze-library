@@ -28,12 +28,13 @@ int test_measurement() {
            "32MM2012HX.maze",         "16MM2019H_kansai.maze",
            "16MM2019H_kanazawa.maze", "16MM2018H_semi.maze",
            "16MM2018H_Chubu.maze",    "16MM2018C.maze",
-           "16MM2017H_Tashiro.maze",  "16MM2017H_Chubu.maze",
-           "16MM2017H_Cheese.maze",   "16MM2017CX.maze",
-           "16MM2017CX_pre.maze",     "16MM2017C_East.maze",
-           "16MM2017C_Chubu.maze",    "16MM2016CX.maze",
-           "16MM2016C_Chubu.maze",    "16MM2015C_Chubu.maze",
-           "16MM2013CX.maze",         "08MM2016CF_pre.maze",
+           "16MM2017H_Tashiro.maze",  "16MM2017HX_pre.maze",
+           "16MM2017H_Chubu.maze",    "16MM2017H_Cheese.maze",
+           "16MM2017CX.maze",         "16MM2017CX_pre.maze",
+           "16MM2017C_East.maze",     "16MM2017C_Chubu.maze",
+           "16MM2016CX.maze",         "16MM2016C_Chubu.maze",
+           "16MM2015C_Chubu.maze",    "16MM2013CX.maze",
+           "08MM2016CF_pre.maze",     "08MM_test.maze",
            //  "32MazeUnknown.maze",
        }) {
     std::cout << std::endl;
@@ -92,35 +93,46 @@ int test_measurement() {
 #if 1
     /* Position Identification Run */
     robot.t_dur_max = 0;
+    float id_cost_max = 0;
+    float id_cost_min = 1e6;
+    /*< 探索時間 [秒] */
     const auto p_step_map = std::make_unique<StepMap>();
     StepMap &step_map = *p_step_map;
     const auto p_maze_pi = std::make_unique<Maze>();
     Maze &maze_pi = *p_maze_pi;
     maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
-    step_map.update(maze_target, maze_target.getGoals(), true, true);
+    // maze_pi.print();
+    /* 迷路的に行き得る区画を洗い出す */
+    step_map.update(maze_target, {maze_target.getStart()}, true, true);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
         for (const auto d : Direction::getAlong4()) {
           const auto p = Position(x, y);
           if (step_map.getStep(p) == STEP_MAX)
-            continue; /*< そもそも迷路的に行けない区画は除外 */
+            continue; /*< そもそも迷路的に行き得ない区画は除外 */
           if (maze_target.isWall(p, d + Direction::Back))
             continue; /*< 壁上からは除外 */
-          if (p == Position(0, 0) || p == Position(0, 1))
-            continue;
+          if (p == Position(0, 0))
+            continue; /*< スタートは除外 */
           /* set fake offset */
           robot.fake_offset = robot.real = Pose(Position(x, y), d);
-          // robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
+          robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
           bool res = robot.positionIdentifyRun();
           if (!res) {
-            // robot.printInfo();
             std::cout << std::endl
                       << "Failed to Identify! fake_offset:\t"
                       << robot.fake_offset << std::endl;
-            // getc(stdin);
           }
+          /* save result */
+          id_cost_max = std::max(id_cost_max, robot.cost);
+          id_cost_min = std::min(id_cost_min, robot.cost);
         }
-    std::cout << "Max P.I. Time:\t" << robot.t_dur_max << "\t[us]" << std::endl;
+    std::cout << "P.I. Max Calc:\t" << robot.t_dur_max << "\t[us]" << std::endl;
+    std::cout << "P.I. Time:\t" << (int(id_cost_min) / 60) % 60 << ":"
+              << std::setw(2) << std::setfill('0') << int(id_cost_min) % 60
+              << "\t" << (int(id_cost_max) / 60) % 60 << ":" << std::setw(2)
+              << std::setfill('0') << int(id_cost_max) % 60 << std::setfill(' ')
+              << std::endl;
     std::cout << "P.I. wall:\t" << robot.min_id_wall << "\t"
               << robot.max_id_wall << std::endl;
 #endif

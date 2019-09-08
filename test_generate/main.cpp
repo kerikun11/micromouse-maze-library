@@ -93,18 +93,31 @@ const std::vector<std::string> mazeData_MM2018H_Chubu = {
     "dca8a8a8a9c9c8a9",
 };
 
+const std::vector<std::string> mazeData_MM2017HX_pre = {
+    "62aaa2aa2aaa2a23", "5c36a8aa8a2a8b55", "5755e36aa29e2295",
+    "5d5c3d56a8a35561", "5e8a83556ab55555", "ca3769c9d6a89555",
+    "6a95562a282aa941", "56a955c35f5eab55", "5d6a9c2943576215",
+    "4a16aa169d555d55", "c3556354aa949741", "755489496b69e95d",
+    "555caa969696aa83", "414aaa3d68356221", "548aa3c297d55dd5",
+    "dcaaa8a8a8a88aa9",
+};
+
 int main(void) {
   std::cout << "Maze File Generator" << std::endl;
   /* parameter */
-  const auto maze_data = mazeData_MM2018H_Chubu;
+  const auto maze_data = mazeData_MM2017HX_pre;
   const int maze_size = 16;
   const std::string output_filename = "output.maze";
   const Positions goals = {
       //   Position(7, 7), Position(8, 7), Position(7, 8), Position(8, 8),
-      Position(9, 9), Position(10, 9), Position(9, 10), Position(10, 10),
+      //   Position(9, 9), Position(10, 9), Position(9, 10), Position(10, 10),
       //   Position(5, 6), Position(6, 6), Position(5, 7), Position(6, 7),
       //   Position(12, 12), Position(13, 12), Position(12, 13), Position(13,
       //   13),
+      Position(4, 4),
+      Position(5, 4),
+      Position(4, 5),
+      Position(5, 5),
   };
   /* process */
   Maze sample;

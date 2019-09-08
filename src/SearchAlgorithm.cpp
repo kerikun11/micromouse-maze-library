@@ -269,7 +269,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
                                              Pose &ans) const {
   const int many = 1000;
   const int min_size = 12;
-  const int min_diff = 6; /*< 許容食い違い壁数 */
+  const int min_diff = 9; /*< 許容食い違い壁数 */
   /* ある程度既知壁になるまで一致判定をしない */
   if (idWallLogs.size() < min_size)
     return many;
@@ -288,7 +288,9 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
           const auto maze_p =
               (wl.getPosition() - idOffset).rotate(offset_d) + offset_p;
           const auto maze_d = wl.d + offset_d;
-          if (!maze_p.isInsideOfField()) {
+          /* 既知範囲外は除外．ちょっと危険な処理． */
+          if (maze_p.x < 0 || maze_p.x >= max_x || maze_p.y < 0 ||
+              maze_p.y >= max_y) {
             diffs = many;
             break;
           }
@@ -302,7 +304,8 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
             break;
         }
         /* 非一致条件，要パラメータチューニング */
-        if (diffs > min_diff || unknown * 5 > (int)idWallLogs.size() * 4)
+        // if (diffs > min_diff || unknown * 5 > (int)idWallLogs.size() * 4)
+        if (diffs > min_diff)
           continue;
         /* 一致 */
         ans.p = offset_p;
