@@ -73,11 +73,13 @@ int test_measurement() {
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
     robot.printResult();
+    csv << "," << robot.cost;
     csv << "," << robot.step << "," << robot.f << "," << robot.l << ","
         << robot.r << "," << robot.b;
+    csv << "," << robot.getMaze().getWallLogs().size();
     std::cout << "Max Calc Time:\t" << robot.t_dur_max << "\t[us]" << std::endl;
-    std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
     csv << "," << robot.t_dur_max;
+    std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
     csv << "," << us.count();
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirections(diag_enabled))
@@ -97,7 +99,8 @@ int test_measurement() {
       if (at.getShortestDirections() != robot.getShortestDirections()) {
         logw << "searched path is not shortest! "
              << (diag_enabled ? "diag" : "no_diag") << std::endl;
-        // at.printPath(); robot.printPath();
+        at.printPath();
+        robot.printPath();
         logi << "target: " << at.getSearchAlgorithm().getShortestCost()
              << " search: " << robot.getSearchAlgorithm().getShortestCost()
              << std::endl;
@@ -149,6 +152,11 @@ int test_measurement() {
               << std::endl;
     std::cout << "P.I. wall:\t" << robot.min_id_wall << "\t"
               << robot.max_id_wall << std::endl;
+    csv << "," << robot.t_dur_max;
+    csv << "," << id_cost_min;
+    csv << "," << id_cost_max;
+    csv << "," << robot.min_id_wall;
+    csv << "," << robot.max_id_wall;
 #endif
 
 #if 1

@@ -477,18 +477,16 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
         isForceGoingToGoal = false;
     }
     /* 自己位置同定中に未知壁を見ていたら更新する */
-    WallLogs new_walls;
-    for (const auto wl : idMaze.getWallLogs()) {
+    const int ignore_first_walls = 12; /*< 復帰直後は壁の読み間違いがありそう */
+    const auto &wall_logs = idMaze.getWallLogs();
+    for (int i = ignore_first_walls; i < (int)wall_logs.size(); ++i) {
+      const auto wl = wall_logs[i];
+      /* 正しいPoseに変換 */
       const auto maze_p = (wl.getPosition() - idOffset).rotate(ans.d) + ans.p;
       const auto maze_d = wl.d + ans.d;
-      if (maze.isKnown(maze_p, maze_d) && maze.isWall(maze_p, maze_d) != wl.b)
-        break;
-      new_walls.push_back(WallLog(maze_p, maze_d, wl.b));
+      if (!maze.isKnown(maze_p, maze_d))
+        maze.updateWall(maze_p, maze_d, wl.b);
     }
-    /* 食い違いがひとつもなければ探索迷路とマージ */
-    if (new_walls.size() == idMaze.getWallLogs().size())
-      for (const auto wl : new_walls)
-        maze.updateWall(wl.getPosition(), wl.getDirection(), wl.b);
     return Reached;
   } else if (cnt == 0) {
     return Error;
