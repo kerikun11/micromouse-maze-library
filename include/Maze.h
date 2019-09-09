@@ -71,6 +71,20 @@ static constexpr int MAZE_SIZE_BIT = std::log2(MAZE_SIZE);
  * 例: Direction(Direction::East + Direction::Left) == Direction::North
  * 例: Direction(Direction::East - Direction::West) == Direction::Back
  * 例: Direction(-Direction::Left) == Direction::Right
+ * +-----------+-------+-----------+
+ * | NorthWest   North   NorthEast |
+ * +           +       +           +
+ * |      West     X          East |
+ * +           +       +           +
+ * | NorthWest   North   NorthEast |
+ * +-----------+-------+-----------+
+ * +-----------+-------+-----------+
+ * |   Left135    Left      Left45 |
+ * +           +       +           +
+ * |      Back     X         Front |
+ * +           +       +           +
+ * |  Right135   Right     Right45 |
+ * +-----------+-------+-----------+
  */
 struct Direction {
 public:
@@ -105,7 +119,7 @@ public:
 
 public:
   /**
-   * @brief デフォルトコンストラクタ
+   * @brief デフォルトコンストラクタ．そのまま格納．
    */
   Direction(const AbsoluteDirection d = East) : d(d) {}
   /**
@@ -115,16 +129,23 @@ public:
    * @param d 相対方向などの演算結果の整数
    */
   Direction(const int8_t d) : d(d & 7) {}
-  /** @brief 整数へのキャスト．相対方向などの演算に使える． */
+  /**
+   * @brief 整数へのキャスト．相対方向などの演算に使える．
+   */
   operator int8_t() const { return d; }
   /** @brief 斜めかどうかの判定 */
   bool isAlong() const { return (d & 1) == 0; }
   bool isDiag() const { return (d & 1) == 1; }
-  /** @brief 方向配列を生成する静的関数 */
+  /**
+   * @brief 斜めでない絶対4方向を取得
+   */
   static const std::array<Direction, 4> &getAlong4() {
     static const std::array<Direction, 4> ds{{East, North, West, South}};
     return ds;
   }
+  /**
+   * @brief 斜めの絶対4方向を取得
+   */
   static const std::array<Direction, 4> &getDiag4() {
     static const std::array<Direction, 4> ds{
         {NorthEast, NorthWest, SouthWest, SouthEast}};
@@ -148,7 +169,7 @@ static_assert(sizeof(Direction) == 1, "size error"); /**< size check */
 using Directions = std::vector<Direction>;
 
 /**
- * @brief 迷路の区画の座標を定義．左下の区画が (0,0) の (x,y) 平面
+ * @brief 迷路の区画の位置(座標)を定義．左下の区画が (0,0) の (x,y) 平面
  * 実体は 16bit の整数
  */
 union Position {
@@ -219,7 +240,7 @@ static_assert(sizeof(Position) == 2, "size error"); /**< size check */
 using Positions = std::vector<Position>;
 
 /**
- * @brief Position と Direction をまとめた型
+ * @brief Position と Direction をまとめた型．位置姿勢．
  * 位置姿勢は，区画に向かう方向を表す．
  * 現在区画から出る方向ではないことに注意する．
  * +---+---+---+ 例
@@ -253,6 +274,22 @@ std::ostream &operator<<(std::ostream &os, const Pose &pose);
  * 最初から全部が通し番号のIDで保持してしまうと，
  * 迷路の範囲外の壁を表現できなくなってしまうため，
  * 必要に応じてIDを生成するようになっている．
+ *      [x, y]    : Cell Position
+ *             z  : Wall Distinction in the Cell; 0:East, 1:North
+ *   => (x, y, z) : Wall Index
+ * +-------------+-------------+-------------+
+ * |             |             |             |
+ * |             |             |             |
+ * |             |             |             |
+ * +-------------+- (x, y, 1) -+-------------+
+ * |             |             |             |
+ * |    (x-1, y, 0)  [ x, y]  (x, y, 0)      |
+ * |             |             |             |
+ * +--- z = 1 ---+- (x,y-1,1) -+-------------+
+ * |             |             |             |
+ * |    Cell   z = 0           |             |
+ * |             |             |             |
+ * +-------------+-------------+-------------+
  */
 union __attribute__((__packed__)) WallIndex {
   /**
@@ -578,50 +615,14 @@ public:
   int8_t getMaxX() const { return max_x; }
   int8_t getMaxY() const { return max_y; }
   /**
-   * @brief 壁ログをファイルに保存する関数
+   * @brief 壁ログをファイルに追記保存する関数
    */
-  bool backupWallLogsFromFile(const std::string filepath) {
-    std::ifstream fs(filepath, std::ifstream::ate);
-    const auto size = static_cast<size_t>(fs.tellg());
-    if (size / sizeof(WallLog) > getWallLogs().size()) {
-      std::remove(filepath.c_str());
-      backup_counter = 0;
-    }
-    std::ofstream of(filepath, std::ios::binary | std::ios::app);
-    if (of.fail()) {
-      loge << "failed to open file! " << filepath << std::endl;
-      return false;
-    }
-    const auto &wallLog = getWallLogs();
-    while (backup_counter < wallLog.size()) {
-      const auto &wl = wallLog[backup_counter];
-      of.write((const char *)&wl, sizeof(wl));
-      backup_counter++;
-    }
-    return true;
-  }
+  bool backupWallLogsFromFile(const std::string filepath,
+                              const bool clear = false);
   /**
    * @brief 壁ログファイルから壁情報を復元する関数
    */
-  bool restoreWallLogsFromFile(const std::string filepath) {
-    std::ifstream f(filepath, std::ios::binary);
-    if (f.fail()) {
-      loge << "failed to open file! " << filepath << std::endl;
-      return false;
-    }
-    backup_counter = 0;
-    reset();
-    while (!f.eof()) {
-      WallLog wl;
-      f.read((char *)(&wl), sizeof(WallLog));
-      Position p = Position(wl.x, wl.y);
-      Direction d = Direction(wl.d);
-      bool b = wl.b;
-      updateWall(p, d, b);
-      backup_counter++;
-    }
-    return true;
-  }
+  bool restoreWallLogsFromFile(const std::string filepath);
   /**
    * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
    * @param maze 迷路の参照

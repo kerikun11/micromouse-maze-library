@@ -145,9 +145,8 @@ protected:
            << getCurrentPose() << std::endl;
     }
   }
-  virtual void crashed() {
-    loge << "The robot crashed into the wall! fake_offset:\t" << fake_offset
-         << "\tcur:\t" << current_pose << "\treal:\t" << real << std::endl;
+  virtual void backupMazeToFlash() override {
+    maze.backupWallLogsFromFile("maze.walllogs");
   }
   virtual void queueAction(const Action action) override {
     cost += getTimeCost(action);
@@ -195,6 +194,11 @@ protected:
       logw << "invalid action" << std::endl;
       break;
     }
+  }
+  virtual void crashed() {
+    loge << "The robot crashed into the wall! fake_offset:\t" << fake_offset
+         << "\tcur:\t" << current_pose << "\treal:\t" << real << std::endl;
+    setBreakFlag();
   }
   virtual float getTimeCost(const Action action) {
     const float velocity = 240.0f;

@@ -51,6 +51,7 @@ public:
   };
   static std::string pathConvertSearchToFast(std::string src,
                                              bool diag_enabled) {
+    /* 前後に半分の直線を追加 */
     src = (char)F_ST_HALF + src + (char)F_ST_HALF;
     return replaceStringSearchToFast(src, diag_enabled);
   }
@@ -72,8 +73,13 @@ public:
   bool positionIdentifyRun();
   bool endFastRunBackingToStartRun();
   bool fastRun(const bool diagonal);
+  void setBreakFlag(const bool break_flag = true) {
+    this->break_flag = break_flag;
+  }
 
 protected:
+  bool break_flag = false; /*< 探索を中断させるフラグ */
+
   /**
    * @brief 仮想関数．継承して中身を埋める
    */
@@ -94,6 +100,9 @@ protected:
   virtual void discrepancyWithKnownWall() {}
 
 private:
+  /**
+   * @brief 処理関数
+   */
   void turnbackSave();
   void queueNextDirections(const Directions &nextDirections);
   bool generalSearchRun();

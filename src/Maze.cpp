@@ -365,5 +365,51 @@ void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
     }
   }
 }
+bool Maze::backupWallLogsFromFile(const std::string filepath,
+                                  const bool clear) {
+  /* 変更なし */
+  if (!clear && backup_counter == wallLogs.size())
+    return true;
+  /* 前のデータが残っていたら削除 */
+  std::ifstream fs(filepath, std::ifstream::ate);
+  const auto size = static_cast<size_t>(fs.tellg());
+  if (clear || size / sizeof(WallLog) > backup_counter) {
+    fs.close();
+    std::remove(filepath.c_str());
+    backup_counter = 0;
+  }
+  fs.close();
+  /* WallLogs を追記 */
+  std::ofstream of(filepath, std::ios::binary | std::ios::app);
+  if (of.fail()) {
+    loge << "failed to open file! " << filepath << std::endl;
+    return false;
+  }
+  while (backup_counter < wallLogs.size()) {
+    const auto &wl = wallLogs[backup_counter];
+    of.write((const char *)&wl, sizeof(wl));
+    backup_counter++;
+  }
+  return true;
+}
+bool Maze::restoreWallLogsFromFile(const std::string filepath) {
+  std::ifstream f(filepath, std::ios::binary);
+  if (f.fail()) {
+    loge << "failed to open file! " << filepath << std::endl;
+    return false;
+  }
+  backup_counter = 0;
+  reset();
+  while (!f.eof()) {
+    WallLog wl;
+    f.read((char *)(&wl), sizeof(WallLog));
+    Position p = Position(wl.x, wl.y);
+    Direction d = Direction(wl.d);
+    bool b = wl.b;
+    updateWall(p, d, b);
+    backup_counter++;
+  }
+  return true;
+}
 
 } // namespace MazeLib

@@ -13,6 +13,8 @@ bool RobotBase::searchRun() {
   /* 既に探索済みなら正常終了 */
   if (!isForceGoingToGoal && isComplete())
     return true;
+  /* 探索中断をクリア */
+  setBreakFlag(false);
   /* ゴール区画への訪問を指定 */
   setForceGoingToGoal();
   /* スタートのアクションをキュー */
@@ -24,6 +26,8 @@ bool RobotBase::searchRun() {
 bool RobotBase::positionIdentifyRun() {
   /* 自己位置同定の初期化 */
   setPositionIdentifying();
+  /* 探索中断をクリア */
+  setBreakFlag(false);
   /* ゴール区画への訪問を指定 */
   setForceGoingToGoal();
   /* 最初のアクションをキュー */
@@ -105,6 +109,13 @@ bool RobotBase::generalSearchRun() {
     const auto status = calcNextDirections(); /*< 時間がかかる処理！ */
     const auto newState = getState();
     calcNextDirectionsPostCallback(prevState, newState);
+    /* 探索中断を確認 */
+    if (break_flag) {
+      break_flag = false;
+      logi << "the break flag was set" << std::endl;
+      stopDequeue();
+      return false;
+    }
     /* 既知区間移動をキューにつめる */
     queueNextDirections(getNextDirections());
     /* 最短経路導出結果を確認 */

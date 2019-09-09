@@ -134,8 +134,7 @@ int test_measurement() {
           robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
           bool res = robot.positionIdentifyRun();
           if (!res) {
-            std::cout << std::endl
-                      << "Failed to Identify! fake_offset:\t"
+            std::cout << "Failed to Identify! fake_offset:\t"
                       << robot.fake_offset << std::endl;
           }
           /* save result */
