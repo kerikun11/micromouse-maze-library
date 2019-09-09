@@ -542,9 +542,7 @@ public:
   bool parse(std::istream &is);
   bool parse(std::string filepath) {
     std::ifstream ifs(filepath);
-    if (ifs.fail())
-      return false;
-    return parse(ifs);
+    return ifs ? parse(ifs) : false;
   }
   /**
    * @brief 配列から迷路を読み込むパーサ

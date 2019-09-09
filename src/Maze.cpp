@@ -154,26 +154,26 @@ void Maze::resetLastWall(const int num) {
   return;
 }
 bool Maze::parse(std::istream &is) {
-  is.seekg(0, std::ios_base::end);
-  int file_size = is.tellg();
-  is.seekg(0, std::ios_base::beg);
   /* 迷路サイズの決定 */
-  int maze_size = 0;
-  if (file_size > 8000)
-    maze_size = 32;
-  else if (file_size > 2000)
-    maze_size = 16;
-  else
-    maze_size = 8;
-  /* 初期化 */
-  reset();
-  goals.clear();
+  /* get file size */
+  is.seekg(0, std::ios::end);
+  int file_size = is.tellg();
+  is.seekg(0, std::ios::beg);
+  /* estimated (minimum) file size [byte] : F = (4*M + 1 + 1) * (2*M + 1) */
+  /* using quadratic formula, M = (sqrt(2*M) - 2) / 4 */
+  int maze_size = (std::sqrt(2 * file_size) - 2) / 4;
+  if (maze_size < 1)
+    return false; /*< file size error */
+  /* reset existing maze */
+  reset(), goals.clear();
+  char c; //< 取得用一時変数
   for (int8_t y = maze_size; y >= 0; --y) {
+    /* vertiacal walls and cells */
     if (y != maze_size) {
-      is.ignore(10, '|'); //< 次の|が出てくるまでスキップ
+      is.ignore(10, '|'); //< 次の '|' が出てくるまで改行などをスキップ
       for (int8_t x = 0; x < maze_size; ++x) {
         is.ignore(1); //< " " 空欄分をスキップ
-        char c = is.get();
+        c = is.get();
         if (c == 'S')
           start = Position(x, y);
         else if (c == 'G')
@@ -181,21 +181,21 @@ bool Maze::parse(std::istream &is) {
         is.ignore(1); //< " " 空欄分をスキップ
         c = is.get();
         if (c == '|')
-          Maze::updateWall(Position(x, y), Direction::East, true);
+          Maze::updateWall(Position(x, y), Direction::East, true, false);
         else if (c == ' ')
-          Maze::updateWall(Position(x, y), Direction::East, false);
+          Maze::updateWall(Position(x, y), Direction::East, false, false);
       }
     }
+    /* horizontal walls and pillars */
     for (uint8_t x = 0; x < maze_size; ++x) {
-      is.ignore(10, '+'); //< 次の+が出てくるまでスキップ
+      is >> c; //< 次の '+' などが出てくるまで改行などをスキップ
       std::string s;
-      s += (char)is.get();
-      s += (char)is.get();
-      s += (char)is.get();
+      for (int i = 0; i < 3; ++i)
+        s += (char)is.get();
       if (s == "---")
-        Maze::updateWall(Position(x, y), Direction::South, true);
+        Maze::updateWall(Position(x, y), Direction::South, true, false);
       else if (s == "   ")
-        Maze::updateWall(Position(x, y), Direction::South, false);
+        Maze::updateWall(Position(x, y), Direction::South, false, false);
     }
   }
   return true;

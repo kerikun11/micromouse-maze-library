@@ -20,31 +20,46 @@ protected:
 
 int test_measurement() {
   std::ofstream csv("measurement.csv");
+  /* specify maze data directory */
   const std::string mazedata_dir = "../mazedata/";
+  /* queue test files */
+  std::vector<std::string> filenames;
+  for (int year = 2018; year >= 2010; --year)
+    filenames.push_back("32MM" + std::to_string(year) + "HX.maze");
+  for (int year = 2018; year >= 2014; --year)
+    filenames.push_back("21MM" + std::to_string(year) + "HX_Taiwan.maze");
+  for (int year = 2018; year >= 2012; --year)
+    filenames.push_back("16MM" + std::to_string(year) + "CX.maze");
   for (const auto filename : {
-           "32MM2018HX.maze",         "32MM2017HX.maze",
-           "32MM2016HX.maze",         "32MM2015HX.maze",
-           "32MM2014HX.maze",         "32MM2013HX.maze",
-           "32MM2012HX.maze",         "16MM2019H_kansai.maze",
-           "16MM2019H_kanazawa.maze", "16MM2018H_semi.maze",
-           "16MM2018H_Chubu.maze",    "16MM2018C.maze",
-           "16MM2017H_Tashiro.maze",  "16MM2017HX_pre.maze",
-           "16MM2017H_Chubu.maze",    "16MM2017H_Cheese.maze",
-           "16MM2017CX.maze",         "16MM2017CX_pre.maze",
-           "16MM2017C_East.maze",     "16MM2017C_Chubu.maze",
-           "16MM2016CX.maze",         "16MM2016C_Chubu.maze",
-           "16MM2015C_Chubu.maze",    "16MM2013CX.maze",
-           "08MM2016CF_pre.maze",     "08MM_test.maze",
-           //  "32MazeUnknown.maze",
-       }) {
+           "16MM2019H_kansai.maze",
+           "16MM2019H_kanazawa.maze",
+           "16MM2018H_semi.maze",
+           "16MM2018H_Chubu.maze",
+           "16MM2017HX_pre.maze",
+           "16MM2017H_Tashiro.maze",
+           "16MM2017H_Chubu.maze",
+           "16MM2017H_Cheese.maze",
+           "16MM2017CX_pre.maze",
+           "16MM2017C_East.maze",
+           "16MM2017C_Chubu.maze",
+           "16MM2016C_Chubu.maze",
+           "16MM2015C_Chubu.maze",
+           "08MM2016CF_pre.maze",
+           "04_test.maze",
+           "32_unknown.maze",
+       })
+    filenames.push_back(filename);
+  /* analyze for each maze */
+  for (const auto filename : filenames) {
     std::cout << std::endl;
     std::cout << "Maze File: \t" << filename << std::endl;
     csv << filename;
 
     /* Maze Target */
-    const auto p_maze_target =
-        std::make_unique<Maze>((mazedata_dir + filename).c_str());
+    const auto p_maze_target = std::make_unique<Maze>();
     Maze &maze_target = *p_maze_target;
+    if (!maze_target.parse(mazedata_dir + filename))
+      continue;
 
 #if 1
     /* Search Run */
@@ -239,9 +254,6 @@ int test_measurement() {
       std::cout << "StepSla " << (diag_enabled ? "diag" : "no_d") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
       // map.print(maze, path);
-      // auto shortest_dirs = map.indexes2dirs(path, diag_enabled);
-      // Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);
-      // maze.print(shortest_dirs);
     }
 #endif
 
