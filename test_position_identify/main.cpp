@@ -88,7 +88,7 @@ int test_position_identify() {
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
       for (const auto d : Direction::getAlong4()) {
         const auto p = Position(x, y);
-        if (step_map.getStep(p) == STEP_MAX)
+        if (step_map.getStep(p) == StepMap::STEP_MAX)
           continue; /*< そもそも迷路的に行き得ない区画は除外 */
         if (maze_target.isWall(p, d + Direction::Back))
           continue; /*< 壁上からは除外 */

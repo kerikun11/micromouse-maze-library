@@ -12,14 +12,15 @@
 
 namespace MazeLib {
 
-using step_t = uint16_t; /**< @brief ステップの型 */
-static constexpr step_t STEP_MAX =
-    std::numeric_limits<step_t>::max(); /**< @brief 最大ステップ値 */
-
 /**
  * @brief 足立法のためのステップマップを管理するクラス
  */
 class StepMap {
+public:
+  using step_t = uint16_t; /**< @brief ステップの型 */
+  static constexpr step_t STEP_MAX =
+      std::numeric_limits<step_t>::max(); /**< @brief 最大ステップ値 */
+
 public:
   /**
    * @brief コンストラクタ

@@ -68,23 +68,26 @@ int test_measurement() {
     robot.replaceGoals(maze_target.getGoals());
     const auto t_s = std::chrono::system_clock().now();
     if (!robot.searchRun())
-      loge << "Failed to Find a Path to Goal! " << std::endl;
+      loge << "Failed to Find a Path to Goal!" << std::endl;
     const auto t_e = std::chrono::system_clock().now();
-    const auto us =
-        std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+    const auto t_search =
+        std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s)
+            .count();
     robot.printResult();
-    csv << "," << robot.cost;
-    csv << "," << robot.step << "," << robot.f << "," << robot.l << ","
-        << robot.r << "," << robot.b;
+    csv << "," << robot.cost << "," << robot.step << "," << robot.f << ","
+        << robot.l << "," << robot.r << "," << robot.b;
     csv << "," << robot.getMaze().getWallLogs().size();
     std::cout << "Max Calc Time:\t" << robot.t_dur_max << "\t[us]" << std::endl;
     csv << "," << robot.t_dur_max;
-    std::cout << "Total Search:\t" << us.count() << "\t[us]" << std::endl;
-    csv << "," << us.count();
+    std::cout << "Total Search:\t" << t_search << "\t[us]" << std::endl;
+    csv << "," << t_search;
+    // robot.getMaze().print();
     for (const auto diag_enabled : {false, true}) {
-      if (!robot.calcShortestDirections(diag_enabled))
+      if (!robot.calcShortestDirections(diag_enabled)) {
         loge << "Failed to Find a Shortest Path! "
              << (diag_enabled ? "diag" : "no_diag") << std::endl;
+        continue;
+      }
       const auto path_cost = robot.getSearchAlgorithm().getShortestCost();
       std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
                 << path_cost << "\t[ms]" << std::endl;
@@ -99,8 +102,7 @@ int test_measurement() {
       if (at.getShortestDirections() != robot.getShortestDirections()) {
         logw << "searched path is not shortest! "
              << (diag_enabled ? "diag" : "no_diag") << std::endl;
-        at.printPath();
-        robot.printPath();
+        // at.printPath(); robot.printPath();
         logi << "target: " << at.getSearchAlgorithm().getShortestCost()
              << " search: " << robot.getSearchAlgorithm().getShortestCost()
              << std::endl;
@@ -111,22 +113,20 @@ int test_measurement() {
 #if 1
     /* Position Identification Run */
     robot.t_dur_max = 0;
-    float id_cost_max = 0;
-    float id_cost_min = 1e6;
-    /*< 探索時間 [秒] */
+    float id_cost_max = 0;   /*< 探索時間 [秒] */
+    float id_cost_min = 1e6; /*< 探索時間 [秒] */
     const auto p_step_map = std::make_unique<StepMap>();
     StepMap &step_map = *p_step_map;
     const auto p_maze_pi = std::make_unique<Maze>();
     Maze &maze_pi = *p_maze_pi;
     maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
-    // maze_pi.print();
     /* 迷路的に行き得る区画を洗い出す */
     step_map.update(maze_target, {maze_target.getStart()}, true, true);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
         for (const auto d : Direction::getAlong4()) {
           const auto p = Position(x, y);
-          if (step_map.getStep(p) == STEP_MAX)
+          if (step_map.getStep(p) == StepMap::STEP_MAX)
             continue; /*< そもそも迷路的に行き得ない区画は除外 */
           if (maze_target.isWall(p, d + Direction::Back))
             continue; /*< 壁上からは除外 */

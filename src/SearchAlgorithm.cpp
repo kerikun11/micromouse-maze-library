@@ -199,6 +199,18 @@ void SearchAlgorithm::printMap(const State state, const Pose &pose) const {
 bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
                                              const bool simple) {
 #if 0
+  /* 全探索 */
+  candidates.clear();
+  step_map.update(maze, maze.getGoals(), false, true);
+  for (int8_t x = 0; x < MAZE_SIZE; ++x)
+    for (int8_t y = 0; y < MAZE_SIZE; ++y) {
+      const auto p = Position(x, y);
+      if (step_map.getStep(p) != StepMap::STEP_MAX && maze.unknownCount(p))
+        candidates.push_back(p);
+    }
+  return true;
+#endif
+#if 0
   /* スラロームコスト考慮 */
   candidates.clear();
   for (const auto diag_enabled : {true, false}) {
@@ -538,7 +550,7 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     idMaze.setWall(wl.getPosition(), wl.d, wl.b);
   /*< 復元終了 */
   /* 既知情報からではスタート区画を避けられない場合 */
-  if (step_map.getStep(current_pose.p) == STEP_MAX)
+  if (step_map.getStep(current_pose.p) == StepMap::STEP_MAX)
     step_map.calcNextDirectionsAdv(idMaze, candidates, current_pose.p,
                                    current_pose.d, nextDirectionsKnown,
                                    nextDirectionCandidates);

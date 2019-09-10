@@ -230,8 +230,9 @@ const Directions StepMapWall::convertWallIndexDirectionsToPositionDirections(
   return dirs;
 }
 
-static step_t gen_cost_impl(const int i, const float am, const float vs,
-                            const float vm, const float seg) {
+static StepMapWall::step_t gen_cost_impl(const int i, const float am,
+                                         const float vs, const float vm,
+                                         const float seg) {
   const auto d = seg * i; /*< i 区画分の走行距離 */
   /* グラフの面積から時間を求める */
   const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */

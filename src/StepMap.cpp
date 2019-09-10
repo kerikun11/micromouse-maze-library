@@ -25,7 +25,7 @@ void StepMap::reset(const step_t step) {
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       setStep(x, y, step); //< ステップをクリア
 }
-step_t StepMap::getStep(const int8_t x, const int8_t y) const {
+StepMap::step_t StepMap::getStep(const int8_t x, const int8_t y) const {
   /* (x, y) がフィールド内か確認 */
   if (x < 0 || y < 0 || x > MAZE_SIZE - 1 || y > MAZE_SIZE - 1) {
     logw << "referred to out of field: " << Position(x, y) << std::endl;
@@ -374,8 +374,9 @@ const Directions StepMap::calcNextDirectionCandidates(const Maze &maze,
       });
   return dirs;
 }
-static step_t gen_cost_impl(const int i, const float am, const float vs,
-                            const float vm, const float seg) {
+static StepMap::step_t gen_cost_impl(const int i, const float am,
+                                     const float vs, const float vm,
+                                     const float seg) {
   const auto d = seg * i; /*< i 区画分の走行距離 */
   /* グラフの面積から時間を求める */
   const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
