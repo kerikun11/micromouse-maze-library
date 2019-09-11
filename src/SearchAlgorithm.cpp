@@ -195,6 +195,7 @@ bool SearchAlgorithm::calcShortestDirections(Directions &shortest_dirs,
 void SearchAlgorithm::printMap(const State state, const Pose &pose) const {
   const auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
   step_map.print(m, pose.p, pose.d);
+  // step_map.printFull(m, pose.p, pose.d);
 }
 bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
                                              const bool simple) {
@@ -383,7 +384,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
   if (candidates.empty())
     return Reached; /*< 探索完了 */
   /* 既知区間移動方向列を生成 */
-  step_map.update(maze, candidates, false, true);
+  step_map.update(maze, candidates, false, false);
   const auto p =
       step_map.calcNextDirections(maze, current_pose.p, current_pose.d,
                                   nextDirectionsKnown, nextDirectionCandidates);

@@ -31,6 +31,7 @@ int test_measurement() {
   for (int year = 2018; year >= 2012; --year)
     filenames.push_back("16MM" + std::to_string(year) + "CX.maze");
   for (const auto filename : {
+           "16MM2019H_East.maze",
            "16MM2019H_kansai.maze",
            "16MM2019H_kanazawa.maze",
            "16MM2018H_semi.maze",

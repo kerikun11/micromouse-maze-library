@@ -291,6 +291,7 @@ bool ShortestAlgorithm::calcShortestPath(Indexes &path, const bool known_only,
       open_list.push_back(i);
       std::push_heap(open_list.begin(), open_list.end(), greater);
     }
+  /* iteration */
   for (int j = 0;; max_iteration_size = std::max(max_iteration_size, ++j)) {
     if (max_open_list_size < (int)open_list.size())
       max_open_list_size = open_list.size();
