@@ -92,7 +92,7 @@ void StepMapWall::print(const Maze &maze, const Directions &shortest_dirs,
 }
 void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
                          const bool known_only, const bool simple) {
-  /* 迷路の大きさを決定 */
+  /* 計算を高速化するため，迷路の大きさを制限 */
   int8_t min_x = maze.getMinX();
   int8_t max_x = maze.getMaxX();
   int8_t min_y = maze.getMinY();
@@ -103,6 +103,7 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
     min_y = std::min(p.y, min_y);
     max_y = std::max(p.y, max_y);
   }
+  min_x -= 1, min_y -= 1, max_x += 2, max_y += 2; /*< 外周を許す */
   /* 全区画のステップを最大値に設定 */
   reset();
   /* ステップの更新予約のキュー */
@@ -124,9 +125,9 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
         next = next.next(d); /*< 移動 */
         if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
           break; /*< 壁あり or 既知壁のみで未知壁 ならば次へ */
-        if (next.x > max_x + 2 || next.y > max_y + 2 || next.x + 1 < min_x ||
-            next.y + 1 < min_y)
-          break; /*< 注目範囲外なら更新しない */
+        if (next.x > max_x || next.y > max_y || next.x < min_x ||
+            next.y < min_y)
+          break; /*< 計算を高速化するため展開範囲を制限 */
         /* 直線加速を考慮したステップを算出 */
         const auto next_step = focus_step + (d.isAlong() ? step_table_along[i]
                                                          : step_table_diag[i]);
@@ -242,13 +243,13 @@ static StepMapWall::step_t gen_cost_impl(const int i, const float am,
     return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 100; /*< 台形加速 */
 }
 void StepMapWall::calcStraightStepTable() {
-  float vs = 450.0f;    /*< 基本速度 [mm/s] */
-  float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
-  float am_d = 3600.0f; /*< 最大加速度(斜め) [mm/s/s] */
-  float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
-  float vm_d = 1200.0f; /*< 飽和速度(斜め) [mm/s] */
-  const float seg_a = 90.0f;
-  const float seg_d = 45.0f * std::sqrt(2);
+  float vs = 450.0f;         /*< 基本速度 [mm/s] */
+  float am_a = 4800.0f;      /*< 最大加速度 [mm/s/s] */
+  float am_d = 3600.0f;      /*< 最大加速度(斜め) [mm/s/s] */
+  float vm_a = 1800.0f;      /*< 飽和速度 [mm/s] */
+  float vm_d = 1200.0f;      /*< 飽和速度(斜め) [mm/s] */
+  const float seg_a = 90.0f; /*< 1区画の長さ [mm] */
+  const float seg_d = 45.0f * std::sqrt(2); /*< 1区画の長さ(斜め) [mm] */
   for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
     step_table_diag[i] = gen_cost_impl(i, am_d, vs, vm_d, seg_d);

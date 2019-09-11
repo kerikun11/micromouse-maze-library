@@ -112,7 +112,7 @@ public:
 
 private:
   step_t step_map[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
-  step_t step_table_along[MAZE_SIZE * 2]; /**< @brief 加速を考慮したステップ */
+  step_t step_table[MAZE_SIZE]; /**< @brief 加速を考慮したステップ */
 
   /**
    * @brief 最短経路導出用の加速を考慮したステップリストを算出する関数

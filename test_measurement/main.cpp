@@ -102,10 +102,10 @@ int test_measurement() {
       if (at.getShortestDirections() != robot.getShortestDirections()) {
         logw << "searched path is not shortest! "
              << (diag_enabled ? "diag" : "no_diag") << std::endl;
-        // at.printPath(); robot.printPath();
-        logi << "target: " << at.getSearchAlgorithm().getShortestCost()
+        logw << "target: " << at.getSearchAlgorithm().getShortestCost()
              << " search: " << robot.getSearchAlgorithm().getShortestCost()
              << std::endl;
+        // at.printPath(); robot.printPath();
       }
     }
 #endif
