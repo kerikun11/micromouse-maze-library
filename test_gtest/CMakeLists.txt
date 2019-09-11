@@ -17,11 +17,11 @@ include_directories(../include)
 include_directories("${gtest_SOURCE_DIR}/include")
 
 file(GLOB SRCS *.cpp)
-add_executable(test_mazelib ${SRCS})
-target_link_libraries(test_mazelib mazelib gtest)
+add_executable(test_gtest ${SRCS})
+target_link_libraries(test_gtest mazelib gtest)
 
 add_custom_target(gt
-  ${CMAKE_BINARY_DIR}/test/test_mazelib
-  DEPENDS test_mazelib mazelib
+  ${CMAKE_BINARY_DIR}/test_gtest/test_gtest
+  DEPENDS test_gtest mazelib
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
