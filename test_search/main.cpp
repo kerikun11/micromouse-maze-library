@@ -172,10 +172,12 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
       /* 現在地を進める */
       current_pos = current_pos.next(next_dir);
       current_dir = next_dir;
+#if 1
       /* アニメーション表示 */
       step_map.print(maze, current_pos, current_dir);
       std::cout << "Going back to start" << std::endl;
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
+#endif
     }
   }
   /* スタートからゴールまでの最短経路導出 */
@@ -210,10 +212,12 @@ int ShortestRun(const Maze &maze) {
     /* 現在地を進める */
     current_pos = current_pos.next(next_dir);
     current_dir = next_dir;
+#if 1
     /* アニメーション表示 */
     step_map.print(maze, current_pos, current_dir);
     std::cout << "Shortest Run" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+#endif
   }
   /* 最短経路の表示 */
   step_map.update(maze, {maze.getStart()}, true, false);
@@ -228,7 +232,15 @@ int ShortestRun(const Maze &maze) {
 int main(void) {
   /* シミュレーションに用いる迷路の選択 */
   const std::string file_path = "../mazedata/16MM2017CX.maze";
-  Maze maze_target(file_path.c_str());
+
+  /* 正解の迷路を用意 */
+  Maze maze_target;
+  /* ファイルから迷路情報を取得 */
+  if (!maze_target.parse(file_path.c_str())) {
+    std::cerr << "Failed to Parse Maze: " << file_path << std::endl;
+    return -1;
+  }
+  /* 表示 */
   maze_target.print();
 
   /* 探索用の迷路を用意 */
@@ -241,7 +253,6 @@ int main(void) {
 
   /* 最短走行テスト */
   ShortestRun(maze);
-  // ShortestRun(maze_target);
 
   /* 終了 */
   return 0;
