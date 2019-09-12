@@ -1,6 +1,8 @@
 #include "CLRobotBase.h"
 #include "ShortestAlgorithm.h"
 
+#include <thread>
+
 using namespace MazeLib;
 
 #if 1
@@ -43,6 +45,7 @@ protected:
     if (display) {
       printInfo();
       // getc(stdin);
+      // std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     CLRobotBase::queueAction(action);
   }
@@ -126,7 +129,8 @@ int main(void) {
     }
     std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
               << sum.count() / n << "\t[us]" << std::endl;
-    map.print(maze, shortest_dirs);
+    // map.print(maze, shortest_dirs);
+    maze.print(shortest_dirs);
   }
 #endif
 
@@ -179,9 +183,9 @@ int main(void) {
     }
     std::cout << "StepMapSlalom\t" << sum.count() / n << "\t[us]" << std::endl;
     map.print(maze, path);
-    auto shortest_dirs = map.indexes2dirs(path, diag_enabled);
-    Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);
-    maze.print(shortest_dirs);
+    // auto shortest_dirs = map.indexes2dirs(path, diag_enabled);
+    // Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);
+    // maze.print(shortest_dirs);
   }
 #endif
 

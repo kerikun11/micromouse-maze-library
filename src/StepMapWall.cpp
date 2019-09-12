@@ -17,35 +17,42 @@ StepMapWall::StepMapWall() {
   calcStraightStepTable();
   reset();
 }
-void StepMapWall::reset(const step_t step) {
-  for (int8_t z = 0; z < 2; ++z)
-    for (int8_t y = 0; y < MAZE_SIZE; ++y)
-      for (int8_t x = 0; x < MAZE_SIZE; ++x)
-        setStep(WallIndex(x, y, z), step); //< ステップをクリア
-}
 void StepMapWall::print(const Maze &maze, std::ostream &os) const {
-  for (int8_t y = MAZE_SIZE; y >= 0; --y) {
-    if (y != MAZE_SIZE) {
-      os << '|';
-      for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
-        os << C_CY << std::setw(3)
-           << std::min(getStep(WallIndex(x, y, 1)), (step_t)999) << C_NO;
+  int maze_size = MAZE_SIZE;
+  for (int8_t y = maze_size - 1; y >= -1; --y) {
+    for (int8_t x = 0; x <= maze_size; ++x) {
+      /* Pillar */
+      os << "+";
+      if (x == maze_size)
+        break;
+      /* Horizontal Wall */
+      const auto w = maze.isWall(x, y, Direction::North);
+      const auto k = maze.isKnown(x, y, Direction::North);
+      const auto i = WallIndex(Position(x, y), Direction::North);
+      if (w)
+        os << "-----" << C_NO;
+      else
+        os << (k ? C_CY : C_RE) << std::setw(5)
+           << std::min(int(getStep(i)), 99999) << C_NO;
+    }
+    os << std::endl;
+    if (y != -1) {
+      os << "|  ";
+      for (int8_t x = 0; x < maze_size; ++x) {
+        /* Cell */
         os << " ";
-        os << C_CY << std::setw(3)
-           << std::min(getStep(WallIndex(x, y, 0)), (step_t)999) << C_NO;
-        os << (maze.isKnown(x, y, Direction::East)
-                   ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
-                   : (C_RE "." C_NO));
+        /* Vertical Wall */
+        const auto w = maze.isWall(x, y, Direction::East);
+        const auto k = maze.isKnown(x, y, Direction::East);
+        const auto i = WallIndex(Position(x, y), Direction::East);
+        if (w)
+          os << "  |  " << C_NO;
+        else
+          os << (k ? C_CY : C_RE) << std::setw(5)
+             << std::min(int(getStep(i)), 99999) << C_NO;
       }
       os << std::endl;
     }
-    for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
-      os << "+";
-      os << (maze.isKnown(x, y, Direction::South)
-                 ? (maze.isWall(x, y, Direction::South) ? "-------" : "       ")
-                 : (C_RE "  . .  " C_NO));
-    }
-    os << "+" << std::endl;
   }
 }
 void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
@@ -55,7 +62,9 @@ void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
   };
   for (int8_t y = MAZE_SIZE - 1; y >= -1; --y) {
     for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+      /* Pillar */
       os << "+";
+      /* Horizontal Wall */
       if (exists(WallIndex(x, y, 1)))
         os << C_YE << " X " << C_NO;
       else
@@ -67,7 +76,9 @@ void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
     if (y != -1) {
       os << '|';
       for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+        /* Cell */
         os << "   ";
+        /* Vertical Wall */
         if (exists(WallIndex(x, y, 0)))
           os << C_YE << "X" << C_NO;
         else

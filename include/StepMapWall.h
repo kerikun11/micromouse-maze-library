@@ -22,7 +22,7 @@ public:
 
 public:
   StepMapWall();
-  void reset(const step_t step = STEP_MAX);
+  void reset(const step_t step = STEP_MAX) { step_map.fill(step); }
   step_t getStep(const WallIndex i) const {
     return i.isInsideOfField() ? step_map[i] : STEP_MAX;
   }
@@ -58,9 +58,11 @@ public:
                                                  const WallIndex start);
 
 private:
-  step_t step_map[WallIndex::SIZE]; /**< @brief ステップ数*/
-  step_t step_table_along[MAZE_SIZE * 2]; /**< @brief 加速を考慮したステップ */
-  step_t step_table_diag[MAZE_SIZE * 2]; /**< @brief 加速を考慮したステップ */
+  std::array<step_t, WallIndex::SIZE> step_map; /**< @brief ステップ数*/
+  std::array<step_t, MAZE_SIZE * 2>
+      step_table_along; /*< @brief 台形加速を考慮したコストテーブル */
+  std::array<step_t, MAZE_SIZE * 2>
+      step_table_diag; /*< @brief 台形加速を考慮したコストテーブル(斜め) */
 
   void calcStraightStepTable();
 };

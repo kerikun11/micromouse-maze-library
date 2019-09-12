@@ -20,21 +20,18 @@ void Agent::printInfo(const bool showMaze, const Pose &pose,
     searchAlgorithm.printMap(state, pose);
   }
   /* 詳細を表示 */
-  std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
+  std::cout << "\x1b[J"; /*< カーソル以下を消去 */
   std::cout << "Cur: " << pose
             << ", State: " << SearchAlgorithm::getStateString(state)
             << std::endl;
-  std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
   std::cout << "nextDirectionsKnown: ";
   for (const auto d : getNextDirections())
     std::cout << d.toChar();
   std::cout << "    " << std::endl;
-  std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
   std::cout << "nextDirectionCandidates: ";
   for (const auto d : getNextDirectionCandidates())
     std::cout << d.toChar();
   std::cout << std::endl;
-  std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
   std::cout << "Match Count: " << matchCount << std::endl;
 }
 

@@ -24,6 +24,9 @@ int test_measurement() {
   const std::string mazedata_dir = "../mazedata/";
   /* queue test files */
   std::vector<std::string> filenames;
+#if 0
+  // filenames.push_back("32_unknown.maze");
+#else
   for (int year = 2018; year >= 2010; --year)
     filenames.push_back("32MM" + std::to_string(year) + "HX.maze");
   for (int year = 2018; year >= 2014; --year)
@@ -50,6 +53,7 @@ int test_measurement() {
            "32_unknown.maze",
        })
     filenames.push_back(filename);
+#endif
   /* analyze for each maze */
   for (const auto filename : filenames) {
     std::cout << std::endl;
