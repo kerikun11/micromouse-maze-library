@@ -407,7 +407,7 @@ const Directions StepMap::calcNextDirectionCandidates(const Maze &maze,
             });
   /* 未知壁優先で並べ替え, これがないと探索時間増大 */
   std::sort(dirs.begin(), dirs.end(),
-            [&](const Direction d1 __attribute_used__, const Direction d2) {
+            [&](const Direction d1 __attribute__((unused)), const Direction d2) {
               return !maze.unknownCount(focus.p.next(d2));
             });
   return dirs;

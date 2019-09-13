@@ -84,18 +84,18 @@ protected:
    * @brief 仮想関数．継承して中身を埋める
    */
   virtual void waitForEndAction() {}
-  virtual void queueAction(const Action action __attribute_used__) {}
-  virtual void senseWalls(bool &left __attribute_used__,
-                          bool &front __attribute_used__,
-                          bool &right __attribute_used__) {}
+  virtual void queueAction(const Action action __attribute__((unused))) {}
+  virtual void senseWalls(bool &left __attribute__((unused)),
+                          bool &front __attribute__((unused)),
+                          bool &right __attribute__((unused))) {}
   virtual void backupMazeToFlash() {}
   virtual void stopDequeue() {}
   virtual void startDequeue() {}
   virtual void calibration() {}
   virtual void calcNextDirectionsPreCallback() {}
   virtual void calcNextDirectionsPostCallback(
-      SearchAlgorithm::State prevState __attribute_used__,
-      SearchAlgorithm::State newState __attribute_used__) {}
+      SearchAlgorithm::State prevState __attribute__((unused)),
+      SearchAlgorithm::State newState __attribute__((unused))) {}
   virtual void discrepancyWithKnownWall() {}
 
 private:
