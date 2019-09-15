@@ -21,18 +21,22 @@ void Agent::printInfo(const bool showMaze, const Pose &pose,
   }
   /* 詳細を表示 */
   std::cout << "\x1b[J"; /*< カーソル以下を消去 */
-  std::cout << "Cur: " << pose
-            << ", State: " << SearchAlgorithm::getStateString(state)
+  std::cout << "Pose: " << pose << ", "
+            << "State: " << SearchAlgorithm::getStateString(state) << ", "
+            << "Force Start: " << (isForceBackToStart ? "true " : "false")
+            << ", "
+            << "Force Goal: " << (isForceGoingToGoal ? "true " : "false")
             << std::endl;
-  std::cout << "nextDirectionsKnown: ";
+  std::cout << "Known: ";
   for (const auto d : getNextDirections())
     std::cout << d.toChar();
-  std::cout << "    " << std::endl;
-  std::cout << "nextDirectionCandidates: ";
+  std::cout << std::endl;
+  std::cout << "Candidates: ";
   for (const auto d : getNextDirectionCandidates())
     std::cout << d.toChar();
   std::cout << std::endl;
-  std::cout << "Match Count: " << matchCount << std::endl;
+  if (state == SearchAlgorithm::IDENTIFYING_POSITION)
+    std::cout << "Match Count: \t" << matchCount << std::endl;
 }
 
 } // namespace MazeLib

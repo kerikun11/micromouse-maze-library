@@ -63,8 +63,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
     Directions &nextDirectionCandidates, bool &isPositionIdentifying,
     bool &isForceBackToStart, bool &isForceGoingToGoal, int &matchCount) {
   state = START;
-  Result result;
   /* check if in goal */
+  /* while p.i., current position is not real so that it can't be goal */
   if (!isPositionIdentifying && isForceGoingToGoal) {
     const auto goals = maze.getGoals();
     const auto it = std::find_if(
@@ -76,7 +76,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
   /* position identification */
   if (isPositionIdentifying) {
     state = IDENTIFYING_POSITION;
-    result = calcNextDirectionsPositionIdentification(
+    Result result = calcNextDirectionsPositionIdentification(
         current_pose, nextDirections, nextDirectionCandidates,
         isForceGoingToGoal, matchCount);
     switch (result) {
@@ -95,8 +95,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
   /* search for goal */
   if (!SEARCHING_ADDITIONALLY_AT_START) {
     state = SEARCHING_FOR_GOAL;
-    result = calcNextDirectionsSearchForGoal(current_pose, nextDirections,
-                                             nextDirectionCandidates);
+    Result result = calcNextDirectionsSearchForGoal(
+        current_pose, nextDirections, nextDirectionCandidates);
     switch (result) {
     case SearchAlgorithm::Processing:
       return result;
@@ -112,8 +112,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
   /* search additionally */
   if (!isForceBackToStart) {
     state = SEARCHING_ADDITIONALLY;
-    result = calcNextDirectionsSearchAdditionally(current_pose, nextDirections,
-                                                  nextDirectionCandidates);
+    Result result = calcNextDirectionsSearchAdditionally(
+        current_pose, nextDirections, nextDirectionCandidates);
     switch (result) {
     case SearchAlgorithm::Processing:
       return result;
@@ -129,8 +129,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
   /* force going to goal */
   if (isForceGoingToGoal) {
     state = GOING_TO_GOAL;
-    result = calcNextDirectionsGoingToGoal(current_pose, nextDirections,
-                                           nextDirectionCandidates);
+    Result result = calcNextDirectionsGoingToGoal(current_pose, nextDirections,
+                                                  nextDirectionCandidates);
     switch (result) {
     case SearchAlgorithm::Processing:
       return result;
@@ -146,8 +146,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
   }
   /* backing to start */
   state = BACKING_TO_START;
-  result = calcNextDirectionsBackingToStart(current_pose, nextDirections,
-                                            nextDirectionCandidates);
+  Result result = calcNextDirectionsBackingToStart(current_pose, nextDirections,
+                                                   nextDirectionCandidates);
   switch (result) {
   case SearchAlgorithm::Processing:
     return result;
