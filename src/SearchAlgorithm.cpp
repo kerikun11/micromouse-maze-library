@@ -54,9 +54,9 @@ bool SearchAlgorithm::updateWall(const State state, const Position p,
   auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
   return m.updateWall(p, d, b);
 }
-void SearchAlgorithm::resetLastWall(const State state, const int num) {
+void SearchAlgorithm::resetLastWalls(const State state, const int num) {
   auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
-  return m.resetLastWall(num);
+  return m.resetLastWalls(num);
 }
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
     State &state, Pose &current_pose, Directions &nextDirections,

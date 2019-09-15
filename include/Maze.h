@@ -548,7 +548,7 @@ public:
    *  @brief 直前に更新した壁を見探索状態にリセットする
    *  @param num リセットする壁の数
    */
-  void resetLastWall(const int num);
+  void resetLastWalls(const int num);
   /**
    * @brief 引数区画の壁の数を返す
    * @param p 区画の座標

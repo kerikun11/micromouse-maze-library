@@ -52,7 +52,7 @@ public:
                   const bool front, const bool right);
   bool updateWall(const State state, const Position p, const Direction d,
                   const bool b);
-  void resetLastWall(const State state, const int num = 1);
+  void resetLastWalls(const State state, const int num = 1);
   Result calcNextDirections(State &state, Pose &current_pose,
                             Directions &nextDirections,
                             Directions &nextDirectionCandidates,

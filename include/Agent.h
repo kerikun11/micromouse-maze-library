@@ -63,8 +63,8 @@ public:
   /**
    * @brief 壁を削除
    */
-  void resetLastWall(const int num = 1) {
-    return searchAlgorithm.resetLastWall(state, num);
+  void resetLastWalls(const int num = 1) {
+    return searchAlgorithm.resetLastWalls(state, num);
   }
   /**
    * @brief 次に行くべき方向配列を計算

@@ -141,7 +141,7 @@ bool Maze::updateWall(const Position p, const Direction d, const bool b,
   }
   return true;
 }
-void Maze::resetLastWall(const int num) {
+void Maze::resetLastWalls(const int num) {
   for (int i = 0; i < num; ++i)
     if (!wallLogs.empty())
       wallLogs.pop_back();
