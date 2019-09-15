@@ -33,10 +33,13 @@ int test_measurement() {
     filenames.push_back("21MM" + std::to_string(year) + "HX_Taiwan.maze");
   for (int year = 2018; year >= 2012; --year)
     filenames.push_back("16MM" + std::to_string(year) + "CX.maze");
+  for (int year = 2017; year >= 2015; --year)
+    filenames.push_back("16MM" + std::to_string(year) + "C_Chubu.maze");
   for (const auto filename : {
-           "16MM2019H_East.maze",
            "16MM2019H_kansai.maze",
            "16MM2019H_kanazawa.maze",
+           "16MM2019H_hokuriku.maze",
+           "16MM2019H_East.maze",
            "16MM2018H_semi.maze",
            "16MM2018H_Chubu.maze",
            "16MM2017HX_pre.maze",
@@ -45,9 +48,7 @@ int test_measurement() {
            "16MM2017H_Cheese.maze",
            "16MM2017CX_pre.maze",
            "16MM2017C_East.maze",
-           "16MM2017C_Chubu.maze",
-           "16MM2016C_Chubu.maze",
-           "16MM2015C_Chubu.maze",
+           "16MM2016C_kyusyu.maze",
            "08MM2016CF_pre.maze",
            "04_test.maze",
            "32_unknown.maze",
@@ -63,8 +64,10 @@ int test_measurement() {
     /* Maze Target */
     const auto p_maze_target = std::make_unique<Maze>();
     Maze &maze_target = *p_maze_target;
-    if (!maze_target.parse(mazedata_dir + filename))
+    if (!maze_target.parse(mazedata_dir + filename)) {
+      loge << "File Parse Error!" << std::endl;
       continue;
+    }
 
 #if 1
     /* Search Run */
