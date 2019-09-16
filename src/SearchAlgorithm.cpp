@@ -68,8 +68,10 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
   if (!isPositionIdentifying && isForceGoingToGoal) {
     const auto goals = maze.getGoals();
     const auto it = std::find_if(
-        goals.cbegin(), goals.cend(),
-        [&current_pose](const Position gp) { return current_pose.p == gp; });
+        goals.cbegin(), goals.cend(), [&current_pose](const Position gp) {
+          return current_pose.p == gp ||
+                 current_pose.p.next(current_pose.d + Direction::Back) == gp;
+        });
     if (it != goals.end())
       isForceGoingToGoal = false;
   }
@@ -428,6 +430,18 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsBackingToStart(
   nextDirectionCandidates.clear();
   nextDirectionsKnown = step_map.calcShortestDirections(
       maze, current_pose.p, {maze.getStart()}, true, false);
+  /* できれば停止なしで帰りたい */
+  const auto d_back = Direction(current_pose.d + Direction::Back);
+  const auto wall_backup = maze.isWall(current_pose.p, d_back);
+  maze.setWall(current_pose.p, d_back, true); /*< 後ろを一時的に塞ぐ */
+  const auto tmp_nextDirectionsKnown = step_map.calcShortestDirections(
+      maze, current_pose.p, {maze.getStart()}, true, false);
+  maze.setWall(current_pose.p, d_back, wall_backup); /*< 壁を戻す */
+  /* 経路がある，かつ，そこまで遠回りにならないとき */
+  if (tmp_nextDirectionsKnown.size() &&
+      tmp_nextDirectionsKnown.size() < nextDirectionsKnown.size() + 9)
+    nextDirectionsKnown = tmp_nextDirectionsKnown;
+  /* 最短経路で帰れる場合 */
   if (!nextDirectionsKnown.empty())
     return Reached;
   /* 行程に未知壁がある */

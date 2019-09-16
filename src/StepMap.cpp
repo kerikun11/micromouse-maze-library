@@ -316,6 +316,24 @@ StepMap::calcNextDirections(const Maze &maze, const Position start_p,
   Pose end;
   nextDirectionsKnown =
       calcNextDirectionsStepDown(maze, {start_p, start_d}, end, false, true);
+  // if (nextDirectionsKnown.size()) {
+  //   const auto d_back = Direction(start_d + Direction::Back);
+  //   if (nextDirectionsKnown.front() == d_back) {
+  //     const auto wall_backup = maze.isWall(start_p, d_back);
+  //     maze.setWall(start_p, d_back, true);
+  //     Pose tmp_end;
+  //     const auto tmp_nextDirectionsKnown = calcNextDirectionsStepDown(
+  //         maze, {start_p, start_d}, tmp_end, false, true);
+  //     std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+  //     maze.print();
+  //     getc(stdin);
+  //     maze.setWall(start_p, d_back, wall_backup);
+  //     if (tmp_nextDirectionsKnown.size()) {
+  //       nextDirectionsKnown = tmp_nextDirectionsKnown;
+  //       end = tmp_end;
+  //     }
+  //   }
+  // }
   nextDirectionCandidates = calcNextDirectionCandidates(maze, end);
   return end.p;
 }
@@ -406,11 +424,20 @@ const Directions StepMap::calcNextDirectionCandidates(const Maze &maze,
               return getStep(focus.p.next(d1)) < getStep(focus.p.next(d2));
             });
   /* 未知壁優先で並べ替え, これがないと探索時間増大 */
-  std::sort(dirs.begin(), dirs.end(),
-            [&](const Direction d1 __attribute__((unused)), const Direction d2) {
-              return !maze.unknownCount(focus.p.next(d2));
-            });
-  return dirs;
+  // std::sort(
+  //     dirs.begin(), dirs.end(),
+  //     [&](const Direction d1 __attribute__((unused)), const Direction d2) {
+  //       return !maze.unknownCount(focus.p.next(d2));
+  //     });
+  // return dirs;
+  Directions tmp_dirs;
+  for (const auto d : dirs)
+    if (maze.unknownCount(focus.p.next(d)))
+      tmp_dirs.push_back(d);
+  for (const auto d : dirs)
+    if (!maze.unknownCount(focus.p.next(d)))
+      tmp_dirs.push_back(d);
+  return tmp_dirs;
 }
 static StepMap::step_t gen_cost_impl(const int i, const float am,
                                      const float vs, const float vm,

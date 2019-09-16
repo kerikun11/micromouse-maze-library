@@ -102,6 +102,7 @@ public:
   const Maze &maze_target;
   Pose fake_offset;
   Pose real;
+  bool real_visit_goal = false;
 
 protected:
   Maze maze;
@@ -148,15 +149,21 @@ protected:
     maze.backupWallLogsFromFile("maze.walllogs");
   }
   virtual void queueAction(const Action action) override {
+    const auto goals = maze.getGoals();
+    if (std::find(goals.cbegin(), goals.cend(), current_pose.p) != goals.cend())
+      real_visit_goal = true;
     cost += getTimeCost(action);
     step++;
     switch (action) {
     case RobotBase::START_STEP:
       real.p = Position(0, 1);
       real.d = Direction::North;
+      real_visit_goal = false;
       f++;
       break;
     case RobotBase::START_INIT:
+      if (real_visit_goal == false)
+        loge << "Reached Start without Going to Goal!" << std::endl;
       break;
     case RobotBase::ST_HALF_STOP:
       break;
