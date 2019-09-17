@@ -371,9 +371,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchForGoal(
       candidates.push_back(p); /*< ゴール区画の未知区画を洗い出す */
   if (candidates.empty())
     return Reached;
-  step_map.calcNextDirectionsAdv(maze, candidates, current_pose.p,
-                                 current_pose.d, nextDirectionsKnown,
-                                 nextDirectionCandidates);
+  calcNextDirectionsInAdvance(maze, candidates, current_pose,
+                              nextDirectionsKnown, nextDirectionCandidates);
   return nextDirectionCandidates.empty() ? Error : Processing;
 }
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
@@ -387,40 +386,42 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
     return Reached; /*< 探索完了 */
   /* 既知区間移動方向列を生成 */
   step_map.update(maze, candidates, false, false);
-  const auto p =
+  const auto p_end =
       step_map.calcNextDirections(maze, current_pose.p, current_pose.d,
                                   nextDirectionsKnown, nextDirectionCandidates);
   /* 事前に進む方向の候補を決定する */
-  Directions ndcs;   /*< Next Direction Candidates */
-  WallIndexes cache; /*< 一時的に壁を立てるときのバックアップ */
+  Directions nextDirectionCandidatesAdvanced;
+  WallIndexes wall_backup; /*< 仮壁を立てるのでバックアップを作成 */
   for (int i = 0; i < 4; ++i) {
     if (nextDirectionCandidates.empty())
       break;
-    const Direction d = nextDirectionCandidates[0]; //< 行きたい方向
-    ndcs.push_back(d);                              //< 候補に入れる
-    if (maze.isKnown(p, d))
-      break;                          //< 既知なら終わり
-    cache.push_back(WallIndex(p, d)); //< 壁をたてるのでキャッシュしておく
-    /* 壁をたてて既知とする*/
-    maze.setWall(p, d, true), maze.setKnown(p, d, true);
+    const Direction d = nextDirectionCandidates[0]; //< 一番行きたい方向
+    nextDirectionCandidatesAdvanced.push_back(d);   //< 候補に入れる
+    if (maze.isKnown(p_end, d))
+      break; //< 既知なら終わり
+    /* 未知なら仮壁をたてて既知とする*/
+    wall_backup.push_back(WallIndex(p_end, d));
+    maze.setWall(p_end, d, true), maze.setKnown(p_end, d, true);
 
     /* 最短になりうる区画の洗い出し */
     findShortestCandidates(candidates, false);
+    /* 既知区間終了地点から次行く方向列を再計算 */
     if (!candidates.empty())
       step_map.update(maze, candidates, false, false);
     Directions tmp_nds;
-    /* 既知区間終了地点から次行く方向列を計算 */
-    step_map.calcNextDirections(maze, p, d, tmp_nds, nextDirectionCandidates);
+    step_map.calcNextDirections(maze, p_end, d, tmp_nds,
+                                nextDirectionCandidates);
     /* 既知区間になった場合 */
     if (!tmp_nds.empty()) {
-      ndcs.push_back(tmp_nds.front());
+      nextDirectionCandidatesAdvanced.push_back(tmp_nds.front());
       break;
     }
   }
-  /* キャッシュを復活 */
-  for (const auto i : cache)
+  /* 仮壁を復元 */
+  for (const auto i : wall_backup)
     maze.setWall(i, false), maze.setKnown(i, false);
-  nextDirectionCandidates = ndcs;
+  /* 後処理 */
+  nextDirectionCandidates = nextDirectionCandidatesAdvanced;
   return nextDirectionCandidates.empty() ? Error : Processing;
 }
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsBackingToStart(
@@ -445,10 +446,10 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsBackingToStart(
   if (!nextDirectionsKnown.empty())
     return Reached;
   /* 行程に未知壁がある */
-  const auto p = step_map.calcNextDirectionsAdv(
-      maze, {maze.getStart()}, current_pose.p, current_pose.d,
-      nextDirectionsKnown, nextDirectionCandidates);
-  if (p == maze.getStart())
+  const auto end_p =
+      calcNextDirectionsInAdvance(maze, {maze.getStart()}, current_pose,
+                                  nextDirectionsKnown, nextDirectionCandidates);
+  if (end_p == maze.getStart())
     return Reached;
   return nextDirectionCandidates.empty() ? Error : Processing;
 }
@@ -456,8 +457,8 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsGoingToGoal(
     const Pose &current_pose, Directions &nextDirectionsKnown,
     Directions &nextDirectionCandidates) {
   const auto &goals = maze.getGoals();
-  step_map.calcNextDirectionsAdv(maze, goals, current_pose.p, current_pose.d,
-                                 nextDirectionsKnown, nextDirectionCandidates);
+  calcNextDirectionsInAdvance(maze, goals, current_pose, nextDirectionsKnown,
+                              nextDirectionCandidates);
   const auto next_p =
       current_pose.p.next(nextDirectionCandidates[0] + Direction::Back);
   const auto it = std::find_if(goals.cbegin(), goals.cend(),
@@ -551,9 +552,8 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
           candidates.push_back(p);
       }
   /* スタート区画を避けて導出 */
-  step_map.calcNextDirectionsAdv(idMaze, candidates, current_pose.p,
-                                 current_pose.d, nextDirectionsKnown,
-                                 nextDirectionCandidates);
+  calcNextDirectionsInAdvance(idMaze, candidates, current_pose,
+                              nextDirectionsKnown, nextDirectionCandidates);
   /* エラー防止のため来た方向を追加 */
   nextDirectionCandidates.push_back(current_pose.d + Direction::Back);
   // std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
@@ -566,9 +566,8 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   /*< 復元終了 */
   /* 既知情報からではスタート区画を避けられない場合 */
   if (step_map.getStep(current_pose.p) == StepMap::STEP_MAX)
-    step_map.calcNextDirectionsAdv(idMaze, candidates, current_pose.p,
-                                   current_pose.d, nextDirectionsKnown,
-                                   nextDirectionCandidates);
+    calcNextDirectionsInAdvance(idMaze, candidates, current_pose,
+                                nextDirectionsKnown, nextDirectionCandidates);
   return nextDirectionCandidates.empty() ? Error : Processing;
 }
 

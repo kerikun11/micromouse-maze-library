@@ -337,41 +337,6 @@ StepMap::calcNextDirections(const Maze &maze, const Position start_p,
   nextDirectionCandidates = calcNextDirectionCandidates(maze, end);
   return end.p;
 }
-const Position StepMap::calcNextDirectionsAdv(
-    Maze &maze, const Positions &dest, const Position vec, const Direction dir,
-    Directions &nextDirectionsKnown, Directions &nextDirectionCandidates) {
-  /* ステップマップの更新 */
-  update(maze, dest, false, false);
-  /* 事前に進む候補を決定する */
-  const auto p = calcNextDirections(maze, vec, dir, nextDirectionsKnown,
-                                    nextDirectionCandidates);
-  Directions ndcs; //< Next Direction Candidates
-  WallLogs cache;
-  while (1) {
-    if (nextDirectionCandidates.empty())
-      break;
-    const Direction d = nextDirectionCandidates[0]; //< 行きたい方向
-    ndcs.push_back(d);                              //< 候補に入れる
-    if (maze.isKnown(p, d))
-      break;                               //< 既知なら終わり
-    cache.push_back(WallLog(p, d, false)); //< 壁をたてるのでキャッシュしておく
-    maze.setWall(p, d, true);  //< 壁をたてる
-    maze.setKnown(p, d, true); //< 既知とする
-    Directions tmp_nds;
-    /* 行く方向を計算しなおす */
-    update(maze, dest, false, false);
-    calcNextDirections(maze, p, d, tmp_nds, nextDirectionCandidates);
-    if (!tmp_nds.empty())
-      nextDirectionCandidates = tmp_nds; //< 既知区間になった場合
-  }
-  /* キャッシュを復活 */
-  for (const auto wl : cache) {
-    maze.setWall(wl.getPosition(), wl.d, false);
-    maze.setKnown(wl.getPosition(), wl.d, false);
-  }
-  nextDirectionCandidates = ndcs;
-  return p;
-}
 const Directions
 StepMap::calcNextDirectionsStepDown(const Maze &maze, const Pose start,
                                     Pose &focus, const bool known_only,

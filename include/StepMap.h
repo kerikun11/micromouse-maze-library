@@ -79,14 +79,6 @@ public:
                                     Directions &nextDirectionsKnown,
                                     Directions &nextDirectionCandidates) const;
   /**
-   * @brief 迷路を編集してさらに優先順の精度を向上させる関数
-   * @return 既知区間の最終区画
-   */
-  const Position calcNextDirectionsAdv(Maze &maze, const Positions &dest,
-                                       const Position vec, const Direction dir,
-                                       Directions &nextDirectionsKnown,
-                                       Directions &nextDirectionCandidates);
-  /**
    * @brief 与えられた区画間の最短経路を導出する関数
    * @param maze 迷路の参照
    * @param start 始点区画
@@ -109,16 +101,6 @@ public:
     return calcShortestDirections(maze, maze.getStart(), maze.getGoals(),
                                   known_only, simple);
   }
-
-private:
-  step_t step_map[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
-  step_t step_table[MAZE_SIZE]; /**< @brief 加速を考慮したステップ */
-
-  /**
-   * @brief 最短経路導出用の加速を考慮したステップリストを算出する関数
-   * 高速化のため，あらかじめ計算を終えておく．
-   */
-  void calcStraightStepTable();
   /**
    * @brief ステップマップにより次に行くべき方向列を生成する
    */
@@ -132,6 +114,16 @@ private:
    */
   const Directions calcNextDirectionCandidates(const Maze &maze,
                                                const Pose focus) const;
+
+private:
+  step_t step_map[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
+  step_t step_table[MAZE_SIZE]; /**< @brief 加速を考慮したステップテーブル */
+
+  /**
+   * @brief 最短経路導出用の加速を考慮したステップリストを算出する関数
+   * 高速化のため，あらかじめ計算を終えておく．
+   */
+  void calcStraightStepTable();
 };
 
 } // namespace MazeLib
