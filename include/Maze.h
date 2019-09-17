@@ -56,13 +56,16 @@ static constexpr int MAZE_SIZE_BIT = std::log2(MAZE_SIZE);
  * @brief ログ出力用 stream
  */
 #ifndef loge /**< @brief Error */
-#define loge (std::cerr << "[E][" << __FILE__ << ":" << __LINE__ << "] ")
+#define loge                                                                   \
+  (std::cerr << C_RE << "[E][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
 #endif
 #ifndef logw /**< @brief Warning */
-#define logw (std::cout << "[W][" << __FILE__ << ":" << __LINE__ << "] ")
+#define logw                                                                   \
+  (std::cout << C_YE << "[W][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
 #endif
 #ifndef logi /**< @brief Info */
-#define logi (std::cout << "[I][" << __FILE__ << ":" << __LINE__ << "] ")
+#define logi                                                                   \
+  (std::cout << C_GR << "[I][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
 #endif
 
 /**
@@ -548,7 +551,7 @@ public:
    *  @brief 直前に更新した壁を見探索状態にリセットする
    *  @param num リセットする壁の数
    */
-  void resetLastWall(const int num);
+  void resetLastWalls(const int num);
   /**
    * @brief 引数区画の壁の数を返す
    * @param p 区画の座標

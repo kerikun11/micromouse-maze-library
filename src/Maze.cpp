@@ -141,44 +141,45 @@ bool Maze::updateWall(const Position p, const Direction d, const bool b,
   }
   return true;
 }
-void Maze::resetLastWall(const int num) {
-  for (int i = 0; i < num; ++i) {
-    if (wallLogs.empty())
-      return;
-    const auto wl = wallLogs.back();
-    const auto wl_p = wl.getPosition();
-    setWall(wl_p, wl.d, false);
-    setKnown(wl_p, wl.d, false);
-    wallLogs.pop_back();
-  }
+void Maze::resetLastWalls(const int num) {
+  for (int i = 0; i < num; ++i)
+    if (!wallLogs.empty())
+      wallLogs.pop_back();
+  const auto new_wallLogs = wallLogs;
+  /* スタート壁を考慮して迷路をリセット */
+  reset(isKnown(getStart(), Direction::East) &&
+        canGo(getStart(), Direction::North));
+  wallLogs = new_wallLogs;
+  for (const auto wl : wallLogs)
+    updateWall(wl.getPosition(), wl.getDirection(), wl.b);
   return;
 }
 bool Maze::parse(std::istream &is) {
-  /* 迷路サイズの決定 */
+  /* determine the maze size */
   /* get file size */
-  is.seekg(0, std::ios::end);
-  int file_size = is.tellg();
-  is.seekg(0, std::ios::beg);
+  is.seekg(0, std::ios::end); //< move the position to end
+  const int file_size = is.tellg();
+  is.seekg(0, std::ios::beg); //< restore the position to begin
   /* estimated (minimum) file size [byte] : F = (4*M + 1 + 1) * (2*M + 1) */
-  /* using quadratic formula, M = (sqrt(2*M) - 2) / 4 */
-  int maze_size = (std::sqrt(2 * file_size) - 2) / 4;
+  /* using quadratic formula, we have: M = (sqrt(2*F) - 2) / 4 */
+  const int maze_size = (std::sqrt(2 * file_size) - 2) / 4;
   if (maze_size < 1)
     return false; /*< file size error */
   /* reset existing maze */
   reset(), goals.clear();
-  char c; //< 取得用一時変数
+  char c; //< temporal variable to use next
   for (int8_t y = maze_size; y >= 0; --y) {
     /* vertiacal walls and cells */
     if (y != maze_size) {
-      is.ignore(10, '|'); //< 次の '|' が出てくるまで改行などをスキップ
+      is.ignore(10, '|'); //< skip until next '|'
       for (int8_t x = 0; x < maze_size; ++x) {
-        is.ignore(1); //< " " 空欄分をスキップ
+        is.ignore(1); //< skip a space
         c = is.get();
         if (c == 'S')
           start = Position(x, y);
         else if (c == 'G')
           goals.push_back(Position(x, y));
-        is.ignore(1); //< " " 空欄分をスキップ
+        is.ignore(1); //< skip a space
         c = is.get();
         if (c == '|')
           Maze::updateWall(Position(x, y), Direction::East, true, false);
@@ -188,7 +189,7 @@ bool Maze::parse(std::istream &is) {
     }
     /* horizontal walls and pillars */
     for (uint8_t x = 0; x < maze_size; ++x) {
-      is >> c; //< 次の '+' などが出てくるまで改行などをスキップ
+      is >> c; //< skip until next '+' or 'o'
       std::string s;
       for (int i = 0; i < 3; ++i)
         s += (char)is.get();
@@ -202,7 +203,7 @@ bool Maze::parse(std::istream &is) {
 }
 bool Maze::parse(const std::vector<std::string> data, const int maze_size) {
   for (const auto xr : {true, false})
-    for (const auto yr : {true, false})
+    for (const auto yr : {false, true})
       for (const auto xy : {true, false})
         for (const auto b0 : Direction::getAlong4())
           for (const auto b1 : Direction::getAlong4())
