@@ -75,7 +75,7 @@ void StepMap::print(const Maze &maze, const Position p, const Direction d,
       }
       os << std::endl;
     }
-    /* Horizontal Wall Line*/
+    /* Horizontal Wall Line */
     for (uint8_t x = 0; x < maze_size; ++x) {
       /* Pillar */
       os << "+";
@@ -308,14 +308,13 @@ const Directions StepMap::calcShortestDirections(const Maze &maze,
     return {}; //< 失敗
   return shortest_dirs;
 }
-const Position
-StepMap::calcNextDirections(const Maze &maze, const Position start_p,
-                            const Direction start_d,
+const Pose
+StepMap::calcNextDirections(const Maze &maze, const Pose &start,
                             Directions &nextDirectionsKnown,
                             Directions &nextDirectionCandidates) const {
   Pose end;
   nextDirectionsKnown =
-      calcNextDirectionsStepDown(maze, {start_p, start_d}, end, false, true);
+      calcNextDirectionsStepDown(maze, start, end, false, true);
   // if (nextDirectionsKnown.size()) {
   //   const auto d_back = Direction(start_d + Direction::Back);
   //   if (nextDirectionsKnown.front() == d_back) {
@@ -335,10 +334,10 @@ StepMap::calcNextDirections(const Maze &maze, const Position start_p,
   //   }
   // }
   nextDirectionCandidates = calcNextDirectionCandidates(maze, end);
-  return end.p;
+  return end;
 }
 const Directions
-StepMap::calcNextDirectionsStepDown(const Maze &maze, const Pose start,
+StepMap::calcNextDirectionsStepDown(const Maze &maze, const Pose &start,
                                     Pose &focus, const bool known_only,
                                     const bool break_unknown) const {
   /* ステップマップから既知区間進行方向列を生成 */
@@ -376,7 +375,7 @@ StepMap::calcNextDirectionsStepDown(const Maze &maze, const Pose start,
   return nextDirectionsKnown;
 }
 const Directions StepMap::calcNextDirectionCandidates(const Maze &maze,
-                                                      const Pose focus) const {
+                                                      const Pose &focus) const {
   /* 直線優先で進行方向の候補を抽出．全方位 STEP_MAX だと空になる */
   Directions dirs;
   for (const auto d : {focus.d + Direction::Front, focus.d + Direction::Left,

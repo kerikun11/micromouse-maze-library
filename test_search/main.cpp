@@ -4,9 +4,16 @@
  * @brief 迷路探索アルゴリズムの使用例
  * @date 2019-08-29
  */
+
+/*
+ * 迷路ライブラリのインクルード
+ */
 #include "Maze.h"
 #include "StepMap.h"
 
+/*
+ * 標準ライブラリのインクルード
+ */
 #include <algorithm> //< for sleep function
 #include <thread>    //< for std::find
 
@@ -17,26 +24,21 @@ using namespace MazeLib;
 
 /**
  * @brief ロボットを動かす模擬関数
- *
  * @param relative_dir 移動方向(自己位置に対する相対方向)
  */
 void MoveRobot(const Direction relative_dir) {
   switch (relative_dir) {
   case Direction::Front:
-    /* <直進の処理> */
-    break;
+    return /* <直進の処理> */;
   case Direction::Left:
-    /* <左ターンの処理> */
-    break;
+    return /* <左ターンの処理> */;
   case Direction::Right:
-    /* <右ターンの処理> */
-    break;
+    return /* <右ターンの処理> */;
   case Direction::Back:
-    /* <引き返しの処理> */
-    break;
+    return /* <引き返しの処理> */;
   default:
     loge << "invalid direction: " << relative_dir << std::endl;
-    break;
+    return;
   }
 }
 
@@ -75,9 +77,9 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
     const auto &goals = maze.getGoals();
     if (std::find(goals.cbegin(), goals.cend(), current_pos) != goals.cend())
       break;
-    /* 現在地からゴールへの最短経路を未知壁はないものとして導出 */
+    /* 現在地からゴールへの移動経路を，未知壁はないものとして導出 */
     const auto move_dirs = step_map.calcShortestDirections(
-        maze, current_pos, maze.getGoals(), false);
+        maze, current_pos, maze.getGoals(), false, true);
     /* エラー処理 */
     if (move_dirs.empty()) {
       loge << "Failed to Find a path to goal!" << std::endl;
@@ -126,9 +128,9 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
     /* 最短経路上に未知区画がなければ次へ */
     if (shortest_candidates.empty())
       break;
-    /* 現在地から最短候補への経路を未知壁はないものとして導出 */
+    /* 現在地から最短候補への移動経路を未知壁はないものとして導出 */
     const auto move_dirs = step_map.calcShortestDirections(
-        maze, current_pos, shortest_candidates, false);
+        maze, current_pos, shortest_candidates, false, true);
     /* エラー処理 */
     if (move_dirs.empty()) {
       loge << "Failed to Find a path to goal!" << std::endl;
@@ -158,7 +160,7 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
       break;
     /* 現在地からスタートへの最短経路を既知壁のみの経路で導出 */
     const auto move_dirs = step_map.calcShortestDirections(
-        maze, current_pos, {maze.getStart()}, true);
+        maze, current_pos, {maze.getStart()}, true, true);
     /* エラー処理 */
     if (move_dirs.empty()) {
       loge << "Failed to Find a path to goal!" << std::endl;
@@ -172,20 +174,13 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
       /* 現在地を進める */
       current_pos = current_pos.next(next_dir);
       current_dir = next_dir;
-#if 1
       /* アニメーション表示 */
       step_map.print(maze, current_pos, current_dir);
       std::cout << "Going back to start" << std::endl;
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
-#endif
     }
   }
-  /* スタートからゴールまでの最短経路導出 */
-  const bool known_only = true;
-  const auto shortest_dirs = step_map.calcShortestDirections(
-      maze, maze.getStart(), maze.getGoals(), known_only);
-  step_map.printFull(maze, shortest_dirs);
-  /* 終了 */
+  /* 正常終了 */
   return 0;
 }
 
@@ -193,11 +188,10 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
  * @brief 最短走行のアルゴリズム
  */
 int ShortestRun(const Maze &maze) {
-  /* 足立法のステップマップ */
+  /* スタートからゴールまでの最短経路導出 */
   StepMap step_map;
-  const bool known_only = true;
   const auto shortest_dirs = step_map.calcShortestDirections(
-      maze, maze.getStart(), maze.getGoals(), known_only, false);
+      maze, maze.getStart(), maze.getGoals(), true, false);
   if (shortest_dirs.empty()) {
     loge << "Failed to Find a path to goal!" << std::endl;
     return -1;
@@ -212,16 +206,13 @@ int ShortestRun(const Maze &maze) {
     /* 現在地を進める */
     current_pos = current_pos.next(next_dir);
     current_dir = next_dir;
-#if 1
     /* アニメーション表示 */
     step_map.print(maze, current_pos, current_dir);
     std::cout << "Shortest Run" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-#endif
   }
   /* 最短経路の表示 */
-  step_map.update(maze, {maze.getStart()}, true, false);
-  step_map.printFull(maze, shortest_dirs);
+  maze.print(shortest_dirs);
   /* 終了 */
   return 0;
 }

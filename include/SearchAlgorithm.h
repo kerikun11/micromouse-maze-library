@@ -140,42 +140,7 @@ private:
    */
   const Position calcNextDirectionsInAdvance(
       Maze &maze, const Positions &dest, const Pose &start_pose,
-      Directions &nextDirectionsKnown, Directions &nextDirectionCandidates) {
-    /* ステップマップの更新 */
-    step_map.update(maze, dest, false, false);
-    /* 既知区間を算出 */
-    const auto p_end = step_map.calcNextDirections(
-        maze, start_pose.p, start_pose.d, nextDirectionsKnown,
-        nextDirectionCandidates);
-    /* 仮壁を立てて事前に進む候補を決定する */
-    Directions nextDirectionCandidatesAdvanced;
-    WallIndexes wall_backup; /*< 仮壁を立てるのでバックアップを作成 */
-    while (1) {
-      if (nextDirectionCandidates.empty())
-        break;
-      const Direction d = nextDirectionCandidates[0]; //< 一番行きたい方向
-      nextDirectionCandidatesAdvanced.push_back(d);   //< 候補に入れる
-      if (maze.isKnown(p_end, d))
-        break; //< 既知なら終わり
-      /* 未知なら仮壁をたてて既知とする*/
-      wall_backup.push_back(WallIndex(p_end, d));
-      maze.setWall(p_end, d, true), maze.setKnown(p_end, d, true);
-      Directions tmp_nds;
-      /* 既知区間終了地点から次行く方向列を再計算 */
-      step_map.update(maze, dest, false, false);
-      step_map.calcNextDirections(maze, p_end, d, tmp_nds,
-                                  nextDirectionCandidates);
-      /* 既知区間になった場合 */
-      if (!tmp_nds.empty())
-        nextDirectionCandidates = tmp_nds;
-    }
-    /* 仮壁を復元 */
-    for (const auto i : wall_backup)
-      maze.setWall(i, false), maze.setKnown(i, false);
-    /* 後処理 */
-    nextDirectionCandidates = nextDirectionCandidatesAdvanced;
-    return p_end;
-  }
+      Directions &nextDirectionsKnown, Directions &nextDirectionCandidates);
 };
 
 } // namespace MazeLib

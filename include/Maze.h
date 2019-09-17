@@ -64,7 +64,8 @@ static constexpr int MAZE_SIZE_BIT = std::log2(MAZE_SIZE);
   (std::cout << C_YE << "[W][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
 #endif
 #ifndef logi /**< @brief Info */
-#define logi (std::cout << "[I][" << __FILE__ << ":" << __LINE__ << "] ")
+#define logi                                                                   \
+  (std::cout << C_GR << "[I][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
 #endif
 
 /**
