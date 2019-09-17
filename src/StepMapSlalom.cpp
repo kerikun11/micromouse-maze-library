@@ -117,7 +117,7 @@ void StepMapSlalom::update(const Maze &maze,
 #endif
   /* dest のコストを0とする */
   for (const auto i : dest) {
-    cost_map[i] = 0;
+    cost_map[i.getIndex()] = 0;
     q.push(i);
   }
   /* known_only を考慮した壁の判定式を用意 */
@@ -134,14 +134,15 @@ void StepMapSlalom::update(const Maze &maze,
     const auto focus = q.front();
 #endif
     q.pop();
-    const auto focus_cost = cost_map[focus];
+    const auto focus_cost = cost_map[focus.getIndex()];
     /* キューに追加する関数を用意 */
     const auto pushAndContinue = [&](const Index next, const cost_t edge_cost) {
       const auto next_cost = focus_cost + edge_cost;
-      if (cost_map[next] <= next_cost)
+      const auto next_index = next.getIndex();
+      if (cost_map[next_index] <= next_cost)
         return false;
-      cost_map[next] = next_cost;
-      from_map[next] = focus;
+      cost_map[next_index] = next_cost;
+      from_map[next_index] = focus;
       q.push(next);
       return true;
     };
@@ -234,11 +235,11 @@ bool StepMapSlalom::genPathFromMap(StepMapSlalom::Indexes &path) const {
   auto i = index_start.opposite();
   while (1) {
     path.push_back(i.opposite());
-    if (cost_map[i] == 0)
+    if (cost_map[i.getIndex()] == 0)
       break;
-    if (cost_map[i] <= cost_map[from_map[i]])
+    if (cost_map[i.getIndex()] <= cost_map[from_map[i.getIndex()].getIndex()])
       return false;
-    i = from_map[i];
+    i = from_map[i.getIndex()];
   }
   return true;
 }

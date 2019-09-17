@@ -30,21 +30,28 @@ public:
    * @brief ステップマップを初期化する関数
    * @param step この値で初期化する
    */
-  void reset(const step_t step = STEP_MAX);
+  void reset(const step_t step = STEP_MAX) { step_map.fill(step); }
   /**
    * @param ステップの取得
    * @param p 区画の座標
    * @return ステップ
    */
-  step_t getStep(const int8_t x, const int8_t y) const;
-  step_t getStep(const Position p) const { return getStep(p.x, p.y); }
+  step_t getStep(const int8_t x, const int8_t y) const {
+    return getStep(Position(x, y));
+  }
+  step_t getStep(const Position p) const {
+    return p.isInsideOfField() ? step_map[p.getIndex()] : STEP_MAX;
+  }
   /**
    * @param ステップへの参照の取得，書き込み可能
    * @param p 区画の座標
    */
-  void setStep(const int8_t x, const int8_t y, const step_t step);
+  void setStep(const int8_t x, const int8_t y, const step_t step) {
+    return setStep(Position(x, y), step);
+  }
   void setStep(const Position p, const step_t step) {
-    return setStep(p.x, p.y, step);
+    if (p.isInsideOfField())
+      step_map[p.getIndex()] = step;
   }
   /**
    * @brief ステップの表示
@@ -115,8 +122,9 @@ public:
                                                const Pose &focus) const;
 
 private:
-  step_t step_map[MAZE_SIZE][MAZE_SIZE]; /**< @brief ステップ数 */
-  step_t step_table[MAZE_SIZE]; /**< @brief 加速を考慮したステップテーブル */
+  std::array<step_t, Position::SIZE> step_map; /**< @brief ステップ数*/
+  std::array<step_t, MAZE_SIZE>
+      step_table; /*< @brief 台形加速を考慮したコストテーブル */
 
   /**
    * @brief 最短経路導出用の加速を考慮したステップリストを算出する関数

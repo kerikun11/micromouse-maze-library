@@ -24,11 +24,11 @@ public:
   StepMapWall();
   void reset(const step_t step = STEP_MAX) { step_map.fill(step); }
   step_t getStep(const WallIndex i) const {
-    return i.isInsideOfField() ? step_map[i] : STEP_MAX;
+    return i.isInsideOfField() ? step_map[i.getIndex()] : STEP_MAX;
   }
   void setStep(const WallIndex i, const step_t step) {
     if (i.isInsideOfField())
-      step_map[i] = step;
+      step_map[i.getIndex()] = step;
   }
   void print(const Maze &maze, std::ostream &os = std::cout) const;
   void print(const Maze &maze, const WallIndexes &indexes,

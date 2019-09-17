@@ -50,9 +50,9 @@ public:
     cost_t getEdgeCost(const Pattern p, const int n = 1) const {
       switch (p) {
       case ST_ALONG:
-        return cost_table_along[n - 1]; /*< [ms] */
+        return cost_table_along[n]; /*< [ms] */
       case ST_DIAG:
-        return cost_table_diag[n - 1]; /*< [ms] */
+        return cost_table_diag[n]; /*< [ms] */
       case F45:
         return rp.t_F45; /*< [ms] */
       case F90:
@@ -78,12 +78,12 @@ public:
 
   private:
     RunParameter rp;
-    std::array<cost_t, MAZE_SIZE * 2> cost_table_along{};
-    std::array<cost_t, MAZE_SIZE * 2> cost_table_diag{};
+    std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
+    std::array<cost_t, MAZE_SIZE * 2> cost_table_diag;
 
     static cost_t gen_cost_impl(const int i, const float am, const float vs,
                                 const float vm, const float seg) {
-      const auto d = seg * (i + 1); /*< (i+1) 区画分の走行距離 */
+      const auto d = seg * i; /*< i区画分の走行距離 */
       /* グラフの面積から時間を求める */
       const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
       if (d < d_thr)
@@ -109,16 +109,13 @@ public:
    * @brief Graph の Node の Index．
    * 「各区画中央の4方位」または「 各壁上の4方位」，の位置姿勢を一意に識別する
    */
-  union __attribute__((__packed__)) Index {
+  struct __attribute__((__packed__)) Index {
   private:
-    struct __attribute__((__packed__)) {
-      int x : 6; /**< @brief x coordinate of the cell */
-      int y : 6; /**< @brief y coordinate of the cell */
-      unsigned int
-          z : 1; /**< @brief position assignment in the cell, 0:East; 1:North */
-      unsigned int nd : 3; /**< @brief direction of the node */
-    };
-    unsigned int all : 16; /**< @brief union element for all access */
+    int x : 6; /**< @brief x coordinate of the cell */
+    int y : 6; /**< @brief y coordinate of the cell */
+    unsigned int
+        z : 1; /**< @brief position assignment in the cell, 0:East; 1:North */
+    unsigned int nd : 3; /**< @brief direction of the node */
 
   public:
     /**
@@ -128,7 +125,7 @@ public:
 
   public:
     /** @brief デフォルトコンストラクタ */
-    Index() : all(0) {}
+    Index() {}
     /** @brief 成分を受け取ってそのまま代入するコンストラクタ */
     Index(const int8_t x, const int8_t y, const uint8_t z, const Direction nd)
         : x(x), y(y), z(z), nd(nd) {}
@@ -145,13 +142,23 @@ public:
     /** @brief 壁上のコンストラクタ */
     Index(const WallIndex i, const Direction nd)
         : x(i.x), y(i.y), z(i.z), nd(nd) {}
+    /** @brief 等号 */
+    bool operator==(const Index i) const {
+      return x == i.x && y == i.y && z == i.z && nd == i.nd;
+    }
+    bool operator!=(const Index i) const {
+      return x != i.x || y != i.y || z != i.z || nd != i.nd;
+    }
     /** @brief WallIndex へのキャスト */
     operator WallIndex() const {
       const auto nd = getNodeDirection();
       return nd.isAlong() ? WallIndex(Position(x, y), nd) : WallIndex(x, y, z);
     }
-    /** @brief unique な ID を返す */
-    operator uint16_t() const {
+    /**
+     * @brief 迷路中のIndexをuniqueな通し番号として表現したID
+     * @return uint16_t ID
+     */
+    uint16_t getIndex() const {
       return (((~nd) & 1) << (2 * MAZE_SIZE_BIT + 3)) |
              (z << (2 * MAZE_SIZE_BIT + 2)) |
              ((6 & nd) << (2 * MAZE_SIZE_BIT - 1)) | (x << MAZE_SIZE_BIT) |
@@ -227,7 +234,9 @@ public:
   bool genPathFromMap(Indexes &path) const;
   void print(const Maze &maze, const Indexes &indexes,
              std::ostream &os = std::cout) const;
-  cost_t getShortestCost() const { return cost_map[index_start.opposite()]; }
+  cost_t getShortestCost() const {
+    return cost_map[index_start.opposite().getIndex()];
+  }
 
   static const Indexes convertDestinations(const Positions &src);
   static const Directions indexes2dirs(const Indexes &path,

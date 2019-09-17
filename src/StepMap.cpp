@@ -18,79 +18,9 @@ StepMap::StepMap() {
   calcStraightStepTable();
   reset();
 }
-void StepMap::reset(const step_t step) {
-  for (int8_t y = 0; y < MAZE_SIZE; ++y)
-    for (int8_t x = 0; x < MAZE_SIZE; ++x)
-      setStep(x, y, step); //< ステップをクリア
-}
-StepMap::step_t StepMap::getStep(const int8_t x, const int8_t y) const {
-  /* (x, y) がフィールド内か確認 */
-  if (x < 0 || y < 0 || x > MAZE_SIZE - 1 || y > MAZE_SIZE - 1) {
-    logw << "referred to out of field: " << Position(x, y) << std::endl;
-    return STEP_MAX;
-  }
-  return step_map[y][x];
-}
-void StepMap::setStep(const int8_t x, const int8_t y, const step_t step) {
-  /* (x, y) がフィールド内か確認 */
-  if (x < 0 || y < 0 || x >= MAZE_SIZE || y >= MAZE_SIZE) {
-    logw << "referred to out of field: " << Position(x, y) << std::endl;
-    return;
-  }
-  step_map[y][x] = step;
-}
 void StepMap::print(const Maze &maze, const Position p, const Direction d,
                     std::ostream &os) const {
-  /* preparation */
-  const auto pose = Pose(p.next(d + Direction::Back), d);
-  const int maze_size = MAZE_SIZE;
-  step_t max_step = 0;
-  for (int x = 0; x < MAZE_SIZE; ++x)
-    for (int y = 0; y < MAZE_SIZE; ++y)
-      if (getStep(x, y) != STEP_MAX)
-        max_step = std::max(max_step, getStep(x, y));
-  const bool simple = (max_step < 999);
-  /* start to draw maze */
-  for (int8_t y = maze_size; y >= 0; --y) {
-    /* Vertical Wall Line*/
-    if (y != maze_size) {
-      for (uint8_t x = 0; x <= maze_size; ++x) {
-        /* Vertical Wall */
-        const auto w = maze.isWall(x, y, Direction::West);
-        const auto k = maze.isKnown(x, y, Direction::West);
-        const auto i = WallIndex(Position(x, y), Direction::West);
-        if (i.isInsideOfField() && WallIndex(pose.p, pose.d) == i)
-          os << C_YE << pose.d << C_NO;
-        else
-          os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
-        /* Cell */
-        if (x != maze_size) {
-          if (getStep(x, y) == STEP_MAX)
-            os << C_CY << "999" << C_NO;
-          else if (simple)
-            os << C_CY << std::setw(3) << getStep(x, y) << C_NO;
-          else
-            os << C_CY << std::setw(3) << getStep(x, y) / 100 << C_NO;
-        }
-      }
-      os << std::endl;
-    }
-    /* Horizontal Wall Line */
-    for (uint8_t x = 0; x < maze_size; ++x) {
-      /* Pillar */
-      os << "+";
-      /* Horizontal Wall */
-      const auto w = maze.isWall(x, y, Direction::South);
-      const auto k = maze.isKnown(x, y, Direction::South);
-      const auto i = WallIndex(Position(x, y), Direction::South);
-      if (i.isInsideOfField() && WallIndex(pose.p, pose.d) == i)
-        os << C_YE << " " << pose.d << " " << C_NO;
-      else
-        os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
-    }
-    /* Last Pillar */
-    os << "+" << std::endl;
-  }
+  return print(maze, {d}, p.next(d + Direction::Back), os);
 }
 void StepMap::print(const Maze &maze, const Directions &dirs,
                     const Position start, std::ostream &os) const {
@@ -101,14 +31,13 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
     path.push_back({p, d}), p = p.next(d);
   const int maze_size = MAZE_SIZE;
   step_t max_step = 0;
-  for (int x = 0; x < MAZE_SIZE; ++x)
-    for (int y = 0; y < MAZE_SIZE; ++y)
-      if (getStep(x, y) != STEP_MAX)
-        max_step = std::max(max_step, getStep(x, y));
+  for (const auto step : step_map)
+    if (step != STEP_MAX)
+      max_step = std::max(max_step, step);
   const bool simple = (max_step < 999);
   const auto find = [&](const WallIndex i) {
     return std::find_if(path.cbegin(), path.cend(), [&](const Pose pose) {
-      return i.isInsideOfField() && WallIndex(pose.p, pose.d) == i;
+      return WallIndex(pose.p, pose.d) == i;
     });
   };
   /* start to draw maze */
