@@ -26,6 +26,7 @@ int test_measurement() {
   std::vector<std::string> filenames;
 #if 0
   // filenames.push_back("32_unknown.maze");
+  filenames.push_back("32MM2018HX.maze");
 #else
   for (int year = 2018; year >= 2010; --year)
     filenames.push_back("32MM" + std::to_string(year) + "HX.maze");
@@ -167,7 +168,7 @@ int test_measurement() {
     csv << "," << robot.max_id_wall;
 #endif
 
-#if 1
+#if 0
     /* Shortest Algorithm */
     for (const auto diag_enabled : {false, true}) {
       const int n = 100;
@@ -192,7 +193,7 @@ int test_measurement() {
     }
 #endif
 
-#if 1
+#if 0
     /* StepMap */
     for (const auto simple : {true, false}) {
       const bool known_only = 0;
@@ -218,7 +219,7 @@ int test_measurement() {
     }
 #endif
 
-#if 1
+#if 0
     /* StepMapWall */
     for (const auto simple : {true, false}) {
       const bool known_only = 0;
@@ -244,7 +245,7 @@ int test_measurement() {
     }
 #endif
 
-#if 1
+#if 0
     /* StepMapSlalom */
     for (const auto diag_enabled : {false, true}) {
       const bool known_only = 0;

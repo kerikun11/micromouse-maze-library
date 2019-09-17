@@ -282,44 +282,37 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
 }
 int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
                                              Pose &ans) const {
-  const int many = 1000;
-  const int min_size = 12;
   const int min_diff = 9; /*< 許容食い違い壁数 */
-  /* ある程度既知壁になるまで一致判定をしない */
-  if (idWallLogs.size() < min_size)
-    return many;
-  /* min max */
+  /* 既知迷路の大きさを取得 */
   const int8_t max_x = maze.getMaxX() + 1;
   const int8_t max_y = maze.getMaxY() + 1;
   /* パターンマッチング開始 */
-  int cnt = 0;
+  int cnt = 0; /*< マッチ数 */
   for (int8_t x = 0; x < max_x; ++x)
     for (int8_t y = 0; y < max_y; ++y) {
       const auto offset_p = Position(x, y);
       for (const auto offset_d : Direction::getAlong4()) {
-        int unknown = 0; /*< 未知壁数 */
-        int diffs = 0;   /*< 既知壁との食い違い数を数える */
+        /* 既知壁との食い違い数を数える */
+        int diffs = 0;
         for (const auto wl : idWallLogs) {
           const auto maze_p =
               (wl.getPosition() - idOffset).rotate(offset_d) + offset_p;
           const auto maze_d = wl.d + offset_d;
-          /* 既知範囲外は除外．ちょっと危険な処理． */
+          /* 既知範囲外は除外．探索中だとちょっと危険な処理． */
           if (maze_p.x < 0 || maze_p.x >= max_x || maze_p.y < 0 ||
               maze_p.y >= max_y) {
-            diffs = many;
+            diffs = 999;
             break;
           }
+          /* 既知かつ食い違い壁をカウント */
           if (maze.isKnown(maze_p, maze_d) &&
               maze.isWall(maze_p, maze_d) != wl.b)
             ++diffs;
-          if (!maze.isKnown(maze_p, maze_d))
-            ++unknown;
           /* 打ち切り条件 */
           if (diffs > min_diff)
             break;
         }
-        /* 非一致条件，要パラメータチューニング */
-        // if (diffs > min_diff || unknown * 5 > (int)idWallLogs.size() * 4)
+        /* 非一致条件 */
         if (diffs > min_diff)
           continue;
         /* 一致 */
@@ -328,7 +321,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
         ++cnt;
         /* 打ち切り */
         if (cnt > 1)
-          return many;
+          return cnt;
       }
     }
   return cnt;
@@ -336,26 +329,34 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
 const Directions
 SearchAlgorithm::findMatchDirectionCandidates(const Position cur_p,
                                               const Pose &target) const {
+  const int min_diff = 0; /*< 許容食い違い壁数 */
+  /* 既知迷路の大きさを取得 */
+  const int8_t max_x = maze.getMaxX() + 1;
+  const int8_t max_y = maze.getMaxY() + 1;
+  /* 4方向を調べる */
   Directions result_dirs;
   for (const auto offset_d : Direction::getAlong4()) {
-    const auto offset_p = target.p - (cur_p - idOffset).rotate(offset_d);
-    int diffs = 0; /*< 既知壁との食い違い数を数える */
+    /* 既知壁との食い違い数を数える */
+    int diffs = 0;
     for (const auto wl : idMaze.getWallLogs()) {
       const auto maze_p =
-          (wl.getPosition() - idOffset).rotate(offset_d) + offset_p;
+          target.p + (wl.getPosition() - cur_p).rotate(offset_d);
       const auto maze_d = wl.d + offset_d;
-      if (!maze_p.isInsideOfField()) {
-        diffs = 9999;
+      /* 既知範囲外は除外．探索中だとちょっと危険な処理． */
+      if (maze_p.x < 0 || maze_p.x >= max_x || maze_p.y < 0 ||
+          maze_p.y >= max_y) {
+        diffs = 999;
         break;
       }
+      /* 既知かつ食い違い壁をカウント */
       if (maze.isKnown(maze_p, maze_d) && maze.isWall(maze_p, maze_d) != wl.b)
         ++diffs;
       /* 打ち切り */
-      if (diffs > 0)
+      if (diffs > min_diff)
         break;
     }
     /* 非一致条件 */
-    if (diffs > 0)
+    if (diffs > min_diff)
       continue;
     /* 一致 */
     result_dirs.push_back(target.d - offset_d);
