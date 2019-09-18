@@ -183,7 +183,7 @@ int main(void) {
     }
     std::cout << "StepMapSlalom\t" << sum.count() / n << "\t[us]" << std::endl;
     map.print(maze, path);
-    // auto shortest_dirs = map.indexes2dirs(path, diag_enabled);
+    // auto shortest_dirs = map.indexes2directions(path, diag_enabled);
     // Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);
     // maze.print(shortest_dirs);
   }

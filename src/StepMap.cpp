@@ -296,10 +296,9 @@ StepMap::calcNextDirectionsStepDown(const Maze &maze, const Pose &start,
     }
     /* focus_step より大きかったらなんかおかしい */
     if (getStep(focus.p) <= min_step)
-      break;                              //< 永遠ループ防止
+      break;
+    focus = focus.next(min_d);            //< 位置を更新
     nextDirectionsKnown.push_back(min_d); //< 既知区間移動
-    focus.p = focus.p.next(min_d);        //< 位置を更新
-    focus.d = min_d;
   }
   return nextDirectionsKnown;
 }

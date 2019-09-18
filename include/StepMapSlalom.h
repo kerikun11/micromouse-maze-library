@@ -239,8 +239,8 @@ public:
   }
 
   static const Indexes convertDestinations(const Positions &src);
-  static const Directions indexes2dirs(const Indexes &path,
-                                       const bool diag_enabled);
+  static const Directions indexes2directions(const Indexes &path,
+                                             const bool diag_enabled);
 
 private:
   const Index index_start = Index(Position(0, 0), Direction::North);

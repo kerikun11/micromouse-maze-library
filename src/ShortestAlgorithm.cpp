@@ -376,8 +376,9 @@ void ShortestAlgorithm::print(const Indexes indexes, std::ostream &os) const {
     os << "+" << std::endl;
   }
 }
-const Directions ShortestAlgorithm::indexes2dirs(const Indexes &path,
-                                                 const bool diag_enabled) {
+const Directions
+ShortestAlgorithm::indexes2directions(const Indexes &path,
+                                      const bool diag_enabled) {
   if (!diag_enabled) {
     Directions dirs;
     for (int i = 1; i < (int)path.size(); ++i) {

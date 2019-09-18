@@ -93,9 +93,10 @@ protected:
   virtual void startDequeue() {}
   virtual void calibration() {}
   virtual void calcNextDirectionsPreCallback() {}
-  virtual void calcNextDirectionsPostCallback(
-      SearchAlgorithm::State prevState __attribute__((unused)),
-      SearchAlgorithm::State newState __attribute__((unused))) {}
+  virtual void calcNextDirectionsPostCallback(SearchAlgorithm::State prevState
+                                              __attribute__((unused)),
+                                              SearchAlgorithm::State newState
+                                              __attribute__((unused))) {}
   virtual void discrepancyWithKnownWall() {}
 
 private:

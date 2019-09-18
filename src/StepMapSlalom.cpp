@@ -95,7 +95,7 @@ bool StepMapSlalom::calcShortestDirections(
   StepMapSlalom::Indexes path;
   if (!genPathFromMap(path))
     return false;
-  shortest_dirs = indexes2dirs(path, diag_enabled);
+  shortest_dirs = indexes2directions(path, diag_enabled);
   return true;
 }
 void StepMapSlalom::update(const Maze &maze,
@@ -293,8 +293,9 @@ StepMapSlalom::convertDestinations(const Positions &src) {
       dest.push_back(Index(p, nd));
   return dest;
 }
-const Directions StepMapSlalom::indexes2dirs(const StepMapSlalom::Indexes &path,
-                                             const bool diag_enabled) {
+const Directions
+StepMapSlalom::indexes2directions(const StepMapSlalom::Indexes &path,
+                                  const bool diag_enabled) {
   if (!diag_enabled) {
     Directions dirs;
     for (int i = 1; i < (int)path.size(); ++i) {

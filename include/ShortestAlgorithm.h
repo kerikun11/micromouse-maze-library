@@ -326,8 +326,8 @@ public:
    * @param diag_enabled
    * @return const Directions
    */
-  static const Directions indexes2dirs(const Indexes &path,
-                                       const bool diag_enabled);
+  static const Directions indexes2directions(const Indexes &path,
+                                             const bool diag_enabled);
 
 private:
   const Maze &maze;

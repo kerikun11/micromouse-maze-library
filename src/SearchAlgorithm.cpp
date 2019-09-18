@@ -220,7 +220,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
     Indexes path;
     if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
       return false; /*< 失敗 */
-    const auto dirs = ShortestAlgorithm::indexes2dirs(path, diag_enabled);
+    const auto dirs = ShortestAlgorithm::indexes2directions(path, diag_enabled);
     auto p = maze.getStart();
     for (const auto d : dirs) {
       p = p.next(d);
