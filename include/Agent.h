@@ -89,21 +89,26 @@ public:
    * @brief 探索を中止してスタート区画へ強制的に戻る
    * 時間が残りわずかな時などに使う
    */
-  void setForceBackToStart(bool yes = true) { isForceBackToStart = yes; }
+  void setForceBackToStart(const bool yes = true) { isForceBackToStart = yes; }
   /**
    * @brief
    * たとえゴール区画が探索済みでも，一度ゴール区画を訪れるモードに設定する
    * 最短失敗後の自己位置同定後などに使用する
    */
-  void setForceGoingToGoal(bool yes = true) { isForceGoingToGoal = yes; }
+  void setForceGoingToGoal(const bool yes = true) { isForceGoingToGoal = yes; }
   /**
    * @brief 自己位置同定モードに設定する
    */
-  void setPositionIdentifying() {
-    searchAlgorithm.positionIdentifyingInit(current_pose);
-    state = SearchAlgorithm::IDENTIFYING_POSITION;
-    isPositionIdentifying = true;
-    calcNextDirections(); /*< 時間がかかる処理！ */
+  void setPositionIdentifying(const bool yes = true) {
+    isPositionIdentifying = yes;
+    if (yes) {
+      searchAlgorithm.positionIdentifyingInit(current_pose);
+      state = SearchAlgorithm::IDENTIFYING_POSITION;
+      calcNextDirections(); /*< 時間がかかる処理！ */
+    } else {
+      state = SearchAlgorithm::START;
+      calcNextDirections(); /*< 時間がかかる処理！ */
+    }
   }
   /**
    * @brief 探索状態の取得

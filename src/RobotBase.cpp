@@ -15,6 +15,10 @@ bool RobotBase::searchRun() {
     return true;
   /* 探索中断をクリア */
   setBreakFlag(false);
+  /* 自己位置同定をクリア */
+  setPositionIdentifying(false);
+  /* 強制帰還をクリア */
+  setForceBackToStart(false);
   /* ゴール区画への訪問を指定 */
   setForceGoingToGoal();
   /* スタートのアクションをキュー */
@@ -52,6 +56,8 @@ bool RobotBase::endFastRunBackingToStartRun() {
   updateCurrentPose(Pose(next_p, next_d));
   queueAction(ROTATE_180);
   queueAction(ST_HALF);
+  /* 自己位置同定をクリア */
+  setPositionIdentifying(false);
   /* 走行開始 */
   return generalSearchRun();
 }
