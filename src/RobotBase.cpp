@@ -23,13 +23,13 @@ bool RobotBase::searchRun() {
   /* 走行開始 */
   return generalSearchRun();
 }
-bool RobotBase::positionIdentifyRun() {
+bool RobotBase::positionIdentifyRun(const bool set_going_to_goal) {
   /* 自己位置同定の初期化 */
   setPositionIdentifying();
   /* 探索中断をクリア */
   setBreakFlag(false);
   /* ゴール区画への訪問を指定 */
-  setForceGoingToGoal();
+  setForceGoingToGoal(set_going_to_goal);
   /* 最初のアクションをキュー */
   queueAction(ST_HALF);
   /* 走行開始 */

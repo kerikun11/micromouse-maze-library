@@ -70,7 +70,7 @@ public:
     return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
   }
   bool searchRun();
-  bool positionIdentifyRun();
+  bool positionIdentifyRun(const bool set_going_to_goal = true);
   bool endFastRunBackingToStartRun();
   bool fastRun(const bool diagonal);
   void setBreakFlag(const bool break_flag = true) {

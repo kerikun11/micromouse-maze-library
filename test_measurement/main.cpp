@@ -51,8 +51,10 @@ int test_measurement() {
            "16MM2017C_East.maze",
            "16MM2016C_kyusyu.maze",
            "08MM2016CF_pre.maze",
+       })
+    filenames.push_back(filename);
+  for (const auto filename : {
            "04_test.maze",
-           "32_no_wall.maze",
            "32_fake.maze",
            "32_unknown.maze",
        })
@@ -146,10 +148,11 @@ int test_measurement() {
           /* set fake offset */
           robot.fake_offset = robot.real = Pose(Position(x, y), d);
           robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
+          robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
           bool res = robot.positionIdentifyRun();
           if (!res) {
-            std::cout << "Failed to Identify! fake_offset:\t"
-                      << robot.fake_offset << std::endl;
+            loge << "Failed to Identify! fake_offset: " << robot.fake_offset
+                 << std::endl;
           }
           /* save result */
           id_cost_max = std::max(id_cost_max, robot.cost);
