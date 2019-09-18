@@ -52,6 +52,8 @@ int test_measurement() {
            "16MM2016C_kyusyu.maze",
            "08MM2016CF_pre.maze",
            "04_test.maze",
+           "32_no_wall.maze",
+           "32_fake.maze",
            "32_unknown.maze",
        })
     filenames.push_back(filename);
