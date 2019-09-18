@@ -53,12 +53,15 @@ int test_measurement() {
            "08MM2016CF_pre.maze",
        })
     filenames.push_back(filename);
+#if 0
   for (const auto filename : {
            "04_test.maze",
            "32_fake.maze",
+           "32_no_wall.maze",
            "32_unknown.maze",
        })
     filenames.push_back(filename);
+#endif
 #endif
   /* analyze for each maze */
   for (const auto filename : filenames) {
