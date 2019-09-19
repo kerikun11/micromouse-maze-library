@@ -49,6 +49,9 @@ public:
     FL180 = 'u',
     FR180 = 'U',
   };
+  using SearchActions = std::vector<Action>;
+  using FastActions = std::vector<FastAction>;
+
   static std::string pathConvertSearchToFast(std::string src,
                                              bool diag_enabled) {
     /* 前後に半分の直線を追加 */
@@ -68,6 +71,30 @@ public:
                                    diag_enabled); /*< 最短走行パターンに変換 */
     /* 最初の直線前と最後の直線後を連結して完了 */
     return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
+  }
+  static std::string
+  convertDirectionsToSearch(const Directions dirs,
+                            const Direction start_d = Direction::North) {
+    if (dirs.empty())
+      return "";
+    std::string path;
+    Direction prevDir = start_d;
+    for (int i = 1; i < dirs.size(); ++i) {
+      const auto nextDir = dirs[i];
+      switch (Direction(nextDir - prevDir)) {
+      case Direction::Front:
+        path += RobotBase::Action::ST_FULL;
+        break;
+      case Direction::Left:
+        path += RobotBase::Action::TURN_L;
+        break;
+      case Direction::Right:
+        path += RobotBase::Action::TURN_R;
+        break;
+      }
+      prevDir = nextDir;
+    }
+    return path;
   }
   bool searchRun();
   bool positionIdentifyRun(const bool set_going_to_goal = true);

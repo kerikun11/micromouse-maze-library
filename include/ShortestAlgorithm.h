@@ -34,14 +34,17 @@ struct Action {
   enum Type : int8_t {
     Straight,
     Slalom,
+    TypeMax,
   };
   enum StraightDirection : int8_t {
     Along,
     Diag,
+    StraightDirectionMax,
   };
   enum SlalomDirection : int8_t {
     Left,
     Right,
+    SlalomDirectionMax,
   };
   enum SlalomIndex : int8_t {
     F45,
@@ -55,12 +58,22 @@ struct Action {
   Type type;
   int8_t direction;
   int8_t index;
+  friend std::ostream &operator<<(std::ostream &os, const Type type) {
+    switch (type) {
+    case Straight:
+      return os << "S";
+    case Slalom:
+      return os << "T";
+    default:
+      return os;
+    }
+  }
 };
 
 struct RunParameter {
-  float slalom_gain[Action::SlalomMax];
-  float v_max;
-  float a_max;
+  std::array<float, Action::SlalomMax> v_slalom;
+  std::array<float, Action::StraightDirectionMax> v_max;
+  std::array<float, Action::StraightDirectionMax> a_max;
 };
 
 class EdgeCost {
