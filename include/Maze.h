@@ -631,7 +631,7 @@ public:
   /**
    * @brief 壁ログをファイルに追記保存する関数
    */
-  bool backupWallLogsFromFile(const std::string filepath,
+  bool backupWallLogsToFile(const std::string filepath,
                               const bool clear = false);
   /**
    * @brief 壁ログファイルから壁情報を復元する関数

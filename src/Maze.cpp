@@ -366,7 +366,7 @@ void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
     }
   }
 }
-bool Maze::backupWallLogsFromFile(const std::string filepath,
+bool Maze::backupWallLogsToFile(const std::string filepath,
                                   const bool clear) {
   /* 変更なし */
   if (!clear && backup_counter == wallLogs.size())
