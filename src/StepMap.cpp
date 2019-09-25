@@ -310,26 +310,23 @@ const Directions StepMap::calcNextDirectionCandidates(const Maze &maze,
                        focus.d + Direction::Right, focus.d + Direction::Back})
     if (!maze.isWall(focus.p, d) && getStep(focus.p.next(d)) != STEP_MAX)
       dirs.push_back(d);
-  /* ステップが小さい順に並べ替え */
+  /* 並べ替え */
   std::sort(dirs.begin(), dirs.end(),
             [&](const Direction d1, const Direction d2) {
+              /* 未知壁直進最優先 */
+              if (d2 == focus.d && maze.unknownCount(focus.p.next(d2)))
+                return false;
+              /* 双方未知ならステップが低い方優先 */
+              if (maze.unknownCount(focus.p.next(d1)) &&
+                  maze.unknownCount(focus.p.next(d2)))
+                return getStep(focus.p.next(d1)) < getStep(focus.p.next(d2));
+              /* 未知壁優先 */
+              if (maze.unknownCount(focus.p.next(d2)))
+                return false;
+              /* 双方既知ならステップが低い方優先 */
               return getStep(focus.p.next(d1)) < getStep(focus.p.next(d2));
             });
-  /* 未知壁優先で並べ替え, これがないと探索時間増大 */
-  // std::sort(
-  //     dirs.begin(), dirs.end(),
-  //     [&](const Direction d1 __attribute__((unused)), const Direction d2) {
-  //       return !maze.unknownCount(focus.p.next(d2));
-  //     });
-  // return dirs;
-  Directions tmp_dirs;
-  for (const auto d : dirs)
-    if (maze.unknownCount(focus.p.next(d)))
-      tmp_dirs.push_back(d);
-  for (const auto d : dirs)
-    if (!maze.unknownCount(focus.p.next(d)))
-      tmp_dirs.push_back(d);
-  return tmp_dirs;
+  return dirs;
 }
 static StepMap::step_t gen_cost_impl(const int i, const float am,
                                      const float vs, const float vm,
