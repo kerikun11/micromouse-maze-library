@@ -79,7 +79,7 @@ public:
       return "";
     std::string path;
     Direction prevDir = start_d;
-    for (int i = 1; i < dirs.size(); ++i) {
+    for (int i = 1; i < (int)dirs.size(); ++i) {
       const auto nextDir = dirs[i];
       switch (Direction(nextDir - prevDir)) {
       case Direction::Front:

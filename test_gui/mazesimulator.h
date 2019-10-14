@@ -65,7 +65,8 @@ public:
     /* Print Walls */
     for (int x = 0; x < MazeLib::MAZE_SIZE + 1; ++x)
       for (int y = 0; y < MazeLib::MAZE_SIZE + 1; ++y) {
-        for (const auto d : {MazeLib::Direction::West, MazeLib::Direction::South}) {
+        for (const auto d :
+             {MazeLib::Direction::West, MazeLib::Direction::South}) {
           /* skip when it's out of the field */
           if (x == MazeLib::MAZE_SIZE && d == MazeLib::Direction::South)
             continue;
@@ -103,8 +104,8 @@ public:
   }
   void drawPose(const Pose &pose) {
     /* Draw Machine */
-    const auto p = pose.first;
-    const auto d = pose.second;
+    const auto p = pose.p;
+    const auto d = pose.d;
     QPolygon pol;
     pol << QPoint(0, wall_unit_px / 6) << QPoint(0, -wall_unit_px / 6)
         << QPoint(wall_unit_px / 4, 0);
@@ -168,7 +169,7 @@ public:
     std::stringstream ss;
     ss << "State: " << SearchAlgorithm::getStateString(getState());
     ss << "\t";
-    ss << "Pos: " << Pose{getCurrentPosition(), getCurrentDirection()};
+    ss << "Pos: " << getCurrentPose();
     ui->statusBar->showMessage(ss.str().c_str());
   }
   void draw() {
@@ -183,28 +184,26 @@ protected:
   Maze maze;
   Maze maze_target;
   Pose fake_offset;
-  Pose real = {Position(0, 0), Direction::North};
+  Pose real;
+  bool real_visit_goal = false;
 
-  virtual void senseWalls(bool &left, bool &front, bool &right,
-                        bool &back) override {
-    left = maze_target.isWall(real.first, real.second + Direction::Left);
-    front = maze_target.isWall(real.first, real.second + Direction::Front);
-    right = maze_target.isWall(real.first, real.second + Direction::Right);
-    back = maze_target.isWall(real.first, real.second + Direction::Back);
+  virtual void senseWalls(bool &left, bool &front, bool &right) override {
+    left = !maze_target.canGo(real.p, real.d + Direction::Left);
+    front = !maze_target.canGo(real.p, real.d + Direction::Front);
+    right = !maze_target.canGo(real.p, real.d + Direction::Right);
 #if 0
-        /* 前1区画先の壁を読める場合 */
-        if (!front)
-            updateWall(current_position.next(current_direction), current_direction,
-                       maze_target.isWall(real.first.next(real.second), real.second));
+    /* 前1区画先の壁を読める場合 */
+    if (!front)
+      updateWall(current_pose.p.next(current_pose.d), current_pose.d,
+                 !maze_target.canGo(real.p.next(real.d), real.d));
 #endif
   }
   virtual void calcNextDirectionsPreCallback() override {
     t_start = std::chrono::system_clock::now();
   }
-  virtual void calcNextDirectionsPostCallback(SearchAlgorithm::State prevState
-                                        __attribute__((unused)),
-                                        SearchAlgorithm::State newState
-                                        __attribute__((unused))) override {
+  virtual void calcNextDirectionsPostCallback(
+      SearchAlgorithm::State prevState __attribute__((unused)),
+      SearchAlgorithm::State newState __attribute__((unused))) override {
     end = std::chrono::system_clock::now();
     usec = std::chrono::duration_cast<std::chrono::microseconds>(end - t_start)
                .count();
@@ -232,7 +231,7 @@ protected:
       printInfo();
       std::cout
           << "There was a discrepancy with known information! CurrentPose:\t"
-          << Pose{getCurrentPosition(), getCurrentDirection()} << std::endl;
+          << getCurrentPose() << std::endl;
     }
   }
   virtual void crashed() {
@@ -251,46 +250,48 @@ protected:
     step++;
     switch (action) {
     case RobotBase::START_STEP:
-      real.first = Position(0, 1);
-      real.second = Direction::North;
+      real.p = Position(0, 1);
+      real.d = Direction::North;
+      real_visit_goal = false;
       f++;
       break;
     case RobotBase::START_INIT:
-      real.second = real.second + Direction::Back;
-      if (!maze_target.canGo(real.first, real.second))
-        crashed();
-      real.first = real.first.next(real.second);
+      if (real_visit_goal == false)
+        loge << "Reached Start without Going to Goal!" << std::endl;
       break;
     case RobotBase::ST_HALF_STOP:
       break;
     case RobotBase::TURN_L:
-      real.second = real.second + Direction::Left;
-      if (!maze_target.canGo(real.first, real.second))
+      real.d = real.d + Direction::Left;
+      if (!maze_target.canGo(real.p, real.d))
         crashed();
-      real.first = real.first.next(real.second);
+      real.p = real.p.next(real.d);
       l++;
       break;
     case RobotBase::TURN_R:
-      real.second = real.second + Direction::Right;
-      if (!maze_target.canGo(real.first, real.second))
+      real.d = real.d + Direction::Right;
+      if (!maze_target.canGo(real.p, real.d))
         crashed();
-      real.first = real.first.next(real.second);
+      real.p = real.p.next(real.d);
       r++;
       break;
     case RobotBase::ROTATE_180:
-      real.second = real.second + Direction::Back;
-      if (!maze_target.canGo(real.first, real.second))
+      real.d = real.d + Direction::Back;
+      if (!maze_target.canGo(real.p, real.d))
         crashed();
-      real.first = real.first.next(real.second);
+      real.p = real.p.next(real.d);
       b++;
       break;
     case RobotBase::ST_FULL:
-      if (!maze_target.canGo(real.first, real.second))
+      if (!maze_target.canGo(real.p, real.d))
         crashed();
-      real.first = real.first.next(real.second);
+      real.p = real.p.next(real.d);
       f++;
       break;
     case RobotBase::ST_HALF:
+      break;
+    default:
+      logw << "invalid action" << std::endl;
       break;
     }
   }
@@ -339,9 +340,9 @@ private:
 
   QGraphicsItem *addWall(QGraphicsScene *scene, MazeLib::Pose pose,
                          const QPen &pen) {
-    int x = pose.first.x;
-    int y = pose.first.y;
-    MazeLib::Direction d = pose.second;
+    int x = pose.p.x;
+    int y = pose.p.y;
+    MazeLib::Direction d = pose.d;
     switch (d) {
     case MazeLib::Direction::East:
       return scene->addLine(cell2posX(x + 1), cell2posY(y) - pillar_px / 2,

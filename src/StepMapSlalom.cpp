@@ -103,7 +103,8 @@ void StepMapSlalom::update(const Maze &maze,
                            const StepMapSlalom::Indexes &dest,
                            const bool known_only, const bool diag_enabled) {
   /* 全ノードのコストを最大値に設定 */
-  cost_map.fill(CostMax);
+  const auto cost = CostMax;
+  cost_map.fill(cost);
   /* 更新予約のキュー */
 #define STEP_MAP_USE_PRIORITY_QUEUE 0
 #if STEP_MAP_USE_PRIORITY_QUEUE == 1

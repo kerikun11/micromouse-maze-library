@@ -11,6 +11,7 @@
 #include <algorithm> /*< for std::find_if, etc. */
 #include <functional>
 #include <iomanip> /*< for std::setw() */
+#include <limits>  /*< for std::numeric_limits */
 #include <queue>
 
 namespace MazeLib {

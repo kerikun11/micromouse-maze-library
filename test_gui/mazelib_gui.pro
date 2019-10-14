@@ -35,6 +35,7 @@ SOURCES += \
     ../src/SearchAlgorithm.cpp \
     ../src/ShortestAlgorithm.cpp \
     ../src/StepMap.cpp \
+    ../src/StepMapSlalom.cpp \
     ../src/StepMapWall.cpp
 
 HEADERS += \
