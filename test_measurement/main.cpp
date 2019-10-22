@@ -40,6 +40,7 @@ int test_measurement() {
            "16MM2019H_kansai.maze",
            "16MM2019H_kanazawa.maze",
            "16MM2019H_hokuriku.maze",
+           "16MM2019H_gakusei.maze",
            "16MM2019H_East.maze",
            "16MM2018H_semi.maze",
            "16MM2018H_Chubu.maze",
