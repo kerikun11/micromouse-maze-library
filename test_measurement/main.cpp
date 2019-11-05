@@ -65,7 +65,7 @@ int test_measurement() {
 #endif
 #endif
   /* analyze for each maze */
-  for (const auto filename : filenames) {
+  for (const auto &filename : filenames) {
     std::cout << std::endl;
     std::cout << "Maze File: \t" << filename << std::endl;
     csv << filename;
