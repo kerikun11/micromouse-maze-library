@@ -36,17 +36,18 @@ int test_measurement() {
     filenames.push_back("16MM" + std::to_string(year) + "CX.maze");
   for (int year = 2017; year >= 2015; --year)
     filenames.push_back("16MM" + std::to_string(year) + "C_Chubu.maze");
+  for (int year = 2019; year >= 2017; --year)
+    filenames.push_back("16MM" + std::to_string(year) + "H_Chubu.maze");
   for (const auto filename : {
+           "16MM2019H_kyusyu.maze",
            "16MM2019H_kansai.maze",
            "16MM2019H_kanazawa.maze",
            "16MM2019H_hokuriku.maze",
            "16MM2019H_gakusei.maze",
            "16MM2019H_East.maze",
            "16MM2018H_semi.maze",
-           "16MM2018H_Chubu.maze",
            "16MM2017HX_pre.maze",
            "16MM2017H_Tashiro.maze",
-           "16MM2017H_Chubu.maze",
            "16MM2017H_Cheese.maze",
            "16MM2017CX_pre.maze",
            "16MM2017C_East.maze",
