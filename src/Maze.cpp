@@ -204,7 +204,7 @@ bool Maze::parse(std::istream &is) {
 bool Maze::parse(const std::vector<std::string> data, const int maze_size) {
   for (const auto xr : {true, false})
     for (const auto yr : {false, true})
-      for (const auto xy : {true, false})
+      for (const auto xy : {false, true})
         for (const auto b0 : Direction::getAlong4())
           for (const auto b1 : Direction::getAlong4())
             for (const auto b2 : Direction::getAlong4())
@@ -366,8 +366,7 @@ void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
     }
   }
 }
-bool Maze::backupWallLogsToFile(const std::string filepath,
-                                  const bool clear) {
+bool Maze::backupWallLogsToFile(const std::string filepath, const bool clear) {
   /* 変更なし */
   if (!clear && backup_counter == wallLogs.size())
     return true;

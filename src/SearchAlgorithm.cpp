@@ -529,6 +529,10 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
       if (idMaze.unknownCount(id_p) == 0)
         isForceGoingToGoal = false;
     }
+    /* 自己位置同定中にスタート区画訪問済みなら，ゴール区画訪問をtrueにする */
+    const auto id_start_p = (maze.getStart() - ans.p).rotate(-ans.d) + idOffset;
+    if (idMaze.unknownCount(id_start_p) == 0)
+      isForceGoingToGoal = true;
     /* 自己位置同定中に未知壁を見ていたら更新する */
     const int ignore_first_walls = 12; /*< 復帰直後は壁の読み間違いがありそう */
     const auto &wall_logs = idMaze.getWallLogs();

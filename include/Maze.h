@@ -388,8 +388,7 @@ public:
     //          (z == 1 && (y == MAZE_SIZE - 1)));
     /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
     return !(((x | y) & (0x100 - MAZE_SIZE)) ||
-             (z == 0 && (x == MAZE_SIZE - 1)) ||
-             (z == 1 && (y == MAZE_SIZE - 1)));
+             (z == 0 && x == MAZE_SIZE - 1) || (z == 1 && y == MAZE_SIZE - 1));
   }
   /**
    * @brief 引数方向の WallIndex を取得する関数
@@ -632,7 +631,7 @@ public:
    * @brief 壁ログをファイルに追記保存する関数
    */
   bool backupWallLogsToFile(const std::string filepath,
-                              const bool clear = false);
+                            const bool clear = false);
   /**
    * @brief 壁ログファイルから壁情報を復元する関数
    */
