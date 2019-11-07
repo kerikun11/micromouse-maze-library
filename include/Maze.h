@@ -224,9 +224,13 @@ public:
    * @return false フィールド内
    */
   bool isInsideOfField() const {
-    // return x >= 0 || x < MAZE_SIZE || y >= 0 || y < MAZE_SIZE;
+    /* (x, y) がフィールド内か判定 */
+    // return x >= 0 && x < MAZE_SIZE && y >= 0 && y < MAZE_SIZE;
     /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
-    return !((x | y) & (0x100 - MAZE_SIZE));
+    // return !((x | y) & (0x100 - MAZE_SIZE));
+    /* 高速化 */
+    return (static_cast<uint8_t>(x) < MAZE_SIZE) &&
+           (static_cast<uint8_t>(y) < MAZE_SIZE);
   }
   /**
    * @brief 座標を回転変換する
@@ -387,8 +391,12 @@ public:
     //          (z == 0 && (x == MAZE_SIZE - 1)) ||
     //          (z == 1 && (y == MAZE_SIZE - 1)));
     /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
-    return !(((x | y) & (0x100 - MAZE_SIZE)) ||
-             (z == 0 && x == MAZE_SIZE - 1) || (z == 1 && y == MAZE_SIZE - 1));
+    // return !(((x | y) & (0x100 - MAZE_SIZE)) ||
+    //          (z == 0 && x == MAZE_SIZE - 1) || (z == 1 && y == MAZE_SIZE -
+    //          1));
+    /* 高速化 */
+    return (static_cast<uint8_t>(x) < MAZE_SIZE - 1 + z) &&
+           (static_cast<uint8_t>(y) < MAZE_SIZE - z);
   }
   /**
    * @brief 引数方向の WallIndex を取得する関数
