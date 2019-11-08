@@ -39,7 +39,7 @@ public:
   step_t getStep(const int8_t x, const int8_t y) const {
     return getStep(Position(x, y));
   }
-  step_t getStep(const Position p) const {
+  step_t getStep(const Position &p) const {
     return p.isInsideOfField() ? step_map[p.getIndex()] : STEP_MAX;
   }
   /**
@@ -49,7 +49,7 @@ public:
   void setStep(const int8_t x, const int8_t y, const step_t step) {
     return setStep(Position(x, y), step);
   }
-  void setStep(const Position p, const step_t step) {
+  void setStep(const Position &p, const step_t step) {
     if (p.isInsideOfField())
       step_map[p.getIndex()] = step;
   }
@@ -57,17 +57,17 @@ public:
    * @brief ステップの表示
    * @param p ハイライト区画
    */
-  void print(const Maze &maze, const Position p = Position(-1, -1),
+  void print(const Maze &maze, const Position &p = Position(-1, -1),
              const Direction d = Direction::Max,
              std::ostream &os = std::cout) const;
   void print(const Maze &maze, const Directions &dirs,
-             const Position start = Position(0, 0),
+             const Position &start = Position(0, 0),
              std::ostream &os = std::cout) const;
-  void printFull(const Maze &maze, const Position p = Position(-1, -1),
+  void printFull(const Maze &maze, const Position &p = Position(-1, -1),
                  const Direction d = Direction::Max,
                  std::ostream &os = std::cout) const;
   void printFull(const Maze &maze, const Directions &dirs,
-                 const Position start = Position(0, 0),
+                 const Position &start = Position(0, 0),
                  std::ostream &os = std::cout) const;
   /**
    * @brief ステップマップの更新
@@ -94,7 +94,7 @@ public:
    *                    経路がない場合は空配列となる．
    */
   const Directions calcShortestDirections(const Maze &maze,
-                                          const Position start,
+                                          const Position &start,
                                           const Positions &dest,
                                           const bool known_only,
                                           const bool simple);

@@ -26,7 +26,8 @@ int test_measurement() {
   std::vector<std::string> filenames;
 #if 0
   // filenames.push_back("32_unknown.maze");
-  filenames.push_back("32MM2018HX.maze");
+  // filenames.push_back("16MM2019H_Chubu.maze");
+  filenames.push_back("32MM2016HX.maze");
 #else
   for (int year = 2018; year >= 2010; --year)
     filenames.push_back("32MM" + std::to_string(year) + "HX.maze");

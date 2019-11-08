@@ -121,7 +121,7 @@ Index::getSuccessors(const Maze &maze, const EdgeCost &edge_cost,
   std::vector<std::pair<Index, cost_t>> succs;
   succs.reserve(MAZE_SIZE * 2);
   /* known_only を考慮した壁の判定式を用意 */
-  const auto canGo = [&](const Position vec, const Direction dir) {
+  const auto canGo = [&](const Position &vec, const Direction dir) {
     /* スタートは袋小路なので例外処理 */
     if (vec == Position(0, 0) && dir == Direction::South)
       return true;
@@ -233,7 +233,7 @@ Index::getPredecessors(const Maze &maze, const EdgeCost &edge_cost,
     std::vector<std::pair<Index, cost_t>> preds;
     preds.reserve(MAZE_SIZE * 2);
     /* known_only を考慮した壁の判定式を用意 */
-    const auto canGo = [&](const Position vec, const Direction dir) {
+    const auto canGo = [&](const Position &vec, const Direction dir) {
       // if (vec == Position(0, 0) && dir == Direction::South)
       //   return true;
       if (maze.isWall(vec, dir))

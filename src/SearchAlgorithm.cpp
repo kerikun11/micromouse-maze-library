@@ -49,7 +49,7 @@ bool SearchAlgorithm::updateWall(const State state, const Pose &pose,
     result = false;
   return result;
 }
-bool SearchAlgorithm::updateWall(const State state, const Position p,
+bool SearchAlgorithm::updateWall(const State state, const Position &p,
                                  const Direction d, const bool b) {
   auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
   return m.updateWall(p, d, b);
@@ -68,7 +68,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
   if (!isPositionIdentifying && isForceGoingToGoal) {
     const auto goals = maze.getGoals();
     const auto it = std::find_if(
-        goals.cbegin(), goals.cend(), [&current_pose](const Position gp) {
+        goals.cbegin(), goals.cend(), [&current_pose](const Position &gp) {
           return current_pose.p == gp ||
                  current_pose.p.next(current_pose.d + Direction::Back) == gp;
         });
@@ -327,7 +327,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
   return cnt;
 }
 const Directions
-SearchAlgorithm::findMatchDirectionCandidates(const Position cur_p,
+SearchAlgorithm::findMatchDirectionCandidates(const Position &cur_p,
                                               const Pose &target) const {
   const int min_diff = 0; /*< 許容食い違い壁数 */
   /* 既知迷路の大きさを取得 */

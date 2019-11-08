@@ -76,7 +76,7 @@ StepMapSlalom::Index ::next(const Direction nd) const {
     return Index(x, y, z, nd);
   }
 }
-std::ostream &operator<<(std::ostream &os, const StepMapSlalom::Index i) {
+std::ostream &operator<<(std::ostream &os, const StepMapSlalom::Index &i) {
   if (i.getNodeDirection().isAlong())
     return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
               << (int)i.y << ", " << i.getNodeDirection().toChar() << ")";
@@ -108,8 +108,8 @@ void StepMapSlalom::update(const Maze &maze,
   /* 更新予約のキュー */
 #define STEP_MAP_USE_PRIORITY_QUEUE 0
 #if STEP_MAP_USE_PRIORITY_QUEUE == 1
-  std::function<bool(const Index, const Index)> greater = [&](const Index i1,
-                                                              const Index i2) {
+  std::function<bool(const Index, const Index)> greater = [&](const Index &i1,
+                                                              const Index &i2) {
     return cost_map[i1] > cost_map[i2];
   };
   std::priority_queue<Index, std::vector<Index>, decltype(greater)> q(greater);
@@ -122,7 +122,7 @@ void StepMapSlalom::update(const Maze &maze,
     q.push(i);
   }
   /* known_only を考慮した壁の判定式を用意 */
-  const auto canGo = [&](const WallIndex i) {
+  const auto canGo = [&](const WallIndex &i) {
     if (maze.isWall(i) || (known_only && !maze.isKnown(i)))
       return false;
     return true;
@@ -137,7 +137,8 @@ void StepMapSlalom::update(const Maze &maze,
     q.pop();
     const auto focus_cost = cost_map[focus.getIndex()];
     /* キューに追加する関数を用意 */
-    const auto pushAndContinue = [&](const Index next, const cost_t edge_cost) {
+    const auto pushAndContinue = [&](const Index &next,
+                                     const cost_t edge_cost) {
       const auto next_cost = focus_cost + edge_cost;
       const auto next_index = next.getIndex();
       if (cost_map[next_index] <= next_cost)
@@ -247,8 +248,8 @@ bool StepMapSlalom::genPathFromMap(StepMapSlalom::Indexes &path) const {
 void StepMapSlalom::print(const Maze &maze,
                           const StepMapSlalom::Indexes &indexes,
                           std::ostream &os) const {
-  const auto exists = [&](const Index i) {
-    return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index ii) {
+  const auto exists = [&](const Index &i) {
+    return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index &ii) {
              if (i.getNodeDirection().isAlong() !=
                  ii.getNodeDirection().isAlong())
                return false;

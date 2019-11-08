@@ -131,23 +131,23 @@ public:
     Index(const int8_t x, const int8_t y, const uint8_t z, const Direction nd)
         : x(x), y(y), z(z), nd(nd) {}
     /** @brief 冗長性を除去するコンストラクタ */
-    Index(const Position p, const Direction d, const Direction nd)
+    Index(const Position &p, const Direction d, const Direction nd)
         : x(p.x), y(p.y), nd(nd) {
       uniquify(d);
     }
     /** @brief 区画中央のコンストラクタ */
     Index(const int8_t x, const int8_t y, const Direction nd)
         : x(x), y(y), z(0), nd(nd) {}
-    Index(const Position p, const Direction nd)
+    Index(const Position &p, const Direction nd)
         : x(p.x), y(p.y), z(0), nd(nd) {}
     /** @brief 壁上のコンストラクタ */
-    Index(const WallIndex i, const Direction nd)
+    Index(const WallIndex &i, const Direction nd)
         : x(i.x), y(i.y), z(i.z), nd(nd) {}
     /** @brief 等号 */
-    bool operator==(const Index i) const {
+    bool operator==(const Index &i) const {
       return x == i.x && y == i.y && z == i.z && nd == i.nd;
     }
-    bool operator!=(const Index i) const {
+    bool operator!=(const Index &i) const {
       return x != i.x || y != i.y || z != i.z || nd != i.nd;
     }
     /** @brief WallIndex へのキャスト */
@@ -191,7 +191,7 @@ public:
     /**
      * @brief stream での表示
      */
-    friend std::ostream &operator<<(std::ostream &os, const Index i);
+    friend std::ostream &operator<<(std::ostream &os, const Index &i);
     /**
      * @brief 斜め方向に向いているときの区画への相対方向(±45度)を返す
      * @return const Direction Direction::Left45 or Direction::Right45

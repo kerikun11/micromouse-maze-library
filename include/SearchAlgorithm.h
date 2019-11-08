@@ -50,7 +50,7 @@ public:
   void positionIdentifyingInit(Pose &current_pose);
   bool updateWall(const State state, const Pose &pose, const bool left,
                   const bool front, const bool right);
-  bool updateWall(const State state, const Position p, const Direction d,
+  bool updateWall(const State state, const Position &p, const Direction d,
                   const bool b);
   void resetLastWalls(const State state, const int num = 1);
   Result calcNextDirections(State &state, Pose &current_pose,
@@ -111,8 +111,9 @@ private:
    * @param target 検索対象の区画と方向
    * @return const Directions 注目する区画からの方向列
    */
-  const Directions findMatchDirectionCandidates(const Position current_position,
-                                                const Pose &target) const;
+  const Directions
+  findMatchDirectionCandidates(const Position &current_position,
+                               const Pose &target) const;
 
   /**
    * @brief 各状態での進行方向列導出関数

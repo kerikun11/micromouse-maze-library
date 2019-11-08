@@ -21,20 +21,12 @@ public:
       std::numeric_limits<step_t>::max(); /**< @brief 最大ステップ値 */
 
 public:
-  StepMapWall();
-  void reset(const step_t step = STEP_MAX) { step_map.fill(step); }
-  step_t getStep(const WallIndex i) const {
-    return i.isInsideOfField() ? step_map[i.getIndex()] : STEP_MAX;
-  }
-  void setStep(const WallIndex i, const step_t step) {
-    if (i.isInsideOfField())
-      step_map[i.getIndex()] = step;
-  }
+  StepMapWall() { calcStraightStepTable(); }
   void print(const Maze &maze, std::ostream &os = std::cout) const;
   void print(const Maze &maze, const WallIndexes &indexes,
              std::ostream &os = std::cout) const;
   void print(const Maze &maze, const Directions &shortest_dirs,
-             const WallIndex start = WallIndex(0, 0, 1),
+             const WallIndex &start = WallIndex(0, 0, 1),
              std::ostream &os = std::cout) const;
   void update(const Maze &maze, const WallIndexes &dest, const bool known_only,
               const bool simple);
@@ -46,16 +38,17 @@ public:
                                   known_only, simple);
   }
   const Directions calcShortestDirections(const Maze &maze,
-                                          const WallIndex start,
+                                          const WallIndex &start,
                                           const WallIndexes &dest,
                                           const bool known_only,
                                           const bool simple);
   static const WallIndexes convertDestinations(const Maze &maze,
-                                               const Positions positions);
-  static const Direction convertDirection(const Direction d, const WallIndex i);
+                                               const Positions &positions);
+  static const Direction convertDirection(const Direction d,
+                                          const WallIndex &i);
   static const Directions
-  convertWallIndexDirectionsToPositionDirections(const Directions src,
-                                                 const WallIndex start);
+  convertWallIndexDirectionsToPositionDirections(const Directions &src,
+                                                 const WallIndex &start);
 
 private:
   std::array<step_t, WallIndex::SIZE> step_map; /**< @brief ステップ数*/

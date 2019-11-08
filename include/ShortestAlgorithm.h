@@ -187,7 +187,7 @@ public:
   Index(const int8_t x, const int8_t y, const uint8_t z, const Direction nd)
       : x(x), y(y), z(z), nd(nd) {}
   /** @brief 冗長性を除去するコンストラクタ */
-  Index(const Position p, const Direction d, const Direction nd)
+  Index(const Position &p, const Direction d, const Direction nd)
       : x(p.x), y(p.y), nd(nd) {
     uniquify(d);
   }
@@ -199,9 +199,9 @@ public:
   /** @brief 区画中央のコンストラクタ */
   Index(const int8_t x, const int8_t y, const Direction nd)
       : x(x), y(y), z(0), nd(nd) {}
-  Index(const Position p, const Direction nd) : x(p.x), y(p.y), z(0), nd(nd) {}
+  Index(const Position &p, const Direction nd) : x(p.x), y(p.y), z(0), nd(nd) {}
   /** @brief 壁上のコンストラクタ */
-  Index(const WallIndex i, const Direction nd)
+  Index(const WallIndex &i, const Direction nd)
       : x(i.x), y(i.y), z(i.z), nd(nd) {}
   /**
    * @brief unique な ID を返す
@@ -234,7 +234,7 @@ public:
   }
   const Direction getNodeDirection() const { return nd; }
   const Position getPosition() const { return Position(x, y); }
-  friend std::ostream &operator<<(std::ostream &os, const Index i) {
+  friend std::ostream &operator<<(std::ostream &os, const Index &i) {
     return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
               << (int)i.y << ", " << i.getDirection().toChar() << ", "
               << i.getNodeDirection().toChar() << ")";
@@ -278,10 +278,10 @@ public:
    * @param i Index
    * @return cost_t heuristic value
    */
-  cost_t getHeuristic(const Index i) const {
+  cost_t getHeuristic(const Index &i) const {
     return getHeuristic(i, index_start);
   }
-  cost_t getHeuristic(const Index i, const Index s) const {
+  cost_t getHeuristic(const Index &i, const Index &s) const {
     // return 0;
     const auto p = i.getPosition() - s.getPosition();
     // const auto d = std::sqrt(p.x * p.x + p.y * p.y);
@@ -347,7 +347,7 @@ private:
   const EdgeCost edge_cost;
   const Index index_start = Index(0, 0, Direction::North);
 
-  std::function<bool(const Index i1, const Index i2)> greater;
+  std::function<bool(const Index &i1, const Index &i2)> greater;
   std::array<Index, Index::Max> from_map;
   std::vector<Index> open_list;
   std::array<cost_t, Index::Max> f_map;

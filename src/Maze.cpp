@@ -43,7 +43,7 @@ const Position Position::rotate(const Direction d) const {
     return *this;
   }
 }
-std::ostream &operator<<(std::ostream &os, const Position p) {
+std::ostream &operator<<(std::ostream &os, const Position &p) {
   return os << "(" << std::setw(2) << (int)p.x << ", " << std::setw(2)
             << (int)p.y << ")";
 }
@@ -78,13 +78,13 @@ const WallIndex WallIndex::next(const Direction d) const {
     return WallIndex(x, y, z);
   }
 }
-std::ostream &operator<<(std::ostream &os, const WallIndex i) {
+std::ostream &operator<<(std::ostream &os, const WallIndex &i) {
   return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
             << (int)i.y << ", " << i.getDirection().toChar() << ")";
 }
 
 /* WallLog */
-std::ostream &operator<<(std::ostream &os, const WallLog obj) {
+std::ostream &operator<<(std::ostream &os, const WallLog &obj) {
   return os << "( " << std::setw(2) << (int)obj.x << ", " << std::setw(2)
             << (int)obj.y << ", " << obj.getDirection().toChar() << ", "
             << (obj.b ? "true" : "false") << ")";
@@ -105,17 +105,17 @@ void Maze::reset(const bool set_start_wall) {
   }
   wallLogs.clear();
 }
-int8_t Maze::wallCount(const Position p) const {
+int8_t Maze::wallCount(const Position &p) const {
   auto dirs = Direction::getAlong4();
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        [&](const Direction d) { return isWall(p, d); });
 }
-int8_t Maze::unknownCount(const Position p) const {
+int8_t Maze::unknownCount(const Position &p) const {
   const auto dirs = Direction::getAlong4();
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        [&](const Direction d) { return !isKnown(p, d); });
 }
-bool Maze::updateWall(const Position p, const Direction d, const bool b,
+bool Maze::updateWall(const Position &p, const Direction d, const bool b,
                       const bool pushLog) {
   /* 既知の壁と食い違いがあったら未知壁としてreturn */
   if (isKnown(p, d) && isWall(p, d) != b) {
@@ -201,7 +201,7 @@ bool Maze::parse(std::istream &is) {
   }
   return true;
 }
-bool Maze::parse(const std::vector<std::string> data, const int maze_size) {
+bool Maze::parse(const std::vector<std::string> &data, const int maze_size) {
   for (const auto xr : {true, false})
     for (const auto yr : {false, true})
       for (const auto xy : {false, true})
@@ -272,8 +272,8 @@ void Maze::print(std::ostream &os, const int maze_size) const {
     os << "+" << std::endl;
   }
 }
-void Maze::print(const Directions &dirs, const Position start, std::ostream &os,
-                 const size_t maze_size) const {
+void Maze::print(const Directions &dirs, const Position &start,
+                 std::ostream &os, const size_t maze_size) const {
   /* preparation */
   std::vector<Pose> path;
   Position p = start;
@@ -366,7 +366,7 @@ void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
     }
   }
 }
-bool Maze::backupWallLogsToFile(const std::string filepath, const bool clear) {
+bool Maze::backupWallLogsToFile(const std::string &filepath, const bool clear) {
   /* 変更なし */
   if (!clear && backup_counter == wallLogs.size())
     return true;
@@ -392,7 +392,7 @@ bool Maze::backupWallLogsToFile(const std::string filepath, const bool clear) {
   }
   return true;
 }
-bool Maze::restoreWallLogsFromFile(const std::string filepath) {
+bool Maze::restoreWallLogsFromFile(const std::string &filepath) {
   std::ifstream f(filepath, std::ios::binary);
   if (f.fail()) {
     loge << "failed to open file! " << filepath << std::endl;

@@ -57,7 +57,7 @@ public:
                   const bool right) {
     return searchAlgorithm.updateWall(state, pose, left, front, right);
   }
-  bool updateWall(const Position p, const Direction d, const bool b) {
+  bool updateWall(const Position &p, const Direction d, const bool b) {
     return searchAlgorithm.updateWall(state, p, d, b);
   }
   /**

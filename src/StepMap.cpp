@@ -18,12 +18,12 @@ StepMap::StepMap() {
   calcStraightStepTable();
   reset();
 }
-void StepMap::print(const Maze &maze, const Position p, const Direction d,
+void StepMap::print(const Maze &maze, const Position &p, const Direction d,
                     std::ostream &os) const {
   return print(maze, {d}, p.next(d + Direction::Back), os);
 }
 void StepMap::print(const Maze &maze, const Directions &dirs,
-                    const Position start, std::ostream &os) const {
+                    const Position &start, std::ostream &os) const {
   /* preparation */
   std::vector<Pose> path;
   Position p = start;
@@ -35,7 +35,7 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
     if (step != STEP_MAX)
       max_step = std::max(max_step, step);
   const bool simple = (max_step < 999);
-  const auto find = [&](const WallIndex i) {
+  const auto find = [&](const WallIndex &i) {
     return std::find_if(path.cbegin(), path.cend(), [&](const Pose pose) {
       return WallIndex(pose.p, pose.d) == i;
     });
@@ -80,12 +80,12 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
     os << "+" << std::endl;
   }
 }
-void StepMap::printFull(const Maze &maze, const Position p, const Direction d,
+void StepMap::printFull(const Maze &maze, const Position &p, const Direction d,
                         std::ostream &os) const {
   return printFull(maze, {d}, p.next(d + Direction::Back), os);
 }
 void StepMap::printFull(const Maze &maze, const Directions &dirs,
-                        const Position start, std::ostream &os) const {
+                        const Position &start, std::ostream &os) const {
   std::vector<Pose> path;
   Position p = start;
   for (const auto d : dirs) {
@@ -190,7 +190,7 @@ void StepMap::update(const Maze &maze, const Positions &dest,
   }
 }
 const Directions StepMap::calcShortestDirections(const Maze &maze,
-                                                 const Position start,
+                                                 const Position &start,
                                                  const Positions &dest,
                                                  const bool known_only,
                                                  const bool simple) {
