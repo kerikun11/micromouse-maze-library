@@ -330,6 +330,50 @@ void Maze::print(const Directions &dirs, const Position &start,
     os << "+" << std::endl;
   }
 }
+void Maze::print(const Positions &positions, std::ostream &os,
+                 const size_t maze_size) const {
+  /* preparation */
+  const auto exists = [&](const Position &p) {
+    return std::find(positions.cbegin(), positions.cend(), p) !=
+           positions.cend();
+  };
+  const auto &maze = *this;
+  /* start to draw maze */
+  for (int8_t y = maze_size; y >= 0; --y) {
+    if (y != (int)maze_size) {
+      for (uint8_t x = 0; x <= maze_size; ++x) {
+        /* Vertical Wall */
+        const auto w = maze.isWall(x, y, Direction::West);
+        const auto k = maze.isKnown(x, y, Direction::West);
+        os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
+        /* Breaking Condition */
+        if (x == maze_size)
+          break;
+        /* Cell */
+        const auto p = Position(x, y);
+        if (p == start)
+          os << C_BL << " S " << C_NO;
+        else if (std::find(goals.cbegin(), goals.cend(), p) != goals.cend())
+          os << C_BL << " G " << C_NO;
+        else if (exists(p))
+          os << C_YE << " X " << C_NO;
+        else
+          os << "   ";
+      }
+      os << std::endl;
+    }
+    for (uint8_t x = 0; x < maze_size; ++x) {
+      /* Pillar */
+      os << "+";
+      /* Horizontal Wall */
+      const auto w = maze.isWall(x, y, Direction::South);
+      const auto k = maze.isKnown(x, y, Direction::South);
+      os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
+    }
+    /* Last Pillar */
+    os << "+" << std::endl;
+  }
+}
 void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
                                     const bool diag_enabled) {
   /* ゴール区画までたどる */

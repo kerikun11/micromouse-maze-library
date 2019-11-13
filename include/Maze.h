@@ -585,13 +585,19 @@ public:
   void print(std::ostream &os = std::cout,
              const int maze_size = MAZE_SIZE) const;
   /**
-   * @brief パス付の迷路の表示
+   * @brief パス付きの迷路の表示
    * @param start パスのスタート座標
    * @param dirs 移動方向の配列
    * @param of output-stream
    */
   void print(const Directions &dirs, const Position &start = Position(0, 0),
              std::ostream &os = std::cout,
+             const size_t maze_size = MAZE_SIZE) const;
+  /**
+   * @brief 位置のハイライト付きの迷路の表示
+   * @param positions ハイライト位置s
+   */
+  void print(const Positions &positions, std::ostream &os = std::cout,
              const size_t maze_size = MAZE_SIZE) const;
   /**
    * @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
@@ -672,6 +678,7 @@ private:
   bool isWallBase(const std::bitset<WallIndex::SIZE> &wall,
                   const WallIndex &i) const {
     return i.isInsideOfField() ? wall[i.getIndex()] : true;
+    // return !i.isInsideOfField() || wall[i.getIndex()];
   }
   /**
    * @brief 壁の更新のベース関数
