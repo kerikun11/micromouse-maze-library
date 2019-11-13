@@ -135,6 +135,60 @@ int main(void) {
 #endif
 
 #if 1
+  /* StepMapDijkstra */
+  for (const auto simple : {true, false}) {
+    const bool known_only = 0;
+    const Maze &maze = maze_target;
+    const auto p = std::make_unique<StepMap>();
+    StepMap &map = *p;
+    std::chrono::microseconds sum{0};
+    const int n = 100;
+    Positions shortest_indexes;
+    for (int i = 0; i < n; ++i) {
+      const auto t_s = std::chrono::system_clock().now();
+      shortest_indexes =
+          map.calcShortestDirectionsDijkstra(maze, known_only, simple);
+      if (shortest_indexes.empty())
+        loge << "Failed!" << std::endl;
+      const auto t_e = std::chrono::system_clock().now();
+      const auto us =
+          std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+      sum += us;
+    }
+    std::cout << "StepMapDi " << (simple ? "s" : "n") << ":\t"
+              << sum.count() / n << "\t[us]" << std::endl;
+    // maze.print(shortest_indexes);
+  }
+#endif
+
+#if 1
+  /* BFS */
+  for (const auto simple : {true, false}) {
+    const bool known_only = 0;
+    const Maze &maze = maze_target;
+    const auto p = std::make_unique<StepMap>();
+    StepMap &map = *p;
+    std::chrono::microseconds sum{0};
+    const int n = 100;
+    Positions shortest_indexes;
+    for (int i = 0; i < n; ++i) {
+      const auto t_s = std::chrono::system_clock().now();
+      shortest_indexes =
+          map.calcShortestDirectionsBFS(maze, known_only, simple);
+      if (shortest_indexes.empty())
+        loge << "Failed!" << std::endl;
+      const auto t_e = std::chrono::system_clock().now();
+      const auto us =
+          std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
+      sum += us;
+    }
+    std::cout << "StepMapBFS " << (simple ? "s" : "n") << ":\t"
+              << sum.count() / n << "\t[us]" << std::endl;
+    maze.print(shortest_indexes);
+  }
+#endif
+
+#if 1
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
@@ -181,7 +235,8 @@ int main(void) {
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
       sum += us;
     }
-    std::cout << "StepMapSlalom\t" << sum.count() / n << "\t[us]" << std::endl;
+    std::cout << "StepSla " << (diag_enabled ? "diag" : "no_d") << ":\t"
+              << sum.count() / n << "\t[us]" << std::endl;
     map.print(maze, path);
     // auto shortest_dirs = map.indexes2directions(path, diag_enabled);
     // Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);

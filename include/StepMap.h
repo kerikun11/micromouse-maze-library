@@ -120,6 +120,18 @@ public:
    */
   const Directions calcNextDirectionCandidates(const Maze &maze,
                                                const Pose &focus) const;
+  /**
+   * @brief Dijkstra Search
+   */
+  const Positions calcShortestDirectionsDijkstra(const Maze &maze,
+                                                 const bool known_only,
+                                                 const bool simple);
+  /**
+   * @brief Breadth First Search
+   */
+  const Positions calcShortestDirectionsBFS(const Maze &maze,
+                                            const bool known_only,
+                                            const bool simple);
 
 private:
   std::array<step_t, Position::SIZE> step_map; /**< @brief ステップ数*/
