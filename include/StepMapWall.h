@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Maze.h"
-#include "StepMap.h" /*< for step_t, STEP_MAX */
+#include <limits> /*< for std::numeric_limits */
 
 namespace MazeLib {
 
