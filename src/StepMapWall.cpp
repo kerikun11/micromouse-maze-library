@@ -236,12 +236,12 @@ static StepMapWall::step_t gen_cost_impl(const int i, const float am,
     return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 100; /*< 台形加速 */
 }
 void StepMapWall::calcStraightStepTable() {
-  float vs = 450.0f;         /*< 基本速度 [mm/s] */
-  float am_a = 4800.0f;      /*< 最大加速度 [mm/s/s] */
-  float am_d = 3600.0f;      /*< 最大加速度(斜め) [mm/s/s] */
-  float vm_a = 1800.0f;      /*< 飽和速度 [mm/s] */
-  float vm_d = 1200.0f;      /*< 飽和速度(斜め) [mm/s] */
-  const float seg_a = 90.0f; /*< 1区画の長さ [mm] */
+  const float vs = 450.0f;    /*< 基本速度 [mm/s] */
+  const float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
+  const float am_d = 3600.0f; /*< 最大加速度(斜め) [mm/s/s] */
+  const float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
+  const float vm_d = 1200.0f; /*< 飽和速度(斜め) [mm/s] */
+  const float seg_a = 90.0f;  /*< 1区画の長さ [mm] */
   const float seg_d = 45.0f * std::sqrt(2); /*< 1区画の長さ(斜め) [mm] */
   for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);

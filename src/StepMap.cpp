@@ -482,10 +482,10 @@ static StepMap::step_t gen_cost_impl(const int i, const float am,
     return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 1000; /*< 台形加速 */
 }
 void StepMap::calcStraightStepTable() {
-  float vs = 450.0f;         /*< 基本速度 [mm/s] */
-  float am_a = 4800.0f;      /*< 最大加速度 [mm/s/s] */
-  float vm_a = 1800.0f;      /*< 飽和速度 [mm/s] */
-  const float seg_a = 90.0f; /*< 区画の長さ [mm] */
+  const float vs = 450.0f;    /*< 基本速度 [mm/s] */
+  const float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
+  const float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
+  const float seg_a = 90.0f;  /*< 区画の長さ [mm] */
   for (int i = 0; i < MAZE_SIZE; ++i)
     step_table[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
   const step_t turn_cost = 280 - step_table[1];
