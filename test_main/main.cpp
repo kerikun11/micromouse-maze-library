@@ -13,12 +13,23 @@ class CLRobot : public CLRobotBase {
 public:
   CLRobot(const Maze &maze_target) : CLRobotBase(maze_target) {}
   bool display = false;
+  bool continue_straight_if_no_front_wall = false;
+  bool continue_straight_if_no_front_wall_prev = false;
 
 protected:
   virtual void
   calcNextDirectionsPostCallback(SearchAlgorithm::State prevState,
                                  SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
+    const auto d = !getNextDirections().empty() ? getNextDirections().back()
+                                                : current_pose.d;
+    continue_straight_if_no_front_wall_prev =
+        continue_straight_if_no_front_wall;
+    continue_straight_if_no_front_wall =
+        newState != SearchAlgorithm::GOING_TO_GOAL &&
+        newState != SearchAlgorithm::IDENTIFYING_POSITION &&
+        !getNextDirectionCandidates().empty() &&
+        getNextDirectionCandidates()[0] == d;
 #if 0
     /* 既知区間観測用 */
     if (getNextDirections().size() > 0) {
@@ -46,6 +57,14 @@ protected:
       printInfo();
       // getc(stdin);
       // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    if (continue_straight_if_no_front_wall_prev &&
+        getNextDirections().empty() &&
+        !maze.isWall(current_pose.p, current_pose.d) &&
+        action != Action::ST_FULL) {
+      printInfo();
+      logw << std::endl;
+      getc(stdin);
     }
     CLRobotBase::queueAction(action);
   }
