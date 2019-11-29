@@ -47,6 +47,7 @@ public:
 public:
   SearchAlgorithm(Maze &maze) : maze(maze) {}
   bool isComplete();
+  bool isSolvable();
   void positionIdentifyingInit(Pose &current_pose);
   bool updateWall(const State state, const Pose &pose, const bool left,
                   const bool front, const bool right);

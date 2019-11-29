@@ -27,8 +27,12 @@ const char *SearchAlgorithm::getStateString(const State s) {
 }
 bool SearchAlgorithm::isComplete() {
   Positions candidates;
-  findShortestCandidates(candidates, false);
+  if (!findShortestCandidates(candidates, false))
+    return false;
   return candidates.empty();
+}
+bool SearchAlgorithm::isSolvable() {
+  return !step_map.calcShortestDirections(maze, false, false).empty();
 }
 void SearchAlgorithm::positionIdentifyingInit(Pose &current_pose) {
   idOffset = Position(MAZE_SIZE / 2, MAZE_SIZE / 2);

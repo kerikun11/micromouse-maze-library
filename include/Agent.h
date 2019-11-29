@@ -38,6 +38,10 @@ public:
    */
   bool isComplete() { return searchAlgorithm.isComplete(); }
   /**
+   * @brief ゴールが封印されていないか確認する関数
+   */
+  bool isSolvable() { return searchAlgorithm.isSolvable(); }
+  /**
    * @brief 現在地を更新
    * @param p 区画座標
    * @param d 絶対方向
