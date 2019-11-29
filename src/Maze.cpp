@@ -145,12 +145,13 @@ void Maze::resetLastWalls(const int num) {
   for (int i = 0; i < num; ++i)
     if (!wallLogs.empty())
       wallLogs.pop_back();
+  /* 編集済みの壁情報を取得 */
   const auto new_wallLogs = wallLogs;
   /* スタート壁を考慮して迷路をリセット */
-  reset(isKnown(getStart(), Direction::East) &&
+  reset(isWall(getStart(), Direction::East) &&
+        isKnown(getStart(), Direction::East) &&
         canGo(getStart(), Direction::North));
-  wallLogs = new_wallLogs;
-  for (const auto wl : wallLogs)
+  for (const auto wl : new_wallLogs)
     updateWall(wl.getPosition(), wl.getDirection(), wl.b);
   return;
 }
