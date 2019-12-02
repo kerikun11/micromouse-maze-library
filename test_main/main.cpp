@@ -58,6 +58,8 @@ protected:
       // getc(stdin);
       // std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+#if 0
+    /* 未知区間加速のバグ探し */
     if (continue_straight_if_no_front_wall_prev &&
         getNextDirections().empty() &&
         !maze.isWall(current_pose.p, current_pose.d) &&
@@ -66,6 +68,7 @@ protected:
       logw << std::endl;
       getc(stdin);
     }
+#endif
     CLRobotBase::queueAction(action);
   }
 };
@@ -78,7 +81,7 @@ int main(void) {
 #if 1
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = "32MM2016HX.maze";
+  const std::string filename = "32MM2019HX.maze";
   Maze maze_target = Maze((mazedata_dir + filename).c_str());
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;
@@ -89,6 +92,7 @@ int main(void) {
   /* Search Run */
   robot.display = 1;
   robot.searchRun();
+  robot.updateCurrentPose({Position(0, 1), Direction::South});
   robot.printInfo();
   robot.fastRun(false);
   // robot.endFastRunBackingToStartRun();
@@ -96,6 +100,22 @@ int main(void) {
   robot.fastRun(true);
   robot.printPath();
   // robot.endFastRunBackingToStartRun();
+#endif
+
+#if 1
+  /* Show Result */
+  std::printf("Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
+              "Left: %3d, Right: %3d, Back: %3d\n",
+              ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step,
+              robot.f, robot.l, robot.r, robot.b);
+  for (bool diag_enabled : {true, false}) {
+    robot.fastRun(diag_enabled);
+    robot.printPath();
+    std::cout << "Estimated Shortest Time "
+              << (diag_enabled ? "(diag)" : "(no diag)") << ": "
+              << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
+              << std::endl;
+  }
 #endif
 
 #if 1

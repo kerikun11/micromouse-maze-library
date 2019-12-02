@@ -29,7 +29,7 @@ int test_measurement() {
   // filenames.push_back("16MM2019H_Chubu.maze");
   filenames.push_back("32MM2016HX.maze");
 #else
-  for (int year = 2018; year >= 2010; --year)
+  for (int year = 2019; year >= 2010; --year)
     filenames.push_back("32MM" + std::to_string(year) + "HX.maze");
   for (int year = 2018; year >= 2014; --year)
     filenames.push_back("21MM" + std::to_string(year) + "HX_Taiwan.maze");
@@ -40,11 +40,12 @@ int test_measurement() {
   for (int year = 2019; year >= 2017; --year)
     filenames.push_back("16MM" + std::to_string(year) + "H_Chubu.maze");
   for (const auto filename : {
+           "16MM2019H_Tashiro.maze",
+           "16MM2019H_student.maze",
            "16MM2019H_Kyushu.maze",
            "16MM2019H_kansai.maze",
            "16MM2019H_kanazawa.maze",
            "16MM2019H_hokuriku.maze",
-           "16MM2019H_student.maze",
            "16MM2019H_East.maze",
            "16MM2018H_semi.maze",
            "16MM2017HX_pre.maze",
@@ -120,7 +121,7 @@ int test_measurement() {
       at.calcShortestDirections(diag_enabled);
       if (at.getShortestDirections() != robot.getShortestDirections()) {
         logw << "searched path is not shortest! "
-             << (diag_enabled ? "diag" : "no_diag") << std::endl;
+             << (diag_enabled ? "(diag)" : "(no_diag)") << std::endl;
         logw << "target: " << at.getSearchAlgorithm().getShortestCost()
              << " search: " << robot.getSearchAlgorithm().getShortestCost()
              << std::endl;
