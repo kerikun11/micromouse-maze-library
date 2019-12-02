@@ -221,12 +221,15 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
   /* スラロームコスト考慮 */
   candidates.clear();
   for (const auto diag_enabled : {true, false}) {
-    Indexes path;
-    if (!shortestAlgorithm.calcShortestPath(path, false, diag_enabled))
-      return false; /*< 失敗 */
-    const auto dirs = ShortestAlgorithm::indexes2directions(path, diag_enabled);
+    Directions shortest_dirs;
+    const StepMapSlalom::EdgeCost edge_cost;
+    const bool known_only = false;
+    if (!step_map_slalom.calcShortestDirections(maze, edge_cost, shortest_dirs,
+                                                known_only, diag_enabled))
+      return false; /* failed */
+    Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);
     auto p = maze.getStart();
-    for (const auto d : dirs) {
+    for (const auto d : shortest_dirs) {
       p = p.next(d);
       if (maze.unknownCount(p))
         candidates.push_back(p);
