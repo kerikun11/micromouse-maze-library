@@ -4,7 +4,7 @@ using namespace MazeLib;
 
 class CLRobot : public CLRobotBase {
 public:
-  CLRobot(const Maze &maze_target) : CLRobotBase(maze_target) {}
+  CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
   bool display = 0;
   void printInfo() {
     CLRobotBase::printInfo();
@@ -48,9 +48,7 @@ protected:
 int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = "32MM2016HX.maze";
-  // const std::string filename = "16MM2019H_kansai.maze";
-  // const std::string filename = "16MM2019H_kanazawa.maze";
+  const std::string filename = "32MM2019HX.maze";
   Maze maze_target = Maze((mazedata_dir + filename).c_str());
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;
@@ -61,9 +59,7 @@ int test_position_identify() {
 #if 0
   /* Position Identification Run */
   robot.display = 1;
-  robot.fake_offset = robot.real =
-      Pose(Position(1, 1), Direction::East); /*< kanazawa */
-  robot.fake_offset = robot.real = Pose(Position(18, 15), Direction::South);
+  robot.fake_offset = robot.real = Pose(Position(23, 11), Direction::South);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();

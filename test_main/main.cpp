@@ -11,7 +11,7 @@ std::ofstream csv("main.csv");
 
 class CLRobot : public CLRobotBase {
 public:
-  CLRobot(const Maze &maze_target) : CLRobotBase(maze_target) {}
+  CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
   bool display = false;
   bool continue_straight_if_no_front_wall = false;
   bool continue_straight_if_no_front_wall_prev = false;

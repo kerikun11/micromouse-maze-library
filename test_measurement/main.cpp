@@ -5,7 +5,7 @@ using namespace MazeLib;
 
 class CLRobot : public CLRobotBase {
 public:
-  CLRobot(const Maze &maze_target) : CLRobotBase(maze_target) {}
+  CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
 
 protected:
   virtual void queueAction(const Action action) override {

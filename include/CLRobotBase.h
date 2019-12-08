@@ -19,8 +19,7 @@ namespace MazeLib {
 
 class CLRobotBase : public RobotBase {
 public:
-  CLRobotBase(const Maze &maze_target)
-      : RobotBase(maze), maze_target(maze_target) {}
+  CLRobotBase(Maze &maze_target) : RobotBase(maze), maze_target(maze_target) {}
 
   void printInfo(bool showMaze = true) {
     RobotBase::printInfo(showMaze);
@@ -82,8 +81,9 @@ public:
     /* 基底関数を呼ぶ */
     return RobotBase::endFastRunBackingToStartRun();
   }
-  bool positionIdentifyRun() {
-    step = f = l = r = b = cost = 0;
+  bool positionIdentifyRun(const bool reset_step = true) {
+    if (reset_step)
+      step = f = l = r = b = cost = 0;
     return RobotBase::positionIdentifyRun();
   }
   void setMaze(const Maze &new_maze) { maze = new_maze; }
@@ -99,7 +99,7 @@ public:
   int t_dur_max = 0;
 
 public:
-  const Maze &maze_target;
+  Maze &maze_target;
   Pose fake_offset;
   Pose real;
   bool real_visit_goal = false;
