@@ -93,13 +93,10 @@ int main(void) {
   robot.display = 1;
   robot.searchRun();
   robot.updateCurrentPose({Position(0, 1), Direction::South});
-  robot.printInfo();
   robot.fastRun(false);
-  // robot.endFastRunBackingToStartRun();
-  robot.printPath();
+  robot.endFastRunBackingToStartRun();
   robot.fastRun(true);
   robot.printPath();
-  // robot.endFastRunBackingToStartRun();
 #endif
 
 #if 1
@@ -109,7 +106,7 @@ int main(void) {
               ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step,
               robot.f, robot.l, robot.r, robot.b);
   for (bool diag_enabled : {true, false}) {
-    robot.fastRun(diag_enabled);
+    robot.calcShortestDirections(diag_enabled);
     robot.printPath();
     std::cout << "Estimated Shortest Time "
               << (diag_enabled ? "(diag)" : "(no diag)") << ": "

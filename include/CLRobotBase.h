@@ -68,15 +68,16 @@ public:
     std::cout << "Walls:    \t" << maze.getWallLogs().size() << std::endl;
   }
   bool fastRun(const bool diag_enabled) {
+    /* 最短経路の導出 */
     if (!calcShortestDirections(diag_enabled)) {
       loge << "Failed to find shortest path!" << std::endl;
       return false;
     }
-    // const auto pose = Pose(maze.getStart().next(getShortestDirections()[0]),
-    //                        getShortestDirections()[0]);
+    /* 現在位置をスタートに設定 */
     const auto pose = Pose(maze.getStart(), getShortestDirections()[0]);
     updateCurrentPose(pose);
     real = pose;
+    /* 移動 */
     queueNextDirections(getShortestDirections());
     return true;
   }

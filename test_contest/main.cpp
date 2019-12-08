@@ -12,7 +12,7 @@ public:
     if (!display)
       return;
     // getc(stdin);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
 
 protected:
@@ -42,8 +42,9 @@ protected:
     if (display) {
       printInfo();
       // getc(stdin);
-      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+      std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
+#if 1
     /* fix mistook wall */
     if (step == 354) {
       maze_target.setWall(0, 28, Direction::East, false);
@@ -58,20 +59,22 @@ protected:
     /* 1st timeout here */
     if (step == 1347) {
       setForceBackToStart();
-      wait();
+      // wait();
     }
     /* 2nd crashed here */
-    if (step == 1502) {
+    if (step == 1503) {
       setBreakFlag();
-      setForceBackToStart();
       wait();
     }
+#endif
     CLRobotBase::queueAction(action);
   }
 };
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
+  std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+  std::cout << "\x1b[J";  /*< カーソル以下を消去 */
 
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
@@ -80,6 +83,8 @@ int main(void) {
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;
   robot.replaceGoals(maze_target.getGoals());
+
+#if 1
   /* Set Mistook Wall */
   maze_target.setWall(0, 28, Direction::East, true);
   maze_target.setWall(0, 29, Direction::East, true);
@@ -124,20 +129,47 @@ int main(void) {
   robot.endFastRunBackingToStartRun();
 
   /* 3rd Fast Run */
+  // robot.wait();
+  // robot.fastRun(false);
+  // robot.wait();
+  // robot.setForceBackToStart();
+  // robot.endFastRunBackingToStartRun();
+#endif
+
+#if 0
+  /* Search Run */
+  robot.display = 1;
+  robot.searchRun();
+  /* 1st Fast Run */
   robot.wait();
   robot.fastRun(false);
   robot.wait();
   robot.setForceBackToStart();
   robot.endFastRunBackingToStartRun();
-
-#if 0
-  /* Result */
-  robot.updateCurrentPose({Position(0, 1), Direction::South});
-  robot.printInfo();
-  robot.fastRun(false);
-  robot.printPath();
+  /* 1st Fast Run */
+  robot.wait();
   robot.fastRun(true);
-  robot.printPath();
+  robot.wait();
+  robot.setForceBackToStart();
+  robot.endFastRunBackingToStartRun();
+#endif
+
+#if 1
+  /* Result */
+  robot.display = 1;
+  // robot.updateCurrentPose({Position(0, 1), Direction::South});
+  // robot.printInfo();
+  for (bool diag_enabled : {true, false}) {
+    robot.calcShortestDirections(diag_enabled);
+    std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+    std::cout << "\x1b[J";  /*< カーソル以下を消去 */
+    robot.printPath();
+    std::cout << "Estimated Shortest Time "
+              << (diag_enabled ? "(diag)" : "(no diag)") << ": "
+              << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
+              << std::endl;
+    robot.wait();
+  }
 #endif
 #if 0
   /* WallLogs */
