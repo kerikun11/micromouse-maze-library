@@ -111,7 +111,6 @@ public:
       calcNextDirections(); /*< 時間がかかる処理！ */
     } else {
       state = SearchAlgorithm::START;
-      calcNextDirections(); /*< 時間がかかる処理！ */
     }
   }
   /**

@@ -61,14 +61,6 @@ bool RobotBase::endFastRunBackingToStartRun() {
   /* 走行開始 */
   return generalSearchRun();
 }
-bool RobotBase::fastRun(const bool diag_enabled) {
-  if (!calcShortestDirections(diag_enabled)) {
-    loge << "Failed to find shortest path!" << std::endl;
-    return false;
-  }
-  /* fast run here */
-  return true;
-}
 
 /* private: */
 
@@ -101,6 +93,8 @@ void RobotBase::queueNextDirections(const Directions &nextDirections) {
       logw << "invalid direction" << std::endl;
     }
     updateCurrentPose(current_pose.next(nextDirection));
+    if (break_flag)
+      return;
   }
 }
 bool RobotBase::generalSearchRun() {
@@ -115,6 +109,8 @@ bool RobotBase::generalSearchRun() {
     const auto status = calcNextDirections(); /*< 時間がかかる処理！ */
     const auto newState = getState();
     calcNextDirectionsPostCallback(prevState, newState);
+    /* 既知区間移動をキューにつめる */
+    queueNextDirections(getNextDirections());
     /* 探索中断を確認 */
     if (break_flag) {
       break_flag = false;
@@ -122,8 +118,6 @@ bool RobotBase::generalSearchRun() {
       stopDequeue();
       return false;
     }
-    /* 既知区間移動をキューにつめる */
-    queueNextDirections(getNextDirections());
     /* 最短経路導出結果を確認 */
     if (status == SearchAlgorithm::Reached)
       break;

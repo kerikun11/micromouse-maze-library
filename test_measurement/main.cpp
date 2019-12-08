@@ -1,6 +1,8 @@
 #include "CLRobotBase.h"
 #include "ShortestAlgorithm.h"
 
+#define PI_ENABLED 0
+
 using namespace MazeLib;
 
 class CLRobot : public CLRobotBase {
@@ -130,7 +132,7 @@ int test_measurement() {
     }
 #endif
 
-#if 1
+#if PI_ENABLED
     /* Position Identification Run */
     robot.t_dur_max = 0;
     float id_cost_max = 0;   /*< 探索時間 [秒] */

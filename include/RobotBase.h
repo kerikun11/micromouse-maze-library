@@ -99,7 +99,6 @@ public:
   bool searchRun();
   bool positionIdentifyRun(const bool set_going_to_goal = true);
   bool endFastRunBackingToStartRun();
-  bool fastRun(const bool diagonal);
   void setBreakFlag(const bool break_flag = true) {
     this->break_flag = break_flag;
   }
@@ -126,7 +125,7 @@ protected:
                                               __attribute__((unused))) {}
   virtual void discrepancyWithKnownWall() {}
 
-private:
+protected:
   /**
    * @brief 処理関数
    */

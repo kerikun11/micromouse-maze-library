@@ -67,6 +67,19 @@ public:
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
     std::cout << "Walls:    \t" << maze.getWallLogs().size() << std::endl;
   }
+  bool fastRun(const bool diag_enabled) {
+    if (!calcShortestDirections(diag_enabled)) {
+      loge << "Failed to find shortest path!" << std::endl;
+      return false;
+    }
+    // const auto pose = Pose(maze.getStart().next(getShortestDirections()[0]),
+    //                        getShortestDirections()[0]);
+    const auto pose = Pose(maze.getStart(), getShortestDirections()[0]);
+    updateCurrentPose(pose);
+    real = pose;
+    queueNextDirections(getShortestDirections());
+    return true;
+  }
   bool endFastRunBackingToStartRun() {
     /* エラー処理 */
     if (getShortestDirections().empty()) {

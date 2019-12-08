@@ -49,13 +49,17 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
         const auto k = maze.isKnown(x, y, Direction::West);
         const auto it = find(WallIndex(Position(x, y), Direction::West));
         if (it != path.cend())
-          os << C_YE << it->d << C_NO;
+          // os << C_YE << it->d << C_NO;
+          os << "\e[43m"
+             << "\e[34m" << it->d << C_NO;
         else
           os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
         /* Cell */
         if (x != maze_size) {
           if (getStep(x, y) == STEP_MAX)
             os << C_CY << "999" << C_NO;
+          else if (getStep(x, y) == 0)
+            os << C_YE << std::setw(3) << getStep(x, y) << C_NO;
           else if (simple)
             os << C_CY << std::setw(3) << getStep(x, y) << C_NO;
           else
@@ -72,7 +76,10 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
       const auto k = maze.isKnown(x, y, Direction::South);
       const auto it = find(WallIndex(Position(x, y), Direction::South));
       if (it != path.cend())
-        os << C_YE << " " << it->d << " " << C_NO;
+        // os << C_YE << " " << it->d << " " << C_NO;
+        os << " "
+           << "\e[43m"
+           << "\e[34m" << it->d << C_NO << " ";
       else
         os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
     }

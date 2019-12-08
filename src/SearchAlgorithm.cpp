@@ -268,7 +268,6 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
       i = i.next(d);
       if (!maze.isKnown(i)) {
         candidates.push_back(i.getPosition());
-        candidates.push_back(i.getPosition().next(i.getDirection()));
       }
     }
     /* ゴール区画内を行けるところまで直進する */
@@ -280,7 +279,6 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
           break;
         if (!maze.isKnown(i)) {
           candidates.push_back(i.getPosition());
-          candidates.push_back(i.getPosition().next(i.getDirection()));
         }
       }
     }
