@@ -49,6 +49,8 @@ public:
   static const Directions
   convertWallIndexDirectionsToPositionDirections(const Directions &src,
                                                  const WallIndex &start);
+  static void appendStraightDirections(const Maze &maze,
+                                       Directions &shortest_dirs);
 
 private:
   std::array<step_t, WallIndex::SIZE> step_map; /**< @brief ステップ数*/

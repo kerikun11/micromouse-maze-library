@@ -21,13 +21,17 @@
 namespace MazeLib {
 
 /**
- * @brief 迷路の1辺の区画数の定数．2の累乗でなければならない
+ * @brief 迷路の1辺の区画数の定数．
  */
 static constexpr int MAZE_SIZE = 32;
 /**
  * @brief 迷路の1辺の区画数の bit 数．bit shift などに用いる．
  */
-static constexpr int MAZE_SIZE_BIT = std::log2(MAZE_SIZE);
+static constexpr int MAZE_SIZE_BIT = std::ceil(std::log2(MAZE_SIZE));
+/**
+ * @brief 迷路の1辺の区画数の最大値．2 の bit 数乗の値．
+ */
+static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 
 /**
  * @brief 迷路のカラー表示切替
@@ -181,7 +185,7 @@ using Directions = std::vector<Direction>;
 struct Position {
 public:
   /** @brief フィールドの区画数．配列確保などで使える． */
-  static constexpr int SIZE = MAZE_SIZE * MAZE_SIZE;
+  static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX;
 
 public:
   int8_t x; /**< @brief 迷路区画のx座標成分 */
@@ -312,7 +316,7 @@ struct WallIndex {
    * @brief 壁を unique な通し番号として表現したときの総数．
    * 配列の確保などで使用できる．
    */
-  static constexpr int SIZE = MAZE_SIZE * MAZE_SIZE * 2;
+  static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 2;
 
 public:
   int8_t x;      /**< @brief 区画座標のx成分 */

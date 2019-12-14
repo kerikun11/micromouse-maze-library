@@ -171,13 +171,13 @@ private:
 public:
 #define INDEX_ARRANGEMENT 3
 #if INDEX_ARRANGEMENT == 0
-  static constexpr int Max = MAZE_SIZE * MAZE_SIZE * 8;
+  static constexpr int Max = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 8;
 #elif INDEX_ARRANGEMENT == 1
-  static constexpr int Max = MAZE_SIZE * MAZE_SIZE * 16;
+  static constexpr int Max = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 16;
 #elif INDEX_ARRANGEMENT == 2
-  static constexpr int Max = MAZE_SIZE * MAZE_SIZE * 6;
+  static constexpr int Max = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 6;
 #elif INDEX_ARRANGEMENT == 3
-  static constexpr int Max = MAZE_SIZE * MAZE_SIZE * 12;
+  static constexpr int Max = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 12;
 #endif
 
 public:

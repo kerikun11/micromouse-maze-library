@@ -152,21 +152,18 @@ const Directions StepMapWall::calcShortestDirections(const Maze &maze,
     auto min_i = focus;
     /* 周辺を走査 */
     for (const auto d : focus.getNextDirection6()) {
-      auto next = focus; /*< 隣接 */
-      /* 直線で行けるところまで更新する */
-      for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
-        next = next.next(d); /*< 移動 */
-        /* 壁があったら次へ */
-        if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
-          break;
-        /* min_step よりステップが小さければ更新 (同じなら更新しない) */
-        const auto next_step = step_map[next.getIndex()];
-        if (min_step <= next_step)
-          break;
-        min_step = next_step;
-        min_d = d;
-        min_i = next;
-      }
+      auto next = focus;   /*< 隣接 */
+      next = next.next(d); /*< 移動 */
+      /* 壁があったら次へ */
+      if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
+        continue;
+      /* min_step よりステップが小さければ更新 (同じなら更新しない) */
+      const auto next_step = step_map[next.getIndex()];
+      if (min_step <= next_step)
+        continue;
+      min_step = next_step;
+      min_d = d;
+      min_i = next;
     }
     /* focus_step より大きかったらなんかおかしい */
     if (step_map[focus.getIndex()] <= min_step)
@@ -222,6 +219,21 @@ const Directions StepMapWall::convertWallIndexDirectionsToPositionDirections(
     i = i.next(d);
   }
   return dirs;
+}
+void StepMapWall::appendStraightDirections(const Maze &maze,
+                                           Directions &shortest_dirs) {
+  auto i = WallIndex(0, 0, 1);
+  for (const auto d : shortest_dirs)
+    i = i.next(d);
+  if (shortest_dirs.size()) {
+    const auto d = shortest_dirs.back();
+    while (1) {
+      i = i.next(d);
+      if (maze.isWall(i))
+        break;
+      shortest_dirs.push_back(d);
+    }
+  }
 }
 
 static StepMapWall::step_t gen_cost_impl(const int i, const float am,

@@ -215,20 +215,17 @@ const Directions StepMap::calcShortestDirections(const Maze &maze,
     /* 周辺を走査 */
     for (const auto d : Direction::getAlong4()) {
       auto next = focus; /*< 隣接 */
-      /* 直線で行けるところまで更新する */
-      for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
-        /* 壁があったら次へ */
-        if (maze.isWall(next, d) || (known_only && !maze.isKnown(next, d)))
-          break;
-        next = next.next(d); /*< 移動 */
-        /* min_step よりステップが小さければ更新 (同じなら更新しない) */
-        const auto next_step = getStep(next);
-        if (min_step <= next_step)
-          break;
-        min_step = next_step;
-        min_d = d;
-        min_i = next;
-      }
+      /* 壁があったら次へ */
+      if (maze.isWall(next, d) || (known_only && !maze.isKnown(next, d)))
+        continue;
+      next = next.next(d); /*< 移動 */
+      /* min_step よりステップが小さければ更新 (同じなら更新しない) */
+      const auto next_step = getStep(next);
+      if (min_step <= next_step)
+        continue;
+      min_step = next_step;
+      min_d = d;
+      min_i = next;
     }
     /* focus_step より大きかったらなんかおかしい */
     if (getStep(focus) <= min_step)

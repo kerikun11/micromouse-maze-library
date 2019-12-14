@@ -122,7 +122,7 @@ public:
     /**
      * @brief 迷路中の Index の総数．
      */
-    static constexpr int SIZE = MAZE_SIZE * MAZE_SIZE * 12;
+    static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 12;
 
   public:
     /** @brief デフォルトコンストラクタ */
