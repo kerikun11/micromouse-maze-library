@@ -40,18 +40,19 @@ public:
         int w = wall_unit_px;
         int s = MazeLib::MAZE_SIZE;
         for (int i = 0; i < MazeLib::MAZE_SIZE; ++i) {
-            scene->addText(QString::number(i))->setPos((i + 0.25) * w, s * w);
-            scene->addText(QString::number(i))->setPos(-w, (s - i - 1) * w);
+            QFont font;
+            font.setPointSize(font_size);
+            scene->addText(QString::number(i), font)->setPos((i + 0.25) * w, s * w);
+            scene->addText(QString::number(i), font)->setPos(-w, (s - i - 1) * w);
         }
         /* Print Cell Line */
-        //        QPen pen;
-        //        pen.setColor(Qt::gray);
-        //        pen.setStyle(Qt::DotLine);
-        //        for(int i=0; i<MazeLib::MAZE_SIZE + 1; ++i) {
-        //            scene->addLine(cell2posX(i), cell2posY(0), cell2posX(i),
-        //            cell2posY(s), pen); scene->addLine(cell2posX(0), cell2posY(i),
-        //            cell2posX(s), cell2posY(i), pen);
-        //        }
+//        QPen pen;
+//        pen.setColor(Qt::gray);
+//        pen.setStyle(Qt::DotLine);
+//        for(int i=0; i<MazeLib::MAZE_SIZE + 1; ++i) {
+//            scene->addLine(cell2posX(i), cell2posY(0), cell2posX(i), cell2posY(s), pen);
+//            scene->addLine(cell2posX(0), cell2posY(i), cell2posX(s), cell2posY(i), pen);
+//        }
     }
     void drawMaze(const Maze& maze)
     {
@@ -87,7 +88,7 @@ public:
         for (int x = 0; x < MazeLib::MAZE_SIZE; ++x)
             for (int y = 0; y < MazeLib::MAZE_SIZE; ++y) {
                 QFont font;
-                font.setPointSize(5);
+                font.setPointSize(font_size);
                 scene
                     ->addText(QString::number(std::min((int)map.getStep(x, y), 99999)),
                         font)
@@ -129,7 +130,7 @@ public:
             QPoint p1 = getGraphicPointByPose(Pose(p, d), diag_enabled);
             QPoint p2 = getGraphicPointByPose(Pose(next_p, next_d), diag_enabled);
             QPen pen(Qt::yellow);
-            pen.setWidth(2);
+            pen.setWidth(line_px);
             scene->addLine(p1.x(), p1.y(), p2.x(), p2.y(), pen);
             p = next_p;
         }
@@ -152,11 +153,11 @@ public:
             const auto d = dirs[i];
             const auto next_p = p.next(d);
             const auto next_d = diag_enabled ? dirs[i + 1] : d;
-            QPoint offset(-2, -2);
+            QPoint offset(-line_px, -line_px);
             QPoint p1 = getGraphicPointByPose(Pose(p, d), diag_enabled) + offset;
             QPoint p2 = getGraphicPointByPose(Pose(next_p, next_d), diag_enabled) + offset;
             QPen pen(Qt::blue);
-            pen.setWidth(2);
+            pen.setWidth(line_px);
             scene->addLine(p1.x(), p1.y(), p2.x(), p2.y(), pen);
             p = next_p;
         }
@@ -176,11 +177,11 @@ public:
         for (size_t i = 0; i < dirs.size(); ++i) {
             const auto d = dirs[i];
             const auto next_p = p.next(d);
-            QPoint offset(2, 2);
+            QPoint offset(line_px, line_px);
             QPoint p1 = getGraphicPointByPose(Pose(p.getPosition(), p.getDirection()), diag_enabled) + offset;
             QPoint p2 = getGraphicPointByPose(Pose(next_p.getPosition(), next_p.getDirection()), diag_enabled) + offset;
             QPen pen(Qt::magenta);
-            pen.setWidth(2);
+            pen.setWidth(line_px);
             scene->addLine(p1.x(), p1.y(), p2.x(), p2.y(), pen);
             p = next_p;
         }
@@ -192,9 +193,11 @@ private:
     QTimer* timer = new QTimer();
     Ui::MainWindow* ui;
     QGraphicsScene* scene;
-    int wall_unit_px = 28;
-    int pillar_px = 2;
+    int wall_unit_px = 24 * 32 / MAZE_SIZE + 4;
+    int pillar_px = 2 * 32 / MAZE_SIZE;
+    int line_px = pillar_px;
     int wall_px = wall_unit_px - pillar_px;
+    int font_size = 10 * 32 / MAZE_SIZE;
 
     QPoint getGraphicPointByPose(const Pose& pose,
         const bool on_the_wall = false)
@@ -218,21 +221,29 @@ private:
         MazeLib::Direction d = pose.d;
         switch (d) {
         case MazeLib::Direction::East:
-            return scene->addLine(cell2posX(x + 1), cell2posY(y) - pillar_px / 2,
-                cell2posX(x + 1),
-                cell2posY(y) - pillar_px / 2 - wall_px, pen);
+            return scene->addLine(
+                        cell2posX(x + 1),
+                        cell2posY(y),
+                        cell2posX(x + 1),
+                        cell2posY(y) - wall_unit_px, pen);
         case MazeLib::Direction::North:
-            return scene->addLine(cell2posX(x) + pillar_px / 2, cell2posY(y + 1),
-                cell2posX(x) + pillar_px / 2 + wall_px,
-                cell2posY(y + 1), pen);
+            return scene->addLine(
+                        cell2posX(x),
+                        cell2posY(y + 1),
+                        cell2posX(x) + wall_unit_px,
+                        cell2posY(y + 1), pen);
         case MazeLib::Direction::West:
-            return scene->addLine(cell2posX(x), cell2posY(y) - pillar_px / 2,
-                cell2posX(x),
-                cell2posY(y) - pillar_px / 2 - wall_px, pen);
+            return scene->addLine(
+                        cell2posX(x),
+                        cell2posY(y),
+                        cell2posX(x),
+                        cell2posY(y) - wall_unit_px, pen);
         case MazeLib::Direction::South:
-            return scene->addLine(cell2posX(x) + pillar_px / 2, cell2posY(y),
-                cell2posX(x) + pillar_px / 2 + wall_px,
-                cell2posY(y), pen);
+            return scene->addLine(
+                        cell2posX(x),
+                        cell2posY(y),
+                        cell2posX(x) + wall_unit_px,
+                        cell2posY(y), pen);
         default:
             break;
         }
