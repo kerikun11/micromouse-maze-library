@@ -171,6 +171,7 @@ public:
         Directions dirs = map.calcShortestDirections(maze, known_only, simple);
         if (dirs.empty())
             return false;
+        map.appendStraightDirections(maze, dirs);
         auto p = WallIndex(0, 0, 1);
         for (size_t i = 0; i < dirs.size(); ++i) {
             const auto d = dirs[i];
@@ -178,7 +179,7 @@ public:
             QPoint offset(2, 2);
             QPoint p1 = getGraphicPointByPose(Pose(p.getPosition(), p.getDirection()), diag_enabled) + offset;
             QPoint p2 = getGraphicPointByPose(Pose(next_p.getPosition(), next_p.getDirection()), diag_enabled) + offset;
-            QPen pen(Qt::green);
+            QPen pen(Qt::magenta);
             pen.setWidth(2);
             scene->addLine(p1.x(), p1.y(), p2.x(), p2.y(), pen);
             p = next_p;

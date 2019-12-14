@@ -60,7 +60,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>KERI's Maze Viewer</string>
+     <string>KERI's Maze Simulator</string>
     </property>
     <property name="textFormat">
      <enum>Qt::RichText</enum>
