@@ -23,11 +23,12 @@ namespace MazeLib {
 /**
  * @brief 迷路の1辺の区画数の定数．
  */
-static constexpr int MAZE_SIZE = 32;
+static constexpr int MAZE_SIZE = 9;
 /**
  * @brief 迷路の1辺の区画数の bit 数．bit shift などに用いる．
  */
-static constexpr int MAZE_SIZE_BIT = std::ceil(std::log2(MAZE_SIZE));
+constexpr int ceil(const auto f) { return int(f) + (f != int(f)); }
+static constexpr int MAZE_SIZE_BIT = ceil(std::log2(MAZE_SIZE));
 /**
  * @brief 迷路の1辺の区画数の最大値．2 の bit 数乗の値．
  */
