@@ -23,7 +23,7 @@ namespace MazeLib {
 /**
  * @brief 迷路の1辺の区画数の定数．
  */
-static constexpr int MAZE_SIZE = 9;
+static constexpr int MAZE_SIZE = 32;
 /**
  * @brief 迷路の1辺の区画数の bit 数．bit shift などに用いる．
  */
