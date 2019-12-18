@@ -54,6 +54,11 @@ public:
       step_map[p.getIndex()] = step;
   }
   /**
+   * @brief ステップマップの配列を取得
+   * @return const auto&
+   */
+  const auto &getMap() const { return step_map; }
+  /**
    * @brief ステップの表示
    * @param p ハイライト区画
    */

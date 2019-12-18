@@ -12,10 +12,10 @@
 
 namespace MazeLib {
 
-void Agent::printInfo(const bool showMaze, const Pose &pose,
+void Agent::printInfo(const bool show_maze, const Pose &pose,
                       const SearchAlgorithm::State state) const {
   /* 迷路を表示 */
-  if (showMaze) {
+  if (show_maze) {
     std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
     searchAlgorithm.printMap(state, pose);
   }

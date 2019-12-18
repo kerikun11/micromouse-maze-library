@@ -145,17 +145,21 @@ public:
   const SearchAlgorithm &getSearchAlgorithm() const { return searchAlgorithm; }
   /**
    * @brief 探索状態を表示
-   * @param showMaze true:迷路も表示, false:迷路は非表示
+   * @param show_maze true:迷路も表示, false:迷路は非表示
    */
-  void printInfo(const bool showMaze = true) const {
-    printInfo(showMaze, current_pose, state);
+  void printInfo(const bool show_maze = true) const {
+    printInfo(show_maze, current_pose, state);
   }
-  void printInfo(const bool showMaze, const Pose &pose,
+  void printInfo(const bool show_maze, const Pose &pose,
                  const SearchAlgorithm::State state) const;
   /**
    * @brief 最短経路の表示
    */
   void printPath() const { maze.print(shortest_dirs, maze.getStart()); }
+  /**
+   * @brief Get the Match Count Value
+   */
+  int getMatchCount() const { return matchCount; }
 
 protected:
   Maze &maze; /**< 使用する迷路の参照 */
