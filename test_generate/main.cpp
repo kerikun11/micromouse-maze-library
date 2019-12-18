@@ -3,13 +3,12 @@
 using namespace MazeLib;
 
 const std::vector<std::string> mazeData = {
-    "636a2aa2a2a2aa2b", "5c160aa028a0aa03", "c3c9c369caa9e215",
-    "682a3c9636aa2155", "c35696a954a21555", "695569635c214015",
-    "c349c289c2155555", "6943e0be29c88895", "c355e0b616363635",
-    "6955e169d5555555", "4349e88aa9c9c955", "5c0a363636363615",
-    "4b43c9c9c9c9c9d5", "4b55636377777775", "4340141400000001",
-    "dc9dc9c9dddddddd",
-
+    "6aaaaaaaaaaaaaa3", "56aaaaaaaaaaaa35", "556aaaaaaaaaa355",
+    "5556aaaaaaaa3555", "55556aaaaaa35555", "555556aaaa355555",
+    "5555556aa3555555", "5555555635555555", "5555555c81555555",
+    "5555555ea9555555", "555555caaa955555", "55555caaaaa95555",
+    "5555caaaaaaa9555", "555caaaaaaaaa955", "55caaaaaaaaaaa95",
+    "dcaaaaaaaaaaaaa9",
 };
 
 int main(void) {
@@ -20,8 +19,8 @@ int main(void) {
   const int maze_size = mazeData.size();
   const std::string output_filename = "output.maze";
   const Positions goals = {
-      Position(6, 9), Position(6, 10), Position(7, 9), Position(7, 10),
-      // Position(7, 7), Position(8, 7), Position(7, 8), Position(8, 8),
+      Position(7, 7), Position(8, 7), Position(7, 8), Position(8, 8),
+      // Position(6, 9), Position(6, 10), Position(7, 9), Position(7, 10),
       // Position(4, 4), Position(5, 4), Position(4, 5), Position(5, 5),
   };
   /* process */
