@@ -1,4 +1,5 @@
 #include "CLRobotBase.h"
+#include <thread>
 
 using namespace MazeLib;
 
@@ -8,9 +9,8 @@ public:
   bool display = 0;
   void printInfo() {
     CLRobotBase::printInfo();
-    std::cout << "\x1b[0K"; /*< カーソルの後ろを削除 */
     std::cout << "P.I. wall:\t"
-              << getSearchAlgorithm().getIdMaze().getWallLogs().size() << "    "
+              << getSearchAlgorithm().getIdMaze().getWallLogs().size()
               << std::endl;
   }
 
@@ -35,6 +35,7 @@ protected:
     if (display) {
       printInfo();
       // getc(stdin);
+      // std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
@@ -59,7 +60,7 @@ int test_position_identify() {
 #if 0
   /* Position Identification Run */
   robot.display = 1;
-  robot.fake_offset = robot.real = Pose(Position(23, 11), Direction::South);
+  robot.fake_offset = robot.real = Pose(Position(5, 3), Direction::North);
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();

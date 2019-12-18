@@ -21,41 +21,105 @@ class CLRobotBase : public RobotBase {
 public:
   CLRobotBase(Maze &maze_target) : RobotBase(maze), maze_target(maze_target) {}
 
-  void printInfo(bool showMaze = true) {
-    RobotBase::printInfo(showMaze);
-    /* 既知区間斜めの変換 */
-    const auto nextDirections = getNextDirections();
-    std::string path;
-    auto prev_d = getCurrentPose().d;
-    for (int i = 0; i < (int)nextDirections.size(); ++i) {
-      const auto next_d = nextDirections[i];
-      switch (Direction(next_d - prev_d)) {
-      case Direction::Front:
-        path += RobotBase::Action::ST_FULL;
-        break;
-      case Direction::Left:
-        path += RobotBase::Action::TURN_L;
-        break;
-      case Direction::Right:
-        path += RobotBase::Action::TURN_R;
-        break;
-      case Direction::Back:
-        path += RobotBase::Action::ST_HALF_STOP;
-        path += RobotBase::Action::ROTATE_180;
-        path += RobotBase::Action::ST_HALF;
-        break;
-      default:
-        loge << std::endl;
-        break;
-      }
-      prev_d = next_d;
+  void printDoubleMaze(std::array<const Maze *, 2> maze,
+                       std::array<const Pose *, 2> pose,
+                       std::array<const StepMap *, 2> step_map,
+                       std::ostream &os) const {
+    /* preparation */
+    const int maze_size = MAZE_SIZE;
+    bool simple[2];
+    for (int i = 0; i < 2; ++i) {
+      StepMap::step_t max_step = 0;
+      for (const auto step : step_map[i]->getMap())
+        if (step != StepMap::STEP_MAX)
+          max_step = std::max(max_step, step);
+      simple[i] = (max_step < 999);
     }
-    /* 表示 */
-    // std::cout << "NextDirectionsKnown:     \x1b[0K";
-    // std::cout << path << std::endl;
-    // std::cout << "NextDirectionsKnownFast: \x1b[0K";
-    // std::cout << RobotBase::pathConvertSearchToKnown(path, true) <<
-    // std::endl;
+    /* start to draw maze */
+    for (int8_t y = maze_size; y >= 0; --y) {
+      if (y != maze_size) {
+        for (int i = 0; i < 2; ++i) {
+          for (uint8_t x = 0; x <= maze_size; ++x) {
+            /* Vertical Wall */
+            const auto w = maze[i]->isWall(x, y, Direction::West);
+            const auto k = maze[i]->isKnown(x, y, Direction::West);
+            const auto d = pose[i]->d;
+            if (WallIndex(pose[i]->p.next(d + Direction::Back), d) ==
+                WallIndex(Position(x, y), Direction::West))
+              os << "\e[43m"
+                 << "\e[34m" << d << C_NO;
+            else
+              os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
+            /* Cell */
+            if (x != maze_size) {
+              if (i == 0) {
+                if (Position(x, y) == maze[i]->getStart())
+                  os << C_BL << " S " << C_NO;
+                else if (std::find(maze[i]->getGoals().cbegin(),
+                                   maze[i]->getGoals().cend(),
+                                   Position(x, y)) !=
+                         maze[i]->getGoals().cend())
+                  os << C_BL << " G " << C_NO;
+                else
+                  os << "   ";
+              } else if (step_map[i]->getStep(x, y) == StepMap::STEP_MAX)
+                os << C_CY << "999" << C_NO;
+              else if (step_map[i]->getStep(x, y) == 0)
+                os << C_YE << std::setw(3) << step_map[i]->getStep(x, y)
+                   << C_NO;
+              else if (simple[i])
+                os << C_CY << std::setw(3) << step_map[i]->getStep(x, y)
+                   << C_NO;
+              else
+                os << C_CY << std::setw(3) << step_map[i]->getStep(x, y) / 100
+                   << C_NO;
+            }
+          }
+          os << "   ";
+        }
+        os << std::endl;
+      }
+      for (int i = 0; i < 2; ++i) {
+        for (uint8_t x = 0; x < maze_size; ++x) {
+          /* Pillar */
+          os << "+";
+          /* Horizontal Wall */
+          const auto w = maze[i]->isWall(x, y, Direction::South);
+          const auto k = maze[i]->isKnown(x, y, Direction::South);
+          const auto d = pose[i]->d;
+          if (WallIndex(pose[i]->p.next(d + Direction::Back), d) ==
+              WallIndex(Position(x, y), Direction::South))
+            os << " "
+               << "\e[43m"
+               << "\e[34m" << pose[i]->d << C_NO << " ";
+          else
+            os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
+        }
+        /* Last Pillar */
+        os << "+";
+        os << "   ";
+      }
+      os << std::endl;
+    }
+  }
+  void printInfo(const bool show_maze = true) {
+#if 0
+    if (show_maze) {
+      std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+      printDoubleMaze(
+          {&maze_target, state == SearchAlgorithm::IDENTIFYING_POSITION
+                             ? &getSearchAlgorithm().getIdMaze()
+                             : &maze},
+          {&real, &current_pose},
+          {&getSearchAlgorithm().getStepMap(),
+           &getSearchAlgorithm().getStepMap()},
+          std::cout);
+    }
+    RobotBase::printInfo(false);
+    // std::cout << "Real Pose:\t" << real << std::endl;
+#else
+    RobotBase::printInfo(show_maze);
+#endif
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
                 "Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
