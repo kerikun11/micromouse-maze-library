@@ -188,10 +188,10 @@ bool SearchAlgorithm::findNextDirection(
   nextDirection = *it;
   return true;
 }
-bool SearchAlgorithm::calcShortestDirections(Directions &shortest_dirs,
-                                             const bool diag_enabled) {
+bool SearchAlgorithm::calcShortestDirections(
+    Directions &shortest_dirs, const bool diag_enabled,
+    const StepMapSlalom::EdgeCost &edge_cost) {
   const bool known_only = true;
-  StepMapSlalom::EdgeCost edge_cost;
   if (!step_map_slalom.calcShortestDirections(maze, edge_cost, shortest_dirs,
                                               known_only, diag_enabled))
     return false; /* failed */

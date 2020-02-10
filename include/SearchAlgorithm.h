@@ -66,8 +66,9 @@ public:
   bool findNextDirection(const Maze &maze, const Pose &pose,
                          const Directions &nextDirectionCandidates,
                          Direction &nextDirection) const;
-  bool calcShortestDirections(Directions &shortest_dirs,
-                              const bool diag_enabled = true);
+  bool calcShortestDirections(
+      Directions &shortest_dirs, const bool diag_enabled = true,
+      const StepMapSlalom::EdgeCost &edge_cost = StepMapSlalom::EdgeCost{});
   StepMapSlalom::cost_t getShortestCost() const {
     return getStepMapSlalom().getShortestCost();
   }
