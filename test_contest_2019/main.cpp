@@ -90,8 +90,8 @@ int main(void) {
   maze_target.setWall(0, 29, Direction::East, true);
   maze_target.setWall(0, 30, Direction::East, true);
 
-  /* Search Run */
-  robot.display = 1;
+  /* 1. Search Run */
+  robot.display = 0;
   robot.searchRun();
   /* 1st Crash */
   {
@@ -100,6 +100,7 @@ int main(void) {
     robot.setMaze(m);
   }
 
+  robot.display = 1;
   /* 1st Recovery */
   robot.fake_offset = robot.real = Pose(Position(23, 11), Direction::South);
   robot.positionIdentifyRun(false);
@@ -112,23 +113,24 @@ int main(void) {
   }
   robot.wait();
 
-  /* 1st Fast Run */
+  /* 2. 1st Fast Run */
   robot.fastRun(true);
   /* 2nd Recovery */
   /* Set Mistook Wall */
   maze_target.setWall(27, 1, Direction::North, true);
   robot.fake_offset = robot.real = Pose(Position(2, 1), Direction::East);
+  robot.setForceGoingToGoal();
   robot.setForceBackToStart();
   robot.positionIdentifyRun(false);
 
-  /* 2nd Fast Run */
+  /* 3. 2nd Fast Run */
   robot.wait();
   robot.fastRun(false);
   robot.wait();
-  robot.setForceBackToStart();
+  robot.setForceBackToStart(); //< time-up
   robot.endFastRunBackingToStartRun();
 
-  /* 3rd Fast Run */
+  /* 4. 3rd Fast Run */
   // robot.wait();
   // robot.fastRun(false);
   // robot.wait();
