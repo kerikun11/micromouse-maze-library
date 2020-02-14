@@ -487,6 +487,11 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsGoingToGoal(
     const Pose &current_pose, Directions &nextDirectionsKnown,
     Directions &nextDirectionCandidates) {
   const auto &goals = maze.getGoals();
+  /* 最短経路で帰れる場合はそれで帰る */
+  nextDirectionsKnown =
+      step_map.calcShortestDirections(maze, current_pose.p, goals, true, false);
+  if (!nextDirectionsKnown.empty())
+    return Reached;
   calcNextDirectionsInAdvance(maze, goals, current_pose, nextDirectionsKnown,
                               nextDirectionCandidates);
   const auto next_p =

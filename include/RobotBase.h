@@ -97,7 +97,7 @@ public:
     return path;
   }
   bool searchRun();
-  bool positionIdentifyRun(const bool set_going_to_goal = true);
+  bool positionIdentifyRun();
   bool endFastRunBackingToStartRun();
   void setBreakFlag(const bool break_flag = true) {
     this->break_flag = break_flag;
