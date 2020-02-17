@@ -1,0 +1,7 @@
+@startuml search-flow
+skinparam defaultTextAlignment center
+:初期状態;
+:ゴール探索;
+:追加探索;
+:スタート帰還;
+@enduml
