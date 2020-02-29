@@ -376,6 +376,7 @@ void Maze::print(const Positions &positions, std::ostream &os,
   }
 }
 void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
+                                    const bool known_only,
                                     const bool diag_enabled) {
   /* ゴール区画までたどる */
   auto p = maze.getStart();
@@ -389,7 +390,7 @@ void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
   bool loop = true;
   while (loop) {
     loop = false;
-    // 斜めを考慮した進行方向を列挙する
+    /* 斜めを考慮した進行方向を列挙する */
     Directions dirs;
     const auto rel_dir = Direction(dir - prev_dir);
     if (diag_enabled && rel_dir == Direction::Left)
@@ -398,9 +399,9 @@ void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
       dirs = {Direction(dir + Direction::Left), dir};
     else
       dirs = {dir};
-    // 行ける方向に行く
+    /* 候補のうち行ける方向に行く */
     for (const auto d : dirs) {
-      if (maze.canGo(p, d)) {
+      if (!maze.isWall(p, d) && (!known_only || maze.isKnown(p, d))) {
         shortest_dirs.push_back(d);
         p = p.next(d);
         prev_dir = dir;

@@ -14,7 +14,7 @@ namespace MazeLib {
 /**
  * @brief 追加探索状態で探索を始める(ゴールを急がない)
  */
-#define SEARCHING_ADDITIONALLY_AT_START 0
+#define SEARCHING_ADDITIONALLY_AT_START 1
 
 const char *SearchAlgorithm::getStateString(const State s) {
   static const char *const str[] = {
@@ -196,7 +196,7 @@ bool SearchAlgorithm::calcShortestDirections(
   if (!step_map_slalom.calcShortestDirections(maze, edge_cost, shortest_dirs,
                                               known_only, diag_enabled))
     return false; /* failed */
-  Maze::appendStraightDirections(maze, shortest_dirs, diag_enabled);
+  Maze::appendStraightDirections(maze, shortest_dirs, known_only, diag_enabled);
   return true; /* 成功 */
 }
 void SearchAlgorithm::printMap(const State state, const Pose &pose) const {
@@ -247,7 +247,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
     if (shortest_dirs.empty())
       return false; /*< 失敗 */
     /* ゴール区画内を行けるところまで直進する */
-    Maze::appendStraightDirections(maze, shortest_dirs, false);
+    Maze::appendStraightDirections(maze, shortest_dirs, false, false);
     /* 経路中の未知壁区画を訪問候補に追加 */
     auto i = maze.getStart();
     for (const auto d : shortest_dirs) {

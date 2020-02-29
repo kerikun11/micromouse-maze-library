@@ -663,6 +663,7 @@ public:
    */
   static void appendStraightDirections(const Maze &maze,
                                        Directions &shortest_dirs,
+                                       const bool known_only,
                                        const bool diag_enabled);
 
 private:
