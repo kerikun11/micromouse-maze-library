@@ -35,6 +35,7 @@ bool SearchAlgorithm::isSolvable() {
   return !step_map.calcShortestDirections(maze, false, false).empty();
 }
 void SearchAlgorithm::positionIdentifyingInit(Pose &current_pose) {
+  /* オフセットを迷路の中央に設定 */
   idOffset = Position(MAZE_SIZE / 2, MAZE_SIZE / 2);
   current_pose = Pose(idOffset, Direction::East);
   idMaze.reset(false); /*< reset without setting start cell */
@@ -70,7 +71,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
   /* check if in goal */
   /* while p.i., current position is not real so that it can't be goal */
   if (!isPositionIdentifying && isForceGoingToGoal) {
-    const auto goals = maze.getGoals();
+    const auto &goals = maze.getGoals();
     const auto it = std::find_if(
         goals.cbegin(), goals.cend(), [&current_pose](const Position &gp) {
           return current_pose.p == gp ||
@@ -565,7 +566,7 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   int8_t max_y = std::min(idMaze.getMaxY() + 2, MAZE_SIZE);
   /* スタート区画への訪問を避けるため，idMazeを編集する */
   WallLogs tmp;
-  /* make candidates */
+  /* 周辺の探索候補を作成 */
   Positions candidates;
   /* 禁止区画でない未知区画を訪問候補に追加する */
   for (int8_t x = min_x; x < max_x; ++x)
