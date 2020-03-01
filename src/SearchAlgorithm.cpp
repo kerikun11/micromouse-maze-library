@@ -142,8 +142,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
     case SearchAlgorithm::Processing:
       return result;
     case SearchAlgorithm::Reached:
-      return SearchAlgorithm::Processing;
-      // break; /*< go to next state */
+      return SearchAlgorithm::Processing; //< to reach the goal exactly
     case SearchAlgorithm::Error:
       state = IMPOSSIBLE;
       return result;
@@ -510,11 +509,6 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsGoingToGoal(
     const Pose &current_pose, Directions &nextDirectionsKnown,
     Directions &nextDirectionCandidates) {
   const auto &goals = maze.getGoals();
-  /* 既知の経路で行ける場合はそれで行く */
-  // nextDirectionsKnown =
-  //     step_map.calcShortestDirections(maze, current_pose.p, goals, true,
-  //     false);
-  // if (nextDirectionsKnown.empty())
   calcNextDirectionsInAdvance(maze, goals, current_pose, nextDirectionsKnown,
                               nextDirectionCandidates);
   const auto next_p =

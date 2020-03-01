@@ -92,7 +92,10 @@ int main(void) {
   /* Search Run */
   robot.display = 1;
   robot.searchRun();
-  robot.updateCurrentPose({Position(0, 1), Direction::South});
+#endif
+
+#if 0
+  /* Fast Run */
   robot.fastRun(false);
   robot.endFastRunBackingToStartRun();
   robot.fastRun(true);
@@ -105,7 +108,7 @@ int main(void) {
               "Left: %3d, Right: %3d, Back: %3d\n",
               ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step,
               robot.f, robot.l, robot.r, robot.b);
-  for (bool diag_enabled : {true, false}) {
+  for (bool diag_enabled : {false, true}) {
     robot.calcShortestDirections(diag_enabled);
     robot.printPath();
     std::cout << "Estimated Shortest Time "
@@ -142,7 +145,7 @@ int main(void) {
   }
 #endif
 
-#if 1
+#if 0
   /* StepMap */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
@@ -224,7 +227,7 @@ int main(void) {
   }
 #endif
 
-#if 1
+#if 0
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
@@ -250,7 +253,7 @@ int main(void) {
   }
 #endif
 
-#if 1
+#if 0
   /* StepMapSlalom */
   for (const auto diag_enabled : {false, true}) {
     const bool known_only = 0;

@@ -184,6 +184,7 @@ public:
 
 protected:
   Maze maze;
+  Action action_prev = START_STEP;
 
   virtual void senseWalls(bool &left, bool &front, bool &right) override {
     left = !maze_target.canGo(real.p, real.d + Direction::Left);
@@ -267,6 +268,8 @@ protected:
       b++;
       break;
     case RobotBase::ST_FULL:
+      if (action_prev == action)
+        cost -= getTimeCost(action) / 2;
       if (!maze_target.canGo(real.p, real.d))
         crashed();
       real.p = real.p.next(real.d);
@@ -278,6 +281,7 @@ protected:
       logw << "invalid action" << std::endl;
       break;
     }
+    action_prev = action;
   }
   virtual void crashed() {
     loge << "The robot crashed into the wall! fake_offset:\t" << fake_offset
