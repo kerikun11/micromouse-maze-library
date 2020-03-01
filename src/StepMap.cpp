@@ -307,7 +307,7 @@ const Directions StepMap::calcNextDirectionCandidates(const Maze &maze,
                   maze.unknownCount(focus.p.next(d2)))
                 return getStep(focus.p.next(d1)) < getStep(focus.p.next(d2));
               /* 未知壁優先 */
-              if (maze.unknownCount(focus.p.next(d2)))
+              if (!maze.unknownCount(focus.p.next(d1)))
                 return false;
               /* 双方既知ならステップが低い方優先 */
               return getStep(focus.p.next(d1)) < getStep(focus.p.next(d2));

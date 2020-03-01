@@ -129,7 +129,7 @@ public:
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, "
                 "Left: %3d, Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    std::cout << "Walls:    \t" << maze.getWallLogs().size() << std::endl;
+    std::cout << "Found Walls:    \t" << maze.getWallLogs().size() << std::endl;
   }
   bool fastRun(const bool diag_enabled) {
     /* 最短経路の導出 */

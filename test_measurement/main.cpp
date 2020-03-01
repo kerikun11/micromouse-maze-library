@@ -31,6 +31,7 @@ int test_measurement() {
 #else
   for (int year = 2019; year >= 2010; --year)
     filenames.push_back("32MM" + std::to_string(year) + "HX.maze");
+#if 1
   for (int year = 2018; year >= 2014; --year)
     filenames.push_back("21MM" + std::to_string(year) + "HX_Taiwan.maze");
   for (int year = 2019; year >= 2012; --year)
@@ -60,6 +61,7 @@ int test_measurement() {
            "08MM2016CF_pre.maze",
        })
     filenames.push_back(filename);
+#endif
 #if 0
   for (const auto filename : {
            "04_test.maze",
@@ -102,7 +104,7 @@ int test_measurement() {
     csv << "," << robot.getMaze().getWallLogs().size();
     std::cout << "Max Calc Time:\t" << robot.t_dur_max << "\t[us]" << std::endl;
     csv << "," << robot.t_dur_max;
-    std::cout << "Total Search:\t" << t_search << "\t[us]" << std::endl;
+    // std::cout << "Total Search:\t" << t_search << "\t[us]" << std::endl;
     csv << "," << t_search;
     // robot.getMaze().print();
     for (const auto diag_enabled : {false, true}) {
@@ -112,8 +114,8 @@ int test_measurement() {
         continue;
       }
       const auto path_cost = robot.getSearchAlgorithm().getShortestCost();
-      std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
-                << path_cost << "\t[ms]" << std::endl;
+      // std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
+      // << path_cost << "\t[ms]" << std::endl;
       csv << "," << path_cost;
       robot.fastRun(diag_enabled);
       // robot.printPath();

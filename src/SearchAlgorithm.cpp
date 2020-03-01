@@ -425,10 +425,29 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
     return Error;
   if (candidates.empty())
     return Reached; /*< 探索完了 */
+#if 1
   /* 既知区間移動方向列を生成 */
   step_map.update(maze, candidates, false, false);
   const auto end = step_map.calcNextDirections(
       maze, current_pose, nextDirectionsKnown, nextDirectionCandidates);
+#else
+  Pose end;
+  {
+    /* 後方に壁を立てる */
+    const auto d_back = Direction(current_pose.d + Direction::Back);
+    const auto wall_backup = maze.isWall(current_pose.p, d_back);
+    maze.setWall(current_pose.p, d_back, true); /*< 後ろを一時的に塞ぐ */
+    step_map.update(maze, candidates, false, false);
+    end = step_map.calcNextDirections(maze, current_pose, nextDirectionsKnown,
+                                      nextDirectionCandidates);
+    maze.setWall(current_pose.p, d_back, wall_backup); /*< 壁を戻す */
+    if (nextDirectionCandidates.empty()) {
+      step_map.update(maze, candidates, false, false);
+      end = step_map.calcNextDirections(maze, current_pose, nextDirectionsKnown,
+                                        nextDirectionCandidates);
+    }
+  }
+#endif
   /* 仮壁を立てて事前に進む候補を決定する */
   Directions nextDirectionCandidatesAdvanced;
   WallIndexes wall_backup; /*< 仮壁を立てるのでバックアップを作成 */
@@ -439,9 +458,9 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
     nextDirectionCandidatesAdvanced.push_back(d);   //< 候補に入れる
     if (maze.isKnown(end.p, d))
       break; //< 既知なら終わり
-    /* 未知なら仮壁をたてて既知とする*/
+    /* 未知なら仮壁をたてる*/
     wall_backup.push_back(WallIndex(end.p, d));
-    maze.setWall(end.p, d, true), maze.setKnown(end.p, d, true);
+    maze.setWall(end.p, d, true);
     /* 最短になりうる区画の洗い出し */
     findShortestCandidates(candidates, false);
     /* 既知区間終了地点から次行く方向列を再計算 */
@@ -453,7 +472,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
   }
   /* 仮壁を復元 */
   for (const auto i : wall_backup)
-    maze.setWall(i, false), maze.setKnown(i, false);
+    maze.setWall(i, false);
   /* 後処理 */
   nextDirectionCandidates = nextDirectionCandidatesAdvanced;
   return nextDirectionCandidates.empty() ? Error : Processing;

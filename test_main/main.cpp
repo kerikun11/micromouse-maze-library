@@ -97,7 +97,6 @@ int main(void) {
   robot.endFastRunBackingToStartRun();
   robot.fastRun(true);
   robot.endFastRunBackingToStartRun();
-  robot.printPath();
 #endif
 
 #if 1
