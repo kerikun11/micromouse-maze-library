@@ -300,8 +300,8 @@ const Directions StepMap::calcNextDirectionCandidates(const Maze &maze,
   std::sort(dirs.begin(), dirs.end(),
             [&](const Direction d1, const Direction d2) {
               /* 未知壁直進最優先 */
-              if (d2 == focus.d && maze.unknownCount(focus.p.next(d2)))
-                return false;
+              // if (d2 == focus.d && maze.unknownCount(focus.p.next(d2)))
+              //   return false;
               /* 双方未知ならステップが低い方優先 */
               if (maze.unknownCount(focus.p.next(d1)) &&
                   maze.unknownCount(focus.p.next(d2)))
