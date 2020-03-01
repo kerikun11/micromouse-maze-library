@@ -290,10 +290,10 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
 }
 int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
                                              Pose &ans) const {
-  const int min_diff = 9; /*< 許容食い違い壁数 */
+  const int min_diff = 6; /*< 許容食い違い壁数 */
   /* 既知迷路の大きさを取得 */
-  const int8_t max_x = maze.getMaxX() + 1;
-  const int8_t max_y = maze.getMaxY() + 1;
+  const int8_t max_x = std::min(MAZE_SIZE, maze.getMaxX() + 1 + 2); //< 余白つき
+  const int8_t max_y = std::min(MAZE_SIZE, maze.getMaxY() + 1 + 2);
   /* パターンマッチング開始 */
   int cnt = 0; /*< マッチ数 */
   for (int8_t x = 0; x < max_x; ++x)
@@ -307,8 +307,10 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
               (wl.getPosition() - idOffset).rotate(offset_d) + offset_p;
           const auto maze_d = wl.d + offset_d;
           /* 既知範囲外は除外．探索中だとちょっと危険な処理． */
-          if (maze_p.x < 0 || maze_p.x >= max_x || maze_p.y < 0 ||
-              maze_p.y >= max_y) {
+          if (static_cast<uint8_t>(maze_p.x) >= max_x ||
+              static_cast<uint8_t>(maze_p.y) >= max_y) {
+            // if (maze_p.x < 0 || maze_p.x >= max_x ||
+            //     maze_p.y < 0 || maze_p.y >= max_y) {
             diffs = 999;
             break;
           }
