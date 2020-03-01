@@ -31,17 +31,17 @@ public:
   public:
     struct RunParameter {
       RunParameter() {}
-      float vs = 450.0f;    /*< 基本速度 [mm/s] */
+      float vs = 420.0f;    /*< 基本速度 [mm/s] */
       float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
       float am_d = 3600.0f; /*< 最大加速度(斜め) [mm/s/s] */
       float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
       float vm_d = 1200.0f; /*< 飽和速度(斜め) [mm/s] */
-      cost_t t_F45 = 249;   /*< [ms] @ v = 425.272 [mm/s] */
-      cost_t t_F90 = 375;   /*< [ms] @ v = 422.846 [mm/s] */
-      cost_t t_F135 = 421;  /*< [ms] @ v = 375.888 [mm/s] */
+      cost_t t_F45 = 249;   /*< [ms] @ v = 425.285 [mm/s] */
+      cost_t t_F90 = 375;   /*< [ms] @ v = 422.868 [mm/s] */
+      cost_t t_F135 = 465;  /*< [ms] @ v = 373.773 [mm/s] */
       cost_t t_F180 = 563;  /*< [ms] @ v = 412.408 [mm/s] */
-      cost_t t_FV90 = 370;  /*< [ms] @ v = 302.004 [mm/s] */
-      cost_t t_FS90 = 280;  /*< [ms] @ v = 271.797 [mm/s] */
+      cost_t t_FV90 = 388;  /*< [ms] @ v = 289.946 [mm/s] */
+      cost_t t_FS90 = 287;  /*< [ms] @ v = 265.760 [mm/s] */
     };
 
   public:
