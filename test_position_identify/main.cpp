@@ -49,7 +49,8 @@ protected:
 int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
-  const std::string filename = "32MM2019HX.maze";
+  // const std::string filename = "32MM2019HX.maze";
+  const std::string filename = "08MM2016CF_pre.maze";
   Maze maze_target = Maze((mazedata_dir + filename).c_str());
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;
@@ -57,10 +58,17 @@ int test_position_identify() {
   robot.searchRun();
   // robot.printInfo();
 
-#if 0
+  /* 探索終了時の迷路を保存 */
+  const auto p_maze_pi = std::make_unique<Maze>();
+  Maze &maze_pi = *p_maze_pi;
+  maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
+
+#if 1
   /* Position Identification Run */
   robot.display = 1;
-  robot.fake_offset = robot.real = Pose(Position(5, 3), Direction::North);
+  robot.fake_offset = robot.real = Pose(Position(4, 1), Direction::South);
+  robot.setMaze(maze_pi);      /*< 探索直後の迷路に置き換える */
+  robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
   bool res = robot.positionIdentifyRun();
   if (!res) {
     robot.printInfo();
@@ -75,10 +83,6 @@ int test_position_identify() {
   /* Position Identification Run */
   const auto p_step_map = std::make_unique<StepMap>();
   StepMap &step_map = *p_step_map;
-  const auto p_maze_pi = std::make_unique<Maze>();
-  Maze &maze_pi = *p_maze_pi;
-  maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
-  // maze_pi.print();
   /* 迷路的に行き得る区画を洗い出す */
   step_map.update(maze_target, {maze_target.getStart()}, true, true);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
@@ -94,6 +98,7 @@ int test_position_identify() {
         /* set fake offset */
         robot.fake_offset = robot.real = Pose(Position(x, y), d);
         robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
+        robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
         robot.display = 1;
         bool res = robot.positionIdentifyRun();
         if (!res) {

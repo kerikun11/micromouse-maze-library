@@ -96,6 +96,7 @@ int main(void) {
   robot.fastRun(false);
   robot.endFastRunBackingToStartRun();
   robot.fastRun(true);
+  robot.endFastRunBackingToStartRun();
   robot.printPath();
 #endif
 
@@ -115,7 +116,7 @@ int main(void) {
   }
 #endif
 
-#if 1
+#if 0
   /* Shortest Algorithm */
   for (const auto diag_enabled : {false, true}) {
     const int n = 100;
@@ -170,7 +171,7 @@ int main(void) {
   }
 #endif
 
-#if 1
+#if 0
   /* StepMapDijkstra */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
@@ -197,7 +198,7 @@ int main(void) {
   }
 #endif
 
-#if 1
+#if 0
   /* BFS */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;

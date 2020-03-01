@@ -9,10 +9,7 @@
 
 namespace MazeLib {
 
-bool RobotBase::searchRun() {
-  /* 既に探索済みなら正常終了 */
-  if (!isForceGoingToGoal && isComplete())
-    return true;
+void RobotBase::reset() {
   /* 探索中断をクリア */
   setBreakFlag(false);
   /* 自己位置同定をクリア */
@@ -21,6 +18,13 @@ bool RobotBase::searchRun() {
   setForceBackToStart(false);
   /* ゴール区画への訪問を指定 */
   setForceGoingToGoal();
+}
+bool RobotBase::searchRun() {
+  /* 既に探索済みなら正常終了 */
+  if (!isForceGoingToGoal && isComplete())
+    return true;
+  /* 探索中断をクリア */
+  setBreakFlag(false);
   /* スタートのアクションをキュー */
   queueAction(START_STEP);
   updateCurrentPose(Pose(Position(0, 1), Direction::North));
@@ -132,7 +136,7 @@ bool RobotBase::generalSearchRun() {
       discrepancyWithKnownWall();
     /* 壁のない方向へ1マス移動 */
     Direction nextDirection;
-    if (!findNextDirection(current_pose, nextDirection)) {
+    if (!determineNextDirection(current_pose, nextDirection)) {
       loge << "I can't go anywhere! " << std::endl;
       stopDequeue();
       return false;

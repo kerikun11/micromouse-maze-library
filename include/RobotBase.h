@@ -17,7 +17,6 @@ namespace MazeLib {
  */
 class RobotBase : public Agent {
 public:
-  RobotBase(Maze &maze) : Agent(maze) {}
   enum Action : char {
     START_STEP = '1',
     START_INIT = '2',
@@ -96,6 +95,10 @@ public:
     }
     return path;
   }
+
+public:
+  RobotBase(Maze &maze) : Agent(maze) { reset(); }
+  void reset();
   bool searchRun();
   bool positionIdentifyRun();
   bool endFastRunBackingToStartRun();

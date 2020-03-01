@@ -35,9 +35,9 @@ public:
     SEARCHING_ADDITIONALLY, /**< 追加探索中 */
     BACKING_TO_START,       /**< スタートに戻っている */
     REACHED_START,          /**< スタートに戻ってきた */
-    IMPOSSIBLE, /**< ゴールにだどりつくことができないと判明した */
-    IDENTIFYING_POSITION, /**< 自己位置同定中 */
-    GOING_TO_GOAL,        /**< ゴールへ向かっている */
+    IMPOSSIBLE,             /**< ゴールは到達不可能な場所 */
+    IDENTIFYING_POSITION,   /**< 自己位置同定中 */
+    GOING_TO_GOAL,          /**< ゴールへ向かっている */
   };
   /**
    * @brief Stateの表示用文字列を返す関数
@@ -48,30 +48,54 @@ public:
   SearchAlgorithm(Maze &maze) : maze(maze) {}
   bool isComplete();
   bool isSolvable();
-  void positionIdentifyingInit(Pose &current_pose);
+
+  /**
+   * @brief 壁の更新
+   */
   bool updateWall(const State state, const Pose &pose, const bool left,
                   const bool front, const bool right);
   bool updateWall(const State state, const Position &p, const Direction d,
                   const bool b);
   void resetLastWalls(const State state, const int num = 1);
+  void updatePose(State &state, Pose &current_pose, bool &isForceGoingToGoal);
+
+  /**
+   * @brief 探索
+   */
   Result calcNextDirections(State &state, Pose &current_pose,
                             Directions &nextDirections,
                             Directions &nextDirectionCandidates,
                             bool &isPositionIdentifying,
                             bool &isForceBackToStart, bool &isForceGoingToGoal,
                             int &matchCount);
-  bool findNextDirection(const State state, const Pose &pose,
-                         const Directions &nextDirectionCandidates,
-                         Direction &nextDirection) const;
-  bool findNextDirection(const Maze &maze, const Pose &pose,
-                         const Directions &nextDirectionCandidates,
-                         Direction &nextDirection) const;
+  bool determineNextDirection(const State state, const Pose &pose,
+                              const Directions &nextDirectionCandidates,
+                              Direction &nextDirection) const;
+  bool determineNextDirection(const Maze &maze, const Pose &pose,
+                              const Directions &nextDirectionCandidates,
+                              Direction &nextDirection) const;
+
+  /**
+   * @brief 最短経路の導出
+   *
+   * @param shortest_dirs 最短経路を格納する方向列
+   * @param diag_enabled オプション
+   * @param edge_cost 加速・スラロームの重み
+   * @return true 成功
+   * @return false 失敗
+   */
   bool calcShortestDirections(
       Directions &shortest_dirs, const bool diag_enabled = true,
       const StepMapSlalom::EdgeCost &edge_cost = StepMapSlalom::EdgeCost{});
-  StepMapSlalom::cost_t getShortestCost() const {
-    return getStepMapSlalom().getShortestCost();
-  }
+
+  /**
+   * @brief 自己位置同定
+   */
+  void positionIdentifyingInit(Pose &current_pose);
+
+  /**
+   * @brief 表示
+   */
   void printMap(const State state, const Pose &pose) const;
 
   /**
@@ -82,6 +106,9 @@ public:
   const StepMapWall &getStepMapWall() const { return step_map_wall; }
   const StepMapSlalom &getStepMapSlalom() const { return step_map_slalom; }
   const Maze &getIdMaze() const { return idMaze; }
+  StepMapSlalom::cost_t getShortestCost() const {
+    return getStepMapSlalom().getShortestCost();
+  }
 
 protected:
   Maze &maze;                    /**< 使用する迷路の参照 */

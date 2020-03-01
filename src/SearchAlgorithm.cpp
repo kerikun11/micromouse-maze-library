@@ -63,23 +63,21 @@ void SearchAlgorithm::resetLastWalls(const State state, const int num) {
   auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
   return m.resetLastWalls(num);
 }
+void SearchAlgorithm::updatePose(State &state, Pose &current_pose,
+                                 bool &isForceGoingToGoal) {
+  if (state == SearchAlgorithm::IDENTIFYING_POSITION)
+    return;
+  if (!isForceGoingToGoal)
+    return;
+  const auto &goals = maze.getGoals();
+  if (std::find(goals.cbegin(), goals.cend(), current_pose.p) != goals.cend())
+    isForceGoingToGoal = false;
+}
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
     State &state, Pose &current_pose, Directions &nextDirections,
     Directions &nextDirectionCandidates, bool &isPositionIdentifying,
     bool &isForceBackToStart, bool &isForceGoingToGoal, int &matchCount) {
   state = START;
-  /* check if in goal */
-  /* while p.i., current position is not real so that it can't be goal */
-  if (!isPositionIdentifying && isForceGoingToGoal) {
-    const auto &goals = maze.getGoals();
-    const auto it = std::find_if(
-        goals.cbegin(), goals.cend(), [&current_pose](const Position &gp) {
-          return current_pose.p == gp ||
-                 current_pose.p.next(current_pose.d + Direction::Back) == gp;
-        });
-    if (it != goals.end())
-      isForceGoingToGoal = false;
-  }
   /* position identification */
   if (isPositionIdentifying) {
     state = IDENTIFYING_POSITION;
@@ -96,7 +94,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       return result;
     default:
       logw << "invalid result" << std::endl;
-      break;
+      return SearchAlgorithm::Error;
     }
   }
   /* search for goal */
@@ -110,13 +108,14 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
     case SearchAlgorithm::Reached:
       break; /*< go to next state */
     case SearchAlgorithm::Error:
+      state = IMPOSSIBLE;
       return result;
     default:
       logw << "invalid result" << std::endl;
-      break;
+      return SearchAlgorithm::Error;
     }
   }
-  /* search additionally */
+  /* searching additionally */
   if (!isForceBackToStart) {
     state = SEARCHING_ADDITIONALLY;
     Result result = calcNextDirectionsSearchAdditionally(
@@ -127,10 +126,11 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
     case SearchAlgorithm::Reached:
       break; /*< go to next state */
     case SearchAlgorithm::Error:
+      state = IMPOSSIBLE;
       return result;
     default:
       logw << "invalid result" << std::endl;
-      break;
+      return SearchAlgorithm::Error;
     }
   }
   /* force going to goal */
@@ -142,13 +142,14 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
     case SearchAlgorithm::Processing:
       return result;
     case SearchAlgorithm::Reached:
-      isForceGoingToGoal = false;
-      break; /*< go to next state */
+      return SearchAlgorithm::Processing;
+      // break; /*< go to next state */
     case SearchAlgorithm::Error:
+      state = IMPOSSIBLE;
       return result;
     default:
       logw << "invalid result" << std::endl;
-      break;
+      return SearchAlgorithm::Error;
     }
   }
   /* backing to start */
@@ -162,22 +163,24 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
     isForceBackToStart = false;
     break; /*< go to next state */
   case SearchAlgorithm::Error:
+    state = IMPOSSIBLE;
     return result;
   default:
     logw << "invalid result" << std::endl;
-    break;
+    return SearchAlgorithm::Error;
   }
   /* reached start */
   state = REACHED_START;
   return result;
 }
-bool SearchAlgorithm::findNextDirection(
+bool SearchAlgorithm::determineNextDirection(
     const State state, const Pose &pose,
     const Directions &nextDirectionCandidates, Direction &nextDirection) const {
   const auto &m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
-  return findNextDirection(m, pose, nextDirectionCandidates, nextDirection);
+  return determineNextDirection(m, pose, nextDirectionCandidates,
+                                nextDirection);
 }
-bool SearchAlgorithm::findNextDirection(
+bool SearchAlgorithm::determineNextDirection(
     const Maze &maze, const Pose &pose,
     const Directions &nextDirectionCandidates, Direction &nextDirection) const {
   /* find a direction it can go in nextDirectionCandidates */
@@ -488,11 +491,11 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsGoingToGoal(
     const Pose &current_pose, Directions &nextDirectionsKnown,
     Directions &nextDirectionCandidates) {
   const auto &goals = maze.getGoals();
-  /* 最短経路で帰れる場合はそれで帰る */
-  nextDirectionsKnown =
-      step_map.calcShortestDirections(maze, current_pose.p, goals, true, false);
-  if (!nextDirectionsKnown.empty())
-    return Reached;
+  /* 既知の経路で行ける場合はそれで行く */
+  // nextDirectionsKnown =
+  //     step_map.calcShortestDirections(maze, current_pose.p, goals, true,
+  //     false);
+  // if (nextDirectionsKnown.empty())
   calcNextDirectionsInAdvance(maze, goals, current_pose, nextDirectionsKnown,
                               nextDirectionCandidates);
   const auto next_p =

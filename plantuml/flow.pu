@@ -9,7 +9,7 @@ repeat
     :waitForEndAction();
     :senseWalls();
     :updateWalls();
-    :findNextDirection();
+    :determineNextDirection();
     :queueNextDirection();
 repeat while (true)
 :queueAction(ST_HALF_STOP);

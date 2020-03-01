@@ -224,7 +224,7 @@ protected:
     }
   }
   virtual void backupMazeToFlash() override {
-    // maze.backupWallLogsToFile("maze.walllogs");
+    // maze.backupWallLogsToFile("maze.walllogs"); //< (takes some time)
   }
   virtual void queueAction(const Action action) override {
     const auto goals = maze.getGoals();

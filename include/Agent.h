@@ -46,12 +46,16 @@ public:
    * @param p 区画座標
    * @param d 絶対方向
    */
-  void updateCurrentPose(const Pose &new_pose) { current_pose = new_pose; }
+  void updateCurrentPose(const Pose &new_pose) {
+    current_pose = new_pose;
+    searchAlgorithm.updatePose(state, current_pose, isForceGoingToGoal);
+  }
   /**
    * @brief 次に行くべき方向を取得する
    */
-  bool findNextDirection(const Pose &pose, Direction &nextDirection) const {
-    return searchAlgorithm.findNextDirection(
+  bool determineNextDirection(const Pose &pose,
+                              Direction &nextDirection) const {
+    return searchAlgorithm.determineNextDirection(
         state, pose, nextDirectionCandidates, nextDirection);
   }
   /**
