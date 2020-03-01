@@ -106,12 +106,12 @@ void Maze::reset(const bool set_start_wall) {
   wallLogs.clear();
 }
 int8_t Maze::wallCount(const Position &p) const {
-  auto dirs = Direction::getAlong4();
+  const auto &dirs = Direction::getAlong4();
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        [&](const Direction d) { return isWall(p, d); });
 }
 int8_t Maze::unknownCount(const Position &p) const {
-  const auto dirs = Direction::getAlong4();
+  const auto &dirs = Direction::getAlong4();
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        [&](const Direction d) { return !isKnown(p, d); });
 }
@@ -142,9 +142,8 @@ bool Maze::updateWall(const Position &p, const Direction d, const bool b,
   return true;
 }
 void Maze::resetLastWalls(const int num) {
-  for (int i = 0; i < num; ++i)
-    if (!wallLogs.empty())
-      wallLogs.pop_back();
+  for (int i = 0; i < num && !wallLogs.empty(); ++i)
+    wallLogs.pop_back();
   /* 編集済みの壁情報を取得 */
   const auto new_wallLogs = wallLogs;
   /* スタート壁を考慮して迷路をリセット */

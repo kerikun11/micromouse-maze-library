@@ -259,6 +259,10 @@ int test_measurement() {
       std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
       // map.print(maze, shortest_dirs);
+      // maze.print(
+      //     StepMapWall::convertWallIndexDirectionsToPositionDirections(
+      //         shortest_dirs, WallIndex(Position(0, 0), Direction::North)),
+      //     maze.getStart());
     }
 #endif
 

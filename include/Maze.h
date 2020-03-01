@@ -368,10 +368,16 @@ public:
    */
   void uniquify(const Direction d) {
     z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
-    if (d == Direction::West)
+    switch (d) {
+    case Direction::West:
       x--;
-    else if (d == Direction::South)
+      break;
+    case Direction::South:
       y--;
+      break;
+    default:
+      break;
+    }
   }
   /** @brief 位置の取得 */
   const Position getPosition() const { return Position(x, y); }
