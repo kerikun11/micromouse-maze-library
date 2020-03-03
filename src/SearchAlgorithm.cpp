@@ -27,7 +27,7 @@ const char *SearchAlgorithm::getStateString(const State s) {
 }
 bool SearchAlgorithm::isComplete() {
   Positions candidates;
-  if (!findShortestCandidates(candidates, false))
+  if (!findShortestCandidates(candidates))
     return false;
   return candidates.empty();
 }
@@ -206,8 +206,7 @@ void SearchAlgorithm::printMap(const State state, const Pose &pose) const {
   step_map.print(m, pose.p, pose.d);
   // step_map.printFull(m, pose.p, pose.d);
 }
-bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
-                                             const bool simple) {
+bool SearchAlgorithm::findShortestCandidates(Positions &candidates) {
 #if 0
   /* 全探索 */
   candidates.clear();
@@ -245,7 +244,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
   {
     /* 最短経路の導出 */
     Directions shortest_dirs =
-        step_map.calcShortestDirections(maze, false, simple);
+        step_map.calcShortestDirections(maze, false, false);
     if (shortest_dirs.empty())
       return false; /*< 失敗 */
     /* ゴール区画内を行けるところまで直進する */
@@ -262,7 +261,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
   {
     /* 最短経路の導出 */
     Directions shortest_dirs =
-        step_map_wall.calcShortestDirections(maze, false, simple);
+        step_map_wall.calcShortestDirections(maze, false, false);
     if (shortest_dirs.empty())
       return false; /*< 失敗 */
     /* 経路中の未知壁区画を訪問候補に追加 */
@@ -422,7 +421,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
     Directions &nextDirectionCandidates) {
   /* 最短になりうる区画の洗い出し */
   Positions candidates; /*< 最短経路になりうる区画 */
-  if (!findShortestCandidates(candidates, false))
+  if (!findShortestCandidates(candidates))
     return Error;
   if (candidates.empty())
     return Reached; /*< 探索完了 */
@@ -463,7 +462,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
     wall_backup.push_back(WallIndex(end.p, d));
     maze.setWall(end.p, d, true);
     /* 最短になりうる区画の洗い出し */
-    findShortestCandidates(candidates, false);
+    findShortestCandidates(candidates);
     /* 既知区間終了地点から次行く方向列を再計算 */
     if (candidates.empty())
       step_map.update(maze, {maze.getStart()}, false, false);

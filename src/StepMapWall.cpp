@@ -169,12 +169,11 @@ const Directions StepMapWall::calcShortestDirections(const Maze &maze,
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
     auto min_d = Direction::Max;
     auto min_step = STEP_MAX;
-    auto min_i = focus;
     /* 周辺を走査 */
     for (const auto d : focus.getNextDirection6()) {
       auto next = focus;   /*< 隣接 */
       next = next.next(d); /*< 移動 */
-      /* 壁があったら次へ */
+      /* 壁あり or 既知壁のみで未知壁 ならば次へ */
       if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
         continue;
       /* min_step よりステップが小さければ更新 (同じなら更新しない) */
@@ -183,16 +182,12 @@ const Directions StepMapWall::calcShortestDirections(const Maze &maze,
         continue;
       min_step = next_step;
       min_d = d;
-      min_i = next;
     }
     /* focus_step より大きかったらなんかおかしい */
     if (step_map[focus.getIndex()] <= min_step)
       break;
-    /* 直線の分だけ移動 */
-    while (focus != min_i) {
-      focus = focus.next(min_d);      //< 位置を更新
-      shortest_dirs.push_back(min_d); //< 既知区間移動
-    }
+    focus = focus.next(min_d);      //< 位置を更新
+    shortest_dirs.push_back(min_d); //< 既知区間移動
   }
   /* ゴール判定 */
   if (step_map[focus.getIndex()] != 0)
@@ -263,26 +258,31 @@ static StepMapWall::step_t gen_cost_impl(const int i, const float am,
   /* グラフの面積から時間を求める */
   const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
   if (d < d_thr)
-    return 2 * (std::sqrt(vs * vs + am * d) - vs) / am * 100; /*< 三角加速 */
+    return 2 * (std::sqrt(vs * vs + am * d) - vs) / am * 1000; /*< 三角加速 */
   else
-    return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 100; /*< 台形加速 */
+    return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 1000; /*< 台形加速 */
 }
 void StepMapWall::calcStraightStepTable() {
-  const float vs = 450.0f;    /*< 基本速度 [mm/s] */
+  const float vs = 420.0f;    /*< 基本速度 [mm/s] */
   const float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
   const float am_d = 3600.0f; /*< 最大加速度(斜め) [mm/s/s] */
   const float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
   const float vm_d = 1200.0f; /*< 飽和速度(斜め) [mm/s] */
   const float seg_a = 90.0f;  /*< 1区画の長さ [mm] */
   const float seg_d = 45.0f * std::sqrt(2); /*< 1区画の長さ(斜め) [mm] */
+  const float t_slalom = 287.0f;            /*< 90度ターンの時間 [ms] */
   for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
     step_table_diag[i] = gen_cost_impl(i, am_d, vs, vm_d, seg_d);
   }
-  const step_t turn_cost = 280 - step_table_along[1];
+  const step_t turn_cost = t_slalom - step_table_along[1];
   for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] += turn_cost;
     step_table_diag[i] += turn_cost;
+  }
+  for (int i = 0; i < MAZE_SIZE * 2; ++i) {
+    step_table_along[i] /= 2;
+    step_table_diag[i] /= 2;
   }
 }
 

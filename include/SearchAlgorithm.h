@@ -123,7 +123,7 @@ private:
   /**
    * @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
-  bool findShortestCandidates(Positions &candidates, const bool simple);
+  bool findShortestCandidates(Positions &candidates);
   /**
    * @brief 自己位置同定のパターンにマッチする候補をカウントする
    *

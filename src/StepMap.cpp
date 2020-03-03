@@ -206,33 +206,36 @@ const Directions StepMap::calcShortestDirections(const Maze &maze,
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
     auto min_d = Direction::Max;
     auto min_step = STEP_MAX;
-    auto min_i = focus;
+    auto min_p = focus;
     /* 周辺を走査 */
     for (const auto d : Direction::getAlong4()) {
+      /* 直線で行けるところまで更新する */
       auto next = focus; /*< 隣接 */
-      /* 壁があったら次へ */
-      if (maze.isWall(next, d) || (known_only && !maze.isKnown(next, d)))
-        continue;
-      next = next.next(d); /*< 移動 */
-      /* min_step よりステップが小さければ更新 (同じなら更新しない) */
-      const auto next_step = getStep(next);
-      if (min_step <= next_step)
-        continue;
-      min_step = next_step;
-      min_d = d;
-      min_i = next;
+      for (int8_t i = 1; i < MAZE_SIZE; ++i) {
+        /* 壁あり or 既知壁のみで未知壁 ならば次へ */
+        if (maze.isWall(next, d) || (known_only && !maze.isKnown(next, d)))
+          break;
+        next = next.next(d); /*< 移動 */
+        /* min_step よりステップが小さければ更新 (同じなら更新しない) */
+        const auto next_step = step_map[next.getIndex()];
+        if (min_step <= next_step)
+          break;
+        min_step = next_step;
+        min_d = d;
+        min_p = next;
+      }
     }
     /* focus_step より大きかったらなんかおかしい */
-    if (getStep(focus) <= min_step)
+    if (step_map[focus.getIndex()] <= min_step)
       break;
     /* 直線の分だけ移動 */
-    while (focus != min_i) {
+    while (focus != min_p) {
       focus = focus.next(min_d);      //< 位置を更新
       shortest_dirs.push_back(min_d); //< 既知区間移動
     }
   }
   /* ゴール判定 */
-  if (getStep(focus) != 0)
+  if (step_map[focus.getIndex()] != 0)
     return {}; //< 失敗
   return shortest_dirs;
 }
@@ -252,31 +255,30 @@ StepMap::calcNextDirectionsStepDown(const Maze &maze, const Pose &start,
                                     const bool break_unknown) const {
   /* ステップマップから既知区間進行方向列を生成 */
   Directions nextDirectionsKnown;
-  /* start から順にステップマップを下って行く */
+  /* start から順にステップマップを下る */
   focus = start;
   while (1) {
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
     auto min_d = Direction::Max;
     auto min_step = STEP_MAX;
-    for (const auto d :
-         {focus.d + Direction::Front, focus.d + Direction::Left,
-          focus.d + Direction::Right, focus.d + Direction::Back}) {
-      /* 壁あり or 既知壁のみで未知壁 ならば次へ */
-      if (maze.isWall(focus.p, d) || (known_only && !maze.isKnown(focus.p, d)))
-        continue;
+    for (const auto d : Direction::getAlong4()) {
+      auto next = focus.p; /*< 隣接 */
       /* break_unknown で未知壁ならば既知区間は終了 */
-      if (break_unknown && !maze.isKnown(focus.p, d))
+      if (break_unknown && !maze.isKnown(next, d))
         return nextDirectionsKnown;
+      /* 壁あり or 既知壁のみで未知壁 ならば次へ */
+      if (maze.isWall(next, d) || (known_only && !maze.isKnown(next, d)))
+        continue;
+      next = next.next(d); /*< 移動 */
       /* min_step よりステップが小さければ更新 (同じなら更新しない) */
-      const auto next = focus.p.next(d);
-      const auto next_step = getStep(next);
-      if (min_step > next_step) {
-        min_step = next_step;
-        min_d = d;
-      }
+      const auto next_step = step_map[next.getIndex()];
+      if (min_step <= next_step)
+        continue;
+      min_step = next_step;
+      min_d = d;
     }
     /* focus_step より大きかったらなんかおかしい */
-    if (getStep(focus.p) <= min_step)
+    if (step_map[focus.p.getIndex()] <= min_step)
       break;
     focus = focus.next(min_d);            //< 位置を更新
     nextDirectionsKnown.push_back(min_d); //< 既知区間移動
@@ -481,15 +483,18 @@ static StepMap::step_t gen_cost_impl(const int i, const float am,
     return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 1000; /*< 台形加速 */
 }
 void StepMap::calcStraightStepTable() {
-  const float vs = 450.0f;    /*< 基本速度 [mm/s] */
-  const float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
-  const float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
-  const float seg_a = 90.0f;  /*< 区画の長さ [mm] */
+  const float vs = 420.0f;       /*< 基本速度 [mm/s] */
+  const float am_a = 4800.0f;    /*< 最大加速度 [mm/s/s] */
+  const float vm_a = 1800.0f;    /*< 飽和速度 [mm/s] */
+  const float seg_a = 90.0f;     /*< 区画の長さ [mm] */
+  const float t_slalom = 287.0f; /*< 90度ターンの時間 [ms] */
   for (int i = 0; i < MAZE_SIZE; ++i)
     step_table[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
-  const step_t turn_cost = 280 - step_table[1];
+  const step_t turn_cost = t_slalom - step_table[1];
   for (int i = 0; i < MAZE_SIZE; ++i)
     step_table[i] += turn_cost;
+  for (int i = 0; i < MAZE_SIZE; ++i)
+    step_table[i] /= 2;
 }
 
 } // namespace MazeLib
