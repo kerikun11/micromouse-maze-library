@@ -22,7 +22,8 @@ public:
 
 public:
   StepMapWall() { calcStraightStepTable(); }
-  void print(const Maze &maze, std::ostream &os = std::cout) const;
+  void print(const Maze &maze, const WallIndex i = WallIndex(-1, -1, 0),
+             std::ostream &os = std::cout) const;
   void print(const Maze &maze, const WallIndexes &indexes,
              std::ostream &os = std::cout) const;
   void print(const Maze &maze, const Directions &shortest_dirs,

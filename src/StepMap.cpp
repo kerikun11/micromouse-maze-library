@@ -49,9 +49,7 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
         const auto k = maze.isKnown(x, y, Direction::West);
         const auto it = find(WallIndex(Position(x, y), Direction::West));
         if (it != path.cend())
-          // os << C_YE << it->d << C_NO;
-          os << "\e[43m"
-             << "\e[34m" << it->d << C_NO;
+          os << "\e[43m\e[34m" << it->d << C_NO;
         else
           os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
         /* Cell */
@@ -76,10 +74,7 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
       const auto k = maze.isKnown(x, y, Direction::South);
       const auto it = find(WallIndex(Position(x, y), Direction::South));
       if (it != path.cend())
-        // os << C_YE << " " << it->d << " " << C_NO;
-        os << " "
-           << "\e[43m"
-           << "\e[34m" << it->d << C_NO << " ";
+        os << "\e[43m\e[34m " << it->d << " " << C_NO;
       else
         os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
     }
@@ -159,7 +154,7 @@ void StepMap::update(const Maze &maze, const Positions &dest,
     min_y = std::min(p.y, min_y);
     max_y = std::max(p.y, max_y);
   }
-  min_x -= 1, min_y -= 1, max_x += 2, max_y += 2; /*< 外周を許す */
+  min_x -= 1, min_y -= 1, max_x += 1, max_y += 1; /*< 外周を許す */
   /* 全区画のステップを最大値に設定 */
   reset();
   /* ステップの更新予約のキュー */
@@ -175,8 +170,8 @@ void StepMap::update(const Maze &maze, const Positions &dest,
     const auto focus_step = getStep(focus);
     /* 周辺を走査 */
     for (const auto d : Direction::getAlong4()) {
-      auto next = focus;
       /* 直線で行けるところまで更新する */
+      auto next = focus;
       for (int8_t i = 1; i < MAZE_SIZE; ++i) {
         if (maze.isWall(next, d) || (known_only && !maze.isKnown(next, d)))
           break; /*< 壁あり or 既知壁のみで未知壁 ならば次へ */

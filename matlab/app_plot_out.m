@@ -13,7 +13,9 @@ set(groot, 'DefaultLineLineWidth', 1.5);
 figindex = 1;
 
 %% Select a Log File
-[filename, pathname] = uigetfile({'*'}, 'Select a Log File');
+% [filename, pathname] = uigetfile({'*'}, 'Select a Log File');
+pathname = '../build/';
+filename = 'main.csv';
 fprintf('Log File: %s\n', filename);
 
 %% Load Data

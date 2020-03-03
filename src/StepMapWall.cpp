@@ -13,7 +13,8 @@
 
 namespace MazeLib {
 
-void StepMapWall::print(const Maze &maze, std::ostream &os) const {
+void StepMapWall::print(const Maze &maze, const WallIndex index,
+                        std::ostream &os) const {
   int maze_size = MAZE_SIZE;
   for (int8_t y = maze_size - 1; y >= -1; --y) {
     for (int8_t x = 0; x <= maze_size; ++x) {
@@ -25,11 +26,13 @@ void StepMapWall::print(const Maze &maze, std::ostream &os) const {
       const auto w = maze.isWall(x, y, Direction::North);
       const auto k = maze.isKnown(x, y, Direction::North);
       const auto i = WallIndex(Position(x, y), Direction::North);
+      const auto s = std::min(int(step_map[i.getIndex()]), 99999);
+      const auto f = i == index;
       if (w)
-        os << "-----" << C_NO;
+        os << "-----";
       else
-        os << (k ? C_CY : C_RE) << std::setw(5)
-           << std::min(int(step_map[i.getIndex()]), 99999) << C_NO;
+        os << (f ? "\e[43m\e[34m" : (s == 0 ? C_YE : (k ? C_CY : C_RE)))
+           << std::setw(5) << s << C_NO;
     }
     os << std::endl;
     if (y != -1) {
@@ -41,11 +44,13 @@ void StepMapWall::print(const Maze &maze, std::ostream &os) const {
         const auto w = maze.isWall(x, y, Direction::East);
         const auto k = maze.isKnown(x, y, Direction::East);
         const auto i = WallIndex(Position(x, y), Direction::East);
+        const auto s = std::min(int(step_map[i.getIndex()]), 99999);
+        const auto f = i == index;
         if (w)
-          os << "  |  " << C_NO;
+          os << "  |  ";
         else
-          os << (k ? C_CY : C_RE) << std::setw(5)
-             << std::min(int(step_map[i.getIndex()]), 99999) << C_NO;
+          os << (f ? "\e[43m\e[34m" : (s == 0 ? C_YE : (k ? C_CY : C_RE)))
+             << std::setw(5) << s << C_NO;
       }
       os << std::endl;
     }
@@ -61,12 +66,12 @@ void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
       /* Pillar */
       os << "+";
       /* Horizontal Wall */
+      const auto w = maze.isWall(x, y, Direction::North);
+      const auto k = maze.isKnown(x, y, Direction::North);
       if (exists(WallIndex(x, y, 1)))
-        os << C_YE << " X " << C_NO;
+        os << C_YE " X " C_NO;
       else
-        os << (maze.isKnown(x, y, Direction::North)
-                   ? (maze.isWall(x, y, Direction::North) ? "---" : "   ")
-                   : (C_RE " . " C_NO));
+        os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
     }
     os << "+" << std::endl;
     if (y != -1) {
@@ -75,12 +80,12 @@ void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
         /* Cell */
         os << "   ";
         /* Vertical Wall */
+        const auto w = maze.isWall(x, y, Direction::East);
+        const auto k = maze.isKnown(x, y, Direction::East);
         if (exists(WallIndex(x, y, 0)))
           os << C_YE << "X" << C_NO;
         else
-          os << (maze.isKnown(x, y, Direction::East)
-                     ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
-                     : (C_RE "." C_NO));
+          os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
       }
       os << std::endl;
     }
@@ -99,6 +104,18 @@ void StepMapWall::print(const Maze &maze, const Directions &shortest_dirs,
 }
 void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
                          const bool known_only, const bool simple) {
+  /* 計算を高速化するため，迷路の大きさを制限 */
+  int8_t min_x = maze.getMinX();
+  int8_t max_x = maze.getMaxX();
+  int8_t min_y = maze.getMinY();
+  int8_t max_y = maze.getMaxY();
+  for (const auto p : dest) { /*< ゴールを含めないと導出不可能になる */
+    min_x = std::min(p.x, min_x);
+    max_x = std::max(p.x, max_x);
+    min_y = std::min(p.y, min_y);
+    max_y = std::max(p.y, max_y);
+  }
+  min_x -= 1, min_y -= 1, max_x += 1, max_y += 1; /*< 外周を許す */
   /* 全区画のステップを最大値に設定 */
   const auto step = STEP_MAX;
   step_map.fill(step);
@@ -115,12 +132,15 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
     const step_t focus_step = step_map[focus.getIndex()];
     /* 周辺を走査 */
     for (const auto d : focus.getNextDirection6()) {
-      auto next = focus;
       /* 直線で行けるところまで更新する */
+      auto next = focus;
       for (int8_t i = 1; i < MAZE_SIZE * 2; ++i) {
         next = next.next(d); /*< 移動 */
         if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
           break; /*< 壁あり or 既知壁のみで未知壁 ならば次へ */
+        if (next.x > max_x || next.y > max_y || next.x < min_x ||
+            next.y < min_y)
+          break; /*< 計算を高速化するため展開範囲を制限 */
         /* 直線加速を考慮したステップを算出 */
         const auto next_step = focus_step + (d.isAlong() ? step_table_along[i]
                                                          : step_table_diag[i]);
