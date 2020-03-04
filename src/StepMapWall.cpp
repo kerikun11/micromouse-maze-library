@@ -115,7 +115,7 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
     min_y = std::min(p.y, min_y);
     max_y = std::max(p.y, max_y);
   }
-  min_x -= 1, min_y -= 1, max_x += 1, max_y += 1; /*< 外周を許す */
+  min_x -= 1, min_y -= 1, max_x += 2, max_y += 2; /*< 外周を許す */
   /* 全区画のステップを最大値に設定 */
   const auto step = STEP_MAX;
   step_map.fill(step);

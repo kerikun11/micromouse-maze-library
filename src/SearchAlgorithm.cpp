@@ -424,11 +424,30 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
     return Error;
   if (candidates.empty())
     return Reached; /*< 探索完了 */
+#if 1
   /* 既知区間移動方向列を生成 */
   step_map.update(maze, candidates, false, false);
   const auto end = step_map.calcNextDirections(
       maze, current_pose, nextDirectionsKnown, nextDirectionCandidates);
-  /* 仮壁を立てて事前に進む候補を決定する */
+#else
+  Pose end;
+  {
+    /* 後方に壁を立てる */
+    const auto d_back = Direction(current_pose.d + Direction::Back);
+    const auto wall_backup = maze.isWall(current_pose.p, d_back);
+    maze.setWall(current_pose.p, d_back, true); /*< 後ろを一時的に塞ぐ */
+    step_map.update(maze, candidates, false, false);
+    end = step_map.calcNextDirections(maze, current_pose, nextDirectionsKnown,
+                                      nextDirectionCandidates);
+    maze.setWall(current_pose.p, d_back, wall_backup); /*< 壁を戻す */
+    if (nextDirectionCandidates.empty()) {
+      step_map.update(maze, candidates, false, false);
+      end = step_map.calcNextDirections(maze, current_pose, nextDirectionsKnown,
+                                        nextDirectionCandidates);
+    }
+  }
+#endif
+  /* 仮壁を立てて事前に進む候補を改良する */
   Directions nextDirectionCandidatesAdvanced;
   WallIndexes wall_backup; /*< 仮壁を立てるのでバックアップを作成 */
   while (1) {
@@ -436,13 +455,21 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
       break;
     const Direction d = nextDirectionCandidates[0]; //< 一番行きたい方向
     nextDirectionCandidatesAdvanced.push_back(d);   //< 候補に入れる
+    /* 既知なら終わり */
     if (maze.isKnown(end.p, d))
-      break; //< 既知なら終わり
-    /* 未知なら仮壁をたてる*/
+      break;
+    /* 未知ならバックアップして壁を立てる*/
     wall_backup.push_back(WallIndex(end.p, d));
     maze.setWall(end.p, d, true);
+    /* 袋小路なら後方を追加して終わり */
+    if (maze.wallCount(end.p) == 3) {
+      nextDirectionCandidatesAdvanced.push_back(
+          Direction(end.d + Direction::Back));
+      break;
+    }
     /* 最短になりうる区画の洗い出し */
-    findShortestCandidates(candidates);
+    if (!findShortestCandidates(candidates))
+      break; //< 最短経路がなくなった場合終わり
     /* 既知区間終了地点から次行く方向列を再計算 */
     if (candidates.empty()) //< 最短候補が空の場合はスタート区画への帰還を想定
       step_map.update(maze, {maze.getStart()}, false, false);

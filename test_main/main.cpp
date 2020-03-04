@@ -12,7 +12,7 @@ std::ofstream csv("main.csv");
 class CLRobot : public CLRobotBase {
 public:
   CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
-  bool display = false;
+  bool display = 0;
   bool continue_straight_if_no_front_wall = false;
   bool continue_straight_if_no_front_wall_prev = false;
 
@@ -30,22 +30,10 @@ protected:
         newState != SearchAlgorithm::IDENTIFYING_POSITION &&
         !getNextDirectionCandidates().empty() &&
         getNextDirectionCandidates()[0] == d;
-#if 0
-    /* 既知区間観測用 */
-    if (getNextDirections().size() > 0) {
-      printInfo();
-      getc(stdin);
-    }
-#endif
     csv << t_dur << std::endl;
     if (newState == prevState)
       return;
     /* State Change has occurred */
-    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      if (display)
-        printInfo();
-      display = 0;
-    }
   }
   virtual void crashed() override {
     printInfo();
@@ -65,7 +53,7 @@ protected:
         !maze.isWall(current_pose.p, current_pose.d) &&
         action != Action::ST_FULL) {
       printInfo();
-      logw << std::endl;
+      logw << "in accel" << std::endl;
       getc(stdin);
     }
 #endif

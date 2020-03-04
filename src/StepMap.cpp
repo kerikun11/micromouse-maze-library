@@ -154,7 +154,7 @@ void StepMap::update(const Maze &maze, const Positions &dest,
     min_y = std::min(p.y, min_y);
     max_y = std::max(p.y, max_y);
   }
-  min_x -= 1, min_y -= 1, max_x += 1, max_y += 1; /*< 外周を許す */
+  min_x -= 1, min_y -= 1, max_x += 2, max_y += 2; /*< 外周を許す */
   /* 全区画のステップを最大値に設定 */
   reset();
   /* ステップの更新予約のキュー */
@@ -293,21 +293,16 @@ const Directions StepMap::calcNextDirectionCandidates(const Maze &maze,
                        focus.d + Direction::Right, focus.d + Direction::Back})
     if (!maze.isWall(focus.p, d) && getStep(focus.p.next(d)) != STEP_MAX)
       dirs.push_back(d);
-  /* 並べ替え */
+  /* コストの低い順に並べ替え */
   std::sort(dirs.begin(), dirs.end(),
             [&](const Direction d1, const Direction d2) {
-              /* 未知壁直進最優先 */
-              // if (d2 == focus.d && maze.unknownCount(focus.p.next(d2)))
-              //   return false;
-              /* 双方未知ならステップが低い方優先 */
-              if (maze.unknownCount(focus.p.next(d1)) &&
-                  maze.unknownCount(focus.p.next(d2)))
-                return getStep(focus.p.next(d1)) < getStep(focus.p.next(d2));
-              /* 未知壁優先 */
-              if (!maze.unknownCount(focus.p.next(d1)))
-                return false;
-              /* 双方既知ならステップが低い方優先 */
               return getStep(focus.p.next(d1)) < getStep(focus.p.next(d2));
+            });
+  /* 未知壁優先で並べ替え(未知壁同士ならばコストが低い順) */
+  std::sort(dirs.begin(), dirs.end(),
+            [&](const Direction d1, const Direction d2) {
+              return (maze.unknownCount(focus.p.next(d1)) &&
+                      !maze.unknownCount(focus.p.next(d2)));
             });
   return dirs;
 }
