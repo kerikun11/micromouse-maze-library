@@ -106,7 +106,6 @@ int test_measurement() {
     csv << "," << robot.t_dur_max;
     // std::cout << "Total Search:\t" << t_search << "\t[us]" << std::endl;
     csv << "," << t_search;
-    // robot.getMaze().print();
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirections(diag_enabled)) {
         loge << "Failed to Find a Shortest Path! "
@@ -124,7 +123,6 @@ int test_measurement() {
       const auto p_at = std::make_unique<Agent>(maze_target);
       Agent &at = *p_at;
       at.calcShortestDirections(diag_enabled);
-      // if (at.getShortestDirections() != robot.getShortestDirections()) {
       if (at.getSearchAlgorithm().getShortestCost() !=
           robot.getSearchAlgorithm().getShortestCost()) {
         logw << "searched path is not shortest! "
@@ -153,25 +151,25 @@ int test_measurement() {
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
         for (const auto d : Direction::getAlong4()) {
           const auto p = Position(x, y);
+          if (p == Position(0, 0))
+            continue; /*< スタートは除外 */
           if (step_map.getStep(p) == StepMap::STEP_MAX)
             continue; /*< そもそも迷路的に行き得ない区画は除外 */
           if (maze_target.isWall(p, d + Direction::Back))
             continue; /*< 壁上からは除外 */
-          if (p == Position(0, 0))
-            continue; /*< スタートは除外 */
-          /* set fake offset */
-          robot.fake_offset = robot.real = Pose(Position(x, y), d);
+          robot.fake_offset = robot.real = Pose(p, d);
           robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
+          // robot.resetLastWalls(maze_pi.getWallLogs().size() / 5);
           robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
-          bool res = robot.positionIdentifyRun();
-          if (!res) {
+          const bool res = robot.positionIdentifyRun();
+          if (!res)
             loge << "Failed to Identify! fake_offset: " << robot.fake_offset
                  << std::endl;
-          }
           /* save result */
           id_cost_max = std::max(id_cost_max, robot.cost);
           id_cost_min = std::min(id_cost_min, robot.cost);
         }
+    /* print result */
     std::cout << "P.I. Max Calc:\t" << robot.t_dur_max << "\t[us]" << std::endl;
     std::cout << "P.I. Time:\t" << (int(id_cost_min) / 60) % 60 << ":"
               << std::setw(2) << std::setfill('0') << int(id_cost_min) % 60
