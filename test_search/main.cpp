@@ -222,7 +222,7 @@ int ShortestRun(const Maze &maze) {
  */
 int main(void) {
   /* シミュレーションに用いる迷路の選択 */
-  const std::string file_path = "../mazedata/16MM2017CX.maze";
+  const std::string file_path = "../mazedata/16MM2019CX.maze";
 
   /* 正解の迷路を用意 */
   Maze maze_target;
