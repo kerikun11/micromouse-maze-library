@@ -374,43 +374,6 @@ void Maze::print(const Positions &positions, std::ostream &os,
     os << "+" << std::endl;
   }
 }
-void Maze::appendStraightDirections(const Maze &maze, Directions &shortest_dirs,
-                                    const bool known_only,
-                                    const bool diag_enabled) {
-  /* ゴール区画までたどる */
-  auto p = maze.getStart();
-  for (const auto d : shortest_dirs)
-    p = p.next(d);
-  if (shortest_dirs.size() < 2)
-    return;
-  auto prev_dir = shortest_dirs[shortest_dirs.size() - 1 - 1];
-  auto dir = shortest_dirs[shortest_dirs.size() - 1];
-  /* ゴール区画内を行けるところまで直進(斜め考慮)する */
-  bool loop = true;
-  while (loop) {
-    loop = false;
-    /* 斜めを考慮した進行方向を列挙する */
-    Directions dirs;
-    const auto rel_dir = Direction(dir - prev_dir);
-    if (diag_enabled && rel_dir == Direction::Left)
-      dirs = {Direction(dir + Direction::Right), dir};
-    else if (diag_enabled && rel_dir == Direction::Right)
-      dirs = {Direction(dir + Direction::Left), dir};
-    else
-      dirs = {dir};
-    /* 候補のうち行ける方向に行く */
-    for (const auto d : dirs) {
-      if (!maze.isWall(p, d) && (!known_only || maze.isKnown(p, d))) {
-        shortest_dirs.push_back(d);
-        p = p.next(d);
-        prev_dir = dir;
-        dir = d;
-        loop = true;
-        break;
-      }
-    }
-  }
-}
 bool Maze::backupWallLogsToFile(const std::string &filepath, const bool clear) {
   /* 変更なし */
   if (!clear && backup_counter == wallLogs.size())

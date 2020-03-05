@@ -7,6 +7,10 @@
 
 #include "StepMapSlalom.h"
 
+#include <algorithm> /*< for std::find_if, etc. */
+#include <iomanip>   /*< for std::setw() */
+#include <queue>
+
 namespace MazeLib {
 
 /* Index */
@@ -214,7 +218,7 @@ void StepMapSlalom::update(const Maze &maze,
         i = next;
       }
       /* ターン */
-      auto nd_r45 = focus.arrow_diag_to_along_rel_45();
+      auto nd_r45 = focus.getRelativeDirectionDiagToAlong();
       auto d45 = nd + nd_r45;
       auto d90 = nd + nd_r45 * 2;
       auto d135 = nd + nd_r45 * 3;
@@ -365,7 +369,7 @@ StepMapSlalom::indexes2directions(const StepMapSlalom::Indexes &path,
       case Direction::Front:
         for (auto index = path[i]; index != path[i + 1];
              index = index.next(index.getNodeDirection())) {
-          const auto nd_45 = index.arrow_diag_to_along_rel_45();
+          const auto nd_45 = index.getRelativeDirectionDiagToAlong();
           dirs.push_back(index.getNodeDirection() + nd_45);
         }
         break;

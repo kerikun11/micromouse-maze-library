@@ -198,7 +198,8 @@ bool SearchAlgorithm::calcShortestDirections(
   if (!step_map_slalom.calcShortestDirections(maze, edge_cost, shortest_dirs,
                                               known_only, diag_enabled))
     return false; /* failed */
-  Maze::appendStraightDirections(maze, shortest_dirs, known_only, diag_enabled);
+  StepMap::appendStraightDirections(maze, shortest_dirs, known_only,
+                                    diag_enabled);
   return true; /* 成功 */
 }
 void SearchAlgorithm::printMap(const State state, const Pose &pose) const {
@@ -229,7 +230,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates) {
     if (!step_map_slalom.calcShortestDirections(maze, edge_cost, shortest_dirs,
                                                 known_only, diag_enabled))
       return false; /* failed */
-    Maze::appendStraightDirections(maze, shortest_dirs, known_only, false);
+    StepMap::appendStraightDirections(maze, shortest_dirs, known_only, false);
     auto p = maze.getStart();
     for (const auto d : shortest_dirs) {
       p = p.next(d);
@@ -249,7 +250,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates) {
     if (shortest_dirs.empty())
       return false; /*< 失敗 */
     /* ゴール区画内を行けるところまで直進する */
-    Maze::appendStraightDirections(maze, shortest_dirs, known_only, false);
+    StepMap::appendStraightDirections(maze, shortest_dirs, known_only, false);
     /* 経路中の未知壁区画を訪問候補に追加 */
     auto i = maze.getStart();
     for (const auto d : shortest_dirs) {

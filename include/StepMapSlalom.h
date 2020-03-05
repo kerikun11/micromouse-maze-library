@@ -7,12 +7,7 @@
 #pragma once
 
 #include "Maze.h"
-
-#include <algorithm> /*< for std::find_if, etc. */
-#include <functional>
-#include <iomanip> /*< for std::setw() */
-#include <limits>  /*< for std::numeric_limits */
-#include <queue>
+#include <limits> /*< for std::numeric_limits */
 
 namespace MazeLib {
 
@@ -171,17 +166,24 @@ public:
      */
     void uniquify(const Direction d) {
       z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
-      if (d == Direction::West)
+      switch (d) {
+      case Direction::West:
         x--;
-      if (d == Direction::South)
+        break;
+      case Direction::South:
         y--;
+        break;
+      default:
+        break;
+      }
     }
     /**
      * @brief Getters
      */
     const Position getPosition() const { return Position(x, y); }
     const Direction getDirection() const {
-      return z == 0 ? Direction::East : Direction::North;
+      // return z == 0 ? Direction::East : Direction::North;
+      return z << 1; /*< 高速化 */
     }
     const Direction getNodeDirection() const { return nd; }
     const WallIndex getWallIndex() const {
@@ -196,7 +198,7 @@ public:
      * @brief 斜め方向に向いているときの区画への相対方向(±45度)を返す
      * @return const Direction Direction::Left45 or Direction::Right45
      */
-    const Direction arrow_diag_to_along_rel_45() const {
+    const Direction getRelativeDirectionDiagToAlong() const {
       switch (nd) {
       case Direction::NorthEast:
       case Direction::SouthWest:
@@ -223,18 +225,22 @@ public:
     }
   };
   static_assert(sizeof(Index) == 2, "size error"); /**< size check */
+
+  /**
+   * @brief Indexの動的配列の定義
+   */
   using Indexes = std::vector<Index>;
 
 public:
   StepMapSlalom() {}
+  void print(const Maze &maze, const Indexes &indexes,
+             std::ostream &os = std::cout) const;
+  void update(const Maze &maze, const EdgeCost &edge_cost, const Indexes &dest,
+              const bool known_only, const bool diag_enabled);
   bool calcShortestDirections(const Maze &maze, const EdgeCost &edge_cost,
                               Directions &shortest_dirs, const bool known_only,
                               const bool diag_enabled);
-  void update(const Maze &maze, const EdgeCost &edge_cost, const Indexes &dest,
-              const bool known_only, const bool diag_enabled);
   bool genPathFromMap(Indexes &path) const;
-  void print(const Maze &maze, const Indexes &indexes,
-             std::ostream &os = std::cout) const;
   cost_t getShortestCost() const {
     return cost_map[index_start.opposite().getIndex()];
   }

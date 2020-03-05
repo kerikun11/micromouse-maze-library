@@ -145,7 +145,7 @@ public:
         Directions dirs = map.calcShortestDirections(maze, known_only, simple);
         if (dirs.empty())
             return false;
-        maze.appendStraightDirections(maze, dirs, known_only, diag_enabled);
+        StepMap::appendStraightDirections(maze, dirs, known_only, diag_enabled);
         auto p = maze.getStart();
         for (size_t i = 0; i < dirs.size(); ++i) {
             if (diag_enabled && i == dirs.size() - 1)

@@ -1,7 +1,7 @@
 /**
  * @file Maze.h
- * @brief マイクロマウスの迷路クラスを定義
- * @author KERI (Github: kerikun11)
+ * @brief マイクロマウスの迷路を扱うクラスを定義
+ * @author Ryotaro Onuki (Github: kerikun11)
  * @url https://kerikeri.top/
  * @date 2017.10.30
  */
@@ -27,10 +27,10 @@ static constexpr int MAZE_SIZE = 32;
 /**
  * @brief 迷路の1辺の区画数の bit 数．bit shift などに用いる．
  */
-constexpr int ceil(const auto f) { return int(f) + (f != int(f)); }
+constexpr int ceil(const auto f) { return int(f) + (f != int(f)); } //< 切り上げ
 static constexpr int MAZE_SIZE_BIT = ceil(std::log2(MAZE_SIZE));
 /**
- * @brief 迷路の1辺の区画数の最大値．2 の bit 数乗の値．
+ * @brief 迷路の1辺の区画数の最大値．2のbit数乗の値．
  */
 static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 
@@ -199,7 +199,8 @@ public:
    */
   Position(const int8_t x = 0, const int8_t y = 0) : x(x), y(y) {}
   /**
-   * @brief 迷路区画内の通し番号となるIDを取得する
+   * @brief 迷路内の区画の一意な通し番号となるIDを取得する
+   *        迷路外の区画の場合未定義動作となる．use Position::isInsideOfField()
    * @return uint16_t 通し番号ID
    */
   uint16_t getIndex() const { return (x << MAZE_SIZE_BIT) | y; }
@@ -260,9 +261,9 @@ using Positions = std::vector<Position>;
 
 /**
  * @brief Position と Direction をまとめた型．位置姿勢．
- * 位置姿勢は，区画に向かう方向を表す．
+ * 位置姿勢は，区画とそこに向かう方向で特定する．
  * 現在区画から出る方向ではないことに注意する．
- * +---+---+---+ 例
+ * +---+---+---+ 例:
  * |   <       | <--- (0, 2, West)
  * +   +---+ ^ + <--- (2, 2, North)
  * |   >       | <--- (1, 1, East)
@@ -354,7 +355,8 @@ public:
     return x != i.x || y != i.y || z != i.z;
   }
   /**
-   * @brief 迷路中の壁をuniqueな通し番号として表現したID
+   * @brief 迷路内の壁を一意な通し番号として表現したIDを返す．
+   *        迷路外の壁の場合未定義動作となる．
    * @return uint16_t ID
    */
   uint16_t getIndex() const {
@@ -363,7 +365,6 @@ public:
   /**
    * @brief 方向の冗長性を除去してユニークにする関数
    * 基本的にコンストラクタで使われるので，ユーザーが使うことはない．
-   *
    * @param d 壁の方向 (4方位)
    */
   void uniquify(const Direction d) {
@@ -383,7 +384,8 @@ public:
   const Position getPosition() const { return Position(x, y); }
   /** @brief 方向の取得 */
   const Direction getDirection() const {
-    return z == 0 ? Direction::East : Direction::North;
+    // return z == 0 ? Direction::East : Direction::North;
+    return z << 1; /*< 高速化 */
   }
   /**
    * @brief 表示用演算子のオーバーロード． ( x, y, d) の形式
@@ -401,10 +403,6 @@ public:
     // return !(x < 0 || y < 0 || x >= MAZE_SIZE || y >= MAZE_SIZE ||
     //          (z == 0 && (x == MAZE_SIZE - 1)) ||
     //          (z == 1 && (y == MAZE_SIZE - 1)));
-    /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
-    // return !(((x | y) & (0x100 - MAZE_SIZE)) ||
-    //          (z == 0 && x == MAZE_SIZE - 1) || (z == 1 && y == MAZE_SIZE -
-    //          1));
     /* 高速化 */
     return (static_cast<uint8_t>(x) < MAZE_SIZE - 1 + z) &&
            (static_cast<uint8_t>(y) < MAZE_SIZE - z);
@@ -429,15 +427,6 @@ public:
         d + Direction::Left135,
         d + Direction::Right135,
     }};
-  }
-  /**
-   * @brief 引数方向の Front Left45 Right 方向に隣接する WallIndex を取得
-   * @param d 正面の方向
-   * @return const std::array<Direction, 3>
-   */
-  const std::array<Direction, 3> getNextDirection3(const Direction d) const {
-    return {
-        {d + Direction::Front, d + Direction::Left45, d + Direction::Right45}};
   }
 };
 static_assert(sizeof(WallIndex) == 2, "size error"); /**< size check */
@@ -661,18 +650,8 @@ public:
    * @brief 壁ログファイルから壁情報を復元する関数
    */
   bool restoreWallLogsFromFile(const std::string &filepath);
-  /**
-   * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
-   * @param maze 迷路の参照
-   * @param shortest_dirs 追記元の方向列．これ自体に追記される．
-   * @param diag_enabled 斜めありなし
-   */
-  static void appendStraightDirections(const Maze &maze,
-                                       Directions &shortest_dirs,
-                                       const bool known_only,
-                                       const bool diag_enabled);
 
-private:
+protected:
   std::bitset<WallIndex::SIZE> wall;  /**< @brief 壁情報 */
   std::bitset<WallIndex::SIZE> known; /**< @brief 壁の既知未知情報 */
   Positions goals;                    /**< @brief ゴール区画の集合 */
@@ -685,19 +664,18 @@ private:
   size_t backup_counter; /**< 壁ログバックアップのカウンタ */
 
   /**
-   * @brief 壁の確認のベース関数
+   * @brief 壁の確認のベース関数．迷路外を参照すると壁ありと返す．
    */
   bool isWallBase(const std::bitset<WallIndex::SIZE> &wall,
                   const WallIndex &i) const {
-    return i.isInsideOfField() ? wall[i.getIndex()] : true;
-    // return !i.isInsideOfField() || wall[i.getIndex()];
+    return i.isInsideOfField() ? wall[i.getIndex()] : true; //< 範囲外は壁ありに
   }
   /**
-   * @brief 壁の更新のベース関数
+   * @brief 壁の更新のベース関数．迷路外を参照しても無視される．
    */
   void setWallBase(std::bitset<WallIndex::SIZE> &wall, const WallIndex &i,
                    const bool b) const {
-    if (i.isInsideOfField())
+    if (i.isInsideOfField()) //< 範囲外アクセスの防止
       wall[i.getIndex()] = b;
   }
 };

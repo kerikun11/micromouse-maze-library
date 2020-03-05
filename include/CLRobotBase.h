@@ -10,10 +10,10 @@
  */
 #pragma once
 
-#include "Maze.h"
 #include "RobotBase.h"
 #include <chrono>
 #include <cstdio>
+#include <iomanip> /*< for std::setw() */
 
 namespace MazeLib {
 

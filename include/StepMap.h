@@ -1,9 +1,8 @@
 /**
  * @file StepMap.h
+ * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路のステップマップを扱うクラス
- * @author KERI (Github: kerikun11)
- * @url https://kerikeri.top/
- * @date 2017.11.05
+ * @date 2017-11-05
  */
 #pragma once
 
@@ -55,7 +54,6 @@ public:
   }
   /**
    * @brief ステップマップの配列を取得
-   * @return const auto&
    */
   const auto &getMap() const { return step_map; }
   /**
@@ -76,19 +74,12 @@ public:
                  std::ostream &os = std::cout) const;
   /**
    * @brief ステップマップの更新
-   * @param dest ステップを0とする区画の配列
-   * @param known_only
-   *        true:未知の壁は通過不可能とする，false:未知の壁はないものとする
+   * @param dest ステップを0とする，目的地の区画の集合
+   * @param known_only true:未知壁は通過不可能，false:未知壁は通過可能とする
+   * @param simple 台形加速を考慮せず，隣接区画のコストをすべて1にする
    */
   void update(const Maze &maze, const Positions &dest, const bool known_only,
               const bool simple);
-  /**
-   * @brief ステップマップから次に行くべき方向を計算する関数
-   * @return 既知区間の最終区画
-   */
-  const Pose calcNextDirections(const Maze &maze, const Pose &start,
-                                Directions &nextDirectionsKnown,
-                                Directions &nextDirectionCandidates) const;
   /**
    * @brief 与えられた区画間の最短経路を導出する関数
    * @param maze 迷路の参照
@@ -113,6 +104,13 @@ public:
                                   known_only, simple);
   }
   /**
+   * @brief ステップマップから次に行くべき方向を計算する関数
+   * @return 既知区間の最終区画
+   */
+  const Pose calcNextDirections(const Maze &maze, const Pose &start,
+                                Directions &nextDirectionsKnown,
+                                Directions &nextDirectionCandidates) const;
+  /**
    * @brief ステップマップにより次に行くべき方向列を生成する
    */
   const Directions calcNextDirectionsStepDown(const Maze &maze,
@@ -126,6 +124,30 @@ public:
   const Directions calcNextDirectionCandidates(const Maze &maze,
                                                const Pose &focus) const;
   /**
+   * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
+   * @param maze 迷路の参照
+   * @param shortest_dirs 追記元の方向列．これ自体に追記される．
+   * @param diag_enabled 斜めありなし
+   */
+  static void appendStraightDirections(const Maze &maze,
+                                       Directions &shortest_dirs,
+                                       const bool known_only,
+                                       const bool diag_enabled);
+
+protected:
+  std::array<step_t, Position::SIZE> step_map; /**< @brief ステップ数*/
+  std::array<step_t, MAZE_SIZE>
+      step_table; /*< @brief 台形加速を考慮したコストテーブル */
+
+  /**
+   * @brief 最短経路導出用の加速を考慮したステップリストを算出する関数
+   * 高速化のため，あらかじめ計算を終えておく．
+   */
+  void calcStraightStepTable();
+
+  /* backup */
+public:
+  /**
    * @brief Dijkstra Search
    */
   const Positions calcShortestDirectionsDijkstra(const Maze &maze,
@@ -137,17 +159,6 @@ public:
   const Positions calcShortestDirectionsBFS(const Maze &maze,
                                             const bool known_only,
                                             const bool simple);
-
-private:
-  std::array<step_t, Position::SIZE> step_map; /**< @brief ステップ数*/
-  std::array<step_t, MAZE_SIZE>
-      step_table; /*< @brief 台形加速を考慮したコストテーブル */
-
-  /**
-   * @brief 最短経路導出用の加速を考慮したステップリストを算出する関数
-   * 高速化のため，あらかじめ計算を終えておく．
-   */
-  void calcStraightStepTable();
 };
 
 } // namespace MazeLib
