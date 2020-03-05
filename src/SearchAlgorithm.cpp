@@ -207,7 +207,8 @@ void SearchAlgorithm::printMap(const State state, const Pose &pose) const {
   step_map.print(m, pose.p, pose.d);
   // step_map.printFull(m, pose.p, pose.d);
 }
-bool SearchAlgorithm::findShortestCandidates(Positions &candidates) {
+bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
+                                             const Pose &current_pose) {
 #if 0
   /* 全探索 */
   candidates.clear();
@@ -251,13 +252,19 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates) {
       return false; /*< 失敗 */
     /* ゴール区画内を行けるところまで直進する */
     StepMap::appendStraightDirections(maze, shortest_dirs, known_only, false);
-    /* 経路中の未知壁区画を訪問候補に追加 */
-    auto i = maze.getStart();
-    for (const auto d : shortest_dirs) {
-      if (!maze.isKnown(i, d))
-        candidates.push_back(i);
-      i = i.next(d);
-    }
+    /* 最短経路中の未知壁区画を訪問候補に追加 */
+    auto p = maze.getStart();
+    for (const auto d : shortest_dirs)
+      if (!maze.isKnown(p = p.next(d), d))
+        candidates.push_back(p);
+    /* 現在地からゴールまでの最短経路の未知区画も追加 */
+    Pose end;
+    shortest_dirs = step_map.getStepDownDirections(maze, current_pose, end,
+                                                   known_only, false);
+    p = current_pose.p;
+    for (const auto d : shortest_dirs)
+      if (!maze.isKnown(p = p.next(d), d))
+        candidates.push_back(p);
   }
   /* diag */
   {
@@ -266,13 +273,11 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates) {
         step_map_wall.calcShortestDirections(maze, known_only, false);
     if (shortest_dirs.empty())
       return false; /*< 失敗 */
-    /* 経路中の未知壁区画を訪問候補に追加 */
-    auto i = WallIndex(0, 0, 1);
-    for (const auto d : shortest_dirs) {
-      i = i.next(d);
-      if (!maze.isKnown(i))
+    /* 最短経路中の未知壁区画を訪問候補に追加 */
+    auto i = WallIndex(0, 0, 1); //< スタート区画
+    for (const auto d : shortest_dirs)
+      if (!maze.isKnown(i = i.next(d)))
         candidates.push_back(i.getPosition());
-    }
     /* ゴール区画内を行けるところまで直進する */
     if (shortest_dirs.size()) {
       const auto d = shortest_dirs.back();
@@ -284,6 +289,16 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates) {
           candidates.push_back(i.getPosition());
       }
     }
+    /* 現在地からゴールまでの最短経路の未知区画も追加 */
+    const auto start =
+        WallIndex(current_pose.p, current_pose.d + Direction::Back);
+    WallIndex end;
+    shortest_dirs =
+        step_map_wall.getStepDownDirections(maze, start, end, false, false);
+    i = start;
+    for (const auto d : shortest_dirs)
+      if (!maze.isKnown(i = i.next(d)))
+        candidates.push_back(i.getPosition());
   }
   return true; /*< 成功 */
 }
@@ -394,7 +409,7 @@ const Position SearchAlgorithm::calcNextDirectionsInAdvance(
     maze.setWall(end.p, d, true), maze.setKnown(end.p, d, true);
     /* 既知区間終了地点から次行く方向列を再計算 */
     step_map.update(maze, dest, false, false);
-    nextDirectionCandidates = step_map.calcNextDirectionCandidates(maze, end);
+    nextDirectionCandidates = step_map.getNextDirectionCandidates(maze, end);
   }
   /* 仮壁を復元 */
   for (const auto i : wall_backup)
@@ -421,7 +436,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
     Directions &nextDirectionCandidates) {
   /* 最短経路上の未知区画を目的地とする */
   Positions candidates; /*< 最短経路になりうる区画 */
-  if (!findShortestCandidates(candidates))
+  if (!findShortestCandidates(candidates, current_pose))
     return Error;
   if (candidates.empty())
     return Reached; /*< 探索完了 */
@@ -469,7 +484,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
       break;
     }
     /* 最短になりうる区画の洗い出し */
-    if (!findShortestCandidates(candidates))
+    if (!findShortestCandidates(candidates, current_pose))
       break; //< 最短経路がなくなった場合終わり
     /* 既知区間終了地点から次行く方向列を再計算 */
     if (candidates.empty()) //< 最短候補が空の場合はスタート区画への帰還を想定
@@ -477,7 +492,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
     else
       step_map.update(maze, candidates, false, false);
     /* 次に行きたい候補を取得する */
-    nextDirectionCandidates = step_map.calcNextDirectionCandidates(maze, end);
+    nextDirectionCandidates = step_map.getNextDirectionCandidates(maze, end);
   }
   /* 仮壁を復元 */
   for (const auto i : wall_backup)

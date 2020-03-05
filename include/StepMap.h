@@ -113,16 +113,15 @@ public:
   /**
    * @brief ステップマップにより次に行くべき方向列を生成する
    */
-  const Directions calcNextDirectionsStepDown(const Maze &maze,
-                                              const Pose &start, Pose &focus,
-                                              const bool known_only,
-                                              const bool break_unknown) const;
+  const Directions getStepDownDirections(const Maze &maze, const Pose &start,
+                                         Pose &end, const bool known_only,
+                                         const bool break_unknown) const;
   /**
    * @brief 引数区画の周囲の未知壁の確認優先順位を生成する関数
    * @return const Directions 行くべき方向の優先順位
    */
-  const Directions calcNextDirectionCandidates(const Maze &maze,
-                                               const Pose &focus) const;
+  const Directions getNextDirectionCandidates(const Maze &maze,
+                                              const Pose &focus) const;
   /**
    * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
    * @param maze 迷路の参照

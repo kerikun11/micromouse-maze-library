@@ -161,17 +161,27 @@ const Directions StepMapWall::calcShortestDirections(const Maze &maze,
                                                      const bool simple) {
   /* ステップマップを更新 */
   update(maze, dest, known_only, simple);
+  WallIndex end;
+  const auto shortest_dirs =
+      getStepDownDirections(maze, start, end, known_only, false);
+  /* ゴール判定 */
+  return step_map[end.getIndex()] == 0 ? shortest_dirs : Directions{};
+}
+const Directions
+StepMapWall::getStepDownDirections(const Maze &maze, const WallIndex &start,
+                                   WallIndex &end, const bool known_only,
+                                   const bool break_unknown) const {
   /* 最短経路となるスタートからの方向列 */
   Directions shortest_dirs;
   /* start から順にステップマップを下る */
-  auto focus = start;
+  end = start;
   while (1) {
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
     auto min_d = Direction::Max;
     auto min_step = STEP_MAX;
     /* 周辺を走査 */
-    for (const auto d : focus.getNextDirection6()) {
-      auto next = focus;   /*< 隣接 */
+    for (const auto d : end.getNextDirection6()) {
+      auto next = end;     /*< 隣接 */
       next = next.next(d); /*< 移動 */
       /* 壁あり or 既知壁のみで未知壁 ならば次へ */
       if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
@@ -183,15 +193,12 @@ const Directions StepMapWall::calcShortestDirections(const Maze &maze,
       min_step = next_step;
       min_d = d;
     }
-    /* focus_step より大きかったらなんかおかしい */
-    if (step_map[focus.getIndex()] <= min_step)
+    /* 現在地のステップより大きかったらなんかおかしい */
+    if (step_map[end.getIndex()] <= min_step)
       break;
-    focus = focus.next(min_d);      //< 位置を更新
+    end = end.next(min_d);          //< 位置を更新
     shortest_dirs.push_back(min_d); //< 既知区間移動
   }
-  /* ゴール判定 */
-  if (step_map[focus.getIndex()] != 0)
-    return {}; //< 失敗
   return shortest_dirs;
 }
 const WallIndexes StepMapWall::convertDestinations(const Maze &maze,
