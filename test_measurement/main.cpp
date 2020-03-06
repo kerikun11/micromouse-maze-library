@@ -115,7 +115,7 @@ int test_measurement() {
       }
       const auto path_cost = robot.getSearchAlgorithm().getShortestCost();
       // std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
-      // << path_cost << "\t[ms]" << std::endl;
+      //           << path_cost << "\t[ms]" << std::endl;
       csv << "," << path_cost;
       robot.fastRun(diag_enabled);
       // robot.printPath();

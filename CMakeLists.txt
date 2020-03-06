@@ -15,10 +15,11 @@ add_compile_options("-mno-ms-bitfields")
 add_subdirectory(src)
 
 ## add tests
-add_subdirectory(test_gtest)
-add_subdirectory(test_main)
 add_subdirectory(test_contest_2019)
 add_subdirectory(test_generate)
+add_subdirectory(test_gtest)
+add_subdirectory(test_load)
+add_subdirectory(test_main)
 add_subdirectory(test_measurement)
 add_subdirectory(test_position_identify)
 add_subdirectory(test_search)

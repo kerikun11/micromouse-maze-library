@@ -344,7 +344,9 @@ public:
    * @param i ID
    */
   WallIndex(const uint16_t i)
-      : x(i), y(i >> MAZE_SIZE_BIT), z(i >> (2 * MAZE_SIZE_BIT)) {}
+      : x(i & (MAZE_SIZE_MAX - 1)),
+        y((i >> MAZE_SIZE_BIT) & (MAZE_SIZE_MAX - 1)),
+        z(i >> (2 * MAZE_SIZE_BIT)) {}
   /**
    * @brief 比較
    */
@@ -493,7 +495,8 @@ public:
    * @brief 迷路の初期化．壁を削除し，スタート区画を既知に
    * @param set_start_wall スタート区画の East と North の壁を設定するかどうか
    */
-  void reset(const bool set_start_wall = true);
+  void reset(const bool set_start_wall = true,
+             const bool set_range_full = false);
   /**
    * @brief 壁の有無を返す
    * @return true: 壁あり，false: 壁なし

@@ -266,7 +266,8 @@ int main(void) {
               << sum.count() / n << "\t[us]" << std::endl;
     map.print(maze, path);
     // auto shortest_dirs = map.indexes2directions(path, diag_enabled);
-    // StepMap::appendStraightDirections(maze, shortest_dirs, diag_enabled);
+    // StepMap::appendStraightDirections(maze, shortest_dirs, known_only,
+    //                                   diag_enabled);
     // maze.print(shortest_dirs);
   }
 #endif

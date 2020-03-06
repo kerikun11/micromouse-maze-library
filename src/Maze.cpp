@@ -17,12 +17,20 @@ const Position Position::next(const Direction d) const {
   switch (d) {
   case Direction::East:
     return Position(x + 1, y);
+  case Direction::NorthEast:
+    return Position(x + 1, y + 1);
   case Direction::North:
     return Position(x, y + 1);
+  case Direction::NorthWest:
+    return Position(x - 1, y + 1);
   case Direction::West:
     return Position(x - 1, y);
+  case Direction::SouthWest:
+    return Position(x - 1, y - 1);
   case Direction::South:
     return Position(x, y - 1);
+  case Direction::SouthEast:
+    return Position(x + 1, y - 1);
   default:
     logw << "Invalid Direction: " << d << std::endl;
     return *this;
@@ -91,13 +99,11 @@ std::ostream &operator<<(std::ostream &os, const WallLog &obj) {
 }
 
 /* Maze */
-void Maze::reset(const bool set_start_wall) {
+void Maze::reset(const bool set_start_wall, const bool set_range_full) {
   wall.reset();
   known.reset();
-  min_x = MAZE_SIZE - 1;
-  min_y = MAZE_SIZE - 1;
-  max_x = 0;
-  max_y = 0;
+  min_x = min_y = set_range_full ? 0 : (MAZE_SIZE - 1);
+  max_x = max_y = set_range_full ? (MAZE_SIZE - 1) : 0;
   backup_counter = 0;
   if (set_start_wall) {
     updateWall(Position(0, 0), Direction::East, true);   //< start cell
