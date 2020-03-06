@@ -310,7 +310,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
   const int8_t max_x = std::min(MAZE_SIZE, maze.getMaxX() + 1 + outside_margin);
   const int8_t max_y = std::min(MAZE_SIZE, maze.getMaxY() + 1 + outside_margin);
   /* パターンマッチング開始 */
-  int cnt = 0; /*< マッチ数 */
+  int candidates_count = 0; /*< マッチ数 */
   for (int8_t x = 0; x < max_x; ++x)
     for (int8_t y = 0; y < max_y; ++y) {
       const auto offset_p = Position(x, y);
@@ -332,7 +332,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
           if (maze.isKnown(maze_p, maze_d) &&
               maze.isWall(maze_p, maze_d) != wl.b)
             ++diffs;
-          /* 打ち切り条件 */
+          /* 打ち切り */
           if (diffs > min_diff)
             break;
         }
@@ -342,36 +342,27 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
         /* 一致 */
         ans.p = offset_p;
         ans.d = offset_d;
-        ++cnt;
+        ++candidates_count;
         /* 高速化のための打ち切り */
-        if (cnt > 1)
-          return cnt;
+        if (candidates_count > 1)
+          return candidates_count;
       }
     }
-  return cnt;
+  return candidates_count;
 }
 const Directions
 SearchAlgorithm::findMatchDirectionCandidates(const Position &cur_p,
                                               const Pose &target) const {
   const int min_diff = 0; /*< 許容食い違い壁数 */
-  /* 既知迷路の大きさを取得 */
-  const int8_t max_x = maze.getMaxX() + 1;
-  const int8_t max_y = maze.getMaxY() + 1;
-  /* 4方向を調べる */
-  Directions result_dirs;
+  /* パターンマッチング開始 */
+  Directions result_dirs; //< target と一致する方向の候補を格納する
   for (const auto offset_d : Direction::getAlong4()) {
     /* 既知壁との食い違い数を数える */
-    int diffs = 0;
+    int diffs = 0; /*< idWallLogs のうち，既知の食い違いの壁の数を格納 */
     for (const auto wl : idMaze.getWallLogs()) {
       const auto maze_p =
           target.p + (wl.getPosition() - cur_p).rotate(offset_d);
       const auto maze_d = wl.d + offset_d;
-      /* 既知範囲外は除外．探索中だとちょっと危険な処理． */
-      if (maze_p.x < 0 || maze_p.x >= max_x || maze_p.y < 0 ||
-          maze_p.y >= max_y) {
-        diffs = 999;
-        break;
-      }
       /* 既知かつ食い違い壁をカウント */
       if (maze.isKnown(maze_p, maze_d) && maze.isWall(maze_p, maze_d) != wl.b)
         ++diffs;
@@ -555,12 +546,13 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     const int8_t min_y = idMaze.getMinY();
     const int8_t max_x = idMaze.getMaxX();
     const int8_t max_y = idMaze.getMaxY();
+    /* 既知のマップが迷路中央に来るように調整する */
     const auto offset_new =
         idOffset + Position((MAZE_SIZE - max_x - min_x - 1) / 2,
                             (MAZE_SIZE - max_y - min_y - 1) / 2);
     const auto offset_diff = offset_new - idOffset;
     idOffset = offset_new;
-    current_pose.p = current_pose.p + offset_diff;
+    current_pose.p = current_pose.p + offset_diff; //< 自己位置を調整
     WallLogs tmp = idMaze.getWallLogs();
     idMaze.reset(false);
     for (const auto wl : tmp)
@@ -569,18 +561,16 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   /* 自己位置同定処理 */
   Pose ans;
   const int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
-  matchCount = cnt;
+  matchCount = cnt; //< 表示用
   if (cnt == 1) {
     /* 自己位置を修正する */
     const auto fixed_p = (current_pose.p - idOffset).rotate(ans.d) + ans.p;
     const auto fixed_d = current_pose.d + ans.d;
     current_pose = Pose(fixed_p, fixed_d);
     /* 自己位置同定中にゴール区画訪問済みなら，ゴール区画訪問をfalseにする */
-    for (const auto maze_p : maze.getGoals()) {
-      const auto id_p = (maze_p - ans.p).rotate(-ans.d) + idOffset;
-      if (idMaze.unknownCount(id_p) == 0)
+    for (const auto maze_p : maze.getGoals())
+      if (idMaze.unknownCount((maze_p - ans.p).rotate(-ans.d) + idOffset) == 0)
         isForceGoingToGoal = false;
-    }
     /* 自己位置同定中にスタート区画訪問済みなら，ゴール区画訪問をtrueにする */
     const auto id_start_p = (maze.getStart() - ans.p).rotate(-ans.d) + idOffset;
     if (idMaze.unknownCount(id_start_p) == 0)
@@ -590,7 +580,6 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     const auto &wall_logs = idMaze.getWallLogs();
     for (int i = ignore_first_walls; i < (int)wall_logs.size(); ++i) {
       const auto wl = wall_logs[i];
-      /* 正しいPoseに変換 */
       const auto maze_p = (wl.getPosition() - idOffset).rotate(ans.d) + ans.p;
       const auto maze_d = wl.d + ans.d;
       if (!maze.isKnown(maze_p, maze_d))
@@ -606,10 +595,9 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   int8_t max_x = std::min(idMaze.getMaxX() + 2, MAZE_SIZE);
   int8_t max_y = std::min(idMaze.getMaxY() + 2, MAZE_SIZE);
   /* スタート区画への訪問を避けるため，idMazeを編集する */
-  WallLogs tmp;
+  WallLogs wall_backup;
   /* 周辺の探索候補を作成 */
   Positions candidates;
-  /* 禁止区画でない未知区画を訪問候補に追加する */
   for (int8_t x = min_x; x < max_x; ++x)
     for (int8_t y = min_y; y < max_y; ++y) {
       const auto p = Position(x, y);
@@ -617,7 +605,7 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
       const auto forbidden =
           findMatchDirectionCandidates(p, {Position(0, 1), Direction::South});
       for (const auto d : forbidden) {
-        tmp.push_back(WallLog(p, d, idMaze.isWall(p, d)));
+        wall_backup.push_back(WallLog(p, d, idMaze.isWall(p, d)));
         idMaze.setWall(p, d, true);
       }
       /* 禁止区画でない未知区画を訪問候補に追加する */
@@ -637,14 +625,10 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
                               nextDirectionsKnown, nextDirectionCandidates);
   /* エラー防止のため来た方向を追加 */
   nextDirectionCandidates.push_back(current_pose.d + Direction::Back);
-  // std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-  // idMaze.print();
-  // getc(stdin);
-  /* idMaze 迷路をもとに戻す */
-  std::reverse(tmp.begin(), tmp.end()); /* 重複の場合でも復元できる */
-  for (const auto wl : tmp)
+  /* 迷路をもとに戻す */
+  std::reverse(wall_backup.begin(), wall_backup.end()); /* 重複対策 */
+  for (const auto wl : wall_backup)
     idMaze.setWall(wl.getPosition(), wl.d, wl.b);
-  /*< 復元終了 */
   /* 既知情報からではスタート区画を避けられない場合 */
   if (step_map.getStep(current_pose.p) == StepMap::STEP_MAX)
     calcNextDirectionsInAdvance(idMaze, candidates, current_pose,

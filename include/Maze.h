@@ -232,8 +232,6 @@ public:
   bool isInsideOfField() const {
     /* (x, y) がフィールド内か判定 */
     // return x >= 0 && x < MAZE_SIZE && y >= 0 && y < MAZE_SIZE;
-    /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
-    // return !((x | y) & (0x100 - MAZE_SIZE));
     /* 高速化 */
     return (static_cast<uint8_t>(x) < MAZE_SIZE) &&
            (static_cast<uint8_t>(y) < MAZE_SIZE);
