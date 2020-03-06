@@ -232,8 +232,6 @@ public:
   bool isInsideOfField() const {
     /* (x, y) がフィールド内か判定 */
     // return x >= 0 && x < MAZE_SIZE && y >= 0 && y < MAZE_SIZE;
-    /* 高速化; MAZE_SIZE が2の累乗であることを使用 */
-    // return !((x | y) & (0x100 - MAZE_SIZE));
     /* 高速化 */
     return (static_cast<uint8_t>(x) < MAZE_SIZE) &&
            (static_cast<uint8_t>(y) < MAZE_SIZE);
@@ -344,7 +342,9 @@ public:
    * @param i ID
    */
   WallIndex(const uint16_t i)
-      : x(i), y(i >> MAZE_SIZE_BIT), z(i >> (2 * MAZE_SIZE_BIT)) {}
+      : x(i & (MAZE_SIZE_MAX - 1)),
+        y((i >> MAZE_SIZE_BIT) & (MAZE_SIZE_MAX - 1)),
+        z(i >> (2 * MAZE_SIZE_BIT)) {}
   /**
    * @brief 比較
    */
@@ -493,7 +493,8 @@ public:
    * @brief 迷路の初期化．壁を削除し，スタート区画を既知に
    * @param set_start_wall スタート区画の East と North の壁を設定するかどうか
    */
-  void reset(const bool set_start_wall = true);
+  void reset(const bool set_start_wall = true,
+             const bool set_range_full = false);
   /**
    * @brief 壁の有無を返す
    * @return true: 壁あり，false: 壁なし
