@@ -100,6 +100,8 @@ int test_measurement() {
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s)
             .count();
     robot.printResult();
+    csv << "," << int(robot.cost / 60) << ":" << std::setw(2)
+        << std::setfill('0') << int(robot.cost) % 60;
     csv << "," << robot.cost << "," << robot.step << "," << robot.f << ","
         << robot.l << "," << robot.r << "," << robot.b;
     csv << "," << robot.getMaze().getWallLogs().size();

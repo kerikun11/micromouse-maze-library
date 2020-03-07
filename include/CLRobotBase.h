@@ -232,13 +232,13 @@ protected:
     if (std::find(goals.cbegin(), goals.cend(), current_pose.p) != goals.cend())
       real_visit_goal = true;
     cost += getTimeCost(action);
-    step++;
     switch (action) {
     case RobotBase::START_STEP:
       real.p = Position(0, 1);
       real.d = Direction::North;
       real_visit_goal = false;
       f++;
+      step++;
       break;
     case RobotBase::START_INIT:
       if (real_visit_goal == false)
@@ -252,6 +252,7 @@ protected:
         crashed();
       real.p = real.p.next(real.d);
       l++;
+      step++;
       break;
     case RobotBase::TURN_R:
       real.d = real.d + Direction::Right;
@@ -259,6 +260,7 @@ protected:
         crashed();
       real.p = real.p.next(real.d);
       r++;
+      step++;
       break;
     case RobotBase::ROTATE_180:
       real.d = real.d + Direction::Back;
@@ -266,6 +268,7 @@ protected:
         crashed();
       real.p = real.p.next(real.d);
       b++;
+      step++;
       break;
     case RobotBase::ST_FULL:
       if (action_prev == action)
@@ -274,6 +277,7 @@ protected:
         crashed();
       real.p = real.p.next(real.d);
       f++;
+      step++;
       break;
     case RobotBase::ST_HALF:
       break;
