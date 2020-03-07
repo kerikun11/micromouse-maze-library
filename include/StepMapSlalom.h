@@ -26,18 +26,18 @@ public:
   public:
     struct RunParameter {
       RunParameter() {}
-      static constexpr float factor = 2;
-      float vs = 420.0f * factor;    /*< 基本速度 [mm/s] */
-      float am_a = 4800.0f * factor; /*< 最大加速度 [mm/s/s] */
-      float am_d = 3600.0f * factor; /*< 最大加速度(斜め) [mm/s/s] */
-      float vm_a = 1800.0f * factor; /*< 飽和速度 [mm/s] */
-      float vm_d = 1200.0f * factor; /*< 飽和速度(斜め) [mm/s] */
-      cost_t t_F45 = 249 / factor;   /*< [ms] @ v = 425.285 [mm/s] */
-      cost_t t_F90 = 375 / factor;   /*< [ms] @ v = 422.868 [mm/s] */
-      cost_t t_F135 = 465 / factor;  /*< [ms] @ v = 373.773 [mm/s] */
-      cost_t t_F180 = 563 / factor;  /*< [ms] @ v = 412.408 [mm/s] */
-      cost_t t_FV90 = 388 / factor;  /*< [ms] @ v = 289.946 [mm/s] */
-      cost_t t_FS90 = 287 / factor;  /*< [ms] @ v = 265.760 [mm/s] */
+      static constexpr float factor = 2;      /*< CostMax の超過防止 */
+      float vs = 420.0f * factor;             /*< 基本速度 [mm/s] */
+      float am_a = 4200.0f * factor * factor; /*< 最大加速度 [mm/s/s] */
+      float am_d = 3600.0f * factor * factor; /*< 最大加速度(斜め) [mm/s/s] */
+      float vm_a = 1500.0f * factor;          /*< 飽和速度 [mm/s] */
+      float vm_d = 1200.0f * factor;          /*< 飽和速度(斜め) [mm/s] */
+      cost_t t_F45 = 249 / factor;            /*< [ms] @ 425 [mm/s] */
+      cost_t t_F90 = 375 / factor;            /*< [ms] @ 422 [mm/s] */
+      cost_t t_F135 = 465 / factor;           /*< [ms] @ 373 [mm/s] */
+      cost_t t_F180 = 563 / factor;           /*< [ms] @ 412 [mm/s] */
+      cost_t t_FV90 = 388 / factor;           /*< [ms] @ 289 [mm/s] */
+      cost_t t_FS90 = 287 / factor;           /*< [ms] @ 265 [mm/s] */
     };
 
   public:
