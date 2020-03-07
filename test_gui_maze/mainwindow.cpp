@@ -112,10 +112,31 @@ void MainWindow::on_stepmapWallTrapezoidButton_clicked() {
   }
 }
 
-void MainWindow::on_fileSeectEdit_returnPressed() { on_drawButton_clicked(); }
+void MainWindow::on_fileSeectEdit_returnPressed() {
+  on_drawButton_clicked();
+  /* add! */
+  on_shortestDiagButton_clicked();
+  on_shortestNoDiagButton_clicked();
+  on_saveImageButton_clicked();
+}
 
 void MainWindow::on_exitButton_clicked() { exit(0); }
 
 void MainWindow::on_actionExit_triggered() { exit(0); }
 
 void MainWindow::on_actionDraw_triggered() { on_drawButton_clicked(); }
+
+void MainWindow::on_saveImageButton_clicked() {
+  auto filepath = QFileInfo(ui->fileSeectEdit->text());
+  scene->clearSelection(); // Selections would also render to the file
+  scene->setSceneRect(scene->itemsBoundingRect()); // Re-shrink the scene to
+                                                   // it's bounding contents
+  QImage image(scene->sceneRect().size().toSize(),
+               QImage::Format_ARGB32); // Create the image with the exact size
+                                       // of the shrunk scene
+  image.fill(Qt::transparent);         // Start all pixels transparent
+
+  QPainter painter(&image);
+  scene->render(&painter);
+  image.save(filepath.fileName() + ".png");
+}
