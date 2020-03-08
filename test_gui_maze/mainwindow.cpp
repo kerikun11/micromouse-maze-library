@@ -115,6 +115,8 @@ void MainWindow::on_stepmapWallTrapezoidButton_clicked() {
 void MainWindow::on_fileSeectEdit_returnPressed() {
   on_drawButton_clicked();
   /* add! */
+  on_stepmapSimpleButton_clicked();
+  on_stepmapWallSimpleButton_clicked();
   on_shortestDiagButton_clicked();
   on_shortestNoDiagButton_clicked();
   on_saveImageButton_clicked();
