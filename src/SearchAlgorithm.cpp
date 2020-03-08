@@ -582,6 +582,8 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     const auto id_start_p = (maze.getStart() - ans.p).rotate(-ans.d) + idOffset;
     if (idMaze.unknownCount(id_start_p) == 0)
       isForceGoingToGoal = true;
+    /* 移動不能にならないように，真下の壁を更新する */
+    maze.updateWall(current_pose.p, current_pose.d + Direction::Back, false);
     /* 自己位置同定中に未知壁を見ていたら更新する */
     const int ignore_first_walls = 12; /*< 復帰直後は壁の読み間違いがありそう */
     const auto &wall_logs = idMaze.getWallLogs();
