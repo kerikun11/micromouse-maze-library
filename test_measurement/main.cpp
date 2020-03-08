@@ -126,6 +126,7 @@ int test_measurement() {
       const auto p_at = std::make_unique<Agent>(maze_target);
       Agent &at = *p_at;
       at.calcShortestDirections(diag_enabled);
+      robot.calcShortestDirections(diag_enabled);
       if (at.getSearchAlgorithm().getShortestCost() !=
           robot.getSearchAlgorithm().getShortestCost()) {
         logw << "searched path is not shortest! "

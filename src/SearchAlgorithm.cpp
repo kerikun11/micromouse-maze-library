@@ -231,12 +231,13 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
     if (!step_map_slalom.calcShortestDirections(maze, edge_cost, shortest_dirs,
                                                 known_only, diag_enabled))
       return false; /* failed */
-    StepMap::appendStraightDirections(maze, shortest_dirs, known_only, false);
+    StepMap::appendStraightDirections(maze, shortest_dirs, known_only,
+                                      diag_enabled);
     auto p = maze.getStart();
     for (const auto d : shortest_dirs) {
-      p = p.next(d);
-      if (maze.unknownCount(p))
+      if (!maze.isKnown(p, d))
         candidates.push_back(p);
+      p = p.next(d);
     }
   }
   return true;
@@ -254,17 +255,21 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
     StepMap::appendStraightDirections(maze, shortest_dirs, known_only, false);
     /* 最短経路中の未知壁区画を訪問候補に追加 */
     auto p = maze.getStart();
-    for (const auto d : shortest_dirs)
-      if (!maze.isKnown(p = p.next(d), d))
+    for (const auto d : shortest_dirs) {
+      if (!maze.isKnown(p, d))
         candidates.push_back(p);
+      p = p.next(d);
+    }
     /* 現在地からゴールまでの最短経路の未知区画も追加 */
     Pose end;
     shortest_dirs = step_map.getStepDownDirections(maze, current_pose, end,
                                                    known_only, false);
     p = current_pose.p;
-    for (const auto d : shortest_dirs)
-      if (!maze.isKnown(p = p.next(d), d))
+    for (const auto d : shortest_dirs) {
+      if (!maze.isKnown(p, d))
         candidates.push_back(p);
+      p = p.next(d);
+    }
   }
   /* diag */
   {
@@ -296,9 +301,11 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
     shortest_dirs =
         step_map_wall.getStepDownDirections(maze, start, end, false, false);
     i = start;
-    for (const auto d : shortest_dirs)
-      if (!maze.isKnown(i = i.next(d)))
+    for (const auto d : shortest_dirs) {
+      if (!maze.isKnown(i))
         candidates.push_back(i.getPosition());
+      i = i.next(d);
+    }
   }
   return true; /*< 成功 */
 }

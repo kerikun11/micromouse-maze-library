@@ -271,22 +271,19 @@ static StepMapWall::step_t gen_cost_impl(const int i, const float am,
 }
 void StepMapWall::calcStraightStepTable() {
   const float vs = 420.0f;    /*< 基本速度 [mm/s] */
-  const float am_a = 4800.0f; /*< 最大加速度 [mm/s/s] */
+  const float am_a = 4200.0f; /*< 最大加速度 [mm/s/s] */
   const float am_d = 3600.0f; /*< 最大加速度(斜め) [mm/s/s] */
-  const float vm_a = 1800.0f; /*< 飽和速度 [mm/s] */
+  const float vm_a = 1500.0f; /*< 飽和速度 [mm/s] */
   const float vm_d = 1200.0f; /*< 飽和速度(斜め) [mm/s] */
   const float seg_a = 90.0f;  /*< 1区画の長さ [mm] */
   const float seg_d = 45.0f * std::sqrt(2); /*< 1区画の長さ(斜め) [mm] */
-  const float t_slalom = 287.0f;            /*< 90度ターンの時間 [ms] */
-  for (int i = 0; i < MAZE_SIZE * 2; ++i) {
+  const float t_slalom = 388.0f;            /*< FV90ターンの時間 [ms] */
+  step_table_along[0] = step_table_diag[0] = 0; /*< [0] は使用しない */
+  for (int i = 1; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
-    step_table_diag[i] = gen_cost_impl(i, am_d, vs, vm_d, seg_d);
+    step_table_diag[i] = t_slalom + gen_cost_impl(i, am_d, vs, vm_d, seg_d);
   }
-  const step_t turn_cost = t_slalom - step_table_along[1];
-  for (int i = 0; i < MAZE_SIZE * 2; ++i) {
-    step_table_along[i] += turn_cost;
-    step_table_diag[i] += turn_cost;
-  }
+  /* 最大値を超えないようにスケーリング */
   for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] /= 2;
     step_table_diag[i] /= 2;
