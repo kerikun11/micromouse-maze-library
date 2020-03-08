@@ -40,7 +40,8 @@ for i, v in enumerate(labels):
 # ラベルが重ならないように幅を調整
 b, t = plt.ylim()
 plt.ylim(0, t * 1.06)
-plt.legend(loc='best')
+plt.legend([p_s_b, p_s_r, p_s_l, p_s_f], [
+           "Back", "Right", "Left", "Forward"], loc='best')
 
 plt.tight_layout()
 
