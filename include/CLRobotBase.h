@@ -307,7 +307,7 @@ protected:
     case RobotBase::TURN_R:
       return 71 / velocity;
     case RobotBase::ROTATE_180:
-      return 5.0f;
+      return 3.0f;
     case RobotBase::ST_FULL:
       return segment / velocity;
     case RobotBase::ST_HALF:
