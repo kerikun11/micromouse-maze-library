@@ -1,5 +1,4 @@
 #include "CLRobotBase.h"
-#include "ShortestAlgorithm.h"
 
 #include <thread>
 
@@ -103,33 +102,6 @@ int main(void) {
               << (diag_enabled ? "(diag)" : "(no diag)") << ": "
               << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
               << std::endl;
-  }
-#endif
-
-#if 0
-  /* Shortest Algorithm */
-  for (const auto diag_enabled : {false, true}) {
-    const int n = 100;
-    const bool known_only = 0;
-    const Maze &maze = maze_target;
-    const auto p_sa = std::make_unique<ShortestAlgorithm>(maze);
-    ShortestAlgorithm &sa = *p_sa;
-    Indexes path;
-    std::chrono::microseconds sum{0};
-    for (int i = 0; i < n; ++i) {
-      const auto t_s = std::chrono::system_clock().now();
-      if (!sa.calcShortestPath(path, known_only, diag_enabled))
-        loge << "Failed!" << std::endl;
-      const auto t_e = std::chrono::system_clock().now();
-      const auto us =
-          std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
-      sum += us;
-    }
-    std::cout << "Shortest " << (diag_enabled ? "diag" : "no_d") << ":\t"
-              << sum.count() / n << "\t[us]" << std::endl;
-    std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
-              << sa.getShortestPathCost() << "\t[ms]" << std::endl;
-    sa.print(path);
   }
 #endif
 
