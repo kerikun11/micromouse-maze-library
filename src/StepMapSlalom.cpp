@@ -161,7 +161,7 @@ void StepMapSlalom::update(const Maze &maze,
       int8_t n = 1;
       for (auto i = focus; canGo(i); ++n) {
         const auto next = i.next(nd);
-        if (!pushAndContinue(next, edge_cost.getEdgeCost(ST_ALONG, n)))
+        if (!pushAndContinue(next, edge_cost.getEdgeCostAlong(n)))
           break;
         i = next;
       }
@@ -177,19 +177,19 @@ void StepMapSlalom::update(const Maze &maze,
           if (canGo(i45)) {
             /* 45 */
             if (canGo(i45.next(i45.getNodeDirection())))
-              pushAndContinue(i45, edge_cost.getEdgeCost(F45));
+              pushAndContinue(i45, edge_cost.getEdgeCostSlalom(F45));
             /* 90 */
             const auto v90 = focus.getPosition().next(nd).next(d90);
-            pushAndContinue(Index(v90, d90), edge_cost.getEdgeCost(F90));
+            pushAndContinue(Index(v90, d90), edge_cost.getEdgeCostSlalom(F90));
             /* 135 and 180 */
             const auto i135 = i45.next(d135);
             if (canGo(i135)) {
               /* 135 */
               if (canGo(i135.next(i135.getNodeDirection())))
-                pushAndContinue(i135, edge_cost.getEdgeCost(F135));
+                pushAndContinue(i135, edge_cost.getEdgeCostSlalom(F135));
               /* 180 */
               pushAndContinue(Index(v90.next(d180), d180),
-                              edge_cost.getEdgeCost(F180));
+                              edge_cost.getEdgeCostSlalom(F180));
             }
           }
         }
@@ -198,7 +198,7 @@ void StepMapSlalom::update(const Maze &maze,
         const auto p_f = focus.getPosition().next(nd); //< i.e. vector front
         for (const auto d90 : {nd + Direction::Left, nd + Direction::Right})
           if (canGo(WallIndex(p_f, d90))) //< 90度方向の壁
-            pushAndContinue(Index(p_f, d90), edge_cost.getEdgeCost(FS90));
+            pushAndContinue(Index(p_f, d90), edge_cost.getEdgeCostSlalom(FS90));
       }
     } else { /* 壁の中央（斜めありの場合しかありえない） */
       /* 直前の壁 */
@@ -213,7 +213,7 @@ void StepMapSlalom::update(const Maze &maze,
         const auto next = i.next(nd);
         if (!canGo(next))
           break;
-        if (!pushAndContinue(i, edge_cost.getEdgeCost(ST_ALONG, n)))
+        if (!pushAndContinue(i, edge_cost.getEdgeCostAlong(n)))
           break;
         i = next;
       }
@@ -223,15 +223,15 @@ void StepMapSlalom::update(const Maze &maze,
       auto d90 = nd + nd_r45 * 2;
       auto d135 = nd + nd_r45 * 3;
       /* 45R */
-      pushAndContinue(focus.next(d45), edge_cost.getEdgeCost(F45));
+      pushAndContinue(focus.next(d45), edge_cost.getEdgeCostSlalom(F45));
       /* V90, 135R */
       const auto i90 = i_f.next(d90);
       if (canGo(i90)) {
         /* V90 */
         if (canGo(i90.next(i90.getNodeDirection())))
-          pushAndContinue(i90, edge_cost.getEdgeCost(FV90));
+          pushAndContinue(i90, edge_cost.getEdgeCostSlalom(FV90));
         /* 135 R */
-        pushAndContinue(focus.next(d135), edge_cost.getEdgeCost(F135));
+        pushAndContinue(focus.next(d135), edge_cost.getEdgeCostSlalom(F135));
       }
     }
   }

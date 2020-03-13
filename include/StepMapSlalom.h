@@ -18,7 +18,7 @@ class StepMapSlalom {
 public:
   using cost_t = uint16_t; /**< @brief 時間コストの型 [ms] */
   static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
-  enum Pattern : int8_t { ST_ALONG, ST_DIAG, F45, F90, F135, F180, FV90, FS90 };
+  enum Slalom : int8_t { F45, F90, F135, F180, FV90, FS90, FMAX };
   /**
    * @brief エッジコストの管理
    */
@@ -44,12 +44,14 @@ public:
     EdgeCost(const RunParameter rp = RunParameter()) : rp(rp) {
       genCostTable();
     }
-    cost_t getEdgeCost(const Pattern p, const int n = 1) const {
+    cost_t getEdgeCostAlong(const int n) const {
+      return cost_table_along[n]; /*< [ms] */
+    }
+    cost_t getEdgeCostDiag(const int n) const {
+      return cost_table_diag[n]; /*< [ms] */
+    }
+    cost_t getEdgeCostSlalom(const Slalom p) const {
       switch (p) {
-      case ST_ALONG:
-        return cost_table_along[n]; /*< [ms] */
-      case ST_DIAG:
-        return cost_table_diag[n]; /*< [ms] */
       case F45:
         return rp.t_F45; /*< [ms] */
       case F90:
