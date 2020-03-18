@@ -2,11 +2,7 @@
  * @file CLRobotBase.h
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief 時間計測や可視化を含むコマンドラインテスト用のロボット基底
- * @version 0.1
  * @date 2019-06-09
- *
- * @copyright Copyright (c) 2019
- *
  */
 #pragma once
 

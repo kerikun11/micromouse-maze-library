@@ -34,7 +34,7 @@ int main(void) {
 
 #if 0
   const std::string mazedata_dir =
-      "/home/kerikun11/Dropbox/Projects/MicroMouse/Github/micromouseonline/"
+      "/home/kerikun11/Dropbox/Projects/MicroMouse/GitHub/micromouseonline/"
       "mazefiles/classic/";
   for (int y = 2015; y >= 2014; --y) {
     const std::string filename = "japan" + std::to_string(y) + "ef.txt";
@@ -48,7 +48,7 @@ int main(void) {
 #if 0
   /* Preparation */
   const std::string mazedata_dir =
-      "/home/kerikun11/Dropbox/Projects/MicroMouse/Github/micromouseonline/"
+      "/home/kerikun11/Dropbox/Projects/MicroMouse/GitHub/micromouseonline/"
       "mazefiles/classic/";
   const std::string filename = "alljapan-033-2012-exp-fin.txt";
   Maze maze = Maze((mazedata_dir + filename).c_str());

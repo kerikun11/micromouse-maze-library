@@ -1,8 +1,7 @@
 /**
  * @file Maze.cpp
+ * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路クラスを定義
- * @author KERI (Github: kerikun11)
- * @url https://kerikeri.top/
  * @date 2017.10.30
  */
 #include "Maze.h"

@@ -1,9 +1,8 @@
 /**
- *  @file SearchAlgorithm.h
- *  @brief マイクロマウスの迷路の探索アルゴリズムを扱うクラス
- *  @author KERI (Github: kerikun11)
- *  @url https://kerikeri.top/
- *  @date 2017.11.05
+ * @file SearchAlgorithm.h
+ * @author Ryotaro Onuki (kerikun11+github@gmail.com)
+ * @brief マイクロマウスの迷路の探索アルゴリズムを扱うクラス
+ * @date 2017.11.05
  */
 #pragma once
 

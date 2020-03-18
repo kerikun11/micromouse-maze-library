@@ -17,7 +17,13 @@ namespace MazeLib {
 class StepMapSlalom {
 public:
   using cost_t = uint16_t; /**< @brief 時間コストの型 [ms] */
+  /**
+   * @brief コストの最大値
+   */
   static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
+  /**
+   * @brief スラロームのインデックス
+   */
   enum Slalom : int8_t { F45, F90, F135, F180, FV90, FS90, FMAX };
   /**
    * @brief エッジコストの管理
@@ -101,8 +107,6 @@ public:
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
         cost_table_along[i] = gen_cost_impl(i, rp.am_a, rp.vs, rp.vm_a, seg_a);
         cost_table_diag[i] = gen_cost_impl(i, rp.am_d, rp.vs, rp.vm_d, seg_d);
-        // std::cout << i + 1 << "\t" << cost_table_along[i] << "\t"
-        //           << cost_table_diag[i] << std::endl;
       }
     }
   };
@@ -111,7 +115,7 @@ public:
    * @brief Graph の Node の Index．
    * 「各区画中央の4方位」または「 各壁上の4方位」，の位置姿勢を一意に識別する
    */
-  struct __attribute__((__packed__)) Index {
+  struct Index {
   private:
     int x : 6; /**< @brief x coordinate of the cell */
     int y : 6; /**< @brief y coordinate of the cell */
@@ -157,7 +161,7 @@ public:
       return nd.isAlong() ? WallIndex(Position(x, y), nd) : WallIndex(x, y, z);
     }
     /**
-     * @brief 迷路中のIndexをuniqueな通し番号として表現したID
+     * @brief 迷路中の Index をuniqueな通し番号として表現したID
      * @return uint16_t ID
      */
     uint16_t getIndex() const {
@@ -229,11 +233,11 @@ public:
     const Index opposite() const {
       return Index(x, y, z, nd + Direction::Back);
     }
-  };
-  static_assert(sizeof(Index) == 2, "size error"); /**< size check */
+  } __attribute__((__packed__));
+  static_assert(sizeof(Index) == 2, "size error"); /*< size check */
 
   /**
-   * @brief Indexの動的配列の定義
+   * @brief Index の動的配列の定義
    */
   using Indexes = std::vector<Index>;
 

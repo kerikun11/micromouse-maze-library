@@ -1,8 +1,7 @@
 /**
  * @file RobotBase.h
+ * @author Ryotaro Onuki (GitHub: kerikun11)
  * @brief ロボットのベース
- * @author KERI (Github: kerikun11)
- * @url https://kerikeri.top/
  * @date 2017.10.30
  */
 #pragma once

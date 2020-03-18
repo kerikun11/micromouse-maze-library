@@ -79,7 +79,9 @@ int main(void) {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/";
   const std::string filename = "32MM2019HX.maze";
-  Maze maze_target = Maze((mazedata_dir + filename).c_str());
+  Maze maze_target;
+  if (!maze_target.parse((mazedata_dir + filename).c_str()))
+    return -1;
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;
   robot.replaceGoals(maze_target.getGoals());
