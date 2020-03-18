@@ -24,6 +24,9 @@ public:
    */
   class EdgeCost {
   public:
+    /**
+     * @brief 走行パラメータの構造体
+     */
     struct RunParameter {
       RunParameter() {}
       static constexpr float factor = 2;      /*< CostMax の超過防止 */

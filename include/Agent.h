@@ -13,7 +13,7 @@
 namespace MazeLib {
 
 /**
- * @brief 自己位置を管理するクラス
+ * @brief 自己位置や探索状態などを保持するクラス
  */
 class Agent {
 public:

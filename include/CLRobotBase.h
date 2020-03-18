@@ -1,7 +1,7 @@
 /**
  * @file CLRobotBase.h
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
- * @brief 時間計測や可視化を含むコマンドラインテスト用のRobotBase
+ * @brief 時間計測や可視化を含むコマンドラインテスト用のロボット基底
  * @version 0.1
  * @date 2019-06-09
  *
@@ -17,6 +17,9 @@
 
 namespace MazeLib {
 
+/**
+ * @brief 時間計測や可視化を含むコマンドラインテスト用の RobotBase
+ */
 class CLRobotBase : public RobotBase {
 public:
   CLRobotBase(Maze &maze_target) : RobotBase(maze), maze_target(maze_target) {}

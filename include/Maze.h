@@ -75,13 +75,16 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 
 /**
  * @brief 迷路上の方向を表す．
+ *
  * 実体は 8bit の整数．
  * 絶対方向 or 相対方向の8方位を表現することができる．
  * コンストラクタにより8方位(0-7)に自動的に収められるので，
  * 加法，減法により相対方向を計算することができる．
- * 例: Direction(Direction::East + Direction::Left) == Direction::North
- * 例: Direction(Direction::East - Direction::West) == Direction::Back
- * 例: Direction(-Direction::Left) == Direction::Right
+ * - 例: Direction(Direction::East + Direction::Left) == Direction::North
+ * - 例: Direction(Direction::East - Direction::West) == Direction::Back
+ * - 例: Direction(-Direction::Left) == Direction::Right
+ * ```
+ * AbsoluteDirection
  * +-----------+-------+-----------+
  * | NorthWest   North   NorthEast |
  * +           +       +           +
@@ -89,6 +92,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
  * +           +       +           +
  * | NorthWest   North   NorthEast |
  * +-----------+-------+-----------+
+ * RelativeDirection
  * +-----------+-------+-----------+
  * |   Left135    Left      Left45 |
  * +           +       +           +
@@ -96,6 +100,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
  * +           +       +           +
  * |  Right135   Right     Right45 |
  * +-----------+-------+-----------+
+ * ```
  */
 struct Direction {
 public:
@@ -259,8 +264,10 @@ using Positions = std::vector<Position>;
 
 /**
  * @brief Position と Direction をまとめた型．位置姿勢．
+ *
  * 位置姿勢は，区画とそこに向かう方向で特定する．
  * 現在区画から出る方向ではないことに注意する．
+ * ```
  * +---+---+---+ 例:
  * |   <       | <--- (0, 2, West)
  * +   +---+ ^ + <--- (2, 2, North)
@@ -268,6 +275,7 @@ using Positions = std::vector<Position>;
  * +   +---+ v + <--- (2, 0, South)
  * | S |       | <--- (0, 0)
  * +---+---+---+
+ * ```
  */
 struct Pose {
 public:
@@ -286,6 +294,7 @@ public:
 
 /**
  * @brief 区画ベースではなく，壁ベースの管理ID
+ *
  * uint16_t にキャストすると，全部の壁が通し番号になったIDを取得できるのが特徴
  * 迷路内部の壁の総数 WallIndex::SIZE 個の配列を確保しておけば，
  * 取得したIDをインデックスとして使える．そのとき， WallIndex が
@@ -294,6 +303,7 @@ public:
  * 最初から全部が通し番号のIDで保持してしまうと，
  * 迷路の範囲外の壁を表現できなくなってしまうため，
  * 必要に応じてIDを生成するようになっている．
+ * ```
  *      [x, y]    : Cell Position
  *             z  : Wall Distinction in the Cell; 0:East, 1:North
  *   => (x, y, z) : Wall Index
@@ -310,6 +320,7 @@ public:
  * |    Cell   z = 0           |             |
  * |             |             |             |
  * +-------------+-------------+-------------+
+ * ```
  */
 struct WallIndex {
   /**
@@ -467,6 +478,7 @@ using WallLogs = std::vector<WallLog>;
 
 /**
  * @brief 迷路の壁情報を管理するクラス
+ *
  * 実体は，壁情報とスタート位置とゴール位置の集合
  * 壁の有無の確認は，isWall()
  * 壁の既知未知の確認は，isKnown()
