@@ -221,6 +221,9 @@ StepMap::getStepDownDirections(const Maze &maze, const Pose &start, Pose &end,
   Directions shortest_dirs;
   /* start から順にステップマップを下る */
   end = start;
+  /* 確認 */
+  if (!start.p.isInsideOfField())
+    return {};
   while (1) {
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
     auto min_pose = end;
