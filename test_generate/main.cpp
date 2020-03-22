@@ -1,7 +1,9 @@
 #include <algorithm>
+#include <queue>
 #include <random>
 #include <stack>
 
+#include "CLRobotBase.h"
 #include "Maze.h"
 #include "StepMap.h"
 #include "StepMapSlalom.h"
@@ -9,20 +11,24 @@
 using namespace MazeLib;
 
 void poll(Maze &maze) {
-  maze.reset(true, true);
+  /* random generator */
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
+  const auto getRandomDirectionsAlong4 = [&]() {
+    Directions dirs;
+    for (const auto d : Direction::getAlong4())
+      dirs.push_back(d);
+    std::shuffle(dirs.begin(), dirs.end(), engine);
+    return dirs;
+  };
+  /* prepare maze */
+  maze.reset(true, true);
   for (int x = 0; x < MAZE_SIZE; ++x)
     for (int y = 0; y < MAZE_SIZE; ++y) {
       auto p = Position(x, y);
       if (p == maze.getStart())
         continue;
-
-      Directions dirs;
-      for (const auto d : Direction::getAlong4())
-        dirs.push_back(d);
-      std::shuffle(dirs.begin(), dirs.end(), engine);
-
+      auto dirs = getRandomDirectionsAlong4();
       while (!dirs.empty()) {
         const auto d = dirs.back();
         dirs.pop_back();
@@ -51,33 +57,60 @@ void dig(Maze &maze) {
   /* prepare maze */
   maze.reset(true, true);
   for (uint16_t i = 0; i < WallIndex::SIZE; ++i)
-    maze.setWall(WallIndex(i), true);
-  maze.setKnown(Position(0, 0), Direction::North, false);
+    maze.setWall(WallIndex(i), true), maze.setKnown(WallIndex(i), true);
+  /* start cell */
+  maze.updateWall(Position(0, 0), Direction::North, false);
+  maze.setKnown(Position(0, 0), Direction::North, true);
   /* depth first search */
-  std::stack<Position> stack;
+  std::stack<Pose> stack;
   std::bitset<Position::SIZE> mark;
-  stack.push(maze.getStart());
+  mark[maze.getStart().getIndex()] = true;
+  stack.push({maze.getStart().next(Direction::North), Direction::North});
   while (!stack.empty()) {
     /* pop */
-    const auto p = stack.top();
+    const auto pose = stack.top();
     stack.pop();
+    const auto p = pose.p;
     mark[p.getIndex()] = true;
     /* print */
-    // maze.print({p});
-    // getc(stdin);
+    // maze.print({p}), getc(stdin);
     /* walk */
-    auto dirs = getRandomDirectionsAlong4();
+    // auto dirs = getRandomDirectionsAlong4();
+    Directions dirs;
+    for (const auto d : Direction::getAlong4())
+      dirs.push_back(d);
+    for (int i = 0; i < 2; ++i)
+      dirs.push_back(Direction::Front);
+    if (!stack.empty()) {
+      if (Direction(pose.d - stack.top().d) == Direction::Left)
+        for (int i = 0; i < 8; ++i)
+          dirs.push_back(Direction::Right);
+      if (Direction(pose.d - stack.top().d) == Direction::Right)
+        for (int i = 0; i < 8; ++i)
+          dirs.push_back(Direction::Left);
+    }
+    std::shuffle(dirs.begin(), dirs.end(), engine);
     while (!dirs.empty()) {
-      const auto d = dirs.back();
+      const auto d = dirs.back() + pose.d;
       dirs.pop_back();
-      if (maze.isKnown(p, d))
+      if (!p.next(d).isInsideOfField())
         continue;
       if (mark[p.next(d).getIndex()])
         continue;
-      maze.setWall(p, d, false);
-      maze.setKnown(p, d, true);
-      stack.push(p);
-      stack.push(p.next(d));
+      maze.setWall(pose.p, d, false);
+      stack.push(pose);
+      stack.push(pose.next(d));
+#if 1
+      const auto known = std::count_if(
+          Direction::getAlong4().cbegin(), Direction::getAlong4().cend(),
+          [&](const auto d) {
+            const auto n = p.next(d);
+            const auto next = n.next(d);
+            return next.isInsideOfField() && !mark[next.getIndex()];
+          });
+      if (known == 0 && (getRandomDirectionsAlong4().front() & 4))
+        maze.setWall(p.next(d), d, false);
+#endif
       break;
     }
   }
@@ -88,6 +121,7 @@ int main(void) {
   Maze maze;
 
   /* set walls */
+  // poll(maze);
   dig(maze);
 
   /* find goal */
@@ -113,6 +147,8 @@ int main(void) {
     maze.setKnown(WallIndex(i), true);
   // maze.setGoals({{MAZE_SIZE - 1, MAZE_SIZE - 1}});
   maze.print();
+  std::ofstream of("gen.maze");
+  maze.print(of);
 
   /* StepMapSlalom */
   for (const auto diag_enabled : {false, true}) {
@@ -128,5 +164,28 @@ int main(void) {
     std::cout << std::endl;
     maze.print(shortest_dirs);
   }
+
+#if 1
+  /* Preparation */
+  const auto p_robot = std::make_unique<CLRobotBase>(maze);
+  CLRobotBase &robot = *p_robot;
+  robot.replaceGoals(maze.getGoals());
+  /* Search Run */
+  robot.searchRun();
+  /* Show Result */
+  robot.printInfo();
+  // std::printf("Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
+  //             "Left: %3d, Right: %3d, Back: %3d\n",
+  //             ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60,
+  //             robot.step, robot.f, robot.l, robot.r, robot.b);
+  for (bool diag_enabled : {false, true}) {
+    // robot.calcShortestDirections(diag_enabled);
+    // std::cout << "Estimated Shortest Time "
+    //           << (diag_enabled ? "(diag)" : "(no diag)") << ": "
+    //           << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
+    //           << std::endl;
+  }
+#endif
+
   return 0;
 }
