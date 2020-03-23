@@ -79,6 +79,15 @@ public:
           addWall(scene, MazeLib::Pose{MazeLib::Position(x, y), d}, pen);
         }
       }
+    /* start & goal */
+//    QFont font;
+//    font.setPointSize(font_size);
+//    const int w = wall_unit_px;
+//    const int s = MazeLib::MAZE_SIZE;
+//    const auto p = maze.getStart();
+//    scene->addText("S", font)->setPos((p.x + 0.2) * w, (s - p.y - 0.95) * w);
+//    for(const auto p: maze.getGoals())
+//        scene->addText("G", font)->setPos((p.x + 0.2) * w, (s - p.y - 0.95) * w);
   }
   void drawStep(const StepMap &map) {
     for (int x = 0; x < MazeLib::MAZE_SIZE; ++x)

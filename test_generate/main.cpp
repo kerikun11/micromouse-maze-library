@@ -47,15 +47,17 @@ void dig(Maze &maze) {
   /* random generator */
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
-  constexpr std::size_t bits = std::numeric_limits<float>::digits;
-  float result = std::generate_canonical<float, bits>(engine);
-  const auto getRandomDirectionsAlong4 = [&]() {
-    Directions dirs;
-    for (const auto d : Direction::getAlong4())
-      dirs.push_back(d);
-    std::shuffle(dirs.begin(), dirs.end(), engine);
-    return dirs;
+  const auto getRandomFloat = [&]() {
+    return std::generate_canonical<float, std::numeric_limits<float>::digits>(
+        engine);
   };
+  // const auto getRandomDirectionsAlong4 = [&]() {
+  //   Directions dirs;
+  //   for (const auto d : Direction::getAlong4())
+  //     dirs.push_back(d);
+  //   std::shuffle(dirs.begin(), dirs.end(), engine);
+  //   return dirs;
+  // };
   /* prepare maze */
   maze.reset(true, true);
   for (uint16_t i = 0; i < WallIndex::SIZE; ++i)
@@ -77,13 +79,16 @@ void dig(Maze &maze) {
     /* print */
     // maze.print({p}), getc(stdin);
     /* walk */
-    // auto dirs = getRandomDirectionsAlong4();
     Directions dirs;
     for (const auto d : Direction::getAlong4())
       dirs.push_back(d);
+#if 1
     for (int i = 0; i < 2; ++i)
       dirs.push_back(Direction::Front);
     if (!stack.empty()) {
+      if (Direction(pose.d - stack.top().d) == Direction::Front)
+        for (int i = 0; i < 4; ++i)
+          dirs.push_back(Direction::Front);
       if (Direction(pose.d - stack.top().d) == Direction::Left)
         for (int i = 0; i < 8; ++i)
           dirs.push_back(Direction::Right);
@@ -91,6 +96,7 @@ void dig(Maze &maze) {
         for (int i = 0; i < 8; ++i)
           dirs.push_back(Direction::Left);
     }
+#endif
     std::shuffle(dirs.begin(), dirs.end(), engine);
     while (!dirs.empty()) {
       const auto d = dirs.back() + pose.d;
@@ -110,7 +116,7 @@ void dig(Maze &maze) {
             const auto next = n.next(d);
             return next.isInsideOfField() && !mark[next.getIndex()];
           });
-      if (known == 0 && (getRandomDirectionsAlong4().front() & 4))
+      if (known == 0 && getRandomFloat() < 0.5f)
         maze.setWall(p.next(d), d, false);
 #endif
       break;
