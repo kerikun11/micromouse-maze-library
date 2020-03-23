@@ -381,24 +381,6 @@ public:
   uint16_t getIndex() const {
     return (z << (2 * MAZE_SIZE_BIT)) | (y << MAZE_SIZE_BIT) | x;
   }
-  /**
-   * @brief 方向の冗長性を除去してユニークにする関数
-   * 基本的にコンストラクタで使われるので，ユーザーが使うことはない．
-   * @param d 壁の方向 (4方位)
-   */
-  void uniquify(const Direction d) {
-    z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
-    switch (d) {
-    case Direction::West:
-      x--;
-      break;
-    case Direction::South:
-      y--;
-      break;
-    default:
-      break;
-    }
-  }
   /** @brief 位置の取得 */
   const Position getPosition() const { return Position(x, y); }
   /** @brief 方向の取得 */
@@ -446,6 +428,26 @@ public:
         d + Direction::Left135,
         d + Direction::Right135,
     }};
+  }
+
+private:
+  /**
+   * @brief 方向の冗長性を除去してユニークにする関数
+   * 基本的にコンストラクタで使われるので，ユーザーが使うことはない．
+   * @param d 壁の方向 (4方位)
+   */
+  void uniquify(const Direction d) {
+    z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
+    switch (d) {
+    case Direction::West:
+      x--;
+      break;
+    case Direction::South:
+      y--;
+      break;
+    default:
+      break;
+    }
   }
 };
 static_assert(sizeof(WallIndex) == 2, "size error"); /*< size check */
