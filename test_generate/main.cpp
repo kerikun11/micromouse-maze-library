@@ -47,6 +47,8 @@ void dig(Maze &maze) {
   /* random generator */
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
+  constexpr std::size_t bits = std::numeric_limits<float>::digits;
+  float result = std::generate_canonical<float, bits>(engine);
   const auto getRandomDirectionsAlong4 = [&]() {
     Directions dirs;
     for (const auto d : Direction::getAlong4())
@@ -116,6 +118,23 @@ void dig(Maze &maze) {
   }
 }
 
+void setGoalLongest(Maze &maze) {
+  StepMap map;
+  map.update(maze, {maze.getStart()}, false, false);
+  StepMap::step_t max_step = 0;
+  Position max_position;
+  for (int x = 0; x < MAZE_SIZE; ++x)
+    for (int y = 0; y < MAZE_SIZE; ++y) {
+      const auto p = Position(x, y);
+      const auto s = map.getStep(p);
+      if (s == StepMap::STEP_MAX || s <= max_step)
+        continue;
+      max_step = s;
+      max_position = p;
+    }
+  maze.setGoals({max_position});
+}
+
 int main(void) {
   /* prepare maze */
   Maze maze;
@@ -124,28 +143,16 @@ int main(void) {
   // poll(maze);
   dig(maze);
 
-  /* find goal */
-  {
-    StepMap map;
-    map.update(maze, {maze.getStart()}, false, false);
-    StepMap::step_t max_step = 0;
-    Position max_position;
-    for (int x = 0; x < MAZE_SIZE; ++x)
-      for (int y = 0; y < MAZE_SIZE; ++y) {
-        const auto p = Position(x, y);
-        const auto s = map.getStep(p);
-        if (s == StepMap::STEP_MAX || s <= max_step)
-          continue;
-        max_step = s;
-        max_position = p;
-      }
-    maze.setGoals({max_position});
-  }
-
   /* post process */
   for (uint16_t i = 0; i < WallIndex::SIZE; ++i)
     maze.setKnown(WallIndex(i), true);
+
+  /* set goal */
+  setGoalLongest(maze);
   // maze.setGoals({{MAZE_SIZE - 1, MAZE_SIZE - 1}});
+  // maze.setGoals({{MAZE_SIZE / 2, MAZE_SIZE / 2}});
+
+  /* print */
   maze.print();
   std::ofstream of("gen.maze");
   maze.print(of);
@@ -173,18 +180,18 @@ int main(void) {
   /* Search Run */
   robot.searchRun();
   /* Show Result */
-  robot.printInfo();
-  // std::printf("Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
-  //             "Left: %3d, Right: %3d, Back: %3d\n",
-  //             ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60,
-  //             robot.step, robot.f, robot.l, robot.r, robot.b);
-  for (bool diag_enabled : {false, true}) {
-    // robot.calcShortestDirections(diag_enabled);
-    // std::cout << "Estimated Shortest Time "
-    //           << (diag_enabled ? "(diag)" : "(no diag)") << ": "
-    //           << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
-    //           << std::endl;
-  }
+  // robot.printInfo();
+  std::printf("Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
+              "Left: %3d, Right: %3d, Back: %3d\n",
+              ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step,
+              robot.f, robot.l, robot.r, robot.b);
+  // for (bool diag_enabled : {false, true}) {
+  //   robot.calcShortestDirections(diag_enabled);
+  //   std::cout << "Estimated Shortest Time "
+  //             << (diag_enabled ? "(diag)" : "(no diag)") << ": "
+  //             << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
+  //             << std::endl;
+  // }
 #endif
 
   return 0;
