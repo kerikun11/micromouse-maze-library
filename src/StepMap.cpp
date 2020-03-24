@@ -1,8 +1,7 @@
 /**
  * @file StepMap.cpp
+ * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路のステップマップを扱うクラス
- * @author KERI (Github: kerikun11)
- * @url https://kerikeri.top/
  * @date 2017.11.05
  */
 #include "StepMap.h"
@@ -221,6 +220,9 @@ StepMap::getStepDownDirections(const Maze &maze, const Pose &start, Pose &end,
   Directions shortest_dirs;
   /* start から順にステップマップを下る */
   end = start;
+  /* 確認 */
+  if (!start.p.isInsideOfField())
+    return {};
   while (1) {
     /* 周辺の走査; 未知壁の有無と，最小ステップの方向を求める */
     auto min_pose = end;
@@ -326,15 +328,16 @@ static StepMap::step_t gen_cost_impl(const int i, const float am,
 }
 void StepMap::calcStraightStepTable() {
   const float vs = 420.0f;       /*< 基本速度 [mm/s] */
-  const float am_a = 4800.0f;    /*< 最大加速度 [mm/s/s] */
-  const float vm_a = 1800.0f;    /*< 飽和速度 [mm/s] */
+  const float am_a = 4200.0f;    /*< 最大加速度 [mm/s/s] */
+  const float vm_a = 1500.0f;    /*< 飽和速度 [mm/s] */
   const float seg_a = 90.0f;     /*< 区画の長さ [mm] */
-  const float t_slalom = 287.0f; /*< 90度ターンの時間 [ms] */
+  const float t_slalom = 287.0f; /*< 小回り90度ターンの時間 [ms] */
+  step_table[0] = 0;             /*< [0] は使用しない */
+  for (int i = 1; i < MAZE_SIZE; ++i)
+    step_table[i] = t_slalom + gen_cost_impl(i - 1, am_a, vs, vm_a, seg_a);
+  /* 最大値を超えないようにスケーリング */
   for (int i = 0; i < MAZE_SIZE; ++i)
-    step_table[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
-  const step_t turn_cost = t_slalom - step_table[1];
-  for (int i = 0; i < MAZE_SIZE; ++i)
-    step_table[i] += turn_cost;
+    step_table[i] /= 2;
 }
 
 } // namespace MazeLib

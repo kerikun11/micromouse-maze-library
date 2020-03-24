@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Release)
 ## for __attribute__((__packed__)) on MSYS
 add_compile_options("-mno-ms-bitfields")
+## for use of 'auto' in parameter declarration on MSYS
+add_compile_options("-fconcepts")
 
 ## add library src
 add_subdirectory(src)
