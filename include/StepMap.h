@@ -135,8 +135,8 @@ public:
 
 protected:
   std::array<step_t, Position::SIZE> step_map; /**< @brief ステップ数*/
-  std::array<step_t, MAZE_SIZE>
-      step_table; /*< @brief 台形加速を考慮したコストテーブル */
+  /** @brief 台形加速を考慮したコストテーブル (壁沿い) */
+  std::array<step_t, MAZE_SIZE> step_table;
 
   /**
    * @brief 最短経路導出用の加速を考慮したステップリストを算出する関数

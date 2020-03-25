@@ -107,7 +107,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
  * +-----------+-------+-----------+
  * ```
  */
-struct Direction {
+class Direction {
 public:
   /**
    * @brief 絶対方向の列挙型． 0-7 の整数
@@ -184,7 +184,7 @@ private:
 static_assert(sizeof(Direction) == 1, "size error"); /*< size check */
 
 /**
- *  @brief Direction 構造体の動的配列の定義
+ *  @brief Direction 構造体の動的配列，集合
  */
 using Directions = std::vector<Direction>;
 
@@ -211,7 +211,8 @@ public:
   Position(const int8_t x = 0, const int8_t y = 0) : x(x), y(y) {}
   /**
    * @brief 迷路内の区画の一意な通し番号となるIDを取得する
-   *        迷路外の区画の場合未定義動作となる．use Position::isInsideOfField()
+   *
+   * 迷路外の区画の場合未定義動作となる．use Position::isInsideOfField()
    * @return uint16_t 通し番号ID
    */
   uint16_t getIndex() const { return (x << MAZE_SIZE_BIT) | y; }
@@ -261,7 +262,7 @@ public:
 static_assert(sizeof(Position) == 2, "size error"); /*< size check */
 
 /**
- * @brief Position 構造体の動的配列の定義
+ * @brief Position 構造体の動的配列，集合
  */
 using Positions = std::vector<Position>;
 
@@ -453,7 +454,7 @@ private:
 static_assert(sizeof(WallIndex) == 2, "size error"); /*< size check */
 
 /**
- * @brief WallIndex の動的配列の定義
+ * @brief WallIndex の動的配列，集合
  */
 using WallIndexes = std::vector<WallIndex>;
 

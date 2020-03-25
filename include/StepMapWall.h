@@ -65,12 +65,16 @@ public:
                                        Directions &shortest_dirs);
 
 private:
-  std::array<step_t, WallIndex::SIZE> step_map; /**< @brief ステップ数*/
-  std::array<step_t, MAZE_SIZE * 2>
-      step_table_along; /*< @brief 台形加速を考慮したコストテーブル */
-  std::array<step_t, MAZE_SIZE * 2>
-      step_table_diag; /*< @brief 台形加速を考慮したコストテーブル(斜め) */
+  /** @brief 迷路中のステップ数 */
+  std::array<step_t, WallIndex::SIZE> step_map;
+  /** @brief 台形加速を考慮したコストテーブル (壁沿い) */
+  std::array<step_t, MAZE_SIZE * 2> step_table_along;
+  /** @brief 台形加速を考慮したコストテーブル (斜め) */
+  std::array<step_t, MAZE_SIZE * 2> step_table_diag;
 
+  /**
+   * @brief 計算の高速化のために予め直進のコストテーブルを生成する関数
+   */
   void calcStraightStepTable();
 };
 

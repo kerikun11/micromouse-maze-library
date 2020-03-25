@@ -261,6 +261,16 @@ void StepMapWall::appendStraightDirections(const Maze &maze,
   }
 }
 
+/**
+ * @brief 台形加速を考慮したコストを生成する関数
+ *
+ * @param i マスの数
+ * @param am 最大加速度
+ * @param vs 始点速度
+ * @param vm 飽和速度
+ * @param seg 1マスの長さ
+ * @return StepMap::step_t コスト
+ */
 static StepMapWall::step_t gen_cost_impl(const int i, const float am,
                                          const float vs, const float vm,
                                          const float seg) {

@@ -85,10 +85,22 @@ public:
     }
 
   private:
-    RunParameter rp;
+    RunParameter rp; /** @brief 走行パラメータ */
+    /** @brief 台形加速を考慮したコストテーブル (壁沿い) */
     std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
+    /** @brief 台形加速を考慮したコストテーブル (斜め) */
     std::array<cost_t, MAZE_SIZE * 2> cost_table_diag;
 
+    /**
+     * @brief 台形加速を考慮したコストを生成する関数
+     *
+     * @param i マスの数
+     * @param am 最大加速度
+     * @param vs 始点速度
+     * @param vm 飽和速度
+     * @param seg 1マスの長さ
+     * @return StepMap::step_t コスト
+     */
     static cost_t gen_cost_impl(const int i, const float am, const float vs,
                                 const float vm, const float seg) {
       const auto d = seg * i; /*< i 区画分の走行距離 */
@@ -101,6 +113,11 @@ public:
         return (am * d + (vm - vs) * (vm - vs)) / (am * vm) *
                1000; /*< 台形加速 */
     }
+    /**
+     * @brief コストテーブルを生成する関数
+     *
+     * 各マスごとのコストは不変なので高速化のために予め計算しておく
+     */
     void genCostTable() {
       const float seg_a = 90.0f;
       const float seg_d = 45.0f * std::sqrt(2);
@@ -112,20 +129,21 @@ public:
   };
 
   /**
-   * @brief Graph の Node の Index．
-   * 「各区画中央の4方位」または「 各壁上の4方位」，の位置姿勢を一意に識別する
+   * @brief スラローム走行のノードの Index．
+   *
+   * 「各区画中央の4方位」または「 各壁上の4方位」，の位置姿勢を一意に識別する．
    */
   struct Index {
   private:
     int x : 6; /**< @brief x coordinate of the cell */
     int y : 6; /**< @brief y coordinate of the cell */
-    unsigned int
-        z : 1; /**< @brief position assignment in the cell, 0:East; 1:North */
+    /** @brief position assignment in the cell, 0:East; 1:North */
+    unsigned int z : 1;
     unsigned int nd : 3; /**< @brief direction of the node */
 
   public:
     /**
-     * @brief 迷路中の Index の総数．
+     * @brief 迷路中の Index の総数．for文などに使える．
      */
     static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 12;
 
@@ -152,6 +170,7 @@ public:
     bool operator==(const Index &i) const {
       return x == i.x && y == i.y && z == i.z && nd == i.nd;
     }
+    /** @brief 等号否定 */
     bool operator!=(const Index &i) const {
       return x != i.x || y != i.y || z != i.z || nd != i.nd;
     }
@@ -187,22 +206,21 @@ public:
         break;
       }
     }
-    /**
-     * @brief Getters
-     */
+    /** @brief 区画 */
     const Position getPosition() const { return Position(x, y); }
+    /** @brief 壁の方向 */
     const Direction getDirection() const {
       // return z == 0 ? Direction::East : Direction::North;
       return z << 1; /*< 高速化 */
     }
+    /** @brief 機体の方向 */
     const Direction getNodeDirection() const { return nd; }
+    /** @brief 直近の壁 */
     const WallIndex getWallIndex() const {
       const auto nd = getNodeDirection();
       return nd.isAlong() ? WallIndex(Position(x, y), nd) : WallIndex(x, y, z);
     }
-    /**
-     * @brief stream での表示
-     */
+    /** @brief 表示 */
     friend std::ostream &operator<<(std::ostream &os, const Index &i);
     /**
      * @brief 斜め方向に向いているときの区画への相対方向(±45度)を返す
@@ -237,33 +255,85 @@ public:
   static_assert(sizeof(Index) == 2, "size error"); /*< size check */
 
   /**
-   * @brief Index の動的配列の定義
+   * @brief Index の動的配列，集合
    */
   using Indexes = std::vector<Index>;
 
 public:
   StepMapSlalom() {}
+  /**
+   * @brief 迷路に Indexes を表示する関数
+   */
   void print(const Maze &maze, const Indexes &indexes,
              std::ostream &os = std::cout) const;
+  /**
+   * @brief コストマップの更新
+   *
+   * @param maze 迷路オブジェクト
+   * @param edge_cost エッジコストオブジェクト
+   * @param dest 目的地
+   * @param known_only 既知壁のみを通過可能とする
+   * @param diag_enabled 斜め走行を有効化する
+   */
   void update(const Maze &maze, const EdgeCost &edge_cost, const Indexes &dest,
               const bool known_only, const bool diag_enabled);
+  /**
+   * @brief 最短経路を導出する
+   *
+   * @param maze
+   * @param edge_cost
+   * @param shortest_dirs
+   * @param known_only
+   * @param diag_enabled
+   * @return true 成功
+   * @return false 失敗．ゴールにたどり着けなかった
+   */
   bool calcShortestDirections(const Maze &maze, const EdgeCost &edge_cost,
                               Directions &shortest_dirs, const bool known_only,
                               const bool diag_enabled);
+  /**
+   * @brief コストマップを辿って経路を生成する
+   *
+   * @param path 経路を格納する配列
+   * @return true 成功
+   * @return false ゴールにたどりつけなかった
+   */
   bool genPathFromMap(Indexes &path) const;
+  /**
+   * @brief コストマップから最短経路のコストを取得する
+   *
+   * @return cost_t 最短経路のコスト
+   */
   cost_t getShortestCost() const {
     return cost_map[index_start.opposite().getIndex()] *
            EdgeCost::RunParameter::factor;
   }
 
+  /**
+   * @brief 目的地の区画集合を Indexes に変換する関数
+   *
+   * 目的地区画のうち壁のない入射 Index を抽出．すべて区画の中央の Index
+   *
+   * @param src
+   * @return const Indexes
+   */
   static const Indexes convertDestinations(const Positions &src);
+  /**
+   * @brief ノード列を方向列に変換する関数
+   *
+   * @param path
+   * @param diag_enabled
+   * @return const Directions
+   */
   static const Directions indexes2directions(const Indexes &path,
                                              const bool diag_enabled);
 
 private:
+  /** @brief スタートのノードの Index */
   const Index index_start = Index(Position(0, 0), Direction::North);
+  /** @brief 迷路上の最短経路候補の移動元を格納するマップ */
   std::array<Index, Index::SIZE> from_map;
-  std::array<cost_t, Index::SIZE> cost_map;
+  std::array<cost_t, Index::SIZE> cost_map; /**< 迷路上のコストマップ */
 };
 
 } // namespace MazeLib
