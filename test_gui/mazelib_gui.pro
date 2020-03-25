@@ -33,7 +33,6 @@ SOURCES += \
     ../src/Maze.cpp \
     ../src/RobotBase.cpp \
     ../src/SearchAlgorithm.cpp \
-    ../src/ShortestAlgorithm.cpp \
     ../src/StepMap.cpp \
     ../src/StepMapSlalom.cpp \
     ../src/StepMapWall.cpp
@@ -46,7 +45,6 @@ HEADERS += \
     ../include/Maze.h \
     ../include/RobotBase.h \
     ../include/SearchAlgorithm.h \
-    ../include/ShortestAlgorithm.h \
     ../include/StepMap.h \
     ../include/StepMapSlalom.h \
     ../include/StepMapWall.h

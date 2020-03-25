@@ -21,14 +21,17 @@ class MainWindow;
 /**
  * @brief The MazeSimulator class
  */
-class MazeSimulator {
+class MazeSimulator : public MazeLib::RobotBase {
 public:
   MazeSimulator(Ui::MainWindow *ui, QGraphicsScene *scene)
-      : ui(ui), scene(scene) {
+      : RobotBase(maze), ui(ui), scene(scene) {
     loop->connect(timer, SIGNAL(timeout()), loop, SLOT(quit()));
   }
-  Maze maze;
 
+  void reset() {
+    maze.reset();
+    RobotBase::reset();
+  }
   void clear() {
     /* set Background Color */
     scene->clear();
@@ -80,22 +83,24 @@ public:
         }
       }
     /* start & goal */
-//    QFont font;
-//    font.setPointSize(font_size);
-//    const int w = wall_unit_px;
-//    const int s = MazeLib::MAZE_SIZE;
-//    const auto p = maze.getStart();
-//    scene->addText("S", font)->setPos((p.x + 0.2) * w, (s - p.y - 0.95) * w);
-//    for(const auto p: maze.getGoals())
-//        scene->addText("G", font)->setPos((p.x + 0.2) * w, (s - p.y - 0.95) * w);
+    //    QFont font;
+    //    font.setPointSize(font_size);
+    //    const int w = wall_unit_px;
+    //    const int s = MazeLib::MAZE_SIZE;
+    //    const auto p = maze.getStart();
+    //    scene->addText("S", font)->setPos((p.x + 0.2) * w, (s - p.y - 0.95) *
+    //    w); for(const auto p: maze.getGoals())
+    //        scene->addText("G", font)->setPos((p.x + 0.2) * w, (s - p.y -
+    //        0.95) * w);
   }
   void drawStep(const StepMap &map) {
     for (int x = 0; x < MazeLib::MAZE_SIZE; ++x)
       for (int y = 0; y < MazeLib::MAZE_SIZE; ++y) {
         QFont font;
+        // font.setPointSize(5);
         font.setPointSize(font_size);
         scene
-            ->addText(QString::number(std::min((int)map.getStep(x, y), 99999)),
+            ->addText(QString::number(std::min((int)map.getStep(x, y), 999)),
                       font)
             ->setPos(cell2posX(x), cell2posY(y + 1));
         /* Draw Wall */
@@ -199,6 +204,77 @@ public:
       p = next_p;
     }
     return true;
+  }
+
+  const Maze &getMazeTarget() { return maze_target; }
+  void setMazeTarget(const Maze &maze) { maze_target = maze; }
+  void drawStatus() {
+    std::stringstream ss;
+    ss << "State: " << SearchAlgorithm::getStateString(getState());
+    ss << "\t";
+    ss << "Pos: " << getCurrentPose();
+    ui->statusBar->showMessage(ss.str().c_str());
+  }
+  void draw() {
+    clear();
+    drawMaze(maze);
+    drawStep(getSearchAlgorithm().getStepMap());
+    drawPose(getCurrentPose());
+    drawStatus();
+  }
+
+  void toggle(const int ms = 100) {
+    if (timer->isActive()) {
+      timer->stop();
+    } else {
+      timer->start(ms);
+    }
+  }
+  void next(int n = 1) {
+    for (int i = 0; i < n; ++i)
+      loop->exit();
+  }
+
+protected:
+  Maze maze;
+  Maze maze_target;
+
+  virtual void senseWalls(bool &left, bool &front, bool &right) override {
+    const auto &pose = getCurrentPose();
+    left = !maze_target.canGo(pose.p, pose.d + Direction::Left);
+    front = !maze_target.canGo(pose.p, pose.d + Direction::Front);
+    right = !maze_target.canGo(pose.p, pose.d + Direction::Right);
+#if 0
+    /* 前1区画先の壁を読める場合 */
+    if (!front)
+      updateWall(current_pose.p.next(current_pose.d), current_pose.d,
+                 !maze_target.canGo(pose.p.next(pose.d), pose.d));
+#endif
+  }
+  virtual void calcNextDirectionsPreCallback() override {}
+  virtual void calcNextDirectionsPostCallback(
+      SearchAlgorithm::State prevState __attribute__((unused)),
+      SearchAlgorithm::State newState __attribute__((unused))) override {
+    if (newState == prevState)
+      return;
+    /* State Change has occurred */
+  }
+  virtual void discrepancyWithKnownWall() override {
+    if (getState() != SearchAlgorithm::IDENTIFYING_POSITION) {
+      printInfo();
+      std::cout
+          << "There was a discrepancy with known information! CurrentPose:\t"
+          << getCurrentPose() << std::endl;
+    }
+  }
+  virtual void queueAction(const Action action __attribute_used__) override {
+    /* draw */
+    draw();
+    /* block */
+    int code = loop->exec();
+    if (code < 0)
+      return;
+    /* release */
   }
 
 private:

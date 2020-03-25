@@ -41,7 +41,9 @@ void MainWindow::on_drawButton_clicked() {
   /* Print Maze */
   maze_simulator.clear();
   maze_simulator.drawMaze(maze);
-  maze_simulator.maze = maze;
+  /* Set the Maze */
+  maze_simulator.setMazeTarget(maze);
+  maze_simulator.replaceGoals(maze.getGoals());
 }
 
 void MainWindow::on_drawAllButton_clicked() {
@@ -58,7 +60,8 @@ void MainWindow::on_shortestDiagButton_clicked() {
   /* Draw Shortest Path */
   StepMapSlalom::EdgeCost::RunParameter rp;
   StepMapSlalom::EdgeCost edge_cost(rp);
-  if (!maze_simulator.drawShortest(maze_simulator.maze, true)) {
+  const auto &maze = maze_simulator.getMazeTarget();
+  if (!maze_simulator.drawShortest(maze, true)) {
     QMessageBox box(QMessageBox::Warning, "Path Error",
                     "Failed to Find any Shortest Path!");
     box.exec();
@@ -68,7 +71,8 @@ void MainWindow::on_shortestDiagButton_clicked() {
 
 void MainWindow::on_shortestNoDiagButton_clicked() {
   /* Draw Shortest Path */
-  if (!maze_simulator.drawShortest(maze_simulator.maze, false)) {
+  const auto &maze = maze_simulator.getMazeTarget();
+  if (!maze_simulator.drawShortest(maze, false)) {
     QMessageBox box(QMessageBox::Warning, "Path Error",
                     "Failed to Find any Shortest Path!");
     box.exec();
@@ -77,7 +81,8 @@ void MainWindow::on_shortestNoDiagButton_clicked() {
 }
 
 void MainWindow::on_stepmapSimpleButton_clicked() {
-  if (!maze_simulator.drawShortestStepMap(maze_simulator.maze, true)) {
+  const auto &maze = maze_simulator.getMazeTarget();
+  if (!maze_simulator.drawShortestStepMap(maze, true)) {
     QMessageBox box(QMessageBox::Warning, "Path Error",
                     "Failed to Find any Shortest Path!");
     box.exec();
@@ -86,7 +91,8 @@ void MainWindow::on_stepmapSimpleButton_clicked() {
 }
 
 void MainWindow::on_stepmapTrapezoidButton_clicked() {
-  if (!maze_simulator.drawShortestStepMap(maze_simulator.maze, false)) {
+  const auto &maze = maze_simulator.getMazeTarget();
+  if (!maze_simulator.drawShortestStepMap(maze, false)) {
     QMessageBox box(QMessageBox::Warning, "Path Error",
                     "Failed to Find any Shortest Path!");
     box.exec();
@@ -95,7 +101,8 @@ void MainWindow::on_stepmapTrapezoidButton_clicked() {
 }
 
 void MainWindow::on_stepmapWallSimpleButton_clicked() {
-  if (!maze_simulator.drawShortestStepMapWall(maze_simulator.maze, true)) {
+  const auto &maze = maze_simulator.getMazeTarget();
+  if (!maze_simulator.drawShortestStepMapWall(maze, true)) {
     QMessageBox box(QMessageBox::Warning, "Path Error",
                     "Failed to Find any Shortest Path!");
     box.exec();
@@ -104,7 +111,8 @@ void MainWindow::on_stepmapWallSimpleButton_clicked() {
 }
 
 void MainWindow::on_stepmapWallTrapezoidButton_clicked() {
-  if (!maze_simulator.drawShortestStepMapWall(maze_simulator.maze, false)) {
+  const auto &maze = maze_simulator.getMazeTarget();
+  if (!maze_simulator.drawShortestStepMapWall(maze, false)) {
     QMessageBox box(QMessageBox::Warning, "Path Error",
                     "Failed to Find any Shortest Path!");
     box.exec();
@@ -127,6 +135,29 @@ void MainWindow::on_exitButton_clicked() { exit(0); }
 void MainWindow::on_actionExit_triggered() { exit(0); }
 
 void MainWindow::on_actionDraw_triggered() { on_drawButton_clicked(); }
+
+void MainWindow::on_resetButton_clicked() { maze_simulator.reset(); }
+
+void MainWindow::on_stepToggleButton_clicked() {
+  //  maze_simulator.toggle(ui->stepTimeBox->text().toInt());
+  maze_simulator.toggle(1);
+}
+
+void MainWindow::on_stepButton_clicked() {
+  //  maze_simulator.next(ui->stepCountBox->text().toInt());
+  maze_simulator.next(1);
+}
+
+void MainWindow::on_searchButton_clicked() {
+  /* Print Maze */
+  maze_simulator.clear();
+  maze_simulator.searchRun();
+  maze_simulator.clear();
+  maze_simulator.drawMaze(maze_simulator.getMaze());
+  /* Draw Shortest Path */
+  on_shortestDiagButton_clicked();
+  on_shortestNoDiagButton_clicked();
+}
 
 void MainWindow::on_saveImageButton_clicked() {
   auto filepath = QFileInfo(ui->fileSeectEdit->text());

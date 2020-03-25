@@ -40,6 +40,14 @@ private slots:
 
   void on_saveImageButton_clicked();
 
+  void on_stepButton_clicked();
+
+  void on_stepToggleButton_clicked();
+
+  void on_searchButton_clicked();
+
+  void on_resetButton_clicked();
+
 private:
   Ui::MainWindow *ui;
   QGraphicsScene *scene;
