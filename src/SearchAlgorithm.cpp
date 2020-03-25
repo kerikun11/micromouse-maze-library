@@ -90,6 +90,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       isPositionIdentifying = false;
       break; /*< go to next state */
     case SearchAlgorithm::Error:
+      state = IMPOSSIBLE;
       return result;
     default:
       logw << "invalid result" << std::endl;
