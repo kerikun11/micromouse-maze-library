@@ -58,25 +58,41 @@ void MainWindow::on_drawAllButton_clicked() {
 
 void MainWindow::on_shortestDiagButton_clicked() {
   /* Draw Shortest Path */
-  StepMapSlalom::EdgeCost::RunParameter rp;
-  StepMapSlalom::EdgeCost edge_cost(rp);
-  const auto &maze = maze_simulator.getMazeTarget();
-  if (!maze_simulator.drawShortest(maze, true)) {
-    QMessageBox box(QMessageBox::Warning, "Path Error",
-                    "Failed to Find any Shortest Path!");
-    box.exec();
-    return;
+  for (const auto &factor : {1.0f}) {
+    // for (const auto &factor : {0.5f, 1.0f, 2.0f, 4.0f}) {
+    StepMapSlalom::EdgeCost::RunParameter rp;
+    rp.am_a *= factor;
+    rp.am_d *= factor;
+    rp.vm_a *= factor * factor;
+    rp.vm_d *= factor * factor;
+    StepMapSlalom::EdgeCost edge_cost(rp);
+    const auto &maze = maze_simulator.getMazeTarget();
+    if (!maze_simulator.drawShortest(maze, true, edge_cost)) {
+      QMessageBox box(QMessageBox::Warning, "Path Error",
+                      "Failed to Find any Shortest Path!");
+      box.exec();
+      return;
+    }
   }
 }
 
 void MainWindow::on_shortestNoDiagButton_clicked() {
   /* Draw Shortest Path */
-  const auto &maze = maze_simulator.getMazeTarget();
-  if (!maze_simulator.drawShortest(maze, false)) {
-    QMessageBox box(QMessageBox::Warning, "Path Error",
-                    "Failed to Find any Shortest Path!");
-    box.exec();
-    return;
+  for (const auto &factor : {1.0f}) {
+    // for (const auto &factor : {0.5f, 1.0f, 2.0f, 4.0f}) {
+    StepMapSlalom::EdgeCost::RunParameter rp;
+    rp.am_a *= factor;
+    rp.am_d *= factor;
+    rp.vm_a *= factor * factor;
+    rp.vm_d *= factor * factor;
+    StepMapSlalom::EdgeCost edge_cost(rp);
+    const auto &maze = maze_simulator.getMazeTarget();
+    if (!maze_simulator.drawShortest(maze, false, edge_cost)) {
+      QMessageBox box(QMessageBox::Warning, "Path Error",
+                      "Failed to Find any Shortest Path!");
+      box.exec();
+      return;
+    }
   }
 }
 
@@ -122,11 +138,13 @@ void MainWindow::on_stepmapWallTrapezoidButton_clicked() {
 
 void MainWindow::on_fileSeectEdit_returnPressed() {
   on_drawButton_clicked();
-  /* add! */
+  /* StepMap StepMapWall */
   on_stepmapSimpleButton_clicked();
   on_stepmapWallSimpleButton_clicked();
-  on_shortestDiagButton_clicked();
+  /* StepMapSlalom */
   on_shortestNoDiagButton_clicked();
+  on_shortestDiagButton_clicked();
+  /* save */
   on_saveImageButton_clicked();
 }
 

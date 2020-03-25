@@ -122,11 +122,12 @@ public:
                          cell2posY(p.y) - wall_unit_px / 2));
     scene->addPolygon(pol, QPen(Qt::yellow), QBrush(Qt::yellow));
   }
-  bool drawShortest(const Maze &maze, const bool diag_enabled) {
+  bool drawShortest(const Maze &maze, const bool diag_enabled,
+                    const StepMapSlalom::EdgeCost &edge_cost = {}) {
     Maze maze_tmp = maze;
     SearchAlgorithm sa(maze_tmp);
     Directions dirs;
-    if (!sa.calcShortestDirections(dirs, diag_enabled))
+    if (!sa.calcShortestDirections(dirs, diag_enabled, edge_cost))
       return false;
     auto p = maze.getStart();
     for (size_t i = 0; i < dirs.size(); ++i) {
