@@ -19,6 +19,7 @@ private slots:
   void on_fileSelectButton_clicked();
 
   void on_drawButton_clicked();
+  void on_drawAllButton_clicked();
 
   void on_exitButton_clicked();
 
@@ -29,8 +30,15 @@ private slots:
   void on_fileSeectEdit_returnPressed();
 
   void on_shortestDiagButton_clicked();
-
   void on_shortestNoDiagButton_clicked();
+
+  void on_stepmapSimpleButton_clicked();
+  void on_stepmapTrapezoidButton_clicked();
+
+  void on_stepmapWallSimpleButton_clicked();
+  void on_stepmapWallTrapezoidButton_clicked();
+
+  void on_saveImageButton_clicked();
 
   void on_stepButton_clicked();
 

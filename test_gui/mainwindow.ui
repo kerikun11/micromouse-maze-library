@@ -24,16 +24,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="logBrowser">
-    <property name="geometry">
-     <rect>
-      <x>960</x>
-      <y>289</y>
-      <width>309</width>
-      <height>31</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="fileSelectButton">
     <property name="geometry">
      <rect>
@@ -84,12 +74,12 @@
      <rect>
       <x>960</x>
       <y>90</y>
-      <width>311</width>
+      <width>151</width>
       <height>29</height>
      </rect>
     </property>
     <property name="text">
-     <string>Draw</string>
+     <string>Draw Maze</string>
     </property>
    </widget>
    <widget class="QPushButton" name="exitButton">
@@ -103,32 +93,6 @@
     </property>
     <property name="text">
      <string>Exit</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="stepToggleButton">
-    <property name="geometry">
-     <rect>
-      <x>1120</x>
-      <y>210</y>
-      <width>151</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Pause / Resume</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="stepButton">
-    <property name="geometry">
-     <rect>
-      <x>1120</x>
-      <y>250</y>
-      <width>151</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Next</string>
     </property>
    </widget>
    <widget class="QPushButton" name="shortestDiagButton">
@@ -157,7 +121,7 @@
      <string>Shortest Path No Diag</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="searchButton">
+   <widget class="QPushButton" name="stepmapSimpleButton">
     <property name="geometry">
      <rect>
       <x>960</x>
@@ -167,71 +131,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>Search Run</string>
+     <string>StepMap Simple</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="stepTimeBox">
-    <property name="geometry">
-     <rect>
-      <x>960</x>
-      <y>210</y>
-      <width>111</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>1000</number>
-    </property>
-    <property name="singleStep">
-     <number>10</number>
-    </property>
-    <property name="value">
-     <number>100</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="stepCountBox">
-    <property name="geometry">
-     <rect>
-      <x>960</x>
-      <y>250</y>
-      <width>111</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>10000</number>
-    </property>
-    <property name="value">
-     <number>1</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="stepTimeLabel">
-    <property name="geometry">
-     <rect>
-      <x>1080</x>
-      <y>210</y>
-      <width>31</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>[ms]</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="stepCountLabel">
-    <property name="geometry">
-     <rect>
-      <x>1080</x>
-      <y>250</y>
-      <width>31</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>[step]</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="resetButton">
+   <widget class="QPushButton" name="stepmapTrapezoidButton">
     <property name="geometry">
      <rect>
       <x>1120</x>
@@ -241,7 +144,111 @@
      </rect>
     </property>
     <property name="text">
+     <string>StepMap Trapezoid</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="stepmapWallSimpleButton">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>210</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>StepMapWall Simple</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="stepmapWallTrapezoidButton">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>210</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>StepMapWall Trapezoid</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="drawAllButton">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>250</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Draw All</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="saveImageButton">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>90</y>
+      <width>151</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Save Image</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="searchButton">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>290</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Search Run</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="resetButton">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>330</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
      <string>Reset</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="stepButton">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>290</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Step</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="stepToggleButton">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>330</y>
+      <width>151</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pause / Resume</string>
     </property>
    </widget>
   </widget>
@@ -254,7 +261,7 @@
      <x>0</x>
      <y>0</y>
      <width>1280</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -262,8 +269,8 @@
      <rect>
       <x>345</x>
       <y>96</y>
-      <width>146</width>
-      <height>63</height>
+      <width>154</width>
+      <height>72</height>
      </rect>
     </property>
     <property name="title">
@@ -276,8 +283,8 @@
      <rect>
       <x>424</x>
       <y>96</y>
-      <width>146</width>
-      <height>42</height>
+      <width>154</width>
+      <height>48</height>
      </rect>
     </property>
     <property name="title">
@@ -289,8 +296,8 @@
      <rect>
       <x>384</x>
       <y>96</y>
-      <width>146</width>
-      <height>42</height>
+      <width>154</width>
+      <height>48</height>
      </rect>
     </property>
     <property name="title">

@@ -28,18 +28,10 @@ public:
     loop->connect(timer, SIGNAL(timeout()), loop, SLOT(quit()));
   }
 
-  void toggle(const int ms = 100) {
-    if (timer->isActive()) {
-      timer->stop();
-    } else {
-      timer->start(ms);
-    }
+  void reset() {
+    maze.reset();
+    RobotBase::reset();
   }
-  void next(int n = 1) {
-    for (int i = 0; i < n; ++i)
-      loop->exit();
-  }
-
   void clear() {
     /* set Background Color */
     scene->clear();
@@ -48,8 +40,10 @@ public:
     int w = wall_unit_px;
     int s = MazeLib::MAZE_SIZE;
     for (int i = 0; i < MazeLib::MAZE_SIZE; ++i) {
-      scene->addText(QString::number(i))->setPos((i + 0.25) * w, s * w);
-      scene->addText(QString::number(i))->setPos(-w, (s - i - 1) * w);
+      QFont font;
+      font.setPointSize(font_size);
+      scene->addText(QString::number(i), font)->setPos((i + 0.25) * w, s * w);
+      scene->addText(QString::number(i), font)->setPos(-w, (s - i - 1) * w);
     }
     /* Print Cell Line */
     //        QPen pen;
@@ -61,7 +55,7 @@ public:
     //            cell2posX(s), cell2posY(i), pen);
     //        }
   }
-  void drawMaze(const MazeLib::Maze &maze) {
+  void drawMaze(const Maze &maze) {
     /* Print Walls */
     for (int x = 0; x < MazeLib::MAZE_SIZE + 1; ++x)
       for (int y = 0; y < MazeLib::MAZE_SIZE + 1; ++y) {
@@ -88,14 +82,25 @@ public:
           addWall(scene, MazeLib::Pose{MazeLib::Position(x, y), d}, pen);
         }
       }
+    /* start & goal */
+    //    QFont font;
+    //    font.setPointSize(font_size);
+    //    const int w = wall_unit_px;
+    //    const int s = MazeLib::MAZE_SIZE;
+    //    const auto p = maze.getStart();
+    //    scene->addText("S", font)->setPos((p.x + 0.2) * w, (s - p.y - 0.95) *
+    //    w); for(const auto p: maze.getGoals())
+    //        scene->addText("G", font)->setPos((p.x + 0.2) * w, (s - p.y -
+    //        0.95) * w);
   }
   void drawStep(const StepMap &map) {
     for (int x = 0; x < MazeLib::MAZE_SIZE; ++x)
       for (int y = 0; y < MazeLib::MAZE_SIZE; ++y) {
         QFont font;
-        font.setPointSize(5);
+        // font.setPointSize(5);
+        font.setPointSize(font_size);
         scene
-            ->addText(QString::number(std::min((int)map.getStep(x, y), 99999)),
+            ->addText(QString::number(std::min((int)map.getStep(x, y), 999)),
                       font)
             ->setPos(cell2posX(x), cell2posY(y + 1));
         /* Draw Wall */
@@ -125,46 +130,84 @@ public:
       return false;
     auto p = maze.getStart();
     for (size_t i = 0; i < dirs.size(); ++i) {
+      if (diag_enabled && i == dirs.size() - 1)
+        break;
       const auto d = dirs[i];
       const auto next_p = p.next(d);
-      QPoint p1, p2;
-      if (diag_enabled) {
-        if (i == dirs.size() - 1)
-          continue;
-        const auto nd = dirs[i + 1];
-        p1 = p2 = QPoint(wall_unit_px / 2, 0);
-        QMatrix m1, m2;
-        m1.rotate(-45 * d);
-        m2.rotate(-45 * nd);
-        p1 = m1.map(p1);
-        p2 = m2.map(p2);
-      }
+      const auto next_d = diag_enabled ? dirs[i + 1] : d;
       QPen pen(Qt::yellow);
-      pen.setWidth(2);
-      scene->addLine(p1.x() + cell2posX(p.x) + wall_unit_px / 2,
-                     p1.y() + cell2posY(p.y) - wall_unit_px / 2,
-                     p2.x() + cell2posX(next_p.x) + wall_unit_px / 2,
-                     p2.y() + cell2posY(next_p.y) - wall_unit_px / 2, pen);
+      QPoint offset(line_px / 2, line_px / 2);
+      if (!diag_enabled) {
+        pen.setColor(Qt::cyan);
+        offset = -offset;
+      }
+      QPoint p1 = getGraphicPointByPose(Pose(p, d), diag_enabled) + offset;
+      QPoint p2 =
+          getGraphicPointByPose(Pose(next_p, next_d), diag_enabled) + offset;
+      pen.setWidth(line_px);
+      scene->addLine(p1.x(), p1.y(), p2.x(), p2.y(), pen);
       p = next_p;
     }
     return true;
   }
-  Maze &getMazeTarget() { return maze_target; }
-  void setMazeTarget(const Maze &maze) { maze_target = maze; }
-  bool endFastRunBackingToStartRun() {
-    /* エラー処理 */
-    if (getShortestDirections().empty()) {
-      logw << "ShortestDirections are empty!" << std::endl;
+  bool drawShortestStepMap(const Maze &maze, const bool simple) {
+    Maze maze_tmp = maze;
+    const bool known_only = 0;
+    const bool diag_enabled = false;
+    StepMap map;
+    Directions dirs = map.calcShortestDirections(maze, known_only, simple);
+    if (dirs.empty())
       return false;
+    StepMap::appendStraightDirections(maze, dirs, known_only, diag_enabled);
+    auto p = maze.getStart();
+    for (size_t i = 0; i < dirs.size(); ++i) {
+      if (diag_enabled && i == dirs.size() - 1)
+        break;
+      const auto d = dirs[i];
+      const auto next_p = p.next(d);
+      const auto next_d = diag_enabled ? dirs[i + 1] : d;
+      QPoint offset(-line_px, -line_px);
+      QPoint p1 = getGraphicPointByPose(Pose(p, d), diag_enabled) + offset;
+      QPoint p2 =
+          getGraphicPointByPose(Pose(next_p, next_d), diag_enabled) + offset;
+      QPen pen(Qt::blue);
+      pen.setWidth(line_px);
+      scene->addLine(p1.x(), p1.y(), p2.x(), p2.y(), pen);
+      p = next_p;
     }
-    /* real を最短後の位置に移す */
-    Position p = maze.getStart();
-    for (const auto d : getShortestDirections())
-      p = p.next(d);
-    real = Pose(p, getShortestDirections().back());
-    /* 基底関数を呼ぶ */
-    return RobotBase::endFastRunBackingToStartRun();
+    return true;
   }
+  bool drawShortestStepMapWall(const Maze &maze, const bool simple) {
+    Maze maze_tmp = maze;
+    const bool known_only = 0;
+    const bool diag_enabled = true;
+    StepMapWall map;
+    Directions dirs = map.calcShortestDirections(maze, known_only, simple);
+    if (dirs.empty())
+      return false;
+    map.appendStraightDirections(maze, dirs);
+    auto p = WallIndex(0, 0, 1);
+    for (size_t i = 0; i < dirs.size(); ++i) {
+      const auto d = dirs[i];
+      const auto next_p = p.next(d);
+      QPoint offset(line_px, line_px);
+      QPoint p1 = getGraphicPointByPose(Pose(p.getPosition(), p.getDirection()),
+                                        diag_enabled) +
+                  offset;
+      QPoint p2 =
+          getGraphicPointByPose(
+              Pose(next_p.getPosition(), next_p.getDirection()), diag_enabled) +
+          offset;
+      QPen pen(Qt::magenta);
+      pen.setWidth(line_px);
+      scene->addLine(p1.x(), p1.y(), p2.x(), p2.y(), pen);
+      p = next_p;
+    }
+    return true;
+  }
+
+  const Maze &getMazeTarget() { return maze_target; }
+  void setMazeTarget(const Maze &maze) { maze_target = maze; }
   void drawStatus() {
     std::stringstream ss;
     ss << "State: " << SearchAlgorithm::getStateString(getState());
@@ -176,55 +219,45 @@ public:
     clear();
     drawMaze(maze);
     drawStep(getSearchAlgorithm().getStepMap());
-    drawPose(real);
+    drawPose(getCurrentPose());
     drawStatus();
+  }
+
+  void toggle(const int ms = 100) {
+    if (timer->isActive()) {
+      timer->stop();
+    } else {
+      timer->start(ms);
+    }
+  }
+  void next(int n = 1) {
+    for (int i = 0; i < n; ++i)
+      loop->exit();
   }
 
 protected:
   Maze maze;
   Maze maze_target;
-  Pose fake_offset;
-  Pose real;
-  bool real_visit_goal = false;
 
   virtual void senseWalls(bool &left, bool &front, bool &right) override {
-    left = !maze_target.canGo(real.p, real.d + Direction::Left);
-    front = !maze_target.canGo(real.p, real.d + Direction::Front);
-    right = !maze_target.canGo(real.p, real.d + Direction::Right);
+    const auto &pose = getCurrentPose();
+    left = !maze_target.canGo(pose.p, pose.d + Direction::Left);
+    front = !maze_target.canGo(pose.p, pose.d + Direction::Front);
+    right = !maze_target.canGo(pose.p, pose.d + Direction::Right);
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
       updateWall(current_pose.p.next(current_pose.d), current_pose.d,
-                 !maze_target.canGo(real.p.next(real.d), real.d));
+                 !maze_target.canGo(pose.p.next(pose.d), pose.d));
 #endif
   }
-  virtual void calcNextDirectionsPreCallback() override {
-    t_start = std::chrono::system_clock::now();
-  }
+  virtual void calcNextDirectionsPreCallback() override {}
   virtual void calcNextDirectionsPostCallback(
       SearchAlgorithm::State prevState __attribute__((unused)),
       SearchAlgorithm::State newState __attribute__((unused))) override {
-    end = std::chrono::system_clock::now();
-    usec = std::chrono::duration_cast<std::chrono::microseconds>(end - t_start)
-               .count();
-    max_usec = std::max(max_usec, usec);
     if (newState == prevState)
       return;
     /* State Change has occurred */
-    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      min_id_wall = std::min(
-          min_id_wall, getSearchAlgorithm().getIdMaze().getWallLogs().size());
-      max_id_wall = std::max(
-          max_id_wall, getSearchAlgorithm().getIdMaze().getWallLogs().size());
-    }
-    if (newState == SearchAlgorithm::IDENTIFYING_POSITION) {
-    }
-    if (newState == SearchAlgorithm::SEARCHING_ADDITIONALLY) {
-    }
-    if (newState == SearchAlgorithm::BACKING_TO_START) {
-    }
-    if (newState == SearchAlgorithm::REACHED_START) {
-    }
   }
   virtual void discrepancyWithKnownWall() override {
     if (getState() != SearchAlgorithm::IDENTIFYING_POSITION) {
@@ -234,11 +267,7 @@ protected:
           << getCurrentPose() << std::endl;
     }
   }
-  virtual void crashed() {
-    std::cerr << "The robot crashed into the wall! fake_offset:\t"
-              << fake_offset << "\treal:\t" << real << std::endl;
-  }
-  virtual void queueAction(const Action action) override {
+  virtual void queueAction(const Action action __attribute_used__) override {
     /* draw */
     draw();
     /* block */
@@ -246,98 +275,32 @@ protected:
     if (code < 0)
       return;
     /* release */
-    cost += getTimeCost(action);
-    step++;
-    switch (action) {
-    case RobotBase::START_STEP:
-      real.p = Position(0, 1);
-      real.d = Direction::North;
-      real_visit_goal = false;
-      f++;
-      break;
-    case RobotBase::START_INIT:
-      if (real_visit_goal == false)
-        loge << "Reached Start without Going to Goal!" << std::endl;
-      break;
-    case RobotBase::ST_HALF_STOP:
-      break;
-    case RobotBase::TURN_L:
-      real.d = real.d + Direction::Left;
-      if (!maze_target.canGo(real.p, real.d))
-        crashed();
-      real.p = real.p.next(real.d);
-      l++;
-      break;
-    case RobotBase::TURN_R:
-      real.d = real.d + Direction::Right;
-      if (!maze_target.canGo(real.p, real.d))
-        crashed();
-      real.p = real.p.next(real.d);
-      r++;
-      break;
-    case RobotBase::ROTATE_180:
-      real.d = real.d + Direction::Back;
-      if (!maze_target.canGo(real.p, real.d))
-        crashed();
-      real.p = real.p.next(real.d);
-      b++;
-      break;
-    case RobotBase::ST_FULL:
-      if (!maze_target.canGo(real.p, real.d))
-        crashed();
-      real.p = real.p.next(real.d);
-      f++;
-      break;
-    case RobotBase::ST_HALF:
-      break;
-    default:
-      logw << "invalid action" << std::endl;
-      break;
-    }
   }
-  virtual float getTimeCost(const Action action) {
-    const float velocity = 240.0f;
-    const float segment = 90.0f;
-    switch (action) {
-    case RobotBase::START_STEP:
-      return 1.0f;
-    case RobotBase::START_INIT:
-      return 3.0f;
-    case RobotBase::ST_HALF_STOP:
-      return segment / 2 / velocity;
-    case RobotBase::TURN_L:
-      return 71 / velocity;
-    case RobotBase::TURN_R:
-      return 71 / velocity;
-    case RobotBase::ROTATE_180:
-      return 2.0f;
-    case RobotBase::ST_FULL:
-      return segment / velocity;
-    case RobotBase::ST_HALF:
-      return segment / 2 / velocity;
-    }
-    return 0;
-  }
-
-private:
-  int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
-  float cost = 0;
-  int max_usec = 0;
-  int usec = 0;
-  size_t max_id_wall = 0;
-  size_t min_id_wall = MAZE_SIZE * MAZE_SIZE * 4;
-  std::chrono::system_clock::time_point t_start;
-  std::chrono::system_clock::time_point end;
 
 private:
   QEventLoop *loop = new QEventLoop();
   QTimer *timer = new QTimer();
   Ui::MainWindow *ui;
   QGraphicsScene *scene;
-  int wall_unit_px = 28;
-  int pillar_px = 2;
+  int wall_unit_px = 24 * 32 / MAZE_SIZE + 4;
+  int pillar_px = 2 * 32 / MAZE_SIZE;
+  int line_px = pillar_px;
   int wall_px = wall_unit_px - pillar_px;
+  int font_size = 10 * 32 / MAZE_SIZE;
 
+  QPoint getGraphicPointByPose(const Pose &pose,
+                               const bool on_the_wall = false) {
+    const auto p = pose.p;
+    QPoint p1;
+    if (on_the_wall) {
+      p1 = QPoint(wall_unit_px / 2, 0);
+      QMatrix m1;
+      m1.rotate(-45 * pose.d);
+      p1 = m1.map(p1);
+    }
+    return QPoint(p1.x() + cell2posX(p.x) + wall_unit_px / 2,
+                  p1.y() + cell2posY(p.y) - wall_unit_px / 2);
+  }
   QGraphicsItem *addWall(QGraphicsScene *scene, MazeLib::Pose pose,
                          const QPen &pen) {
     int x = pose.p.x;
@@ -345,21 +308,17 @@ private:
     MazeLib::Direction d = pose.d;
     switch (d) {
     case MazeLib::Direction::East:
-      return scene->addLine(cell2posX(x + 1), cell2posY(y) - pillar_px / 2,
-                            cell2posX(x + 1),
-                            cell2posY(y) - pillar_px / 2 - wall_px, pen);
+      return scene->addLine(cell2posX(x + 1), cell2posY(y), cell2posX(x + 1),
+                            cell2posY(y) - wall_unit_px, pen);
     case MazeLib::Direction::North:
-      return scene->addLine(cell2posX(x) + pillar_px / 2, cell2posY(y + 1),
-                            cell2posX(x) + pillar_px / 2 + wall_px,
-                            cell2posY(y + 1), pen);
+      return scene->addLine(cell2posX(x), cell2posY(y + 1),
+                            cell2posX(x) + wall_unit_px, cell2posY(y + 1), pen);
     case MazeLib::Direction::West:
-      return scene->addLine(cell2posX(x), cell2posY(y) - pillar_px / 2,
-                            cell2posX(x),
-                            cell2posY(y) - pillar_px / 2 - wall_px, pen);
+      return scene->addLine(cell2posX(x), cell2posY(y), cell2posX(x),
+                            cell2posY(y) - wall_unit_px, pen);
     case MazeLib::Direction::South:
-      return scene->addLine(cell2posX(x) + pillar_px / 2, cell2posY(y),
-                            cell2posX(x) + pillar_px / 2 + wall_px,
-                            cell2posY(y), pen);
+      return scene->addLine(cell2posX(x), cell2posY(y),
+                            cell2posX(x) + wall_unit_px, cell2posY(y), pen);
     default:
       break;
     }

@@ -28,7 +28,6 @@ INCLUDEPATH += \
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    mazesimulator.cpp \
     ../src/Agent.cpp \
     ../src/Maze.cpp \
     ../src/RobotBase.cpp \
