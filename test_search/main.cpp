@@ -14,9 +14,8 @@
 /*
  * 標準ライブラリのインクルード
  */
-#include <algorithm> //< for sleep function
-#include <thread>    //< for std::find
-
+#include <algorithm> //< for std::find
+#include <thread>    //< for sleep function
 /**
  * @brief 名前空間の展開
  */
