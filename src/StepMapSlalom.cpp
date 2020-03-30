@@ -213,7 +213,7 @@ void StepMapSlalom::update(const Maze &maze,
         const auto next = i.next(nd);
         if (!canGo(next))
           break;
-        if (!pushAndContinue(i, edge_cost.getEdgeCostAlong(n)))
+        if (!pushAndContinue(i, edge_cost.getEdgeCostDiag(n)))
           break;
         i = next;
       }
