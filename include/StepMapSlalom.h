@@ -41,12 +41,14 @@ public:
       float am_d = 3600.0f * factor * factor; /*< 最大加速度(斜め) [mm/s/s] */
       float vm_a = 1500.0f * factor;          /*< 飽和速度 [mm/s] */
       float vm_d = 1200.0f * factor;          /*< 飽和速度(斜め) [mm/s] */
-      cost_t t_F45 = 249 / factor;            /*< [ms] @ 425 [mm/s] */
-      cost_t t_F90 = 375 / factor;            /*< [ms] @ 422 [mm/s] */
-      cost_t t_F135 = 465 / factor;           /*< [ms] @ 373 [mm/s] */
-      cost_t t_F180 = 563 / factor;           /*< [ms] @ 412 [mm/s] */
-      cost_t t_FV90 = 388 / factor;           /*< [ms] @ 289 [mm/s] */
-      cost_t t_FS90 = 287 / factor;           /*< [ms] @ 265 [mm/s] */
+      std::array<cost_t, Slalom::FMAX> slalom_cost_table = {{
+          cost_t(257 / factor), /*< F45  [ms] @ 412 [mm/s] */
+          cost_t(375 / factor), /*< F90  [ms] @ 422 [mm/s] */
+          cost_t(465 / factor), /*< F135 [ms] @ 354 [mm/s] */
+          cost_t(563 / factor), /*< F180 [ms] @ 412 [mm/s] */
+          cost_t(388 / factor), /*< FV90 [ms] @ 290 [mm/s] */
+          cost_t(287 / factor), /*< FS90 [ms] @ 266 [mm/s] */
+      }};
     };
 
   public:
@@ -60,23 +62,7 @@ public:
       return cost_table_diag[n]; /*< [ms] */
     }
     cost_t getEdgeCostSlalom(const Slalom p) const {
-      switch (p) {
-      case F45:
-        return rp.t_F45; /*< [ms] */
-      case F90:
-        return rp.t_F90; /*< [ms] */
-      case F135:
-        return rp.t_F135; /*< [ms] */
-      case F180:
-        return rp.t_F180; /*< [ms] */
-      case FV90:
-        return rp.t_FV90; /*< [ms] */
-      case FS90:
-        return rp.t_FS90; /*< [ms] */
-      default:
-        std::cerr << "Unknown Pattern" << std::endl;
-        return 0;
-      }
+      return rp.slalom_cost_table[p]; /*< [ms] */
     }
     const RunParameter &getRunParameter() const { return rp; }
     void setRunParameter(const RunParameter &rp) {
