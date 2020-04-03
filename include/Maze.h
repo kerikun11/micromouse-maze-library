@@ -27,7 +27,7 @@ namespace MazeLib {
 /**
  * @brief 迷路の1辺の区画数の定数．
  */
-static constexpr int MAZE_SIZE = 32;
+static constexpr int MAZE_SIZE = 16;
 /**
  * @brief 少数部分の切り上げ関数．
  */
@@ -107,7 +107,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
  * +-----------+-------+-----------+
  * ```
  */
-struct Direction {
+class Direction {
 public:
   /**
    * @brief 絶対方向の列挙型． 0-7 の整数
@@ -181,10 +181,10 @@ public:
 private:
   int8_t d; /**< @brief 方向の実体, コンストラクタによって確実に 0-7 に収める */
 };
-static_assert(sizeof(Direction) == 1, "size error"); /*< size check */
+static_assert(sizeof(Direction) == 1, "size error"); /**< @brief size check */
 
 /**
- *  @brief Direction 構造体の動的配列の定義
+ *  @brief Direction 構造体の動的配列，集合
  */
 using Directions = std::vector<Direction>;
 
@@ -211,7 +211,8 @@ public:
   Position(const int8_t x = 0, const int8_t y = 0) : x(x), y(y) {}
   /**
    * @brief 迷路内の区画の一意な通し番号となるIDを取得する
-   *        迷路外の区画の場合未定義動作となる．use Position::isInsideOfField()
+   *
+   * 迷路外の区画の場合未定義動作となる．use Position::isInsideOfField()
    * @return uint16_t 通し番号ID
    */
   uint16_t getIndex() const { return (x << MAZE_SIZE_BIT) | y; }
@@ -258,10 +259,10 @@ public:
    */
   friend std::ostream &operator<<(std::ostream &os, const Position &p);
 };
-static_assert(sizeof(Position) == 2, "size error"); /*< size check */
+static_assert(sizeof(Position) == 2, "size error"); /**< @brief size check */
 
 /**
- * @brief Position 構造体の動的配列の定義
+ * @brief Position 構造体の動的配列，集合
  */
 using Positions = std::vector<Position>;
 
@@ -450,10 +451,10 @@ private:
     }
   }
 };
-static_assert(sizeof(WallIndex) == 2, "size error"); /*< size check */
+static_assert(sizeof(WallIndex) == 2, "size error"); /**< @brief size check */
 
 /**
- * @brief WallIndex の動的配列の定義
+ * @brief WallIndex の動的配列，集合
  */
 using WallIndexes = std::vector<WallIndex>;
 
@@ -480,7 +481,7 @@ struct WallLog {
   /** @brief 表示 */
   friend std::ostream &operator<<(std::ostream &os, const WallLog &obj);
 } __attribute__((__packed__));
-static_assert(sizeof(WallLog) == 2, "size error"); /*< size check */
+static_assert(sizeof(WallLog) == 2, "size error"); /**< @brief size check */
 
 /**
  * @brief WallLog 構造体の動的配列の定義
@@ -621,8 +622,8 @@ public:
              const size_t maze_size = MAZE_SIZE) const;
   /**
    * @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
-   * @param is *.maze 形式のファイルの input-stream
-   * @detail *.maze 形式．S: スタート区画(単数)，G: ゴール区画(複数)
+   *
+   * テキスト形式．S: スタート区画(単数)，G: ゴール区画(複数)
    * ```
    * +---+---+
    * |     G |
@@ -630,6 +631,7 @@ public:
    * | S | G |
    * +---+---+
    * ```
+   * @param is *.maze 形式のファイルの input-stream
    */
   bool parse(std::istream &is);
   bool parse(std::string filepath) {

@@ -31,7 +31,7 @@ const Position Position::next(const Direction d) const {
   case Direction::SouthEast:
     return Position(x + 1, y - 1);
   default:
-    logw << "Invalid Direction: " << d << std::endl;
+    logw << d << std::endl;
     return *this;
   }
 }
@@ -46,7 +46,7 @@ const Position Position::rotate(const Direction d) const {
   case Direction::South:
     return Position(y, -x);
   default:
-    logw << "Invalid Direction: " << d << std::endl;
+    logw << d << std::endl;
     return *this;
   }
 }
@@ -81,7 +81,7 @@ const WallIndex WallIndex::next(const Direction d) const {
   case Direction::SouthEast:
     return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
   default:
-    logw << "Invalid Direction: " << d << std::endl;
+    logw << d << std::endl;
     return WallIndex(x, y, z);
   }
 }
@@ -163,7 +163,7 @@ bool Maze::parse(std::istream &is) {
   /* determine the maze size */
   /* get file size */
   is.seekg(0, std::ios::end); //< move the position to end
-  const int file_size = is.tellg();
+  const int file_size = 1 + is.tellg();
   is.seekg(0, std::ios::beg); //< restore the position to begin
   /* estimated (minimum) file size [byte] : F = (4*M + 1 + 1) * (2*M + 1) */
   /* using quadratic formula, we have: M = (sqrt(2*F) - 2) / 4 */
