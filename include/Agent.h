@@ -147,12 +147,20 @@ public:
    */
   const SearchAlgorithm &getSearchAlgorithm() const { return searchAlgorithm; }
   /**
-   * @brief 探索状態を表示
+   * @brief 探索状態の表示
+   * 
    * @param show_maze true:迷路も表示, false:迷路は非表示
    */
   void printInfo(const bool show_maze = true) const {
     printInfo(show_maze, current_pose, state);
   }
+  /**
+   * @brief 探索状態の表示
+   *
+   * @param show_maze true:迷路も表示, false:迷路は非表示
+   * @param pose ハイライトする区画姿勢
+   * @param state 探索状態
+   */
   void printInfo(const bool show_maze, const Pose &pose,
                  const SearchAlgorithm::State state) const;
   /**

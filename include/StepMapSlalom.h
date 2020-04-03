@@ -238,7 +238,7 @@ public:
       return Index(x, y, z, nd + Direction::Back);
     }
   } __attribute__((__packed__));
-  static_assert(sizeof(Index) == 2, "size error"); /*< size check */
+  static_assert(sizeof(Index) == 2, "size error"); /**< @brief size check */
 
   /**
    * @brief Index の動的配列，集合

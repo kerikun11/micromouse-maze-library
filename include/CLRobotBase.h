@@ -29,7 +29,7 @@ public:
     bool simple[2];
     for (int i = 0; i < 2; ++i) {
       StepMap::step_t max_step = 0;
-      for (const auto step : step_map[i]->getMap())
+      for (const auto step : step_map[i]->getMapArray())
         if (step != StepMap::STEP_MAX)
           max_step = std::max(max_step, step);
       simple[i] = (max_step < 999);

@@ -19,7 +19,7 @@ protected:
   }
 };
 
-int test_measurement() {
+int test_meas() {
   std::ofstream csv("measurement.csv");
   /* specify maze data directory */
   const std::string mazedata_dir = "../mazedata/";
@@ -281,5 +281,5 @@ int test_measurement() {
 
 int main(void) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
-  return test_measurement();
+  return test_meas();
 }

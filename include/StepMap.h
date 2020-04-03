@@ -31,7 +31,7 @@ public:
    */
   void reset(const step_t step = STEP_MAX) { step_map.fill(step); }
   /**
-   * @param ステップの取得
+   * @brief ステップの取得
    * @param p 区画の座標
    * @return ステップ
    */
@@ -42,7 +42,7 @@ public:
     return p.isInsideOfField() ? step_map[p.getIndex()] : STEP_MAX;
   }
   /**
-   * @param ステップへの参照の取得，書き込み可能
+   * @brief ステップの更新
    * @param p 区画の座標
    */
   void setStep(const int8_t x, const int8_t y, const step_t step) {
@@ -55,7 +55,7 @@ public:
   /**
    * @brief ステップマップの配列を取得
    */
-  const auto &getMap() const { return step_map; }
+  const auto &getMapArray() const { return step_map; }
   /**
    * @brief ステップの表示
    * @param p ハイライト区画
