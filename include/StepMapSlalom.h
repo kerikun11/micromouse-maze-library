@@ -119,7 +119,7 @@ public:
    *
    * 「各区画中央の4方位」または「 各壁上の4方位」，の位置姿勢を一意に識別する．
    */
-  struct Index {
+  class Index {
   private:
     int x : 6; /**< @brief x coordinate of the cell */
     int y : 6; /**< @brief y coordinate of the cell */
@@ -167,6 +167,8 @@ public:
     }
     /**
      * @brief 迷路中の Index をuniqueな通し番号として表現したID
+     *
+     * 取りうる値を 0-11 に収めるために、bit shift を行っている
      * @return uint16_t ID
      */
     uint16_t getIndex() const {
