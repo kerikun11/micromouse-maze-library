@@ -156,6 +156,12 @@ public:
   /** @brief 斜めかどうかの判定 */
   bool isAlong() const { return (d & 1) == 0; }
   bool isDiag() const { return (d & 1) == 1; }
+  /** @brief 表示用char型へのキャスト */
+  char toChar() const { return ">'^`<,v.X"[d]; }
+  /** @brief stream での表示 */
+  friend std::ostream &operator<<(std::ostream &os, const Direction d) {
+    return os << d.toChar();
+  }
   /**
    * @brief 斜めでない絶対4方向を取得
    */
@@ -170,12 +176,6 @@ public:
     static const std::array<Direction, 4> ds{
         {NorthEast, NorthWest, SouthWest, SouthEast}};
     return ds;
-  }
-  /** @brief 表示用char型へのキャスト */
-  char toChar() const { return ">'^`<,v.X"[d]; }
-  /** @brief stream での表示 */
-  friend std::ostream &operator<<(std::ostream &os, const Direction d) {
-    return os << d.toChar();
   }
 
 private:
@@ -193,6 +193,12 @@ using Directions = std::vector<Direction>;
  *
  * 左下の区画が (0,0) の (x,y) 平面．
  * 実体は 16bit の整数．
+ * ```
+ * +--------+--------+
+ * | (0, 1) | (1, 1) |
+ * +--------+--------+
+ * | (0, 0) | (1, 0) |
+ * +--------+--------+
  */
 struct Position {
 public:
@@ -205,7 +211,7 @@ public:
 
 public:
   /**
-   * @brief コンストラクタ
+   * @brief デフォルトコンストラクタ
    * @param x,y 初期化パラメータ
    */
   Position(const int8_t x = 0, const int8_t y = 0) : x(x), y(y) {}
