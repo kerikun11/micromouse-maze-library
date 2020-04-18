@@ -13,10 +13,8 @@ add_compile_options("-mno-ms-bitfields")
 ## for use of 'auto' in parameter declarration on MSYS
 add_compile_options("-fconcepts")
 
-## add library src
+## add modules
 add_subdirectory(src)
 add_subdirectory(docs)
 add_subdirectory(examples)
-
-## add test
-add_subdirectory(test_gtest)
+add_subdirectory(test)
