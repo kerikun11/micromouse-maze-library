@@ -15,11 +15,6 @@
 #include <vector>
 
 /**
- * @mainpage マイクロマウスの迷路探索ライブラリ
- * @author Ryotaro Onuki (GitHub: kerikun11)
- */
-
-/**
  * @brief 迷路探索ライブラリはすべてこの名前空間に格納されている．
  */
 namespace MazeLib {

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # ============================================================================ #
 # enable japanese
-plt.rcParams["font.family"] = "IPAexGothic"
+plt.rcParams["font.family"] = "IPAGothic"
 
 # ============================================================================ #
 # load measurement.csv
