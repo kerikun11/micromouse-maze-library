@@ -1,4 +1,5 @@
-include_directories(../include)
+## author: Ryotaro Onuki <kerikun11+github@gmail.com>
+include_directories(${CMAKE_HOME_DIRECTORY}/include)
 file(GLOB SRCS *.cpp)
 add_library(mazelib STATIC ${SRCS})
 

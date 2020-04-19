@@ -140,7 +140,7 @@ make search
 
 ## 使用例
 
-- [main.cpp](test_search/main.cpp)
+- [main.cpp](examples/search_main.cpp)
 
 ## 設定項目
 

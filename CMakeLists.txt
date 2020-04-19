@@ -1,6 +1,6 @@
 ## file: CMakeLists.txt
-## author: Ryotaro Onuki (kerikun11+github@gmail.com)
-## date: 2019.09.11
+## author: Ryotaro Onuki <kerikun11+github@gmail.com>
+## date: 2020.04.19
 cmake_minimum_required(VERSION 3.10)
 project("MazeLib" CXX)
 
@@ -13,9 +13,7 @@ add_compile_options("-mno-ms-bitfields")
 ## for use of 'auto' in parameter declarration on MSYS
 add_compile_options("-fconcepts")
 
-## add library src
+## add modules
 add_subdirectory(src)
 add_subdirectory(docs)
-
-## add tests
-add_subdirectory(test_search)
+add_subdirectory(examples)
