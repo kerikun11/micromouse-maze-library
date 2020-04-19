@@ -6,6 +6,10 @@
 
 - [Maze Library](#maze-library)
   - [目次](#%e7%9b%ae%e6%ac%a1)
+  - [使用例](#%e4%bd%bf%e7%94%a8%e4%be%8b)
+    - [必要なパッケージ](#%e5%bf%85%e8%a6%81%e3%81%aa%e3%83%91%e3%83%83%e3%82%b1%e3%83%bc%e3%82%b8)
+    - [コマンド](#%e3%82%b3%e3%83%9e%e3%83%b3%e3%83%89)
+    - [リファレンスの自動生成](#%e3%83%aa%e3%83%95%e3%82%a1%e3%83%ac%e3%83%b3%e3%82%b9%e3%81%ae%e8%87%aa%e5%8b%95%e7%94%9f%e6%88%90)
   - [アルゴリズムの概要](#%e3%82%a2%e3%83%ab%e3%82%b4%e3%83%aa%e3%82%ba%e3%83%a0%e3%81%ae%e6%a6%82%e8%a6%81)
     - [迷路探索に必要な処理](#%e8%bf%b7%e8%b7%af%e6%8e%a2%e7%b4%a2%e3%81%ab%e5%bf%85%e8%a6%81%e3%81%aa%e5%87%a6%e7%90%86)
     - [移動経路導出アルゴリズム](#%e7%a7%bb%e5%8b%95%e7%b5%8c%e8%b7%af%e5%b0%8e%e5%87%ba%e3%82%a2%e3%83%ab%e3%82%b4%e3%83%aa%e3%82%ba%e3%83%a0)
@@ -16,12 +20,46 @@
     - [名前空間](#%e5%90%8d%e5%89%8d%e7%a9%ba%e9%96%93)
     - [クラス・構造体・共用体・型](#%e3%82%af%e3%83%a9%e3%82%b9%e3%83%bb%e6%a7%8b%e9%80%a0%e4%bd%93%e3%83%bb%e5%85%b1%e7%94%a8%e4%bd%93%e3%83%bb%e5%9e%8b)
     - [定数](#%e5%ae%9a%e6%95%b0)
-  - [コンピュータでの動作確認](#%e3%82%b3%e3%83%b3%e3%83%94%e3%83%a5%e3%83%bc%e3%82%bf%e3%81%a7%e3%81%ae%e5%8b%95%e4%bd%9c%e7%a2%ba%e8%aa%8d)
-    - [依存パッケージ](#%e4%be%9d%e5%ad%98%e3%83%91%e3%83%83%e3%82%b1%e3%83%bc%e3%82%b8)
-    - [動作確認 Linux コマンド](#%e5%8b%95%e4%bd%9c%e7%a2%ba%e8%aa%8d-linux-%e3%82%b3%e3%83%9e%e3%83%b3%e3%83%89)
-  - [使用例](#%e4%bd%bf%e7%94%a8%e4%be%8b)
-  - [設定項目](#%e8%a8%ad%e5%ae%9a%e9%a0%85%e7%9b%ae)
-    - [迷路サイズ](#%e8%bf%b7%e8%b7%af%e3%82%b5%e3%82%a4%e3%82%ba)
+
+## 使用例
+
+ターミナルでの使用例
+
+### 必要なパッケージ
+
+- [cmake](https://cmake.org/)
+- [gcc](https://gcc.gnu.org/)
+- [git](https://git-scm.com/)
+
+### コマンド
+
+```sh
+## クローン
+git clone https://github.com/kerikun11/MazeLibrary.git
+## 移動
+cd MazeLibrary
+## 作業ディレクトリを作成
+mkdir build
+cd build
+## 初期化 (Makefileの生成)
+cmake ..
+## 実行
+make search
+## コマンドラインにアニメーションが流れる
+```
+
+### リファレンスの自動生成
+
+追加で必要なパッケージ
+
+- [Doxygen](http://www.doxygen.jp/)
+
+```sh
+# ドキュメントの自動生成
+make docs
+```
+
+上記コマンドにより `MazeLibrary/build/docs/html/index.html` にリファレンスが生成される．
 
 ## アルゴリズムの概要
 
@@ -112,42 +150,3 @@
 | 定数      | 意味           | 用途                              |
 | --------- | -------------- | --------------------------------- |
 | MAZE_SIZE | 迷路の最大区画 | 16 or 32 などの迷路サイズを定義． |
-
-## コンピュータでの動作確認
-
-### 依存パッケージ
-
-- cmake
-- gcc
-- git
-
-### 動作確認 Linux コマンド
-
-```sh
-## クローン
-git clone https://github.com/kerikun11/MazeLibrary.git
-## 移動
-cd MazeLibrary
-## 作業ディレクトリを作成
-mkdir build
-cd build
-## 初期化 (Makefileの生成)
-cmake ..
-## 実行
-make search
-## コマンドラインにアニメーションが流れる
-```
-
-## 使用例
-
-- [main.cpp](examples/search_main.cpp)
-
-## 設定項目
-
-### 迷路サイズ
-
-- [include/Maze.h](include/Maze.h)
-
-```cpp
-static constexpr int MAZE_SIZE = 16;
-```
