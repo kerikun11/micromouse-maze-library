@@ -17,8 +17,10 @@ namespace MazeLib {
 class StepMapWall {
 public:
   using step_t = uint16_t; /**< @brief ステップの型 */
-  static constexpr step_t STEP_MAX =
-      std::numeric_limits<step_t>::max(); /**< @brief 最大ステップ値 */
+  /**
+   * @brief 最大ステップ値
+   */
+  static constexpr step_t STEP_MAX = std::numeric_limits<step_t>::max();
 
 public:
   StepMapWall() { calcStraightStepTable(); }

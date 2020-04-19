@@ -102,7 +102,7 @@ public:
     /**
      * @brief コストテーブルを生成する関数
      *
-     * 各マスごとのコストは不変なので高速化のために予め計算しておく
+     * 各マス数ごとのコストは不変なので高速化のために予め計算しておく
      */
     void genCostTable() {
       const float seg_a = 90.0f;
@@ -321,7 +321,7 @@ private:
   const Index index_start = Index(Position(0, 0), Direction::North);
   /** @brief 迷路上の最短経路候補の移動元を格納するマップ */
   std::array<Index, Index::SIZE> from_map;
-  std::array<cost_t, Index::SIZE> cost_map; /**< 迷路上のコストマップ */
+  std::array<cost_t, Index::SIZE> cost_map; /**< @brief 迷路上のコストマップ */
 };
 
 } // namespace MazeLib
