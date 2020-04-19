@@ -16,7 +16,7 @@ namespace MazeLib {
  */
 class RobotBase : public Agent {
 public:
-  enum Action : char {
+  enum SearchAction : char {
     START_STEP = '1',
     START_INIT = '2',
     ST_FULL = 'S',
@@ -30,24 +30,24 @@ public:
     F_ST_FULL = 'S',
     F_ST_HALF = 's',
     F_ST_DIAG = 'w',
-    FL45 = 'z',
-    FL45P = 'Z',
-    FR45 = 'c',
-    FR45P = 'C',
-    FL90 = 'q',
-    FR90 = 'Q',
-    FLV90 = 'p',
-    FRV90 = 'P',
-    FLS90 = 'L',
-    FRS90 = 'R',
-    FL135 = 'a',
-    FL135P = 'A',
-    FR135 = 'd',
-    FR135P = 'D',
-    FL180 = 'u',
-    FR180 = 'U',
+    F45_L = 'z',
+    F45_LP = 'Z',
+    F45_R = 'c',
+    F45_RP = 'C',
+    F90_L = 'q',
+    F90_R = 'Q',
+    FV90_L = 'p',
+    FV90_R = 'P',
+    FS90_L = 'L',
+    FS90_R = 'R',
+    F135_L = 'a',
+    F135_LP = 'A',
+    F135_R = 'd',
+    F135_RP = 'D',
+    F180_L = 'u',
+    F180_R = 'U',
   };
-  using SearchActions = std::vector<Action>;
+  using SearchActions = std::vector<SearchAction>;
   using FastActions = std::vector<FastAction>;
 
   static std::string pathConvertSearchToFast(std::string src,
@@ -81,13 +81,13 @@ public:
       const auto nextDir = dirs[i];
       switch (Direction(nextDir - prevDir)) {
       case Direction::Front:
-        path += RobotBase::Action::ST_FULL;
+        path += RobotBase::SearchAction::ST_FULL;
         break;
       case Direction::Left:
-        path += RobotBase::Action::TURN_L;
+        path += RobotBase::SearchAction::TURN_L;
         break;
       case Direction::Right:
-        path += RobotBase::Action::TURN_R;
+        path += RobotBase::SearchAction::TURN_R;
         break;
       }
       prevDir = nextDir;
@@ -112,7 +112,7 @@ protected:
    * @brief 仮想関数．継承して中身を埋める
    */
   virtual void waitForEndAction() {}
-  virtual void queueAction(const Action action __attribute__((unused))) {}
+  virtual void queueAction(const SearchAction action __attribute__((unused))) {}
   virtual void senseWalls(bool &left __attribute__((unused)),
                           bool &front __attribute__((unused)),
                           bool &right __attribute__((unused))) {}

@@ -9,7 +9,7 @@ public:
   CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
 
 protected:
-  virtual void queueAction(const Action action) override {
+  virtual void queueAction(const SearchAction action) override {
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.p == maze.getStart() && action != ST_HALF_STOP)

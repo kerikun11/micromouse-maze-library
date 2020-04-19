@@ -268,7 +268,8 @@ protected:
           << getCurrentPose() << std::endl;
     }
   }
-  virtual void queueAction(const Action action __attribute_used__) override {
+  virtual void
+  queueAction(const SearchAction action __attribute_used__) override {
     /* draw */
     draw();
     /* block */

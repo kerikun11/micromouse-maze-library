@@ -39,7 +39,7 @@ protected:
     CLRobotBase::crashed();
     getc(stdin);
   }
-  virtual void queueAction(const Action action) override {
+  virtual void queueAction(const SearchAction action) override {
     if (display) {
       printInfo();
       // getc(stdin);

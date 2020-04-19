@@ -183,7 +183,7 @@ public:
 
 protected:
   Maze maze;
-  Action action_prev = START_STEP;
+  SearchAction action_prev = START_STEP;
 
   virtual void senseWalls(bool &left, bool &front, bool &right) override {
     left = !maze_target.canGo(real.p, real.d + Direction::Left);
@@ -226,7 +226,7 @@ protected:
   virtual void backupMazeToFlash() override {
     // maze.backupWallLogsToFile("maze.walllogs"); //< (takes some time)
   }
-  virtual void queueAction(const Action action) override {
+  virtual void queueAction(const SearchAction action) override {
     const auto goals = maze.getGoals();
     if (std::find(goals.cbegin(), goals.cend(), current_pose.p) != goals.cend())
       real_visit_goal = true;
@@ -291,7 +291,7 @@ protected:
          << "\tcur:\t" << current_pose << "\treal:\t" << real << std::endl;
     setBreakFlag();
   }
-  virtual float getTimeCost(const Action action) {
+  virtual float getTimeCost(const SearchAction action) {
     const float velocity = 300.0f;
     const float segment = 90.0f;
     switch (action) {
