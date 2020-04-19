@@ -194,6 +194,7 @@ using Directions = std::vector<Direction>;
  * +--------+--------+
  * | (0, 0) | (1, 0) |
  * +--------+--------+
+ * ```
  */
 struct Position {
 public:
