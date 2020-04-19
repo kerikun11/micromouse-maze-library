@@ -52,7 +52,7 @@ make search
 
 追加で必要なパッケージ
 
-- [Doxygen](http://www.doxygen.jp/)
+- [doxygen](http://www.doxygen.jp/)
 
 ```sh
 # ドキュメントの自動生成
