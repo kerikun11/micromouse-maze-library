@@ -52,7 +52,8 @@ make search
 
 追加で必要なパッケージ
 
-- [Doxygen](http://www.doxygen.jp/)
+- [doxygen](http://www.doxygen.jp/)
+- [graphviz](http://www.graphviz.org/)
 
 ```sh
 # ドキュメントの自動生成
