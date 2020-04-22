@@ -14,6 +14,9 @@
 #include <iostream>
 #include <vector>
 
+#include <cstring>
+#include <string>
+
 /**
  * @brief 迷路探索ライブラリはすべてこの名前空間に格納されている．
  */
@@ -60,20 +63,38 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 /*
  * ログ出力 stream
  */
+/* @brief File Path Management */
+#ifdef PROJ_DIR /*< defined at CMakeLists.txt */
+#define FILEPATH (".." + std::string(__FILE__).substr(std::strlen(PROJ_DIR)))
+#else
+#define FILEPATH __FILE__
+#endif
 /** @brief Log Stream (Error) */
 #ifndef loge
+#if 1
 #define loge                                                                   \
-  (std::cerr << C_RE << "[E][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
+  (std::cout << C_RE "[E][" << FILEPATH << ":" << __LINE__ << "]\t" << C_NO)
+#else
+#define loge std::ostream(0)
+#endif
 #endif
 /** @brief Log Stream (Warnning) */
 #ifndef logw
+#if 1
 #define logw                                                                   \
-  (std::cout << C_YE << "[W][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
+  (std::cout << C_YE "[W][" << FILEPATH << ":" << __LINE__ << "]\t" << C_NO)
+#else
+#define logw std::ostream(0)
+#endif
 #endif
 /** @brief Log Stream (Info) */
 #ifndef logi
+#if 1
 #define logi                                                                   \
-  (std::cout << C_GR << "[I][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
+  (std::cout << C_GR "[I][" << FILEPATH << ":" << __LINE__ << "]\t" << C_NO)
+#else
+#define logi std::ostream(0)
+#endif
 #endif
 
 /**

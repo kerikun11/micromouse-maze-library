@@ -8,10 +8,14 @@ project("MazeLib" CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Release)
+
 ## for __attribute__((__packed__)) on MSYS
 add_compile_options("-mno-ms-bitfields")
 ## for use of 'auto' in parameter declarration on MSYS
 add_compile_options("-fconcepts")
+
+## for log stream in C++ src
+add_compile_options(-DPROJ_DIR="${CMAKE_HOME_DIRECTORY}")
 
 ## add modules
 add_subdirectory(src)
