@@ -1,10 +1,10 @@
-# Maze Library
+# MicroMouse Maze Library
 
 マイクロマウスの迷路探索ライブラリ
 
 ## 目次
 
-- [Maze Library](#maze-library)
+- [MicroMouse Maze Library](#micromouse-maze-library)
   - [目次](#%e7%9b%ae%e6%ac%a1)
   - [使用例](#%e4%bd%bf%e7%94%a8%e4%be%8b)
     - [必要なパッケージ](#%e5%bf%85%e8%a6%81%e3%81%aa%e3%83%91%e3%83%83%e3%82%b1%e3%83%bc%e3%82%b8)
