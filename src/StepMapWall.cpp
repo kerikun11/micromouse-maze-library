@@ -294,7 +294,7 @@ void StepMapWall::calcStraightStepTable() {
   step_table_along[0] = step_table_diag[0] = 0; /*< [0] は使用しない */
   for (int i = 1; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
-    step_table_diag[i] = t_slalom + gen_cost_impl(i, am_d, vs, vm_d, seg_d);
+    step_table_diag[i] = t_slalom + gen_cost_impl(i - 1, am_d, vs, vm_d, seg_d);
   }
   /* 最大値を超えないようにスケーリング */
   for (int i = 0; i < MAZE_SIZE * 2; ++i) {
