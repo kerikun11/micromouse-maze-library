@@ -42,15 +42,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 /*
  * 迷路のカラー表示切替
  */
-#if 1
-#define C_RE "\x1b[31m" /**< @brief RED */
-#define C_GR "\x1b[32m" /**< @brief GREEN */
-#define C_YE "\x1b[33m" /**< @brief YELLOW */
-#define C_BL "\x1b[34m" /**< @brief BLUE */
-#define C_MA "\x1b[35m" /**< @brief MAGENTA */
-#define C_CY "\x1b[36m" /**< @brief CYAN */
-#define C_NO "\x1b[0m"  /**< @brief RESET */
-#else
+#ifdef MAZE_COLOR_DISABLED
 #define C_RE ""
 #define C_GR ""
 #define C_YE ""
@@ -58,6 +50,14 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 #define C_MA ""
 #define C_CY ""
 #define C_NO ""
+#else
+#define C_RE "\x1b[31m" /**< @brief RED */
+#define C_GR "\x1b[32m" /**< @brief GREEN */
+#define C_YE "\x1b[33m" /**< @brief YELLOW */
+#define C_BL "\x1b[34m" /**< @brief BLUE */
+#define C_MA "\x1b[35m" /**< @brief MAGENTA */
+#define C_CY "\x1b[36m" /**< @brief CYAN */
+#define C_NO "\x1b[0m"  /**< @brief RESET */
 #endif
 
 /*
