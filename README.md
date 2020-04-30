@@ -35,8 +35,8 @@
 ### コマンド
 
 ```sh
-## クローン
-git clone https://github.com/kerikun11/MazeLibrary.git
+## 迷路データを含めて複製
+git clone --recursive https://github.com/kerikun11/MazeLibrary.git
 ## 移動
 cd MazeLibrary
 ## 作業ディレクトリを作成
