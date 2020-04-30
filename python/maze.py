@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# python version >= 3.8
+# usage: $ python maze.py mazefile.maze
 # ============================================================================ #
 import sys
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+
+# ============================================================================ #
 
 
 class Maze:
@@ -23,6 +27,35 @@ class Maze:
         self.walls = np.zeros(self.index_size, dtype=bool)  # wall flags
         self.start = []
         self.goals = []
+
+    @staticmethod
+    def parse(file):
+        """
+        parse maze string and construct maze object
+        """
+        lines = file.readlines()
+        maze = Maze(len(lines)//2)
+        # print(f'maze size: {maze.size}x{maze.size}')
+        for i, line in enumerate(reversed(lines)):
+            line = line.rstrip()  # remove \n
+            # +---+---+
+            if i % 2 == 0:
+                for j, c in enumerate(line[2:: 4]):
+                    if c == '-':
+                        maze.wall(j, i//2, Maze.South, True)
+            # |   |   |
+            else:
+                for j, c in enumerate(line[0:: 4]):
+                    if c == '|':
+                        maze.wall(j, i//2, Maze.West, True)
+                for j, c in enumerate(line[2:: 4]):
+                    if c == 'S':
+                        # print(f"S: ({j},{i//2})")
+                        maze.start.append([j, i//2])
+                    if c == 'G':
+                        # print(f"G: ({j},{i//2})")
+                        maze.goals.append([j, i//2])
+        return maze
 
     @classmethod
     def uniquify(cls, x, y, d):
@@ -101,37 +134,41 @@ class Maze:
             res += '\n'
         return res
 
-    @staticmethod
-    def parse(file):
-        """
-        parse maze string and construct maze object
-        """
-        lines = file.readlines()
-        maze = Maze(len(lines)//2)
-        # print(f'maze size: {maze.size}x{maze.size}')
-        for i, line in enumerate(reversed(lines)):
-            line = line.rstrip()  # remove \n
-            # +---+---+
-            if i % 2 == 0:
-                for j, c in enumerate(line[2:: 4]):
-                    if c == '-':
-                        maze.wall(j, i//2, Maze.South, True)
-            # |   |   |
-            else:
-                for j, c in enumerate(line[0:: 4]):
-                    if c == '|':
-                        maze.wall(j, i//2, Maze.West, True)
-                for j, c in enumerate(line[2:: 4]):
-                    if c == 'S':
-                        # print(f"S: ({j},{i//2})")
-                        maze.start.append([j, i//2])
-                    if c == 'G':
-                        # print(f"G: ({j},{i//2})")
-                        maze.goals.append([j, i//2])
-        return maze
 
+# ============================================================================ #
 
 class MazePainter:
+    """
+    paint a maze with matplotlib.pyplot
+    """
+
+    def __init__(self, maze):
+        self.maze = maze
+
+    def draw_maze(self):
+        maze = self.maze
+        for i in range(maze.size+1):
+            for j in range(maze.size):
+                # +---+---+
+                if maze.wall(i, j, Maze.South):
+                    self.draw_wall(maze, i, j, Maze.South)
+                else:
+                    self.draw_wall(maze, i, j, Maze.South, ':', color='gray')
+                # |   |   |
+                if maze.wall(j, i, Maze.West):
+                    self.draw_wall(maze, j, i, Maze.West)
+                else:
+                    self.draw_wall(maze, j, i, Maze.West, ':', color='gray')
+        for ps, t in [[maze.start, 'S'], [maze.goals, 'G']]:
+            for p in ps:
+                plt.text(p[0], p[1], t, ha='center', va='center')
+        plt.axes().set_aspect('equal')  # set the x and y axes to the same scale
+        plt.xticks(range(0, maze.size+1, 1))
+        plt.yticks(range(0, maze.size+1, 1))
+        plt.xlim([-1/2, maze.size-1/2])
+        plt.ylim([-1/2, maze.size-1/2])
+        plt.tight_layout()
+
     @staticmethod
     def draw_wall(maze, x, y, d, fmt='k', **kwargs):
         x, y, z, d = Maze.uniquify(x, y, d)
@@ -143,49 +180,11 @@ class MazePainter:
         plt.plot(x, y, fmt, **kwargs)
         plt.plot(x, y, 'k.')
 
-    @classmethod
-    def draw_maze(cls, maze):
-        for i in range(maze.size+1):
-            for j in range(maze.size):
-                # +---+---+
-                if maze.wall(i, j, Maze.South):
-                    cls.draw_wall(maze, i, j, Maze.South)
-                else:
-                    cls.draw_wall(maze, i, j, Maze.South, ':', color='gray')
-                # |   |   |
-                if maze.wall(j, i, Maze.West):
-                    cls.draw_wall(maze, j, i, Maze.West)
-                else:
-                    cls.draw_wall(maze, j, i, Maze.West, ':', color='gray')
-        for ps, t in [[maze.start, 'S'], [maze.goals, 'G']]:
-            for p in ps:
-                plt.text(p[0], p[1], t, ha='center', va='center')
-        plt.axes().set_aspect('equal')  # set the x and y axes to the same scale
-        plt.xticks(range(0, maze.size+1, 1))
-        plt.yticks(range(0, maze.size+1, 1))
-        plt.xlim([-1/2, maze.size-1/2])
-        plt.ylim([-1/2, maze.size-1/2])
-        plt.tight_layout()
+    def attach_wall_toggle(self):
+        plt.connect('button_press_event', self.button_press_event)
 
-
-# ============================================================================ #
-if __name__ == "__main__":
-    filepath = './mazedata/32MM2019HX.maze'
-    # filepath = './mazedata/16MM2019CX.maze'
-    # filepath = './mazedata/09MM2019C_Cheese_cand.maze'
-
-    # overwrite with commandline argument
-    if len(sys.argv) > 1:
-        filepath = sys.argv[1]
-
-    # read file
-    with open(filepath, 'r') as file:
-        maze = Maze.parse(file)
-    print(maze)
-    print(maze.generate_maze_string())
-
-    # setup maze modifier
-    def button_press_event(event):
+    def button_press_event(self, event):
+        maze = self.maze
         x, y = event.xdata, event.ydata
         xf, xi = math.modf(x)
         yf, yi = math.modf(y)
@@ -200,9 +199,34 @@ if __name__ == "__main__":
         MazePainter.draw_wall(maze, x, y, d, c)
         plt.draw()
         print(maze.generate_maze_string())
+
+
+# ============================================================================ #
+# example
+
+if __name__ == "__main__":
+    # default filepath for debug
+    filepath = './mazedata/32MM2019HX.maze'
+
+    # overwrite with commandline argument
+    if len(sys.argv) > 1:
+        filepath = sys.argv[1]
+
+    # read maze file
+    with open(filepath, 'r') as file:
+        maze = Maze.parse(file)
+    print(maze)
+    print(maze.generate_maze_string())
+
+    # prepare figure
     fig = plt.figure(figsize=(10, 10))
-    MazePainter.draw_maze(maze)
-    plt.connect('button_press_event', button_press_event)
+
+    # setup maze modifier
+    mp = MazePainter(maze)
+    mp.draw_maze()
+    mp.attach_wall_toggle()
+
+    # start
     plt.show()
 
     # save modified maze
