@@ -1,0 +1,3 @@
+[submodule "mazedata"]
+	path = mazedata
+	url = https://github.com/kerikun11/micromouse-mazedata.git

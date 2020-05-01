@@ -14,6 +14,9 @@
 #include <iostream>
 #include <vector>
 
+#include <cstring>
+#include <string>
+
 /**
  * @brief 迷路探索ライブラリはすべてこの名前空間に格納されている．
  */
@@ -36,18 +39,10 @@ static constexpr int MAZE_SIZE_BIT = ceil(std::log2(MAZE_SIZE));
  */
 static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 
-/**
- * @brief 迷路のカラー表示切替
+/*
+ * 迷路のカラー表示切替
  */
-#if 1
-#define C_RE "\x1b[31m" /*< RED */
-#define C_GR "\x1b[32m" /*< GREEN */
-#define C_YE "\x1b[33m" /*< YELLOW */
-#define C_BL "\x1b[34m" /*< BLUE */
-#define C_MA "\x1b[35m" /*< MAGENTA */
-#define C_CY "\x1b[36m" /*< CYAN */
-#define C_NO "\x1b[0m"  /*< RESET */
-#else
+#ifdef MAZE_COLOR_DISABLED
 #define C_RE ""
 #define C_GR ""
 #define C_YE ""
@@ -55,22 +50,51 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 #define C_MA ""
 #define C_CY ""
 #define C_NO ""
+#else
+#define C_RE "\x1b[31m" /**< @brief RED */
+#define C_GR "\x1b[32m" /**< @brief GREEN */
+#define C_YE "\x1b[33m" /**< @brief YELLOW */
+#define C_BL "\x1b[34m" /**< @brief BLUE */
+#define C_MA "\x1b[35m" /**< @brief MAGENTA */
+#define C_CY "\x1b[36m" /**< @brief CYAN */
+#define C_NO "\x1b[0m"  /**< @brief RESET */
 #endif
 
-/**
- * @brief ログ出力用 stream
+/*
+ * ログ出力 stream
  */
-#ifndef loge /**< @brief Error */
+/* @brief File Path Management */
+#ifdef PROJ_DIR /*< defined at CMakeLists.txt */
+#define FILEPATH (".." + std::string(__FILE__).substr(std::strlen(PROJ_DIR)))
+#else
+#define FILEPATH __FILE__
+#endif
+/** @brief Log Stream (Error) */
+#ifndef loge
+#if 1
 #define loge                                                                   \
-  (std::cerr << C_RE << "[E][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
+  (std::cout << C_RE "[E][" << FILEPATH << ":" << __LINE__ << "]\t" << C_NO)
+#else
+#define loge std::ostream(0)
 #endif
-#ifndef logw /**< @brief Warning */
+#endif
+/** @brief Log Stream (Warnning) */
+#ifndef logw
+#if 1
 #define logw                                                                   \
-  (std::cout << C_YE << "[W][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
+  (std::cout << C_YE "[W][" << FILEPATH << ":" << __LINE__ << "]\t" << C_NO)
+#else
+#define logw std::ostream(0)
 #endif
-#ifndef logi /**< @brief Info */
+#endif
+/** @brief Log Stream (Info) */
+#ifndef logi
+#if 1
 #define logi                                                                   \
-  (std::cout << C_GR << "[I][" << __FILE__ << ":" << __LINE__ << "] " << C_NO)
+  (std::cout << C_GR "[I][" << FILEPATH << ":" << __LINE__ << "]\t" << C_NO)
+#else
+#define logi std::ostream(0)
+#endif
 #endif
 
 /**
@@ -285,8 +309,8 @@ using Positions = std::vector<Position>;
  */
 struct Pose {
 public:
-  Position p;
-  Direction d;
+  Position p;  /**< @brief 位置 */
+  Direction d; /**< @brief 姿勢 */
 
 public:
   Pose() {}
@@ -693,7 +717,7 @@ protected:
   int8_t min_y;                       /**< @brief 既知壁の最小区画 */
   int8_t max_x;                       /**< @brief 既知壁の最大区画 */
   int8_t max_y;                       /**< @brief 既知壁の最大区画 */
-  size_t backup_counter; /**< 壁ログバックアップのカウンタ */
+  size_t backup_counter; /**< @brief 壁ログバックアップのカウンタ */
 
   /**
    * @brief 壁の確認のベース関数．迷路外を参照すると壁ありと返す．

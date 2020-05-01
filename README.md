@@ -1,10 +1,10 @@
-# Maze Library
+# MicroMouse Maze Library
 
 マイクロマウスの迷路探索ライブラリ
 
 ## 目次
 
-- [Maze Library](#maze-library)
+- [MicroMouse Maze Library](#micromouse-maze-library)
   - [目次](#%e7%9b%ae%e6%ac%a1)
   - [使用例](#%e4%bd%bf%e7%94%a8%e4%be%8b)
     - [必要なパッケージ](#%e5%bf%85%e8%a6%81%e3%81%aa%e3%83%91%e3%83%83%e3%82%b1%e3%83%bc%e3%82%b8)
@@ -27,17 +27,18 @@
 
 ### 必要なパッケージ
 
-- [cmake](https://cmake.org/)
-- [gcc](https://gcc.gnu.org/)
 - [git](https://git-scm.com/)
+- [gcc, g++](https://gcc.gnu.org/)
+- [make](https://www.gnu.org/software/make/)
+- [cmake](https://cmake.org/)
 
 ### コマンド
 
 ```sh
-## クローン
-git clone https://github.com/kerikun11/MazeLibrary.git
+## 迷路データを含めて複製
+git clone --recursive https://github.com/kerikun11/micromouse-maze-library.git
 ## 移動
-cd MazeLibrary
+cd micromouse-maze-library
 ## 作業ディレクトリを作成
 mkdir build
 cd build
@@ -53,6 +54,7 @@ make search
 追加で必要なパッケージ
 
 - [doxygen](http://www.doxygen.jp/)
+- [graphviz](http://www.graphviz.org/)
 
 ```sh
 # ドキュメントの自動生成
@@ -60,6 +62,8 @@ make docs
 ```
 
 上記コマンドにより `MazeLibrary/build/docs/html/index.html` にリファレンスが生成される．
+
+--------------------------------------------------------------------------------
 
 ## アルゴリズムの概要
 
@@ -126,6 +130,8 @@ make docs
 
 1. スタート区画からゴール区画の最短経路を，（念のため）未知壁は壁ありとして導出する．
 2. 上記経路を走行する．
+
+--------------------------------------------------------------------------------
 
 ## ライブラリ構成
 
