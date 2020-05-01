@@ -1,0 +1,4 @@
+<map id="MazeLib::Maze" name="MazeLib::Maze">
+<area shape="rect" id="node1" title="迷路の壁情報を管理するクラス" alt="" coords="13,95,124,121"/>
+<area shape="rect" id="node2" href="$structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義．" alt="" coords="5,5,132,32"/>
+</map>
