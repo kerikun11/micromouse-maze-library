@@ -48,7 +48,7 @@ protected:
 
 int test_position_identify() {
   /* Preparation */
-  const std::string mazedata_dir = "../mazedata/";
+  const std::string mazedata_dir = "../mazedata/data/";
   const std::string filename = "32MM2019HX.maze";
   Maze maze_target;
   if (!maze_target.parse((mazedata_dir + filename).c_str()))

@@ -36,9 +36,9 @@
 
 ```sh
 ## 迷路データを含めて複製
-git clone --recursive https://github.com/kerikun11/MazeLibrary.git
+git clone --recursive https://github.com/kerikun11/micromouse-maze-library.git
 ## 移動
-cd MazeLibrary
+cd micromouse-maze-library
 ## 作業ディレクトリを作成
 mkdir build
 cd build

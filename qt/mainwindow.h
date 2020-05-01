@@ -23,7 +23,7 @@ public:
       : QMainWindow(parent), ui(new Ui::MainWindow), scene(new QGraphicsScene),
         maze_simulator(ui, scene) {
     ui->setupUi(this);
-    ui->fileSeectEdit->setText("../mazedata/32MM2016HX.maze");
+    ui->fileSeectEdit->setText("../mazedata/data/32MM2016HX.maze");
     ui->statusBar->showMessage("Hello World!");
     ui->mazeView->setScene(scene);
   }
@@ -34,7 +34,7 @@ private slots:
 
   void on_fileSelectButton_clicked() {
     QFileInfo fileinfo = QFileDialog::getOpenFileName(
-        nullptr, "Select a Maze File", "../mazedata");
+        nullptr, "Select a Maze File", "../mazedata/data");
     /* get Relative Path */
     QDir pwd(".");
     QString s = pwd.relativeFilePath(fileinfo.filePath());
