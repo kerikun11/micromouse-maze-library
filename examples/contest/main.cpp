@@ -176,10 +176,10 @@ int main(void) {
   }
 #endif
 #if 0
-  /* WallLogs */
+  /* WallRecords */
   std::cout << std::endl;
-  for (const auto &wl : robot.getMaze().getWallLogs())
-    std::cout << wl << std::endl;
+  for (const auto &wr : robot.getMaze().getWallRecords())
+    std::cout << wr << std::endl;
 #endif
 
   return 0;

@@ -127,11 +127,12 @@ private:
   /**
    * @brief 自己位置同定のパターンにマッチする候補をカウントする
    *
-   * @param idWallLogs
+   * @param idWallRecords
    * @param ans マッチした解のひとつ
    * @return int マッチ数, 0: 失敗, 1: 特定, 2-: 複数マッチ
    */
-  int countIdentityCandidates(const WallLogs &idWallLogs, Pose &ans) const;
+  int countIdentityCandidates(const WallRecords &idWallRecords,
+                              Pose &ans) const;
   /**
    * @brief 特定の区画にマッチする方向の候補を探す
    * スタート区画への訪問を避けるために使用する関数

@@ -148,7 +148,7 @@ public:
   const SearchAlgorithm &getSearchAlgorithm() const { return searchAlgorithm; }
   /**
    * @brief 探索状態の表示
-   * 
+   *
    * @param show_maze true:迷路も表示, false:迷路は非表示
    */
   void printInfo(const bool show_maze = true) const {

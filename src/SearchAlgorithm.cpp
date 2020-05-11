@@ -309,7 +309,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions &candidates,
   }
   return true; /*< 成功 */
 }
-int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
+int SearchAlgorithm::countIdentityCandidates(const WallRecords &idWallRecords,
                                              Pose &ans) const {
   const int min_diff = 6; /*< 許容食い違い壁数 */
   /* 既知迷路の大きさを取得 */
@@ -323,11 +323,11 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
       const auto offset_p = Position(x, y);
       for (const auto offset_d : Direction::getAlong4()) {
         /* 既知壁との食い違い数を数える */
-        int diffs = 0; /*< idWallLogs のうち，既知の食い違いの壁の数を格納 */
-        for (const auto wl : idWallLogs) {
+        int diffs = 0; /*< idWallRecords のうち，既知の食い違いの壁の数を格納 */
+        for (const auto wr : idWallRecords) {
           const auto maze_p =
-              (wl.getPosition() - idOffset).rotate(offset_d) + offset_p;
-          const auto maze_d = wl.d + offset_d;
+              (wr.getPosition() - idOffset).rotate(offset_d) + offset_p;
+          const auto maze_d = wr.d + offset_d;
           /* 既知範囲外は除外．探索中だとちょっと危険な処理． */
           if (static_cast<uint8_t>(maze_p.x) >= max_x ||
               static_cast<uint8_t>(maze_p.y) >= max_y) {
@@ -337,7 +337,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallLogs &idWallLogs,
           }
           /* 既知かつ食い違い壁をカウント */
           if (maze.isKnown(maze_p, maze_d) &&
-              maze.isWall(maze_p, maze_d) != wl.b)
+              maze.isWall(maze_p, maze_d) != wr.b)
             ++diffs;
           /* 打ち切り */
           if (diffs > min_diff)
@@ -365,13 +365,13 @@ SearchAlgorithm::findMatchDirectionCandidates(const Position &cur_p,
   Directions result_dirs; //< target と一致する方向の候補を格納する
   for (const auto offset_d : Direction::getAlong4()) {
     /* 既知壁との食い違い数を数える */
-    int diffs = 0; /*< idWallLogs のうち，既知の食い違いの壁の数を格納 */
-    for (const auto wl : idMaze.getWallLogs()) {
+    int diffs = 0; /*< idWallRecords のうち，既知の食い違いの壁の数を格納 */
+    for (const auto wr : idMaze.getWallRecords()) {
       const auto maze_p =
-          target.p + (wl.getPosition() - cur_p).rotate(offset_d);
-      const auto maze_d = wl.d + offset_d;
+          target.p + (wr.getPosition() - cur_p).rotate(offset_d);
+      const auto maze_d = wr.d + offset_d;
       /* 既知かつ食い違い壁をカウント */
-      if (maze.isKnown(maze_p, maze_d) && maze.isWall(maze_p, maze_d) != wl.b)
+      if (maze.isKnown(maze_p, maze_d) && maze.isWall(maze_p, maze_d) != wr.b)
         ++diffs;
       /* 打ち切り */
       if (diffs > min_diff)
@@ -548,7 +548,7 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     Directions &nextDirectionCandidates, bool &isForceGoingToGoal,
     int &matchCount) {
   /* オフセットを調整する(処理はこのブロックで完結) */
-  if (!idMaze.getWallLogs().empty()) {
+  if (!idMaze.getWallRecords().empty()) {
     const int8_t min_x = idMaze.getMinX();
     const int8_t min_y = idMaze.getMinY();
     const int8_t max_x = idMaze.getMaxX();
@@ -560,14 +560,14 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     const auto offset_diff = offset_new - idOffset;
     idOffset = offset_new;
     current_pose.p = current_pose.p + offset_diff; //< 自己位置を調整
-    WallLogs tmp = idMaze.getWallLogs();
+    WallRecords tmp = idMaze.getWallRecords();
     idMaze.reset(false);
-    for (const auto wl : tmp)
-      idMaze.updateWall(wl.getPosition() + offset_diff, wl.d, wl.b);
+    for (const auto wr : tmp)
+      idMaze.updateWall(wr.getPosition() + offset_diff, wr.d, wr.b);
   }
   /* 自己位置同定処理 */
   Pose ans;
-  const int cnt = countIdentityCandidates(idMaze.getWallLogs(), ans);
+  const int cnt = countIdentityCandidates(idMaze.getWallRecords(), ans);
   matchCount = cnt; //< 表示用
   if (cnt == 1) {
     /* 自己位置を修正する */
@@ -586,13 +586,13 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     maze.updateWall(current_pose.p, current_pose.d + Direction::Back, false);
     /* 自己位置同定中に未知壁を見ていたら更新する */
     const int ignore_first_walls = 12; /*< 復帰直後は壁の読み間違いがありそう */
-    const auto &wall_logs = idMaze.getWallLogs();
-    for (int i = ignore_first_walls; i < (int)wall_logs.size(); ++i) {
-      const auto wl = wall_logs[i];
-      const auto maze_p = (wl.getPosition() - idOffset).rotate(ans.d) + ans.p;
-      const auto maze_d = wl.d + ans.d;
+    const auto &wallRecords = idMaze.getWallRecords();
+    for (int i = ignore_first_walls; i < (int)wallRecords.size(); ++i) {
+      const auto wr = wallRecords[i];
+      const auto maze_p = (wr.getPosition() - idOffset).rotate(ans.d) + ans.p;
+      const auto maze_d = wr.d + ans.d;
       if (!maze.isKnown(maze_p, maze_d))
-        maze.updateWall(maze_p, maze_d, wl.b);
+        maze.updateWall(maze_p, maze_d, wr.b);
     }
     return Reached;
   } else if (cnt == 0) {
@@ -604,7 +604,7 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   int8_t max_x = std::min(idMaze.getMaxX() + 2, MAZE_SIZE);
   int8_t max_y = std::min(idMaze.getMaxY() + 2, MAZE_SIZE);
   /* スタート区画への訪問を避けるため，idMazeを編集する */
-  WallLogs wall_backup;
+  WallRecords wall_backup;
   /* 周辺の探索候補を作成 */
   Positions candidates;
   for (int8_t x = min_x; x < max_x; ++x)
@@ -614,7 +614,7 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
       const auto forbidden =
           findMatchDirectionCandidates(p, {Position(0, 1), Direction::South});
       for (const auto d : forbidden) {
-        wall_backup.push_back(WallLog(p, d, idMaze.isWall(p, d)));
+        wall_backup.push_back(WallRecord(p, d, idMaze.isWall(p, d)));
         idMaze.setWall(p, d, true);
       }
       /* 禁止区画でない未知区画を訪問候補に追加する */
@@ -636,8 +636,8 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   nextDirectionCandidates.push_back(current_pose.d + Direction::Back);
   /* 迷路をもとに戻す */
   std::reverse(wall_backup.begin(), wall_backup.end()); /* 重複対策 */
-  for (const auto wl : wall_backup)
-    idMaze.setWall(wl.getPosition(), wl.d, wl.b);
+  for (const auto wr : wall_backup)
+    idMaze.setWall(wr.getPosition(), wr.d, wr.b);
   /* 既知情報からではスタート区画を避けられない場合 */
   if (step_map.getStep(current_pose.p) == StepMap::STEP_MAX)
     calcNextDirectionsInAdvance(idMaze, candidates, current_pose,

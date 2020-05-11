@@ -128,7 +128,8 @@ public:
     std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, "
                 "Left: %3d, Right: %3d, Back: %3d\n",
                 ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    std::cout << "Found Walls:    \t" << maze.getWallLogs().size() << std::endl;
+    std::cout << "Found Walls:    \t" << maze.getWallRecords().size()
+              << std::endl;
   }
   bool fastRun(const bool diag_enabled) {
     /* 最短経路の導出 */
@@ -211,10 +212,12 @@ protected:
       return;
     /* State Change has occurred */
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      min_id_wall = std::min(
-          min_id_wall, getSearchAlgorithm().getIdMaze().getWallLogs().size());
-      max_id_wall = std::max(
-          max_id_wall, getSearchAlgorithm().getIdMaze().getWallLogs().size());
+      min_id_wall =
+          std::min(min_id_wall,
+                   getSearchAlgorithm().getIdMaze().getWallRecords().size());
+      max_id_wall =
+          std::max(max_id_wall,
+                   getSearchAlgorithm().getIdMaze().getWallRecords().size());
     }
   }
   virtual void discrepancyWithKnownWall() override {
@@ -224,7 +227,7 @@ protected:
     }
   }
   virtual void backupMazeToFlash() override {
-    // maze.backupWallLogsToFile("maze.walllogs"); //< (takes some time)
+    // maze.backupWallRecordsToFile("maze.wallRecords"); //< (takes some time)
   }
   virtual void queueAction(const SearchAction action) override {
     const auto goals = maze.getGoals();
