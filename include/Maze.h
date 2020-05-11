@@ -485,9 +485,13 @@ static_assert(sizeof(WallIndex) == 2, "size error"); /**< @brief size check */
 using WallIndexes = std::vector<WallIndex>;
 
 /**
- * @brief 区画位置，方向，壁の有無を保持する構造体．実体は 16bit の整数
+ * @brief 区画位置，方向，壁の有無を保持する構造体．
+ *
+ * - 探索の記録などに用いる
+ * - サイズを小さくするためにビットフィールド構造体を用いている
+ * - 実体は 16bit の整数
  */
-struct WallLog {
+struct WallRecord {
   int x : 6;          /**< @brief 区画のx座標 */
   int y : 6;          /**< @brief 区画のy座標 */
   unsigned int d : 3; /**< @brief 壁の方向 */
@@ -495,32 +499,32 @@ struct WallLog {
   /**
    * @brief コンストラクタ
    */
-  WallLog() {}
-  WallLog(const int8_t x, const int8_t y, const Direction d, const bool b)
+  WallRecord() {}
+  WallRecord(const int8_t x, const int8_t y, const Direction d, const bool b)
       : x(x), y(y), d(d), b(b) {}
-  WallLog(const Position &p, const Direction d, const bool b)
+  WallRecord(const Position &p, const Direction d, const bool b)
       : x(p.x), y(p.y), d(d), b(b) {}
   /** @brief 区画の取得 */
   const Position getPosition() const { return Position(x, y); }
   /** @brief 方向の取得 */
   const Direction getDirection() const { return d; }
   /** @brief 表示 */
-  friend std::ostream &operator<<(std::ostream &os, const WallLog &obj);
+  friend std::ostream &operator<<(std::ostream &os, const WallRecord &obj);
 } __attribute__((__packed__));
-static_assert(sizeof(WallLog) == 2, "size error"); /**< @brief size check */
+static_assert(sizeof(WallRecord) == 2, "size error"); /**< @brief size check */
 
 /**
- * @brief WallLog 構造体の動的配列の定義
+ * @brief WallRecord 構造体の動的配列の定義
  */
-using WallLogs = std::vector<WallLog>;
+using WallRecords = std::vector<WallRecord>;
 
 /**
  * @brief 迷路の壁情報を管理するクラス
  *
- * - 実体は，壁情報とスタート位置とゴール位置の集合
+ * - 壁情報とスタート位置とゴール位置の集合などを保持する
  * - 壁の有無の確認は，isWall()
  * - 壁の既知未知の確認は，isKnown()
- * - 壁の更新は，updateWall() によって一気に行う
+ * - 壁の更新は，updateWall() によって行う
  */
 class Maze {
 public:
@@ -537,7 +541,7 @@ public:
   /**
    * @brief 迷路の初期化．壁を削除し，スタート区画を既知に
    * @param set_start_wall スタート区画の East と North の壁を設定するかどうか
-   * @param set_range_full min_x, max_x などを予め最大に設定するかどうか
+   * @param set_range_full 高速化用の min_x, max_x を予め最大に設定するかどうか
    */
   void reset(const bool set_start_wall = true,
              const bool set_range_full = false);
@@ -689,7 +693,7 @@ public:
   /**
    * @brief 壁ログを取得
    */
-  const WallLogs &getWallLogs() const { return wallLogs; }
+  const WallRecords &getWallRecords() const { return wallRecords; }
   /**
    * @brief 既知部分の迷路サイズを返す．計算量を減らすために使用．
    */
@@ -700,19 +704,19 @@ public:
   /**
    * @brief 壁ログをファイルに追記保存する関数
    */
-  bool backupWallLogsToFile(const std::string &filepath,
-                            const bool clear = false);
+  bool backupWallRecordsToFile(const std::string &filepath,
+                               const bool clear = false);
   /**
    * @brief 壁ログファイルから壁情報を復元する関数
    */
-  bool restoreWallLogsFromFile(const std::string &filepath);
+  bool restoreWallRecordsFromFile(const std::string &filepath);
 
 protected:
   std::bitset<WallIndex::SIZE> wall;  /**< @brief 壁情報 */
   std::bitset<WallIndex::SIZE> known; /**< @brief 壁の既知未知情報 */
   Positions goals;                    /**< @brief ゴール区画の集合 */
   Position start;                     /**< @brief スタート区画 */
-  WallLogs wallLogs;                  /**< @brief 更新した壁のログ */
+  WallRecords wallRecords;            /**< @brief 更新した壁のログ */
   int8_t min_x;                       /**< @brief 既知壁の最小区画 */
   int8_t min_y;                       /**< @brief 既知壁の最小区画 */
   int8_t max_x;                       /**< @brief 既知壁の最大区画 */

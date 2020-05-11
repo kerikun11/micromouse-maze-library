@@ -90,8 +90,8 @@ std::ostream &operator<<(std::ostream &os, const WallIndex &i) {
             << (int)i.y << ", " << i.getDirection().toChar() << ")";
 }
 
-/* WallLog */
-std::ostream &operator<<(std::ostream &os, const WallLog &obj) {
+/* WallRecord */
+std::ostream &operator<<(std::ostream &os, const WallRecord &obj) {
   return os << "( " << std::setw(2) << (int)obj.x << ", " << std::setw(2)
             << (int)obj.y << ", " << obj.getDirection().toChar() << ", "
             << (obj.b ? "true" : "false") << ")";
@@ -108,7 +108,7 @@ void Maze::reset(const bool set_start_wall, const bool set_range_full) {
     updateWall(Position(0, 0), Direction::East, true);   //< start cell
     updateWall(Position(0, 0), Direction::North, false); //< start cell
   }
-  wallLogs.clear();
+  wallRecords.clear();
 }
 int8_t Maze::wallCount(const Position &p) const {
   const auto &dirs = Direction::getAlong4();
@@ -128,7 +128,7 @@ bool Maze::updateWall(const Position &p, const Direction d, const bool b,
     setKnown(p, d, false);
     /* ログに追加 */
     if (pushLog)
-      wallLogs.push_back(WallLog(p, d, b));
+      wallRecords.push_back(WallRecord(p, d, b));
     return false;
   }
   /* 未知壁なら壁情報を更新 */
@@ -137,7 +137,7 @@ bool Maze::updateWall(const Position &p, const Direction d, const bool b,
     setKnown(p, d, true);
     /* ログに追加 */
     if (pushLog)
-      wallLogs.push_back(WallLog(p, d, b));
+      wallRecords.push_back(WallRecord(p, d, b));
     /* 最大最小区画を更新 */
     min_x = std::min(p.x, min_x);
     min_y = std::min(p.y, min_y);
@@ -147,16 +147,16 @@ bool Maze::updateWall(const Position &p, const Direction d, const bool b,
   return true;
 }
 void Maze::resetLastWalls(const int num) {
-  for (int i = 0; i < num && !wallLogs.empty(); ++i)
-    wallLogs.pop_back();
+  for (int i = 0; i < num && !wallRecords.empty(); ++i)
+    wallRecords.pop_back();
   /* 編集済みの壁情報を取得 */
-  const auto new_wallLogs = wallLogs;
+  const auto new_wallRecords = wallRecords;
   /* スタート壁を考慮して迷路をリセット */
   reset(isWall(getStart(), Direction::East) &&
         isKnown(getStart(), Direction::East) &&
         canGo(getStart(), Direction::North));
-  for (const auto wl : new_wallLogs)
-    updateWall(wl.getPosition(), wl.getDirection(), wl.b);
+  for (const auto wr : new_wallRecords)
+    updateWall(wr.getPosition(), wr.getDirection(), wr.b);
   return;
 }
 bool Maze::parse(std::istream &is) {
@@ -379,33 +379,34 @@ void Maze::print(const Positions &positions, std::ostream &os,
     os << "+" << std::endl;
   }
 }
-bool Maze::backupWallLogsToFile(const std::string &filepath, const bool clear) {
+bool Maze::backupWallRecordsToFile(const std::string &filepath,
+                                   const bool clear) {
   /* 変更なし */
-  if (!clear && backup_counter == wallLogs.size())
+  if (!clear && backup_counter == wallRecords.size())
     return true;
   /* 前のデータが残っていたら削除 */
   std::ifstream fs(filepath, std::ifstream::ate);
   const auto size = static_cast<size_t>(fs.tellg());
-  if (clear || size / sizeof(WallLog) > backup_counter) {
+  if (clear || size / sizeof(WallRecord) > backup_counter) {
     fs.close();
     std::remove(filepath.c_str());
     backup_counter = 0;
   }
   fs.close();
-  /* WallLogs を追記 */
+  /* WallRecords を追記 */
   std::ofstream of(filepath, std::ios::binary | std::ios::app);
   if (of.fail()) {
     loge << "failed to open file! " << filepath << std::endl;
     return false;
   }
-  while (backup_counter < wallLogs.size()) {
-    const auto &wl = wallLogs[backup_counter];
-    of.write((const char *)&wl, sizeof(wl));
+  while (backup_counter < wallRecords.size()) {
+    const auto &wr = wallRecords[backup_counter];
+    of.write((const char *)&wr, sizeof(wr));
     backup_counter++;
   }
   return true;
 }
-bool Maze::restoreWallLogsFromFile(const std::string &filepath) {
+bool Maze::restoreWallRecordsFromFile(const std::string &filepath) {
   std::ifstream f(filepath, std::ios::binary);
   if (f.fail()) {
     loge << "failed to open file! " << filepath << std::endl;
@@ -414,11 +415,11 @@ bool Maze::restoreWallLogsFromFile(const std::string &filepath) {
   backup_counter = 0;
   reset();
   while (!f.eof()) {
-    WallLog wl;
-    f.read((char *)(&wl), sizeof(WallLog));
-    Position p = Position(wl.x, wl.y);
-    Direction d = Direction(wl.d);
-    bool b = wl.b;
+    WallRecord wr;
+    f.read((char *)(&wr), sizeof(WallRecord));
+    Position p = Position(wr.x, wr.y);
+    Direction d = Direction(wr.d);
+    bool b = wr.b;
     updateWall(p, d, b);
     backup_counter++;
   }
