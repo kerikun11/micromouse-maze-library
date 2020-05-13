@@ -73,8 +73,8 @@ private slots:
 
   void on_shortestDiagButton_clicked() {
     /* Draw Shortest Path */
-    for (const auto &factor : {1.0f}) {
-      // for (const auto &factor : {0.5f, 1.0f, 2.0f, 4.0f}) {
+    for (const auto &factor : {float(1)}) {
+      // for (const auto &factor : {float(0.5), float(1), float(2), float(4)}) {
       //    StepMapSlalom::EdgeCost::RunParameter rp;
       //    rp.am_a *= factor;
       //    rp.am_d *= factor;
@@ -93,8 +93,8 @@ private slots:
 
   void on_shortestNoDiagButton_clicked() {
     /* Draw Shortest Path */
-    for (const auto &factor : {1.0f}) {
-      // for (const auto &factor : {0.5f, 1.0f, 2.0f, 4.0f}) {
+    for (const auto &factor : {float(1)}) {
+      // for (const auto &factor : {float(0.5), float(1), float(2), float(4)}) {
       //    StepMapSlalom::EdgeCost::RunParameter rp;
       //    rp.am_a *= factor;
       //    rp.am_d *= factor;

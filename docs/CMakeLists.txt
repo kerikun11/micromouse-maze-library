@@ -15,6 +15,7 @@ set(DOXYGEN_EXPAND_ONLY_PREDEF YES)
 set(DOXYGEN_PREDEFINED __attribute__((__packed__)))
 
 doxygen_add_docs(docs
+  ${CMAKE_HOME_DIRECTORY}/docs
   ${CMAKE_HOME_DIRECTORY}/include
   ${CMAKE_HOME_DIRECTORY}/src
   ${CMAKE_HOME_DIRECTORY}/examples

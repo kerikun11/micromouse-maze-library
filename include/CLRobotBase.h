@@ -295,13 +295,13 @@ protected:
     setBreakFlag();
   }
   virtual float getTimeCost(const SearchAction action) {
-    const float velocity = 300.0f;
-    const float segment = 90.0f;
+    const float velocity = float(300);
+    const float segment = float(90);
     switch (action) {
     case RobotBase::START_STEP:
-      return 3.0f;
+      return float(3);
     case RobotBase::START_INIT:
-      return 3.0f;
+      return float(3);
     case RobotBase::ST_HALF_STOP:
       return segment / 2 / velocity;
     case RobotBase::TURN_L:
@@ -309,7 +309,7 @@ protected:
     case RobotBase::TURN_R:
       return 71 / velocity;
     case RobotBase::ROTATE_180:
-      return 3.0f;
+      return float(3);
     case RobotBase::ST_FULL:
       return segment / velocity;
     case RobotBase::ST_HALF:
