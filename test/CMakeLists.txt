@@ -41,7 +41,7 @@ target_include_directories(test_gtest PRIVATE ${CMAKE_HOME_DIRECTORY}/include)
 target_link_libraries(test_gtest mazelib gtest)
 # gt
 add_custom_target(gt
-  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/test_gtest
+  COMMAND env GTEST_COLOR=1 ${CMAKE_CURRENT_BINARY_DIR}/test_gtest
   DEPENDS test_gtest mazelib gtest
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )

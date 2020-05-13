@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 add_compile_options(-fconcepts) # for use of ‘auto’ in parameter declaration
 add_compile_options(-mno-ms-bitfields) # for use of __attribute__((__packed__)) on MSYS
+add_compile_options(-fdiagnostics-color=always) # colorized output for gcc
 
 ## add modules
 add_subdirectory(src)
