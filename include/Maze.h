@@ -51,13 +51,13 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 #define C_CY ""
 #define C_NO ""
 #else
-#define C_RE "\x1b[31m" /**< @brief RED */
-#define C_GR "\x1b[32m" /**< @brief GREEN */
-#define C_YE "\x1b[33m" /**< @brief YELLOW */
-#define C_BL "\x1b[34m" /**< @brief BLUE */
-#define C_MA "\x1b[35m" /**< @brief MAGENTA */
-#define C_CY "\x1b[36m" /**< @brief CYAN */
-#define C_NO "\x1b[0m"  /**< @brief RESET */
+#define C_RE "\x1b[31m" /**< @brief ANSI Escape Sequence RED */
+#define C_GR "\x1b[32m" /**< @brief ANSI Escape Sequence GREEN */
+#define C_YE "\x1b[33m" /**< @brief ANSI Escape Sequence YELLOW */
+#define C_BL "\x1b[34m" /**< @brief ANSI Escape Sequence BLUE */
+#define C_MA "\x1b[35m" /**< @brief ANSI Escape Sequence MAGENTA */
+#define C_CY "\x1b[36m" /**< @brief ANSI Escape Sequence CYAN */
+#define C_NO "\x1b[0m"  /**< @brief ANSI Escape Sequence RESET */
 #endif
 
 /*
@@ -66,8 +66,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 /** @brief Log Stream (Error) */
 #ifndef loge
 #if 1
-#define loge                                                                   \
-  (std::cout << C_RE "[E][" << __FILE__ << ":" << __LINE__ << "]\t" << C_NO)
+#define loge (std::cout << C_RE "[E][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
 #else
 #define loge std::ostream(0)
 #endif
@@ -75,8 +74,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 /** @brief Log Stream (Warnning) */
 #ifndef logw
 #if 1
-#define logw                                                                   \
-  (std::cout << C_YE "[W][" << __FILE__ << ":" << __LINE__ << "]\t" << C_NO)
+#define logw (std::cout << C_YE "[W][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
 #else
 #define logw std::ostream(0)
 #endif
@@ -84,8 +82,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 /** @brief Log Stream (Info) */
 #ifndef logi
 #if 1
-#define logi                                                                   \
-  (std::cout << C_GR "[I][" << __FILE__ << ":" << __LINE__ << "]\t" << C_NO)
+#define logi (std::cout << C_GR "[I][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
 #else
 #define logi std::ostream(0)
 #endif
