@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1280</width>
-    <height>1030</height>
+    <height>1010</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -485,7 +485,7 @@
      <x>0</x>
      <y>0</y>
      <width>1280</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -493,7 +493,7 @@
      <rect>
       <x>345</x>
       <y>96</y>
-      <width>154</width>
+      <width>165</width>
       <height>72</height>
      </rect>
     </property>
@@ -507,7 +507,7 @@
      <rect>
       <x>424</x>
       <y>96</y>
-      <width>154</width>
+      <width>165</width>
       <height>48</height>
      </rect>
     </property>
@@ -520,7 +520,7 @@
      <rect>
       <x>384</x>
       <y>96</y>
-      <width>154</width>
+      <width>165</width>
       <height>48</height>
      </rect>
     </property>
@@ -536,15 +536,6 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionDraw"/>
   </widget>
   <action name="actionExit">
    <property name="text">

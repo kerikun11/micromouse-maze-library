@@ -1,5 +1,7 @@
 # CMake
 build/
+
+# Qt Creator
 build-*
 
 # VSCode

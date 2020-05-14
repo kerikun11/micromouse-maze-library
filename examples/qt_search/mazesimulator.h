@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QMainWindow>
 #include <QTimer>
+
 #include <sstream>
 
 #include "Maze.h"
