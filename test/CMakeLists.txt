@@ -1,4 +1,5 @@
 # author: Ryotaro Onuki <kerikun11+github@gmail.com>
+# date: 2020.05.14
 
 # GoogleTest Project
 # see https://github.com/google/googletest/blob/master/googletest/README.md

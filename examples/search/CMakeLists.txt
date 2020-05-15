@@ -13,7 +13,7 @@ target_include_directories(${TARGET_NAME}
 target_link_libraries(${TARGET_NAME} mazelib)
 # make a custom target to run
 add_custom_target(${CUSTOM_TARGET_NAME}
-  COMMAND clear && ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   DEPENDS ${TARGET_NAME} mazelib
   USES_TERMINAL
