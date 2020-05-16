@@ -36,11 +36,11 @@ public:
     struct RunParameter {
       RunParameter() {}
       static constexpr float factor = 2;      /*< CostMax の超過防止 */
-      float vs = float(420) * factor;             /*< 基本速度 [mm/s] */
-      float am_a = float(4200) * factor * factor; /*< 最大加速度 [mm/s/s] */
-      float am_d = float(3600) * factor * factor; /*< 最大加速度(斜め) [mm/s/s] */
-      float vm_a = float(1500) * factor;          /*< 飽和速度 [mm/s] */
-      float vm_d = float(1200) * factor;          /*< 飽和速度(斜め) [mm/s] */
+      float vs = 420.0f * factor;             /*< 基本速度 [mm/s] */
+      float am_a = 4200.0f * factor * factor; /*< 最大加速度 [mm/s/s] */
+      float am_d = 3600.0f * factor * factor; /*< 最大加速度(斜め) [mm/s/s] */
+      float vm_a = 1500.0f * factor;          /*< 飽和速度 [mm/s] */
+      float vm_d = 1200.0f * factor;          /*< 飽和速度(斜め) [mm/s] */
       std::array<cost_t, Slalom::FMAX> slalom_cost_table = {{
           cost_t(257 / factor), /*< F45  [ms] @ 412 [mm/s] */
           cost_t(375 / factor), /*< F90  [ms] @ 422 [mm/s] */
@@ -105,8 +105,8 @@ public:
      * 各マス数ごとのコストは不変なので高速化のために予め計算しておく
      */
     void genCostTable() {
-      const float seg_a = float(90);
-      const float seg_d = float(45) * std::sqrt(float(2));
+      const float seg_a = 90.0f;
+      const float seg_d = 45.0f * std::sqrt(2.0f);
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
         cost_table_along[i] = gen_cost_impl(i, rp.am_a, rp.vs, rp.vm_a, seg_a);
         cost_table_diag[i] = gen_cost_impl(i, rp.am_d, rp.vs, rp.vm_d, seg_d);

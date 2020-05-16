@@ -116,7 +116,7 @@ void dig(Maze &maze) {
             const auto next = n.next(d);
             return next.isInsideOfField() && !mark[next.getIndex()];
           });
-      if (known == 0 && getRandomFloat() < float(0.5))
+      if (known == 0 && getRandomFloat() < 0.5f)
         maze.setWall(p.next(d), d, false);
 #endif
       break;

@@ -284,15 +284,14 @@ static StepMapWall::step_t gen_cost_impl(const int i, const float am,
     return (am * d + (vm - vs) * (vm - vs)) / (am * vm) * 1000; /*< 台形加速 */
 }
 void StepMapWall::calcStraightStepTable() {
-  const float vs = float(420);    /*< 基本速度 [mm/s] */
-  const float am_a = float(4200); /*< 最大加速度 [mm/s/s] */
-  const float am_d = float(3600); /*< 最大加速度(斜め) [mm/s/s] */
-  const float vm_a = float(1500); /*< 飽和速度 [mm/s] */
-  const float vm_d = float(1200); /*< 飽和速度(斜め) [mm/s] */
-  const float seg_a = float(90);  /*< 1区画の長さ [mm] */
-  const float seg_d =
-      float(45) * std::sqrt(float(2)); /*< 1区画の長さ(斜め) [mm] */
-  const float t_slalom = float(388);   /*< FV90ターンの時間 [ms] */
+  const float vs = 420.0f;    /*< 基本速度 [mm/s] */
+  const float am_a = 4200.0f; /*< 最大加速度 [mm/s/s] */
+  const float am_d = 3600.0f; /*< 最大加速度(斜め) [mm/s/s] */
+  const float vm_a = 1500.0f; /*< 飽和速度 [mm/s] */
+  const float vm_d = 1200.0f; /*< 飽和速度(斜め) [mm/s] */
+  const float seg_a = 90.0f;  /*< 1区画の長さ [mm] */
+  const float seg_d = 45.0f * std::sqrt(2.0f); /*< 1区画の長さ(斜め) [mm] */
+  const float t_slalom = 388.0f; /*< FV90ターンの時間 [ms] */
   step_table_along[0] = step_table_diag[0] = 0; /*< [0] は使用しない */
   for (int i = 1; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);

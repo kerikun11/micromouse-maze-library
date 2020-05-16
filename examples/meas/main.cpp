@@ -142,8 +142,8 @@ int test_meas() {
 #if PI_ENABLED
     /* Position Identification Run */
     robot.t_dur_max = 0;
-    float id_cost_max = 0;   /*< 探索時間 [秒] */
-    float id_cost_min = 1e6; /*< 探索時間 [秒] */
+    float id_cost_max = 0;    /*< 探索時間 [秒] */
+    float id_cost_min = 1e6f; /*< 探索時間 [秒] */
     const auto p_step_map = std::make_unique<StepMap>();
     StepMap &step_map = *p_step_map;
     const auto p_maze_pi = std::make_unique<Maze>();
