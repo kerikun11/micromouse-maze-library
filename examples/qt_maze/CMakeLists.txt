@@ -26,7 +26,7 @@ target_link_libraries(${TARGET_NAME}
 )
 ## qt_maze
 add_custom_target(qt_maze
-  COMMAND clear && ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   DEPENDS ${TARGET_NAME} mazelib
   USES_TERMINAL
