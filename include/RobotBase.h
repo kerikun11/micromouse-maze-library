@@ -111,21 +111,21 @@ protected:
   /**
    * @brief 仮想関数．継承して中身を埋める
    */
-  virtual void waitForEndAction() {}
+  virtual void calibration() {}
   virtual void queueAction(const SearchAction action __attribute__((unused))) {}
+  virtual void startDequeue() {}
+  virtual void waitForEndAction() {}
   virtual void senseWalls(bool &left __attribute__((unused)),
                           bool &front __attribute__((unused)),
                           bool &right __attribute__((unused))) {}
-  virtual void backupMazeToFlash() {}
   virtual void stopDequeue() {}
-  virtual void startDequeue() {}
-  virtual void calibration() {}
   virtual void calcNextDirectionsPreCallback() {}
   virtual void calcNextDirectionsPostCallback(SearchAlgorithm::State prevState
                                               __attribute__((unused)),
                                               SearchAlgorithm::State newState
                                               __attribute__((unused))) {}
   virtual void discrepancyWithKnownWall() {}
+  virtual void backupMazeToFlash() {}
 
 protected:
   /**
