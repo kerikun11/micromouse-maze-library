@@ -401,7 +401,7 @@ bool Maze::backupWallRecordsToFile(const std::string &filepath,
   }
   while (backup_counter < wallRecords.size()) {
     const auto &wr = wallRecords[backup_counter];
-    of.write((const char *)&wr, sizeof(wr));
+    of.write(reinterpret_cast<const char *>(&wr), sizeof(wr));
     backup_counter++;
   }
   return true;
@@ -416,7 +416,7 @@ bool Maze::restoreWallRecordsFromFile(const std::string &filepath) {
   reset();
   while (!f.eof()) {
     WallRecord wr;
-    f.read((char *)(&wr), sizeof(WallRecord));
+    f.read(reinterpret_cast<char *>(&wr), sizeof(WallRecord));
     Position p = Position(wr.x, wr.y);
     Direction d = Direction(wr.d);
     bool b = wr.b;

@@ -346,8 +346,9 @@ void StepMap::calcStraightStepTable() {
   for (int i = 1; i < MAZE_SIZE; ++i)
     step_table[i] = t_slalom + gen_cost_impl(i - 1, am_a, vs, vm_a, seg_a);
   /* 最大値を超えないようにスケーリング */
+  const float scaling_factor = 2;
   for (int i = 0; i < MAZE_SIZE; ++i)
-    step_table[i] /= 2;
+    step_table[i] /= scaling_factor;
 }
 
 } // namespace MazeLib
