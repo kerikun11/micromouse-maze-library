@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.18"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MazeLib: MicroMouse Maze Library</title>
+<title>MicroMouse Maze Library: MicroMouse Maze Library</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">MazeLib
+   <div id="projectname">MicroMouse Maze Library
    </div>
   </td>
  </tr>
@@ -71,7 +71,8 @@ $(function() {
 <ul>
 <li><a href="#micromouse-maze-library">MicroMouse Maze Library</a><ul>
 <li><a href="#%e7%9b%ae%e6%ac%a1">目次</a></li>
-<li><a href="#%e4%bd%bf%e7%94%a8%e4%be%8b">使用例</a><ul>
+<li><a href="#%e3%83%9e%e3%82%a4%e3%82%b3%e3%83%b3%e3%81%a7%e3%81%ae%e4%bd%bf%e7%94%a8%e6%96%b9%e6%b3%95">マイコンでの使用方法</a></li>
+<li><a href="#%e3%82%b3%e3%83%b3%e3%83%94%e3%83%a5%e3%83%bc%e3%82%bf%e3%81%a7%e3%81%ae%e4%bd%bf%e7%94%a8%e4%be%8b">コンピュータでの使用例</a><ul>
 <li><a href="#%e5%bf%85%e8%a6%81%e3%81%aa%e3%83%91%e3%83%83%e3%82%b1%e3%83%bc%e3%82%b8">必要なパッケージ</a></li>
 <li><a href="#%e3%82%b3%e3%83%9e%e3%83%b3%e3%83%89">コマンド</a></li>
 </ul>
@@ -99,9 +100,23 @@ $(function() {
 </ul>
 <hr  />
 <h1><a class="anchor" id="autotoc_md3"></a>
-使用例</h1>
+マイコンでの使用方法</h1>
+<p>マイコンのC++プロジェクトにこのリポジトリを追加して以下の設定を行う．</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">項目 </th><th class="markdownTableHeadNone">値  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">include directory </td><td class="markdownTableBodyNone"><code>./include</code>  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">source directory </td><td class="markdownTableBodyNone"><code>./src</code>  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">compile option </td><td class="markdownTableBodyNone"><code>-std=c++14 -fconcepts</code>  </td></tr>
+</table>
+<hr  />
+<h1><a class="anchor" id="autotoc_md5"></a>
+コンピュータでの使用例</h1>
 <p>ターミナルでの使用例</p>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
 必要なパッケージ</h2>
 <ul>
 <li><a href="https://git-scm.com/">git</a></li>
@@ -109,7 +124,7 @@ $(function() {
 <li><a href="https://www.gnu.org/software/make/">make</a></li>
 <li><a href="https://cmake.org/">cmake</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 コマンド</h2>
 <p>サンプルコード <a href="examples/search/main.cpp">examples/search/main.cpp</a> を実行するコマンドの例</p>
 <div class="fragment"><div class="line">## 迷路データ(サブモジュール)を含めて複製</div>
@@ -125,10 +140,10 @@ $(function() {
 <div class="line">make search</div>
 <div class="line">## コマンドラインにアニメーションが流れる</div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md7"></a>
+<h1><a class="anchor" id="autotoc_md9"></a>
 アルゴリズムの概要</h1>
 <p>以下で説明するアルゴリズムを用いることで，どんな迷路に対しても少なくともひとつの経路を見つけ出すことができる． ただし，目的地が封鎖されていて経路が存在しない場合はその事実を検出して終了する．</p>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<h2><a class="anchor" id="autotoc_md10"></a>
 迷路探索に必要な処理</h2>
 <p>マイクロマウスで迷路探索を行うためには，主に以下の処理が必要となる．</p>
 <ul>
@@ -138,7 +153,7 @@ $(function() {
 <li>スタート区画からゴール区画(の集合)への最短経路を導出する処理 (※)</li>
 </ul>
 <p>※初期段階では最短経路導出処理は移動経路導出処理で代用できる．</p>
-<h2><a class="anchor" id="autotoc_md9"></a>
+<h2><a class="anchor" id="autotoc_md11"></a>
 探索走行アルゴリズム</h2>
 <p>未知の迷路を探索し，スタートからゴールまでの最短経路を発見するアルゴリズム．</p>
 <ol type="1">
@@ -170,7 +185,7 @@ $(function() {
 </ol>
 </li>
 </ol>
-<h2><a class="anchor" id="autotoc_md10"></a>
+<h2><a class="anchor" id="autotoc_md12"></a>
 移動経路導出アルゴリズム</h2>
 <p>探索中に用いる，「ある始点区画」から「ある目的区画集合」への「移動経路」導出処理．</p>
 <ol type="1">
@@ -190,7 +205,7 @@ $(function() {
 </ol>
 </li>
 </ol>
-<h2><a class="anchor" id="autotoc_md11"></a>
+<h2><a class="anchor" id="autotoc_md13"></a>
 最短経路導出アルゴリズム</h2>
 <p>探索中や最短走行前に用いる，「スタート区画」から「ゴール区画の集合」への「最短経路」の導出処理．</p>
 <p>一番簡単な実装としては， 移動経路導出アルゴリズムの始点をスタート区画に， 目的区画をゴールにすればよい． しかしながら，それだけだとターンの多い経路になりがちなので， 直線部分の加速や各ターンのコストを考慮した最短経路が導出できるとよい．</p>
@@ -215,12 +230,12 @@ $(function() {
 </li>
 </ol>
 <hr  />
-<h1><a class="anchor" id="autotoc_md13"></a>
+<h1><a class="anchor" id="autotoc_md15"></a>
 ライブラリ構成</h1>
-<h2><a class="anchor" id="autotoc_md14"></a>
+<h2><a class="anchor" id="autotoc_md16"></a>
 名前空間</h2>
 <p>この迷路探索ライブラリは，すべて <code><a class="el" href="namespaceMazeLib.html" title="迷路探索ライブラリはすべてこの名前空間に格納されている．">MazeLib</a></code> 名前空間に収められている．</p>
-<h2><a class="anchor" id="autotoc_md15"></a>
+<h2><a class="anchor" id="autotoc_md17"></a>
 クラス・構造体・共用体・型</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -244,7 +259,7 @@ $(function() {
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="classMazeLib_1_1StepMap.html" title="足立法のためのステップマップを管理するクラス">MazeLib::StepMap</a> </td><td class="markdownTableBodyNone">歩数マップ </td><td class="markdownTableBodyNone">足立法の歩数マップを表すクラス．移動経路導出に使用．  </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md16"></a>
+<h2><a class="anchor" id="autotoc_md18"></a>
 定数</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -253,16 +268,16 @@ $(function() {
 <td class="markdownTableBodyNone"><a class="el" href="namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa" title="迷路の1辺の区画数の定数．">MazeLib::MAZE_SIZE</a> </td><td class="markdownTableBodyNone">迷路の一辺の区画数 </td><td class="markdownTableBodyNone">正方形の迷路を仮定．16 or 32 などの定数を定義．  </td></tr>
 </table>
 <hr  />
-<h1><a class="anchor" id="autotoc_md18"></a>
+<h1><a class="anchor" id="autotoc_md20"></a>
 リファレンスの生成</h1>
 <p>コード中のコメントは <a href="http://www.doxygen.jp/">Doxygen</a> に準拠しているので，APIリファレンスを自動生成することができる．</p>
-<h2><a class="anchor" id="autotoc_md19"></a>
+<h2><a class="anchor" id="autotoc_md21"></a>
 追加で必要なパッケージ</h2>
 <ul>
 <li><a href="http://www.doxygen.jp/">doxygen</a></li>
 <li><a href="http://www.graphviz.org/">graphviz</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md20"></a>
+<h2><a class="anchor" id="autotoc_md22"></a>
 生成方法</h2>
 <div class="fragment"><div class="line"># CMake により初期化されたディレクトリへ移動する</div>
 <div class="line">cd build</div>
