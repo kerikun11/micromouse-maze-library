@@ -114,7 +114,6 @@ bool RobotBase::generalSearchRun() {
     queueNextDirections(getNextDirections());
     /* 探索中断を確認 */
     if (break_flag) {
-      break_flag = false;
       logi << "the break flag was set" << std::endl;
       stopDequeue();
       return false;
@@ -150,6 +149,8 @@ bool RobotBase::generalSearchRun() {
   waitForEndAction();
   stopDequeue();
   backupMazeToFlash();
+  if (break_flag)
+    return false;
   return true;
 }
 
