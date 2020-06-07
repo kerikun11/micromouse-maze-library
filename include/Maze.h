@@ -14,9 +14,6 @@
 #include <iostream>
 #include <vector>
 
-#include <cstring>
-#include <string>
-
 /**
  * @brief 迷路探索ライブラリはすべてこの名前空間に格納されている．
  */
