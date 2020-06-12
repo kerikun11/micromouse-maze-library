@@ -4,7 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-import maze as MazeLib  # calls build/maze.so
+import MazeLib  # calls $PYTHONPATH/MazeLib.so
 
 
 def plot_maze():
@@ -12,8 +12,10 @@ def plot_maze():
         print(d)
     # plt.show()
     print(MazeLib.Direction(9))
-    print(MazeLib.AbsoluteDirection.East)
+    print(MazeLib.Direction.East)
+    print(MazeLib.Direction.AbsoluteDirection.East)
     # print(MazeLib.East)
+    print(MazeLib.Position.SIZE)
 
 
 plot_maze()

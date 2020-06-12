@@ -19,5 +19,5 @@ add_compile_options(-fdiagnostics-color=always) # colorized output for gcc
 add_subdirectory(src)
 add_subdirectory(docs)
 add_subdirectory(examples)
-add_subdirectory(python)
+add_subdirectory(pybind11)
 add_subdirectory(test)

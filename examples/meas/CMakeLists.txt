@@ -18,9 +18,15 @@ add_custom_target(${CUSTOM_TARGET_NAME}
   DEPENDS ${TARGET_NAME} mazelib
   USES_TERMINAL
 )
+# find python interpreter
+find_package(Python3)
+if(NOT Python3_FOUND)
+  message(WARNING "Python3 not found in your environment! skipping...")
+  RETURN()
+endif()
 # make a custom target to plot
 add_custom_target(${CUSTOM_TARGET_NAME}_plot
-  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/plot.py
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/plot.py
   WORKING_DIRECTORY ${CMAKE_HOME_DIRECTORY}
   USES_TERMINAL
 )
