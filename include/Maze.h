@@ -68,7 +68,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 #define loge std::ostream(0)
 #endif
 #endif
-/** @brief Log Stream (Warnning) */
+/** @brief Log Stream (Warning) */
 #ifndef logw
 #if 1
 #define logw (std::cout << C_YE "[W][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
@@ -652,7 +652,7 @@ public:
    * @param is *.maze 形式のファイルの input-stream
    */
   bool parse(std::istream &is);
-  bool parse(std::string filepath) {
+  bool parse(const std::string &filepath) {
     std::ifstream ifs(filepath);
     return ifs ? parse(ifs) : false;
   }
