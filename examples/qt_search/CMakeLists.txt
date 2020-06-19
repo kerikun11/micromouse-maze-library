@@ -1,7 +1,7 @@
 ## author: Ryotaro Onuki <kerikun11+github@gmail.com>
 ## date: 2020.05.14
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Widgets)
 if(NOT Qt5_FOUND)
   message(WARNING "Qt5 Not Found. skipping...")
   RETURN()
@@ -24,8 +24,8 @@ add_executable(${TARGET_NAME}
   ${UI_HEADERS}
   ${CODE_FILES}
 )
-target_include_directories(${TARGET_NAME} PRIVATE
-  ${CMAKE_HOME_DIRECTORY}/include # mazelib
+target_include_directories(${TARGET_NAME}
+  PRIVATE ${CMAKE_HOME_DIRECTORY}/include # mazelib
 )
 target_link_libraries(${TARGET_NAME}
   Qt5::Widgets

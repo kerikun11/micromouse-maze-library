@@ -15,13 +15,11 @@ set(TARGET_NAME example_qt_maze)
 add_executable(${TARGET_NAME}
   ${CODE_FILES}
 )
-target_include_directories(${TARGET_NAME} PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_HOME_DIRECTORY}/include # mazelib
+target_include_directories(${TARGET_NAME}
+  PRIVATE ${CMAKE_HOME_DIRECTORY}/include # mazelib
 )
 target_link_libraries(${TARGET_NAME}
   Qt5::Widgets
-  Qt5::Charts
   mazelib
 )
 ## qt_maze
