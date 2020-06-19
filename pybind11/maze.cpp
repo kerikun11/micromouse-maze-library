@@ -23,9 +23,11 @@ PYBIND11_MODULE(MazeLib, m) {
   /* Direction */
   py::class_<Direction> direction(m, "Direction");
   direction.def(py::init<int>())
+      .def(py::init<enum Direction::AbsoluteDirection>())
       .def("getAlong4", &Direction::getAlong4)
       .def("getDiag4", &Direction::getDiag4)
       .def("__str__", &Direction::toChar)
+      .def("__int__", [](const Direction &d) { return uint8_t(d); })
       //
       ;
   py::enum_<Direction::AbsoluteDirection>(direction, "AbsoluteDirection")
@@ -48,6 +50,7 @@ PYBIND11_MODULE(MazeLib, m) {
       .value("Right", Direction::Right)
       .value("Right45", Direction::Right45)
       .export_values();
+  py::implicitly_convertible<Direction::AbsoluteDirection, Direction>();
   py::class_<Directions>(m, "Directions");
 
   /* Position */
@@ -206,6 +209,16 @@ PYBIND11_MODULE(MazeLib, m) {
            })
       /* parse */
       .def("parse", py::overload_cast<const std::string &>(&Maze::parse))
+      /* setters and getters */
+      .def("setGoals", &Maze::setGoals)
+      .def("setStart", &Maze::setStart)
+      .def("getGoals", &Maze::getGoals)
+      .def("getStart", &Maze::getStart)
+      .def("getWallRecords", &Maze::getWallRecords)
+      .def("getMinX", &Maze::getMinX)
+      .def("getMinY", &Maze::getMinY)
+      .def("getMaxX", &Maze::getMaxX)
+      .def("getMaxY", &Maze::getMaxY)
       //
       ;
 }
