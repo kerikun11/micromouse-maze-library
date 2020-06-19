@@ -1,7 +1,7 @@
 ## author: Ryotaro Onuki <kerikun11+github@gmail.com>
 ## date: 2020.05.14
 
-find_package(Qt5 COMPONENTS Widgets Charts REQUIRED)
+find_package(Qt5 COMPONENTS Widgets)
 if(NOT Qt5_FOUND)
   message(WARNING "Qt5 Not Found. skipping...")
   RETURN()
