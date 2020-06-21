@@ -6,13 +6,20 @@
  * @copyright Copyright (c) 2020 Ryotaro Onuki
  */
 #include <Maze.h>
+#include <StepMap.h>
 
 #include <pybind11/iostream.h>
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 
 #include <sstream>
+
+// see
+// https://pybind11.readthedocs.io/en/stable/advanced/cast/stl.html#making-opaque-types
+PYBIND11_MAKE_OPAQUE(MazeLib::Directions);
+PYBIND11_MAKE_OPAQUE(MazeLib::Positions);
 
 PYBIND11_MODULE(MazeLib, m) {
   namespace py = pybind11;
@@ -51,7 +58,9 @@ PYBIND11_MODULE(MazeLib, m) {
       .value("Right45", Direction::Right45)
       .export_values();
   py::implicitly_convertible<Direction::AbsoluteDirection, Direction>();
-  py::class_<Directions>(m, "Directions");
+  py::implicitly_convertible<Direction::RelativeDirection, Direction>();
+  //   py::class_<Directions>(m, "Directions");
+  py::bind_vector<Directions>(m, "Directions");
 
   /* Position */
   py::class_<Position> position(m, "Position");
@@ -78,7 +87,8 @@ PYBIND11_MODULE(MazeLib, m) {
            })
       //
       ;
-  py::class_<Positions>(m, "Positions");
+  //   py::class_<Positions>(m, "Positions");
+  py::bind_vector<Positions>(m, "Positions");
 
   /* Pose */
   py::class_<Pose>(m, "Pose")
@@ -97,11 +107,15 @@ PYBIND11_MODULE(MazeLib, m) {
       ;
 
   /* WallIndex */
-  py::class_<WallIndex>(m, "WallIndex")
-      .def(py::init<int8_t, int8_t, int8_t>(), py::arg("x") = 0,
-           py::arg("y") = 0, py::arg("z") = 0)
+  py::class_<WallIndex> wall_index(m, "WallIndex");
+  wall_index.attr("SIZE") = py::cast(WallIndex::SIZE);
+  wall_index
+      //  .def(py::init<int8_t, int8_t, int8_t>(), py::arg("x") = 0,
+      //       py::arg("y") = 0, py::arg("z") = 0)
+      .def(py::init<int8_t, int8_t, int8_t>())
       .def(py::init<const Position &, const Direction>())
-      .def(py::init<const uint16_t>())
+      //  .def(py::init<const uint16_t>())
+      .def(py::init<const uint16_t>(), py::arg("index") = 0)
       .def(py::self == py::self)
       .def(py::self != py::self)
       .def("getIndex", &WallIndex::getIndex)
@@ -219,6 +233,21 @@ PYBIND11_MODULE(MazeLib, m) {
       .def("getMinY", &Maze::getMinY)
       .def("getMaxX", &Maze::getMaxX)
       .def("getMaxY", &Maze::getMaxY)
+      //
+      ;
+
+  /* StepMap */
+  py::class_<StepMap>(m, "StepMap")
+      .def(py::init<>())
+      .def("calcShortestDirections",
+           py::overload_cast<const Maze &, const bool, const bool>(
+               &StepMap::calcShortestDirections),
+           py::arg("maze"), py::arg("known_only") = true,
+           py::arg("simple") = false)
+      .def_static("appendStraightDirections",
+                  &StepMap::appendStraightDirections, py::arg("maze"),
+                  py::arg("directions"), py::arg("known_only"),
+                  py::arg("diag_enabled"))
       //
       ;
 }
