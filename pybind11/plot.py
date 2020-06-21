@@ -48,13 +48,39 @@ class MazeDrawer:
         plt.ylim([-1/2, size-1/2])
         plt.tight_layout()
 
-    def draw_path(self, start, directions, cell_node=True):
-        p = start
+    def draw_path(self, start, directions, color='y'):
         lines = []
+        p = start
         for d in directions:
             p_next = p.next(d)
-            line, = plt.plot([p.x, p_next.x], [p.y, p_next.y], c='y')
+            x, y = [p.x, p_next.x], [p.y, p_next.y]
+            line, = plt.plot(x, y, c=color)
             p = p_next
+            lines.append(line)
+        self.paths.append(lines)
+
+    def draw_path_wall(self, start, directions, color='y'):
+        p = start
+        indexes = []
+        for d in directions:
+            indexes.append(MazeLib.WallIndex(p, d))
+            p = p.next(d)
+        lines = []
+        for i in range(len(indexes)-1):
+            w = indexes[i]
+            p = w.getPosition()
+            w_next = indexes[i+1]
+            p_next = w_next.getPosition()
+            if int(w.getDirection()) == MazeLib.Direction.East:
+                x, y = p.x+1/2, p.y
+            else:
+                x, y = p.x, p.y+1/2
+            if int(w_next.getDirection()) == MazeLib.Direction.East:
+                x_next, y_next = p_next.x+1/2, p_next.y
+            else:
+                x_next, y_next = p_next.x, p_next.y+1/2
+            x, y = [x, x_next], [y, y_next]
+            line, = plt.plot(x, y, c=color)
             lines.append(line)
         self.paths.append(lines)
 
@@ -102,13 +128,23 @@ class MazeDrawer:
             while path:
                 path.pop(0).remove()
         maze = self.maze
+        # step_map
         step_map = MazeLib.StepMap()
         sd = step_map.calcShortestDirections(maze)
         if not sd:
             print("Failed to Find any Path!")
-        step_map.appendStraightDirections(
+        MazeLib.StepMap.appendStraightDirections(
             maze, sd, known_only=True, diag_enabled=False)
-        self.draw_path(maze.getStart(), sd)
+        self.draw_path(maze.getStart(), sd, color='c')
+        # step_map_wall
+        step_map_wall = MazeLib.StepMapWall()
+        sd = step_map_wall.calcShortestDirections(maze)
+        if not sd:
+            print("Failed to Find any Path!")
+        sd = step_map_wall.convertWallIndexDirectionsToPositionDirections(sd)
+        MazeLib.StepMap.appendStraightDirections(
+            maze, sd, known_only=True, diag_enabled=True)
+        self.draw_path_wall(maze.getStart(), sd, color='y')
 
 
 def plot_maze():

@@ -7,6 +7,7 @@
  */
 #include <Maze.h>
 #include <StepMap.h>
+#include <StepMapWall.h>
 
 #include <pybind11/iostream.h>
 #include <pybind11/operators.h>
@@ -248,6 +249,20 @@ PYBIND11_MODULE(MazeLib, m) {
                   &StepMap::appendStraightDirections, py::arg("maze"),
                   py::arg("directions"), py::arg("known_only"),
                   py::arg("diag_enabled"))
+      //
+      ;
+
+  /* StepMapWall */
+  py::class_<StepMapWall>(m, "StepMapWall")
+      .def(py::init<>())
+      .def("calcShortestDirections",
+           py::overload_cast<const Maze &, const bool, const bool>(
+               &StepMapWall::calcShortestDirections),
+           py::arg("maze"), py::arg("known_only") = true,
+           py::arg("simple") = false)
+      .def_static("convertWallIndexDirectionsToPositionDirections",
+                  &StepMapWall::convertWallIndexDirectionsToPositionDirections,
+                  py::arg("src"), py::arg("start") = WallIndex(0, 0, 1))
       //
       ;
 }
