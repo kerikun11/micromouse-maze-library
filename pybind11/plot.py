@@ -53,7 +53,7 @@ class MazeDrawer:
         lines = []
         for d in directions:
             p_next = p.next(d)
-            line, = plt.plot([p.x, p_next.x], [p.y, p_next.y], c='m')
+            line, = plt.plot([p.x, p_next.x], [p.y, p_next.y], c='y')
             p = p_next
             lines.append(line)
         self.paths.append(lines)
@@ -83,7 +83,7 @@ class MazeDrawer:
         self.draw_wall(maze, wi)
         self.update_path()
         plt.draw()
-    
+
     def find_nearest_wall(self, event):
         x, y = event.xdata, event.ydata
         xf, xi = math.modf(x)
@@ -110,25 +110,19 @@ class MazeDrawer:
             maze, sd, known_only=True, diag_enabled=False)
         self.draw_path(maze.getStart(), sd)
 
+
 def plot_maze():
-    filepath = '../mazedata/data/32MM2019HX.maze'
+    # filepath = '../mazedata/data/32MM2019HX.maze'
     # filepath = '../mazedata/data/16MM2019CX.maze'
+    filepath = '../mazedata/data/16MM2019H_semi.maze'
     maze = MazeLib.Maze()
     if not maze.parse(filepath):
         print("Failed to Parse Maze File: ", filepath)
-    size = max(maze.getMaxX(), maze.getMaxY()) + 1
-    # maze.print(size)
-
-    step_map = MazeLib.StepMap()
-    sd = step_map.calcShortestDirections(maze)
-    if not sd:
-        print("Failed to Find any Path!")
-    step_map.appendStraightDirections(
-        maze, sd, known_only=True, diag_enabled=False)
+    size = maze.getMaxX() + 1
 
     maze_drawer = MazeDrawer(maze, size)
     maze_drawer.attach_wall_toggle()
-    maze_drawer.draw_path(maze.getStart(), sd)
+    maze_drawer.update_path()
 
     plt.show()
 
