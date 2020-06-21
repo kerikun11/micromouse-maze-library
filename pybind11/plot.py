@@ -42,13 +42,16 @@ class MazeDrawer:
         plt.gca().set_aspect('equal')  # set the x and y axes to the same scale
         plt.gca().set_facecolor(background_color)
         plt.gcf().set_facecolor(background_color)
+        plt.rcParams['savefig.facecolor'] = background_color
         plt.xticks(range(0, size+1, 1), color=label_color)
         plt.yticks(range(0, size+1, 1), color=label_color)
         plt.xlim([-1/2, size-1/2])
         plt.ylim([-1/2, size-1/2])
         plt.tight_layout()
 
-    def draw_path(self, start, directions, color='y'):
+    def draw_path(self, start, directions, color='y', diag_enabled=False):
+        if diag_enabled:
+            return self.draw_path_wall(start, directions, color)
         lines = []
         p = start
         for d in directions:
@@ -130,27 +133,37 @@ class MazeDrawer:
         maze = self.maze
         # step_map
         step_map = MazeLib.StepMap()
-        sd = step_map.calcShortestDirections(maze)
+        sd = step_map.calcShortestDirections(maze, simple=True)
         if not sd:
             print("Failed to Find any Path!")
         MazeLib.StepMap.appendStraightDirections(
             maze, sd, known_only=True, diag_enabled=False)
-        self.draw_path(maze.getStart(), sd, color='c')
+        self.draw_path(maze.getStart(), sd, color='b')
         # step_map_wall
         step_map_wall = MazeLib.StepMapWall()
-        sd = step_map_wall.calcShortestDirections(maze)
-        if not sd:
-            print("Failed to Find any Path!")
+        sd = step_map_wall.calcShortestDirections(maze, simple=True)
         sd = step_map_wall.convertWallIndexDirectionsToPositionDirections(sd)
         MazeLib.StepMap.appendStraightDirections(
             maze, sd, known_only=True, diag_enabled=True)
-        self.draw_path_wall(maze.getStart(), sd, color='y')
+        self.draw_path_wall(maze.getStart(), sd, color='g')
+        # step_map_slalom
+        step_map = MazeLib.StepMapSlalom()
+        for diag_enabled in [False, True]:
+            sd = step_map.calcShortestDirections(
+                maze, diag_enabled=diag_enabled)
+            MazeLib.StepMap.appendStraightDirections(
+                maze, sd, known_only=True, diag_enabled=diag_enabled)
+            c = 'y' if diag_enabled else 'c'
+            self.draw_path(maze.getStart(), sd, color=c,
+                           diag_enabled=diag_enabled)
 
 
 def plot_maze():
     # filepath = '../mazedata/data/32MM2019HX.maze'
+    # filepath = '../mazedata/data/32MM2018HX.maze'
+    filepath = '../mazedata/data/32MM2015HX.maze'
     # filepath = '../mazedata/data/16MM2019CX.maze'
-    filepath = '../mazedata/data/16MM2019H_semi.maze'
+    # filepath = '../mazedata/data/16MM2019H_semi.maze'
     maze = MazeLib.Maze()
     if not maze.parse(filepath):
         print("Failed to Parse Maze File: ", filepath)

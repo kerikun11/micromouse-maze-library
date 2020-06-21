@@ -9,6 +9,8 @@
 #include <StepMap.h>
 #include <StepMapWall.h>
 
+#include <StepMapSlalom.h>
+
 #include <pybind11/iostream.h>
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
@@ -30,12 +32,15 @@ PYBIND11_MODULE(MazeLib, m) {
 
   /* Direction */
   py::class_<Direction> direction(m, "Direction");
+  direction.attr("Max") = py::cast(Direction::Max);
   direction.def(py::init<int>())
       .def(py::init<enum Direction::AbsoluteDirection>())
       .def("getAlong4", &Direction::getAlong4)
       .def("getDiag4", &Direction::getDiag4)
       .def("__str__", &Direction::toChar)
       .def("__int__", [](const Direction &d) { return uint8_t(d); })
+      .def(py::self == py::self)
+      .def(py::self != py::self)
       //
       ;
   py::enum_<Direction::AbsoluteDirection>(direction, "AbsoluteDirection")
@@ -263,6 +268,41 @@ PYBIND11_MODULE(MazeLib, m) {
       .def_static("convertWallIndexDirectionsToPositionDirections",
                   &StepMapWall::convertWallIndexDirectionsToPositionDirections,
                   py::arg("src"), py::arg("start") = WallIndex(0, 0, 1))
+      //
+      ;
+
+  /* StepMapSlalom */
+  py::class_<StepMapSlalom> step_map_slalom(m, "StepMapSlalom");
+  py::class_<StepMapSlalom::EdgeCost>(step_map_slalom, "EdgeCost")
+      .def(py::init<>())
+      //
+      ;
+  step_map_slalom
+      .def(py::init<>())
+      //  .def(
+      //      "calcShortestDirections",
+      //      [](StepMapSlalom &map, const Maze &maze, const bool known_only,
+      //         const bool diag_enabled) {
+      //        Directions shortest_dirs;
+      //        StepMapSlalom::EdgeCost edge_cost;
+      //        map.calcShortestDirections(maze, edge_cost, shortest_dirs,
+      //                                   known_only, diag_enabled);
+      //        return shortest_dirs;
+      //      },
+      //      py::arg("maze"), py::arg("known_only") = true,
+      //      py::arg("diag_enabled") = true)
+      .def(
+          "calcShortestDirections",
+          [](StepMapSlalom &map, const Maze &maze,
+             const StepMapSlalom::EdgeCost &edge_cost, const bool known_only,
+             const bool diag_enabled) {
+            Directions shortest_dirs;
+            map.calcShortestDirections(maze, edge_cost, shortest_dirs,
+                                       known_only, diag_enabled);
+            return shortest_dirs;
+          },
+          py::arg("maze"), py::arg("edge_cost") = StepMapSlalom::EdgeCost(),
+          py::arg("known_only") = true, py::arg("diag_enabled") = true)
       //
       ;
 }
