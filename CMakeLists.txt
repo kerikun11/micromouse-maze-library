@@ -15,9 +15,9 @@ add_compile_options(-fconcepts) # for use of ‘auto’ in parameter declaration
 add_compile_options(-mno-ms-bitfields) # for use of '__attribute__((__packed__))' on MSYS
 add_compile_options(-fdiagnostics-color=always) # colorized output for gcc
 
-## add modules
+## add components
 add_subdirectory(src)
 add_subdirectory(docs)
 add_subdirectory(examples)
-add_subdirectory(pybind11)
-add_subdirectory(test)
+add_subdirectory(test EXCLUDE_FROM_ALL)
+add_subdirectory(pybind11 EXCLUDE_FROM_ALL)
