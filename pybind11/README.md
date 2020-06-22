@@ -1,4 +1,4 @@
-# MicroMouse Control Module in Python
+# MicroMouse Maze Module in Python
 
 C++ライブラリをPythonから呼び出すためのサブプロジェクト．
 
@@ -27,13 +27,13 @@ pacman -S --needed mingw-w64-x86_64-pybind11
 
 pybind11を用いてC++ライブラリをラッピングするPythonモジュールを定義した．
 
-新たにC++ファイル [ctrl.cpp](ctrl.cpp) を導入して，名前空間 `ctrl` に含まれるクラスのラッパーを実装した．
+新たにC++ファイル [MazeLib.cpp](MazeLib.cpp) を導入して，名前空間 `MazeLib` に含まれるクラスのラッパーを実装した．
 
-このプロジェクトをビルドすると，動的ライブラリ `ctrl.so` が得られる．
+このプロジェクトをビルドすると，動的ライブラリ `MazeLib.so` が得られる．
 
-これはPythonモジュールになっており，任意のPythonスクリプトから `import ctrl` することができる．
+これはPythonモジュールになっており，任意のPythonスクリプトから `import MazeLib` することができる．
 
-このようにして `ctrl.cpp` で定義されたC++ライブラリにPythonからアクセスすることができる．
+このようにして `MazeLib.cpp` で定義されたC++ライブラリにPythonからアクセスすることができる．
 
 ## 実行例
 
@@ -42,7 +42,7 @@ pybind11を用いてC++ライブラリをラッピングするPythonモジュー
 ```sh
 # CMake ビルドディレクトリへ移動
 cd ../build
-# Pythonモジュール ctrl.so の生成
+# Pythonモジュール MazeLib.so の生成
 make all
 # 可視化用Pythonスクリプト ./plot.py の実行
 make pybind11_plot
