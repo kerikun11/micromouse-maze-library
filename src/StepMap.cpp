@@ -269,12 +269,20 @@ const Directions StepMap::getNextDirectionCandidates(const Maze &maze,
             [&](const Direction d1, const Direction d2) {
               return getStep(focus.p.next(d1)) < getStep(focus.p.next(d2));
             });
+#if 1
   /* 未知壁優先で並べ替え(未知壁同士ならばコストが低い順) */
   std::sort(dirs.begin(), dirs.end(),
             [&](const Direction d1, const Direction d2) {
               return (maze.unknownCount(focus.p.next(d1)) &&
                       !maze.unknownCount(focus.p.next(d2)));
             });
+#endif
+#if 1
+  /* 直進優先に並べ替え */
+  std::sort(dirs.begin(), dirs.end(),
+            [&](const Direction d1, const Direction d2
+                __attribute__((unused))) { return d1 == focus.d; });
+#endif
   return dirs;
 }
 void StepMap::appendStraightDirections(const Maze &maze,

@@ -12,23 +12,12 @@ class CLRobot : public CLRobotBase {
 public:
   CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
   bool display = 0;
-  bool continue_straight_if_no_front_wall = false;
-  bool continue_straight_if_no_front_wall_prev = false;
 
 protected:
   virtual void
   calcNextDirectionsPostCallback(SearchAlgorithm::State prevState,
                                  SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
-    const auto d = !getNextDirections().empty() ? getNextDirections().back()
-                                                : current_pose.d;
-    continue_straight_if_no_front_wall_prev =
-        continue_straight_if_no_front_wall;
-    continue_straight_if_no_front_wall =
-        newState != SearchAlgorithm::GOING_TO_GOAL &&
-        newState != SearchAlgorithm::IDENTIFYING_POSITION &&
-        !getNextDirectionCandidates().empty() &&
-        getNextDirectionCandidates()[0] == d;
     csv << t_dur << std::endl;
     if (newState == prevState)
       return;
@@ -46,15 +35,10 @@ protected:
       // std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 #if 0
-    /* 未知区間加速のバグ探し */
-    if (continue_straight_if_no_front_wall_prev &&
-        getNextDirections().empty() &&
-        !maze.isWall(current_pose.p, current_pose.d) &&
-        action != Action::ST_FULL) {
-      printInfo();
-      logw << "in accel" << std::endl;
-      getc(stdin);
-    }
+    /* 袋小路以外の転回検出 */
+    if (action == SearchAction::ROTATE_180 &&
+        maze_target.wallCount(real.p) != 3)
+      logi << "it's not dead end!" << std::endl, getc(stdin);
 #endif
     CLRobotBase::queueAction(action);
   }

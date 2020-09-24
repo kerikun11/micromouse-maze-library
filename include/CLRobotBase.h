@@ -184,7 +184,8 @@ public:
 
 protected:
   Maze maze;
-  SearchAction action_prev = START_STEP;
+  SearchAction action_prev = SearchAction::START_STEP;
+  bool unknown_accel_prev = false;
 
   virtual void senseWalls(bool &left, bool &front, bool &right) override {
     left = !maze_target.canGo(real.p, real.d + Direction::Left);
@@ -230,6 +231,19 @@ protected:
     // maze.backupWallRecordsToFile("maze.wallRecords"); //< (takes some time)
   }
   virtual void queueAction(const SearchAction action) override {
+#if 1
+    /* 未知区間加速のバグ探し */
+    if (unknown_accel_prev && action_prev == SearchAction::ST_FULL &&
+        action != SearchAction::ST_FULL && getNextDirections().size() == 0 &&
+        !maze.isWall(current_pose.p, current_pose.d)) {
+      printInfo();
+      logw << "not straight in unknown accel" << std::endl;
+      getc(stdin);
+    }
+    unknown_accel_prev = getState() != SearchAlgorithm::GOING_TO_GOAL &&
+                         getState() != SearchAlgorithm::IDENTIFYING_POSITION &&
+                         getUnknownAccelFlag();
+#endif
     const auto goals = maze.getGoals();
     if (std::find(goals.cbegin(), goals.cend(), current_pose.p) != goals.cend())
       real_visit_goal = true;
@@ -273,11 +287,15 @@ protected:
       step++;
       break;
     case RobotBase::ST_FULL:
-      if (action_prev == action)
-        cost -= getTimeCost(action) / 2;
       if (!maze_target.canGo(real.p, real.d))
         crashed();
       real.p = real.p.next(real.d);
+      /* 未知区間加速 */
+      if (getUnknownAccelFlag() && action_prev == action)
+        cost -= getTimeCost(action) / 3;
+      /* 既知区間加速 */
+      if (getNextDirections().size() > 1 && action_prev == action)
+        cost -= getTimeCost(action) / 2;
       f++;
       step++;
       break;

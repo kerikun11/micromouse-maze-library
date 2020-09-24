@@ -26,6 +26,8 @@ void Agent::printInfo(const bool show_maze, const Pose &pose,
             << "Force Start: " << (isForceBackToStart ? "true " : "false")
             << ", "
             << "Force Goal: " << (isForceGoingToGoal ? "true " : "false")
+            << ", "
+            << "Unknown Accel: " << (getUnknownAccelFlag() ? "true " : "false")
             << std::endl;
   std::cout << "Known: ";
   for (const auto d : getNextDirections())
@@ -36,7 +38,7 @@ void Agent::printInfo(const bool show_maze, const Pose &pose,
     std::cout << d.toChar();
   std::cout << std::endl;
   if (state == SearchAlgorithm::IDENTIFYING_POSITION)
-    std::cout << "Match Count: \t" << matchCount << std::endl;
+    std::cout << "Match Count: \t" << getMatchCount() << std::endl;
 }
 
 } // namespace MazeLib

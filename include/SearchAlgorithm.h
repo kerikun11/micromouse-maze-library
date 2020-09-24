@@ -42,6 +42,17 @@ public:
    * @brief Stateの表示用文字列を返す関数
    */
   static const char *getStateString(const State s);
+  /**
+   * @brief 計算結果の構造体
+   */
+  struct NextDirections {
+    State state = State::START;           /**< 探索状態 */
+    Directions next_directions_known;     /**< 既地区間移動候補列 */
+    Directions next_direction_candidates; /**< 未知区間移動候補順位 */
+    bool unknown_accel_flag = false; /**< 未知区間加速可能フラグ */
+    Pose known_end;                  /**< 既地区間終了時の姿勢 */
+    int match_count = 0;             /**< 自己位置同定の候補数 */
+  };
 
 public:
   SearchAlgorithm(Maze &maze) : maze(maze) {}
@@ -56,17 +67,15 @@ public:
   bool updateWall(const State state, const Position &p, const Direction d,
                   const bool b);
   void resetLastWalls(const State state, const int num = 1);
-  void updatePose(State &state, Pose &current_pose, bool &isForceGoingToGoal);
+  void updatePose(const State &state, Pose &current_pose,
+                  bool &isForceGoingToGoal);
 
   /**
    * @brief 探索
    */
-  Result calcNextDirections(State &state, Pose &current_pose,
-                            Directions &nextDirections,
-                            Directions &nextDirectionCandidates,
+  Result calcNextDirections(NextDirections &next_directions, Pose &current_pose,
                             bool &isPositionIdentifying,
-                            bool &isForceBackToStart, bool &isForceGoingToGoal,
-                            int &matchCount);
+                            bool &isForceBackToStart, bool &isForceGoingToGoal);
   bool determineNextDirection(const State state, const Pose &pose,
                               const Directions &nextDirectionCandidates,
                               Direction &nextDirection) const;
@@ -148,30 +157,25 @@ private:
   /**
    * @brief 各状態での進行方向列導出関数
    */
-  Result calcNextDirectionsSearchForGoal(const Pose &current_pose,
-                                         Directions &nextDirectionsKnown,
-                                         Directions &nextDirectionCandidates);
+  Result calcNextDirectionsSearchForGoal(NextDirections &next_directions,
+                                         const Pose &current_pose);
+  Result calcNextDirectionsSearchAdditionally(NextDirections &next_directions,
+                                              const Pose &current_pose);
+  Result calcNextDirectionsBackingToStart(NextDirections &next_directions,
+                                          const Pose &current_pose);
+  Result calcNextDirectionsGoingToGoal(NextDirections &next_directions,
+                                       const Pose &current_pose);
   Result
-  calcNextDirectionsSearchAdditionally(const Pose &current_pose,
-                                       Directions &nextDirectionsKnown,
-                                       Directions &nextDirectionCandidates);
-  Result calcNextDirectionsBackingToStart(const Pose &current_pose,
-                                          Directions &nextDirectionsKnown,
-                                          Directions &nextDirectionCandidates);
-  Result calcNextDirectionsGoingToGoal(const Pose &current_pose,
-                                       Directions &nextDirectionsKnown,
-                                       Directions &nextDirectionCandidates);
-  Result calcNextDirectionsPositionIdentification(
-      Pose &current_pose, Directions &nextDirectionsKnown,
-      Directions &nextDirectionCandidates, bool &isForceGoingToGoal,
-      int &matchCount);
+  calcNextDirectionsPositionIdentification(NextDirections &next_directions,
+                                           Pose &current_pose,
+                                           bool &isForceGoingToGoal);
   /**
    * @brief 迷路を編集してさらに優先順の精度を向上させる関数
    * @return 既知区間の最終区画
    */
-  const Position calcNextDirectionsInAdvance(
-      Maze &maze, const Positions &dest, const Pose &start_pose,
-      Directions &nextDirectionsKnown, Directions &nextDirectionCandidates);
+  const Position calcNextDirectionsInAdvance(Maze &maze, const Positions &dest,
+                                             const Pose &start_pose,
+                                             NextDirections &next_directions);
 };
 
 } // namespace MazeLib

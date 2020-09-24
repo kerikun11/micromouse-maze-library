@@ -22,7 +22,7 @@ public:
    */
   void reset() {
     maze.reset();
-    state = SearchAlgorithm::START;
+    next_directions.state = SearchAlgorithm::START;
     current_pose = Pose(Position(0, 1), Direction::North);
     isPositionIdentifying = false;
     isForceBackToStart = false;
@@ -47,7 +47,7 @@ public:
    */
   void updateCurrentPose(const Pose &new_pose) {
     current_pose = new_pose;
-    searchAlgorithm.updatePose(state, current_pose, isForceGoingToGoal);
+    searchAlgorithm.updatePose(getState(), current_pose, isForceGoingToGoal);
   }
   /**
    * @brief 次に行くべき方向を取得する
@@ -55,23 +55,24 @@ public:
   bool determineNextDirection(const Pose &pose,
                               Direction &nextDirection) const {
     return searchAlgorithm.determineNextDirection(
-        state, pose, nextDirectionCandidates, nextDirection);
+        getState(), pose, next_directions.next_direction_candidates,
+        nextDirection);
   }
   /**
    * @brief 壁を更新
    */
   bool updateWall(const Pose &pose, const bool left, const bool front,
                   const bool right) {
-    return searchAlgorithm.updateWall(state, pose, left, front, right);
+    return searchAlgorithm.updateWall(getState(), pose, left, front, right);
   }
   bool updateWall(const Position &p, const Direction d, const bool b) {
-    return searchAlgorithm.updateWall(state, p, d, b);
+    return searchAlgorithm.updateWall(getState(), p, d, b);
   }
   /**
    * @brief 壁を削除
    */
   void resetLastWalls(const int num = 1) {
-    return searchAlgorithm.resetLastWalls(state, num);
+    return searchAlgorithm.resetLastWalls(getState(), num);
   }
   /**
    * @brief 次に行くべき方向配列を計算
@@ -80,9 +81,8 @@ public:
    */
   SearchAlgorithm::Result calcNextDirections() {
     return searchAlgorithm.calcNextDirections(
-        state, current_pose, nextDirectionsKnown, nextDirectionCandidates,
-        isPositionIdentifying, isForceBackToStart, isForceGoingToGoal,
-        matchCount);
+        next_directions, current_pose, isPositionIdentifying,
+        isForceBackToStart, isForceGoingToGoal);
   }
   /**
    * @brief 最短経路を導出
@@ -110,25 +110,35 @@ public:
     isPositionIdentifying = yes;
     if (yes) {
       searchAlgorithm.positionIdentifyingInit(current_pose);
-      state = SearchAlgorithm::IDENTIFYING_POSITION;
+      next_directions.state = SearchAlgorithm::IDENTIFYING_POSITION;
       calcNextDirections(); /*< 時間がかかる処理！ */
     } else {
-      state = SearchAlgorithm::START;
+      next_directions.state = SearchAlgorithm::START;
     }
   }
   /**
    * @brief 探索状態の取得
    */
-  const SearchAlgorithm::State &getState() const { return state; }
+  const SearchAlgorithm::State &getState() const {
+    return next_directions.state;
+  }
   /**
    * @brief 次に行くべき方向配列の計算結果を取得
    */
-  const Directions &getNextDirections() const { return nextDirectionsKnown; }
+  const Directions &getNextDirections() const {
+    return next_directions.next_directions_known;
+  }
   /**
    * @brief 次に行くべき方向配列の計算結果を取得
    */
   const Directions &getNextDirectionCandidates() const {
-    return nextDirectionCandidates;
+    return next_directions.next_direction_candidates;
+  }
+  /**
+   * @brief 未知区間加速可能かどうかを取得
+   */
+  bool getUnknownAccelFlag() const {
+    return next_directions.unknown_accel_flag;
   }
   /**
    * @brief 現在姿勢を取得
@@ -152,7 +162,7 @@ public:
    * @param show_maze true:迷路も表示, false:迷路は非表示
    */
   void printInfo(const bool show_maze = true) const {
-    printInfo(show_maze, current_pose, state);
+    printInfo(show_maze, current_pose, getState());
   }
   /**
    * @brief 探索状態の表示
@@ -170,23 +180,19 @@ public:
   /**
    * @brief Get the Match Count Value
    */
-  int getMatchCount() const { return matchCount; }
+  int getMatchCount() const { return next_directions.match_count; }
 
 protected:
-  Maze &maze; /**< 使用する迷路の参照 */
-  SearchAlgorithm::State state =
-      SearchAlgorithm::START;         /**< 現在の探索状態を保持 */
+  Maze &maze;                         /**< 使用する迷路の参照 */
   Pose current_pose;                  /**< 現在の姿勢 */
   bool isForceBackToStart = false;    /**< 強制帰還モード */
   bool isForceGoingToGoal = false;    /**< 強制終点訪問モード */
   bool isPositionIdentifying = false; /**< 自己位置同定モード */
 
 private:
-  SearchAlgorithm searchAlgorithm; /**< 探索器 */
-  Directions nextDirectionsKnown;  /**< 次に行く既知方向配列 */
-  Directions nextDirectionCandidates; /**< 次に行く未知方向候補の優先順 */
-  Directions shortest_dirs;           /**< 最短経路の方向配列 */
-  int matchCount = 0; /**< 自己位置同定の候補数，表示用 */
+  SearchAlgorithm searchAlgorithm;                 /**< 探索器 */
+  SearchAlgorithm::NextDirections next_directions; /**< 次に行く既知方向配列 */
+  Directions shortest_dirs; /**< 最短経路の方向配列 */
 };
 
 } // namespace MazeLib
