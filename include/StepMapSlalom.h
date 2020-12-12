@@ -52,7 +52,7 @@ public:
     };
 
   public:
-    EdgeCost(const RunParameter rp = RunParameter()) : rp(rp) {
+    EdgeCost(const RunParameter &rp = RunParameter()) : rp(rp) {
       genCostTable();
     }
     cost_t getEdgeCostAlong(const int n) const {
@@ -71,7 +71,7 @@ public:
     }
 
   private:
-    RunParameter rp; /** @brief 走行パラメータ */
+    RunParameter rp; /**< @brief 走行パラメータ */
     /** @brief 台形加速を考慮したコストテーブル (壁沿い) */
     std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
     /** @brief 台形加速を考慮したコストテーブル (斜め) */
@@ -121,11 +121,16 @@ public:
    */
   class Index {
   private:
-    int x : 6; /**< @brief x coordinate of the cell */
-    int y : 6; /**< @brief y coordinate of the cell */
-    /** @brief position assignment in the cell, 0:East; 1:North */
-    unsigned int z : 1;
-    unsigned int nd : 3; /**< @brief direction of the node */
+    union {
+      struct {
+        int x : 6; /**< @brief x coordinate of the cell */
+        int y : 6; /**< @brief y coordinate of the cell */
+        /** @brief position assignment in the cell, 0:East; 1:North */
+        unsigned int z : 1;
+        unsigned int nd : 3; /**< @brief direction of the node */
+      } __attribute__((__packed__));
+      uint16_t data;
+    };
 
   public:
     /**
@@ -140,25 +145,27 @@ public:
     Index(const int8_t x, const int8_t y, const uint8_t z, const Direction nd)
         : x(x), y(y), z(z), nd(nd) {}
     /** @brief 冗長性を除去するコンストラクタ */
-    Index(const Position &p, const Direction d, const Direction nd)
+    Index(const Position p, const Direction d, const Direction nd)
         : x(p.x), y(p.y), nd(nd) {
       uniquify(d);
     }
     /** @brief 区画中央のコンストラクタ */
     Index(const int8_t x, const int8_t y, const Direction nd)
         : x(x), y(y), z(0), nd(nd) {}
-    Index(const Position &p, const Direction nd)
+    Index(const Position p, const Direction nd)
         : x(p.x), y(p.y), z(0), nd(nd) {}
     /** @brief 壁上のコンストラクタ */
-    Index(const WallIndex &i, const Direction nd)
+    Index(const WallIndex i, const Direction nd)
         : x(i.x), y(i.y), z(i.z), nd(nd) {}
     /** @brief 等号 */
-    bool operator==(const Index &i) const {
-      return x == i.x && y == i.y && z == i.z && nd == i.nd;
+    bool operator==(const Index i) const {
+      // return x == i.x && y == i.y && z == i.z && nd == i.nd;
+      return data == i.data; /*< 高速化 */
     }
     /** @brief 等号否定 */
-    bool operator!=(const Index &i) const {
-      return x != i.x || y != i.y || z != i.z || nd != i.nd;
+    bool operator!=(const Index i) const {
+      // return x != i.x || y != i.y || z != i.z || nd != i.nd;
+      return data != i.data; /*< 高速化 */
     }
     /** @brief WallIndex へのキャスト */
     operator WallIndex() const {
@@ -190,21 +197,19 @@ public:
       case Direction::South:
         y--;
         break;
-      default:
-        break;
       }
     }
     /** @brief 区画 */
-    const Position getPosition() const { return Position(x, y); }
+    Position getPosition() const { return Position(x, y); }
     /** @brief 壁の方向 */
-    const Direction getDirection() const {
+    Direction getDirection() const {
       // return z == 0 ? Direction::East : Direction::North;
       return z << 1; /*< 高速化 */
     }
     /** @brief 機体の方向 */
-    const Direction getNodeDirection() const { return nd; }
+    Direction getNodeDirection() const { return nd; }
     /** @brief 直近の壁 */
-    const WallIndex getWallIndex() const {
+    WallIndex getWallIndex() const {
       const auto nd = getNodeDirection();
       return nd.isAlong() ? WallIndex(Position(x, y), nd) : WallIndex(x, y, z);
     }
@@ -214,7 +219,7 @@ public:
      * @brief 斜め方向に向いているときの区画への相対方向(±45度)を返す
      * @return const Direction Direction::Left45 or Direction::Right45
      */
-    const Direction getRelativeDirectionDiagToAlong() const {
+    Direction getRelativeDirectionDiagToAlong() const {
       switch (nd) {
       case Direction::NorthEast:
       case Direction::SouthWest:
@@ -231,7 +236,7 @@ public:
      * @brief NodeDirection が向いている方向の隣の Index を返す
      * @return const Index 隣接 Index
      */
-    const Index next(const Direction nd) const;
+    Index next(const Direction nd) const;
     /**
      * @brief 反対向きのIndexを取得
      * @return const Index 反対向き Index
@@ -239,7 +244,7 @@ public:
     const Index opposite() const {
       return Index(x, y, z, nd + Direction::Back);
     }
-  } __attribute__((__packed__));
+  };
   static_assert(sizeof(Index) == 2, "size error"); /**< @brief size check */
 
   /**
@@ -305,7 +310,7 @@ public:
    * @param src
    * @return const Indexes
    */
-  static const Indexes convertDestinations(const Positions &src);
+  static Indexes convertDestinations(const Positions &src);
   /**
    * @brief ノード列を方向列に変換する関数
    *
@@ -313,8 +318,8 @@ public:
    * @param diag_enabled
    * @return const Directions
    */
-  static const Directions indexes2directions(const Indexes &path,
-                                             const bool diag_enabled);
+  static Directions indexes2directions(const Indexes &path,
+                                       const bool diag_enabled);
 
 private:
   /** @brief スタートのノードの Index */

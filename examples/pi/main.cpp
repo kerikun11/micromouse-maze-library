@@ -89,7 +89,7 @@ int test_position_identify() {
   step_map.update(maze_target, {maze_target.getStart()}, true, true);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
-      for (const auto d : Direction::getAlong4()) {
+      for (const auto d : Direction::Along4) {
         const auto p = Position(x, y);
         if (step_map.getStep(p) == StepMap::STEP_MAX)
           continue; /*< そもそも迷路的に行き得ない区画は除外 */

@@ -8,14 +8,14 @@
 #include "StepMapSlalom.h"
 
 #include <algorithm> /*< for std::find_if, etc. */
-#include <iomanip>   /*< for std::setw() */
+#include <functional>
+#include <iomanip> /*< for std::setw() */
 #include <queue>
 
 namespace MazeLib {
 
 /* Index */
-const StepMapSlalom::Index
-StepMapSlalom::Index ::next(const Direction nd) const {
+StepMapSlalom::Index StepMapSlalom::Index::next(const Direction nd) const {
   switch (getNodeDirection()) {
   case Direction::East:
   case Direction::North:
@@ -91,30 +91,31 @@ std::ostream &operator<<(std::ostream &os, const StepMapSlalom::Index &i) {
 
 /* StepMapSlalom */
 
-bool StepMapSlalom::calcShortestDirections(
-    const Maze &maze, const StepMapSlalom::EdgeCost &edge_cost,
-    Directions &shortest_dirs, const bool known_only, const bool diag_enabled) {
+bool StepMapSlalom::calcShortestDirections(const Maze &maze,
+                                           const EdgeCost &edge_cost,
+                                           Directions &shortest_dirs,
+                                           const bool known_only,
+                                           const bool diag_enabled) {
   const auto dest = convertDestinations(maze.getGoals());
   update(maze, edge_cost, dest, known_only, diag_enabled);
-  StepMapSlalom::Indexes path;
+  Indexes path;
   if (!genPathFromMap(path))
     return false;
   shortest_dirs = indexes2directions(path, diag_enabled);
   return true;
 }
-void StepMapSlalom::update(const Maze &maze,
-                           const StepMapSlalom::EdgeCost &edge_cost,
-                           const StepMapSlalom::Indexes &dest,
-                           const bool known_only, const bool diag_enabled) {
+void StepMapSlalom::update(const Maze &maze, const EdgeCost &edge_cost,
+                           const Indexes &dest, const bool known_only,
+                           const bool diag_enabled) {
   /* 全ノードのコストを最大値に設定 */
   const auto cost = CostMax;
   cost_map.fill(cost);
   /* 更新予約のキュー */
 #define STEP_MAP_USE_PRIORITY_QUEUE 0
 #if STEP_MAP_USE_PRIORITY_QUEUE == 1
-  std::function<bool(const Index, const Index)> greater = [&](const Index &i1,
-                                                              const Index &i2) {
-    return cost_map[i1] > cost_map[i2];
+  std::function<bool(const Index, const Index)> greater = [&](const Index i1,
+                                                              const Index i2) {
+    return cost_map[i1.getIndex()] > cost_map[i2.getIndex()];
   };
   std::priority_queue<Index, std::vector<Index>, decltype(greater)> q(greater);
 #else
@@ -134,9 +135,9 @@ void StepMapSlalom::update(const Maze &maze,
   /* 更新がなくなるまで更新 */
   while (!q.empty()) {
 #if STEP_MAP_USE_PRIORITY_QUEUE
-    const auto focus = q.top();
+    const auto &&focus = std::move(q.top());
 #else
-    const auto focus = q.front();
+    const auto &&focus = std::move(q.front());
 #endif
     q.pop();
     const auto focus_cost = cost_map[focus.getIndex()];
@@ -236,7 +237,7 @@ void StepMapSlalom::update(const Maze &maze,
     }
   }
 }
-bool StepMapSlalom::genPathFromMap(StepMapSlalom::Indexes &path) const {
+bool StepMapSlalom::genPathFromMap(Indexes &path) const {
   path.clear();
   auto i = index_start.opposite();
   while (1) {
@@ -249,8 +250,7 @@ bool StepMapSlalom::genPathFromMap(StepMapSlalom::Indexes &path) const {
   }
   return true;
 }
-void StepMapSlalom::print(const Maze &maze,
-                          const StepMapSlalom::Indexes &indexes,
+void StepMapSlalom::print(const Maze &maze, const Indexes &indexes,
                           std::ostream &os) const {
   const auto exists = [&](const Index &i) {
     return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index &ii) {
@@ -291,17 +291,16 @@ void StepMapSlalom::print(const Maze &maze,
     }
   }
 }
-const StepMapSlalom::Indexes
+StepMapSlalom::Indexes
 StepMapSlalom::convertDestinations(const Positions &src) {
   Indexes dest;
   for (const auto p : src)
-    for (const auto nd : Direction::getAlong4())
+    for (const auto nd : Direction::Along4)
       dest.push_back(Index(p, nd));
   return dest;
 }
-const Directions
-StepMapSlalom::indexes2directions(const StepMapSlalom::Indexes &path,
-                                  const bool diag_enabled) {
+Directions StepMapSlalom::indexes2directions(const Indexes &path,
+                                             const bool diag_enabled) {
   if (!diag_enabled) {
     Directions dirs;
     for (int i = 1; i < (int)path.size(); ++i) {

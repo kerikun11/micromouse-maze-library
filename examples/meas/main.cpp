@@ -42,10 +42,10 @@ int test_meas() {
     filenames.push_back("16MM" + std::to_string(year) + "H_Chubu.maze");
   for (int year = 2019; year >= 2017; --year)
     filenames.push_back("16MM" + std::to_string(year) + "H_Tashiro.maze");
+  for (int year = 2020; year >= 2019; --year)
+    filenames.push_back("16MM" + std::to_string(year) + "H_student.maze");
   for (const auto filename : {
-           "16MM2020H_student.maze",
-           "16MM2020H_student.maze",
-           "16MM2019H_student.maze",
+           "16MM2020C_student.maze",
            "16MM2019H_semi.maze",
            "16MM2019H_Kyushu.maze",
            "16MM2019H_Kansai.maze",
@@ -155,7 +155,7 @@ int test_meas() {
     step_map.update(maze_target, {maze_target.getStart()}, true, true);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
-        for (const auto d : Direction::getAlong4()) {
+        for (const auto d : Direction::Along4) {
           const auto p = Position(x, y);
           if (p == Position(0, 0))
             continue; /*< スタートは除外 */

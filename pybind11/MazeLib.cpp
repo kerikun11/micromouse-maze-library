@@ -33,10 +33,12 @@ PYBIND11_MODULE(MazeLib, m) {
   /* Direction */
   py::class_<Direction> direction(m, "Direction");
   direction.attr("Max") = py::cast(Direction::Max);
+  direction.attr("ALong4") = py::cast(Direction::Along4);
+  direction.attr("Diag4") = py::cast(Direction::Diag4);
   direction.def(py::init<int>())
       .def(py::init<enum Direction::AbsoluteDirection>())
-      .def("getAlong4", &Direction::getAlong4)
-      .def("getDiag4", &Direction::getDiag4)
+      //   .def("Along4", &Direction::Along4)
+      //   .def("Diag4", &Direction::Diag4)
       .def("__str__", &Direction::toChar)
       .def("__int__", [](const Direction &d) { return uint8_t(d); })
       .def(py::self == py::self)
@@ -82,8 +84,8 @@ PYBIND11_MODULE(MazeLib, m) {
       .def("next", &Position::next)
       .def("isInsideOfField", &Position::isInsideOfField)
       .def("rotate",
-           py::overload_cast<const Direction, const Position &>(
-               &Position::rotate, py::const_),
+           py::overload_cast<const Direction, const Position>(&Position::rotate,
+                                                              py::const_),
            py::arg("d"), py::arg("center") = Position())
       .def("__str__",
            [](const Position &obj) {
@@ -162,46 +164,43 @@ PYBIND11_MODULE(MazeLib, m) {
            py::arg("set_range_full") = false)
       /* isWall */
       .def("isWall",
-           py::overload_cast<const WallIndex &>(&Maze::isWall, py::const_))
-      .def("isWall", py::overload_cast<const Position &, const Direction>(
+           py::overload_cast<const WallIndex>(&Maze::isWall, py::const_))
+      .def("isWall", py::overload_cast<const Position, const Direction>(
                          &Maze::isWall, py::const_))
       .def("isWall",
            py::overload_cast<const int8_t, const int8_t, const Direction>(
                &Maze::isWall, py::const_))
       /* setWall */
-      .def("setWall",
-           py::overload_cast<const WallIndex &, bool>(&Maze::setWall))
-      .def("setWall",
-           py::overload_cast<const Position &, const Direction, bool>(
-               &Maze::setWall))
+      .def("setWall", py::overload_cast<const WallIndex, bool>(&Maze::setWall))
+      .def("setWall", py::overload_cast<const Position, const Direction, bool>(
+                          &Maze::setWall))
       .def("setWall",
            py::overload_cast<const int8_t, const int8_t, const Direction, bool>(
                &Maze::setWall))
       /* isKnown */
       .def("isKnown",
-           py::overload_cast<const WallIndex &>(&Maze::isKnown, py::const_))
-      .def("isKnown", py::overload_cast<const Position &, const Direction>(
+           py::overload_cast<const WallIndex>(&Maze::isKnown, py::const_))
+      .def("isKnown", py::overload_cast<const Position, const Direction>(
                           &Maze::isKnown, py::const_))
       .def("isKnown",
            py::overload_cast<const int8_t, const int8_t, const Direction>(
                &Maze::isKnown, py::const_))
       /* setKnown */
       .def("setKnown",
-           py::overload_cast<const WallIndex &, bool>(&Maze::setKnown))
-      .def("setKnown",
-           py::overload_cast<const Position &, const Direction, bool>(
-               &Maze::setKnown))
+           py::overload_cast<const WallIndex, bool>(&Maze::setKnown))
+      .def("setKnown", py::overload_cast<const Position, const Direction, bool>(
+                           &Maze::setKnown))
       .def("setKnown",
            py::overload_cast<const int8_t, const int8_t, const Direction, bool>(
                &Maze::setKnown))
       /* canGo */
       .def("canGo",
-           py::overload_cast<const WallIndex &>(&Maze::canGo, py::const_))
-      .def("canGo", py::overload_cast<const Position &, const Direction>(
+           py::overload_cast<const WallIndex>(&Maze::canGo, py::const_))
+      .def("canGo", py::overload_cast<const Position, const Direction>(
                         &Maze::canGo, py::const_))
       /* others */
       .def("updateWall",
-           py::overload_cast<const Position &, const Direction, bool, bool>(
+           py::overload_cast<const Position, const Direction, bool, bool>(
                &Maze::updateWall),
            py::arg("p"), py::arg("d"), py::arg("b"), py::arg("pushLog") = true)
       .def("resetLastWalls", &Maze::resetLastWalls)

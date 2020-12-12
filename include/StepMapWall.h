@@ -24,14 +24,14 @@ public:
 
 public:
   StepMapWall() { calcStraightStepTable(); }
-  step_t getStep(const WallIndex &i) const {
+  step_t getStep(const WallIndex i) const {
     return i.isInsideOfField() ? step_map[i.getIndex()] : STEP_MAX;
   }
-  void setStep(const WallIndex &i, const step_t step) {
+  void setStep(const WallIndex i, const step_t step) {
     if (i.isInsideOfField())
       step_map[i.getIndex()] = step;
   }
-  void print(const Maze &maze, const WallIndex i = WallIndex(-1, -1, 0),
+  void print(const Maze &maze, const WallIndex &i = WallIndex(-1, -1, 0),
              std::ostream &os = std::cout) const;
   void print(const Maze &maze, const WallIndexes &indexes,
              std::ostream &os = std::cout) const;
@@ -40,27 +40,22 @@ public:
              std::ostream &os = std::cout) const;
   void update(const Maze &maze, const WallIndexes &dest, const bool known_only,
               const bool simple);
-  const Directions calcShortestDirections(const Maze &maze,
-                                          const bool known_only,
-                                          const bool simple) {
+  Directions calcShortestDirections(const Maze &maze, const bool known_only,
+                                    const bool simple) {
     return calcShortestDirections(maze, WallIndex(0, 0, 1),
                                   convertDestinations(maze, maze.getGoals()),
                                   known_only, simple);
   }
-  const Directions calcShortestDirections(const Maze &maze,
-                                          const WallIndex &start,
-                                          const WallIndexes &dest,
-                                          const bool known_only,
-                                          const bool simple);
-  const Directions getStepDownDirections(const Maze &maze,
-                                         const WallIndex &start, WallIndex &end,
-                                         const bool known_only,
-                                         const bool break_unknown) const;
-  static const WallIndexes convertDestinations(const Maze &maze,
-                                               const Positions &positions);
-  static const Direction convertDirection(const Direction d,
-                                          const WallIndex &i);
-  static const Directions
+  Directions calcShortestDirections(const Maze &maze, const WallIndex &start,
+                                    const WallIndexes &dest,
+                                    const bool known_only, const bool simple);
+  Directions getStepDownDirections(const Maze &maze, const WallIndex &start,
+                                   WallIndex &end, const bool known_only,
+                                   const bool break_unknown) const;
+  static WallIndexes convertDestinations(const Maze &maze,
+                                         const Positions &positions);
+  static Direction convertDirection(const Direction d, const WallIndex &i);
+  static Directions
   convertWallIndexDirectionsToPositionDirections(const Directions &src,
                                                  const WallIndex &start);
   static void appendStraightDirections(const Maze &maze,

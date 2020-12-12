@@ -327,7 +327,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallRecords &idWallRecords,
   for (int8_t x = 0; x < max_x; ++x)
     for (int8_t y = 0; y < max_y; ++y) {
       const auto offset_p = Position(x, y);
-      for (const auto offset_d : Direction::getAlong4()) {
+      for (const auto offset_d : Direction::Along4) {
         /* 既知壁との食い違い数を数える */
         int diffs = 0; /*< idWallRecords のうち，既知の食い違いの壁の数を格納 */
         for (const auto wr : idWallRecords) {
@@ -369,7 +369,7 @@ SearchAlgorithm::findMatchDirectionCandidates(const Position &cur_p,
   const int min_diff = 0; /*< 許容食い違い壁数 */
   /* パターンマッチング開始 */
   Directions result_dirs; //< target と一致する方向の候補を格納する
-  for (const auto offset_d : Direction::getAlong4()) {
+  for (const auto offset_d : Direction::Along4) {
     /* 既知壁との食い違い数を数える */
     int diffs = 0; /*< idWallRecords のうち，既知の食い違いの壁の数を格納 */
     for (const auto wr : idMaze.getWallRecords()) {
