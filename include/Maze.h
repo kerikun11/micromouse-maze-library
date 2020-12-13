@@ -674,6 +674,10 @@ public:
     std::ifstream ifs(filepath);
     return ifs ? parse(ifs) : false;
   }
+  friend std::istream &operator>>(std::istream &is, Maze &maze) {
+    maze.parse(is);
+    return is;
+  }
   /**
    * @brief 配列から迷路を読み込むパーサ
    * @param data 各区画16進表記の文字列配列

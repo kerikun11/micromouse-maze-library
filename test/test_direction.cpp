@@ -17,9 +17,9 @@ TEST(Direction, isAlong_isDiag) {
   EXPECT_FALSE(Direction(Direction::West).isDiag());
 }
 
-TEST(Direction, getAlong4_getDiag4) {
-  for (const auto d : Direction::getAlong4())
+TEST(Direction, Along4_Diag4) {
+  for (const auto d : Direction::Along4)
     EXPECT_TRUE(d.isAlong());
-  for (const auto d : Direction::getDiag4())
+  for (const auto d : Direction::Diag4)
     EXPECT_TRUE(d.isDiag());
 }

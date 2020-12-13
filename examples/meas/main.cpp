@@ -42,10 +42,11 @@ int test_meas() {
     filenames.push_back("16MM" + std::to_string(year) + "H_Chubu.maze");
   for (int year = 2019; year >= 2017; --year)
     filenames.push_back("16MM" + std::to_string(year) + "H_Tashiro.maze");
-  for (int year = 2020; year >= 2019; --year)
+  for (int year = 2020; year >= 2017; --year)
     filenames.push_back("16MM" + std::to_string(year) + "H_student.maze");
+  for (int year = 2020; year >= 2017; --year)
+    filenames.push_back("16MM" + std::to_string(year) + "C_student.maze");
   for (const auto filename : {
-           "16MM2020C_student.maze",
            "16MM2019H_semi.maze",
            "16MM2019H_Kyushu.maze",
            "16MM2019H_Kansai.maze",
