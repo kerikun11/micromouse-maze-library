@@ -24,3 +24,9 @@ TEST(Position, rotate) {
   EXPECT_EQ(Position(2, 3).rotate(Direction::North, Position(2, 1)),
             Position(0, 1));
 }
+
+TEST(Position, operator_left_shift_left_shift) {
+  std::stringstream ss;
+  ss << Position(1, 2);
+  EXPECT_EQ(ss.str(), "(  1,  2)");
+}

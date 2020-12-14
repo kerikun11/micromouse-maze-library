@@ -26,7 +26,7 @@ void StepMapWall::print(const Maze &maze, const WallIndex &index,
       const auto w = maze.isWall(x, y, Direction::North);
       const auto k = maze.isKnown(x, y, Direction::North);
       const auto i = WallIndex(Position(x, y), Direction::North);
-      const auto s = std::min(int(step_map[i.getIndex()]), 99999);
+      const auto s = std::min(int(getStep(i)), 99999);
       const auto f = i == index;
       if (w)
         os << "-----";
@@ -44,7 +44,7 @@ void StepMapWall::print(const Maze &maze, const WallIndex &index,
         const auto w = maze.isWall(x, y, Direction::East);
         const auto k = maze.isKnown(x, y, Direction::East);
         const auto i = WallIndex(Position(x, y), Direction::East);
-        const auto s = std::min(int(step_map[i.getIndex()]), 99999);
+        const auto s = std::min(int(getStep(i)), 99999);
         const auto f = i == index;
         if (w)
           os << "  |  ";

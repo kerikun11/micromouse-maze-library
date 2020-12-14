@@ -19,10 +19,9 @@ protected:
   }
 };
 
-int test_meas() {
+int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
+  /* save file */
   std::ofstream csv("measurement.csv");
-  /* specify maze data directory */
-  const std::string mazedata_dir = "../mazedata/data/";
   /* queue test files */
   std::vector<std::string> filenames;
 #if 0

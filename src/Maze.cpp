@@ -56,7 +56,7 @@ Position Position::rotate(const Direction d) const {
   }
 }
 std::ostream &operator<<(std::ostream &os, const Position p) {
-  return os << "(" << std::setw(2) << (int)p.x << ", " << std::setw(2)
+  return os << "( " << std::setw(2) << (int)p.x << ", " << std::setw(2)
             << (int)p.y << ")";
 }
 

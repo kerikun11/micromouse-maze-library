@@ -39,16 +39,31 @@ endif()
 set(CUSTOM_TARGET_NAME "test")
 set(TARGET_NAME test_${CUSTOM_TARGET_NAME})
 # make a target
-file(GLOB SRC_FILES *.cpp)
+file(GLOB SRC_FILES *.cpp ../src/*.cpp)
 add_executable(${TARGET_NAME} ${SRC_FILES})
-target_include_directories(${TARGET_NAME}
-  PRIVATE ${CMAKE_HOME_DIRECTORY}/include
-)
-target_link_libraries(${TARGET_NAME} mazelib gtest)
+target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_HOME_DIRECTORY}/include)
+target_compile_options(${TARGET_NAME} PRIVATE --coverage -g -O0)
+target_link_libraries(${TARGET_NAME} gtest)
+target_link_options(${TARGET_NAME} PRIVATE --coverage)
 # make a custom target to run
 add_custom_target(${CUSTOM_TARGET_NAME}
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  DEPENDS ${TARGET_NAME} mazelib gtest
+  DEPENDS ${TARGET_NAME} gtest
+  USES_TERMINAL
+)
+
+# give a name
+set(CUSTOM_TARGET_NAME "coverage")
+# make a custom target to run
+add_custom_target(${CUSTOM_TARGET_NAME}
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}
+  && type lcov &>/dev/null
+  && lcov --quiet --capture --directory ${CMAKE_CURRENT_BINARY_DIR} --output coverage.info
+  && lcov --quiet --remove coverage.info '*/c++/*' '*/googletest/*' --output coverage.info
+  && lcov --summary coverage.info
+  && genhtml --quiet coverage.info --output ${CMAKE_CURRENT_BINARY_DIR}/html
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  DEPENDS ${TARGET_NAME}
   USES_TERMINAL
 )
