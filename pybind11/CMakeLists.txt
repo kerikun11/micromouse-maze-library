@@ -17,9 +17,6 @@ target_include_directories(${MODULE_NAME}
   PRIVATE ${CMAKE_HOME_DIRECTORY}/include
   PRIVATE ${PYBIND11_INCLUDE_DIR}
 )
-# to suppress warning in clang
-target_compile_options(${MODULE_NAME} PRIVATE -Wno-self-assign)
-target_link_libraries(${MODULE_NAME} PRIVATE )
 
 # give a name
 set(CUSTOM_TARGET_NAME "pybind11")
