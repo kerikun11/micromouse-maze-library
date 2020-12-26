@@ -10,9 +10,11 @@ endif()
 
 # make a python module
 set(MODULE_NAME "MazeLib")
-file(GLOB SRC_FILES *.cpp)
-file(GLOB MAZELIB_SRC_FILES ../src/*.cpp)
-pybind11_add_module(${MODULE_NAME} ${SRC_FILES} ${MAZELIB_SRC_FILES})
+file(GLOB SRC_FILES
+  ${CMAKE_HOME_DIRECTORY}/src/*.cpp
+  *.cpp
+)
+pybind11_add_module(${MODULE_NAME} ${SRC_FILES})
 target_include_directories(${MODULE_NAME}
   PRIVATE ${CMAKE_HOME_DIRECTORY}/include
   PRIVATE ${PYBIND11_INCLUDE_DIR}

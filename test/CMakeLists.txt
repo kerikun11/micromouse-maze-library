@@ -4,17 +4,16 @@
 # GoogleTest
 add_subdirectory(googletest/googletest)
 
-# give a name
+# give a target
 set(TARGET_NAME "test")
-# make a target
 file(GLOB SRC_FILES
   ${CMAKE_HOME_DIRECTORY}/src/*.cpp
   *.cpp
 )
 add_executable(${TARGET_NAME} ${SRC_FILES})
-target_include_directories(${TARGET_NAME} PRIVATE
-  ${CMAKE_HOME_DIRECTORY}/include
-  ${gtest_build_include_dirs}
+target_include_directories(${TARGET_NAME}
+  PRIVATE ${CMAKE_HOME_DIRECTORY}/include
+  PRIVATE ${gtest_build_include_dirs}
 )
 target_compile_options(${TARGET_NAME} PRIVATE --coverage -g -O0)
 target_link_libraries(${TARGET_NAME} gtest)
@@ -27,9 +26,8 @@ add_custom_target("${TARGET_NAME}_run"
   USES_TERMINAL
 )
 
-# give a name
-set(CUSTOM_TARGET_NAME "lcov")
 # make a custom target to run
+set(CUSTOM_TARGET_NAME "lcov")
 set(INFO_FILENAME "${CMAKE_PROJECT_NAME}.info")
 add_custom_target(${CUSTOM_TARGET_NAME}
   COMMAND type lcov &>/dev/null

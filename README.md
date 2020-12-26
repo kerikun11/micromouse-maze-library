@@ -191,6 +191,33 @@ make search
 cd build
 # ドキュメントの自動生成
 make docs
+# ブラウザで開く
+open docs/html/index.html
 ```
 
 上記コマンドにより `build/docs/html/index.html` にリファレンスが生成される．
+
+--------------------------------------------------------------------------------
+
+## ユニットテスト
+
+### 追加で必要なパッケージ
+
+- [lcov](https://github.com/linux-test-project/lcov)
+
+### 実行方法
+
+```sh
+# CMake により初期化されたディレクトリへ移動する
+cd build
+# テストを実行
+make test_run
+# カバレッジ結果の収集
+make lcov
+# ブラウザで開く
+open test/html/index.html
+# カバレッジのクリア
+make lcov_clean
+```
+
+上記コマンドにより `build/test/html/index.html` にカバレッジ結果が生成される．
