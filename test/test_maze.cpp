@@ -10,8 +10,8 @@ TEST(Maze, parse_from_file) {
   EXPECT_TRUE(maze.parse(file_path.c_str()));
   EXPECT_TRUE(maze.canGo(Position(0, 0), Direction::North));
   for (const auto clear : {true, false})
-    EXPECT_TRUE(maze.backupWallRecordsToFile("/dev/null", clear));
-  EXPECT_TRUE(maze.restoreWallRecordsFromFile("/dev/null"));
+    EXPECT_TRUE(maze.backupWallRecordsToFile("data.bin", clear));
+  EXPECT_TRUE(maze.restoreWallRecordsFromFile("data.bin"));
 }
 
 TEST(Maze, parse_from_istream) {

@@ -48,27 +48,6 @@ TEST(CLRobotBase, CLRobotBase) {
     maze.print(shortest_dirs);
   }
 
-  /* StepMapDijkstra */
-  for (const auto simple : {true, false}) {
-    const bool known_only = 0;
-    const Maze &maze = maze_target;
-    StepMap map;
-    auto shortest_indexes =
-        map.calcShortestDirectionsDijkstra(maze, known_only, simple);
-    EXPECT_FALSE(shortest_indexes.empty());
-  }
-
-  /* BFS */
-  for (const auto simple : {true, false}) {
-    const bool known_only = 0;
-    const Maze &maze = maze_target;
-    StepMap map;
-    auto shortest_indexes =
-        map.calcShortestDirectionsBFS(maze, known_only, simple);
-    EXPECT_FALSE(shortest_indexes.empty());
-    maze.print(shortest_indexes);
-  }
-
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
@@ -142,27 +121,6 @@ TEST(CLRobotBase, fake) {
     map.printFull(maze, shortest_dirs);
     map.printFull(maze);
     maze.print(shortest_dirs);
-  }
-
-  /* StepMapDijkstra */
-  for (const auto simple : {true, false}) {
-    const bool known_only = 0;
-    const Maze &maze = maze_target;
-    StepMap map;
-    auto shortest_indexes =
-        map.calcShortestDirectionsDijkstra(maze, known_only, simple);
-    EXPECT_TRUE(shortest_indexes.empty());
-  }
-
-  /* BFS */
-  for (const auto simple : {true, false}) {
-    const bool known_only = 0;
-    const Maze &maze = maze_target;
-    StepMap map;
-    auto shortest_indexes =
-        map.calcShortestDirectionsBFS(maze, known_only, simple);
-    EXPECT_TRUE(shortest_indexes.empty());
-    maze.print(shortest_indexes);
   }
 
   /* StepMapWall */

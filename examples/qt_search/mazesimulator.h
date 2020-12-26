@@ -270,7 +270,7 @@ protected:
     }
   }
   virtual void
-  queueAction(const SearchAction action __attribute_used__) override {
+  queueAction(const SearchAction action __attribute__((unused))) override {
     /* draw */
     draw();
     /* block */

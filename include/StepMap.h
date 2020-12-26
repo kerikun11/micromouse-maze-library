@@ -140,20 +140,6 @@ protected:
    * 高速化のため，あらかじめ計算を終えておく．
    */
   void calcStraightStepTable();
-
-  /* backup */
-public:
-  /**
-   * @brief Dijkstra Search
-   */
-  Positions calcShortestDirectionsDijkstra(const Maze &maze,
-                                           const bool known_only,
-                                           const bool simple);
-  /**
-   * @brief Breadth First Search
-   */
-  Positions calcShortestDirectionsBFS(const Maze &maze, const bool known_only,
-                                      const bool simple);
 };
 
 } // namespace MazeLib
