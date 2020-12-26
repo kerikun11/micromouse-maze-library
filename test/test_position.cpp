@@ -8,6 +8,11 @@ TEST(Position, next) {
   EXPECT_EQ(Position(0, 0).next(Direction::North), Position(0, 1));
   EXPECT_EQ(Position(0, 0).next(Direction::West), Position(-1, 0));
   EXPECT_EQ(Position(0, 0).next(Direction::South), Position(0, -1));
+
+  EXPECT_EQ(Position(0, 0).next(Direction::NorthEast), Position(1, 1));
+  EXPECT_EQ(Position(0, 0).next(Direction::NorthWest), Position(-1, 1));
+  EXPECT_EQ(Position(0, 0).next(Direction::SouthEast), Position(1, -1));
+  EXPECT_EQ(Position(0, 0).next(Direction::SouthWest), Position(-1, -1));
 }
 
 TEST(Position, isInsideOfField) {

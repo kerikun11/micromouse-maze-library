@@ -1,7 +1,7 @@
 # author: Ryotaro Onuki <kerikun11+github@gmail.com>
 # date: 2020.06.11
 
-# find packages
+# find pybind11
 find_package(pybind11)
 if(NOT pybind11_FOUND)
   message(WARNING "pybind11 not found in your environment! skipping...")

@@ -39,7 +39,7 @@ TEST(Maze, parse_from_istream) {
 )";
   Maze maze;
   maze_stream >> maze;
-  // maze.parse(maze_stream);
+  maze.print({Position(1, 1)});
 
   EXPECT_EQ(maze.getStart(), Position(1, 0));
 

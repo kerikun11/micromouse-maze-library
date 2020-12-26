@@ -2,7 +2,7 @@
 # date: 2020.12.25
 
 # GoogleTest
-add_subdirectory(googletest/googletest)
+add_subdirectory(googletest)
 
 # give a target
 set(TARGET_NAME "test")
@@ -16,7 +16,7 @@ target_include_directories(${TARGET_NAME}
   PRIVATE ${gtest_build_include_dirs}
 )
 target_compile_options(${TARGET_NAME} PRIVATE --coverage -g -O0)
-target_link_libraries(${TARGET_NAME} gtest)
+target_link_libraries(${TARGET_NAME} PRIVATE gtest)
 target_link_options(${TARGET_NAME} PRIVATE --coverage)
 # make a custom target to run
 add_custom_target("${TARGET_NAME}_run"
