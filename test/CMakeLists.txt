@@ -1,54 +1,45 @@
 # author: Ryotaro Onuki <kerikun11+github@gmail.com>
-# date: 2020.05.14
+# date: 2020.12.25
 
-# GoogleTest Project
-# see https://github.com/google/googletest/blob/master/googletest/README.md
-# Download and unpack googletest at configure time
-configure_file(./googletest-download.cmake googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
-endif()
+# GoogleTest
+add_subdirectory(googletest)
 
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-# Add googletest directly to our build. This defines
-# the gtest and gtest_main targets.
-add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
-                 ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
-                 EXCLUDE_FROM_ALL)
-
-# The gtest/gtest_main targets carry header search path
-# dependencies automatically when using CMake 2.8.11 or
-# later. Otherwise we have to add them here ourselves.
-if (CMAKE_VERSION VERSION_LESS 2.8.11)
-  include_directories("${gtest_SOURCE_DIR}/include")
-endif()
-
-# give a name
-set(CUSTOM_TARGET_NAME "test")
-set(TARGET_NAME test_${CUSTOM_TARGET_NAME})
-# make a target
-file(GLOB SRC_FILES *.cpp)
+# give a target
+set(TARGET_NAME "test")
+file(GLOB SRC_FILES
+  ${CMAKE_HOME_DIRECTORY}/src/*.cpp
+  *.cpp
+)
 add_executable(${TARGET_NAME} ${SRC_FILES})
 target_include_directories(${TARGET_NAME}
   PRIVATE ${CMAKE_HOME_DIRECTORY}/include
+  PRIVATE ${gtest_build_include_dirs}
 )
-target_link_libraries(${TARGET_NAME} mazelib gtest)
+target_compile_options(${TARGET_NAME} PRIVATE --coverage -g -O0)
+target_link_libraries(${TARGET_NAME} PRIVATE gtest)
+target_link_options(${TARGET_NAME} PRIVATE --coverage)
 # make a custom target to run
-add_custom_target(${CUSTOM_TARGET_NAME}
+add_custom_target("${TARGET_NAME}_run"
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  DEPENDS ${TARGET_NAME} mazelib gtest
+  DEPENDS ${TARGET_NAME}
+  USES_TERMINAL
+)
+
+# make a custom target to run
+set(CUSTOM_TARGET_NAME "lcov")
+set(INFO_FILENAME "${CMAKE_PROJECT_NAME}.info")
+add_custom_target(${CUSTOM_TARGET_NAME}
+  COMMAND type lcov &>/dev/null
+  && lcov --quiet --output ${INFO_FILENAME} --capture --directory ${CMAKE_CURRENT_BINARY_DIR}
+  && lcov --quiet --output ${INFO_FILENAME} --extract ${INFO_FILENAME} ${CMAKE_HOME_DIRECTORY}/{src,include}/*
+  && lcov --summary ${INFO_FILENAME}
+  && genhtml --quiet ${INFO_FILENAME} --output ${CMAKE_CURRENT_BINARY_DIR}/html
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  USES_TERMINAL
+)
+add_custom_target(${CUSTOM_TARGET_NAME}_clean
+  COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   USES_TERMINAL
 )
