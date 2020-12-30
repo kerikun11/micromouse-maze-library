@@ -17,3 +17,9 @@ TEST(WallIndex, isInsideOfField) {
   EXPECT_FALSE(
       WallIndex({0, MAZE_SIZE - 1}, Direction::North).isInsideOfField());
 }
+
+TEST(WallIndex, operator_left_shift_left_shift) {
+  std::stringstream ss;
+  ss << WallIndex(1, 2, 0);
+  EXPECT_EQ(ss.str(), "(  1,  2, >)");
+}
