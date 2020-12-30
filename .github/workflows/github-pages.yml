@@ -1,0 +1,28 @@
+name: GitHub Pages Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install Packages
+        run: sudo apt install -y gcc g++ make cmake doxygen graphviz
+
+      - name: Build
+        run: mkdir build && cd build && cmake .. && make docs
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/docs/html
+          publish_branch: gh-pages
