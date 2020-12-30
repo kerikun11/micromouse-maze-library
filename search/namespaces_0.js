@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mazelib_116',['MazeLib',['../namespaceMazeLib.html',1,'']]]
+  ['mazelib',['MazeLib',['../dc/d56/namespaceMazeLib.html',1,'']]]
 ];
