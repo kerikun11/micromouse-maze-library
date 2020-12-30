@@ -14,9 +14,6 @@
 #include <iostream>
 #include <vector>
 
-#include <cstring>
-#include <string>
-
 /**
  * @brief 迷路探索ライブラリはすべてこの名前空間に格納されている．
  */
@@ -71,7 +68,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 #define loge std::ostream(0)
 #endif
 #endif
-/** @brief Log Stream (Warnning) */
+/** @brief Log Stream (Warning) */
 #ifndef logw
 #if 1
 #define logw (std::cout << C_YE "[W][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
@@ -162,7 +159,7 @@ public:
   /**
    * @brief 整数へのキャスト．相対方向などの演算に使える．
    */
-  operator const int8_t &() const { return d; }
+  operator int8_t() const { return d; }
   /** @brief 斜めかどうかの判定 */
   bool isAlong() const { return (d & 1) == 0; }
   bool isDiag() const { return (d & 1) == 1; }
@@ -172,21 +169,10 @@ public:
   friend std::ostream &operator<<(std::ostream &os, const Direction d) {
     return os << d.toChar();
   }
-  /**
-   * @brief 斜めでない絶対4方向を取得
-   */
-  static const std::array<Direction, 4> &getAlong4() {
-    static const std::array<Direction, 4> ds{{East, North, West, South}};
-    return ds;
-  }
-  /**
-   * @brief 斜めの絶対4方向を取得
-   */
-  static const std::array<Direction, 4> &getDiag4() {
-    static const std::array<Direction, 4> ds{
-        {NorthEast, NorthWest, SouthWest, SouthEast}};
-    return ds;
-  }
+  /** @brief for文用の斜めでない絶対4方向 */
+  static const std::array<Direction, 4> Along4;
+  /** @brief for文用の斜めの絶対4方向 */
+  static const std::array<Direction, 4> Diag4;
 
 private:
   int8_t d; /**< @brief 方向の実体, コンストラクタによって確実に 0-7 に収める */
@@ -217,15 +203,24 @@ public:
   static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX;
 
 public:
-  int8_t x; /**< @brief 迷路区画のx座標成分 */
-  int8_t y; /**< @brief 迷路区画のy座標成分 */
+  union {
+    struct {
+      int8_t x; /**< @brief 迷路区画のx座標成分 */
+      int8_t y; /**< @brief 迷路区画のy座標成分 */
+    };
+    uint16_t data;
+  };
 
 public:
   /**
-   * @brief デフォルトコンストラクタ
+   * @brief ゼロ初期化のデフォルトコンストラクタ
+   */
+  Position() : data(0) {}
+  /**
+   * @brief コンストラクタ
    * @param x,y 初期化パラメータ
    */
-  Position(const int8_t x = 0, const int8_t y = 0) : x(x), y(y) {}
+  Position(const int8_t x, const int8_t y) : x(x), y(y) {}
   /**
    * @brief 迷路内の区画の一意な通し番号となるIDを取得する
    *
@@ -234,23 +229,29 @@ public:
    */
   uint16_t getIndex() const { return (x << MAZE_SIZE_BIT) | y; }
   /** @brief 加法 */
-  const Position operator+(const Position &p) const {
+  Position operator+(const Position p) const {
     return Position(x + p.x, y + p.y);
   }
   /** @brief 減法 */
-  const Position operator-(const Position &p) const {
+  Position operator-(const Position p) const {
     return Position(x - p.x, y - p.y);
   }
   /** @brief 等号 */
-  bool operator==(const Position &p) const { return x == p.x && y == p.y; }
+  bool operator==(const Position p) const {
+    // return x == p.x && y == p.y;
+    return data == p.data; /*< 高速化 */
+  }
   /** @brief 等号否定 */
-  bool operator!=(const Position &p) const { return x != p.x || y != p.y; }
+  bool operator!=(const Position p) const {
+    // return x != p.x || y != p.y;
+    return data != p.data; /*< 高速化 */
+  }
   /**
    * @brief 自分の引数方向に隣接した区画の Position を返す
    * @param d 隣接方向
    * @return 隣接区画の座標
    */
-  const Position next(const Direction d) const;
+  Position next(const Direction d) const;
   /**
    * @brief フィールド内かどうかを判定する関数
    * @return true フィールド内
@@ -267,14 +268,14 @@ public:
    * @param d 回転角度, 4方位のみ
    * @return const Position
    */
-  const Position rotate(const Direction d) const;
-  const Position rotate(const Direction d, const Position &center) const {
+  Position rotate(const Direction d) const;
+  Position rotate(const Direction d, const Position center) const {
     return center + (*this - center).rotate(d);
   }
   /**
    * @brief stream での表示． (  x,  y) の形式
    */
-  friend std::ostream &operator<<(std::ostream &os, const Position &p);
+  friend std::ostream &operator<<(std::ostream &os, const Position p);
 };
 static_assert(sizeof(Position) == 2, "size error"); /**< @brief size check */
 
@@ -305,13 +306,13 @@ public:
 
 public:
   Pose() {}
-  Pose(const Position &p, const Direction d) : p(p), d(d) {}
+  Pose(const Position p, const Direction d) : p(p), d(d) {}
   /**
    * @brief 隣接姿勢の取得
    * @param next_direction 隣接方向
    * @return const Pose 隣接姿勢
    */
-  const Pose next(const Direction next_direction) const {
+  Pose next(const Direction next_direction) const {
     return Pose(p.next(next_direction), next_direction);
   }
   /** @brief stream での表示 */
@@ -356,15 +357,24 @@ struct WallIndex {
   static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 2;
 
 public:
-  int8_t x;      /**< @brief 区画座標のx成分 */
-  int8_t y : 7;  /**< @brief 区画座標のy成分 */
-  uint8_t z : 1; /**< @brief 区画内の壁の位置．0:East, 1:North */
+  union {
+    struct {
+      int8_t x;      /**< @brief 区画座標のx成分 */
+      int8_t y : 7;  /**< @brief 区画座標のy成分 */
+      uint8_t z : 1; /**< @brief 区画内の壁の位置．0:East, 1:North */
+    };
+    uint16_t data;
+  };
 
 public:
   /**
+   * @brief デフォルトコンストラク
+   */
+  WallIndex() : data(0) {}
+  /**
    * @brief 成分を受け取ってそのまま格納するコンストラクタ
    */
-  WallIndex(const int8_t x = 0, const int8_t y = 0, const uint8_t z = 0)
+  WallIndex(const int8_t x, const int8_t y, const uint8_t z)
       : x(x), y(y), z(z) {}
   /**
    * @brief 表現の冗長性を除去して格納するコンストラクタ
@@ -384,12 +394,14 @@ public:
         y((i >> MAZE_SIZE_BIT) & (MAZE_SIZE_MAX - 1)),
         z(i >> (2 * MAZE_SIZE_BIT)) {}
   /** @brief 等号 */
-  bool operator==(const WallIndex &i) const {
-    return x == i.x && y == i.y && z == i.z;
+  bool operator==(const WallIndex i) const {
+    // return x == i.x && y == i.y && z == i.z;
+    return data == i.data; /*< 高速化 */
   }
   /** @brief 等号否定 */
-  bool operator!=(const WallIndex &i) const {
-    return x != i.x || y != i.y || z != i.z;
+  bool operator!=(const WallIndex i) const {
+    // return x != i.x || y != i.y || z != i.z;
+    return data != i.data; /*< 高速化 */
   }
   /**
    * @brief 迷路内の壁を一意な通し番号として表現したIDを返す．
@@ -400,16 +412,16 @@ public:
     return (z << (2 * MAZE_SIZE_BIT)) | (y << MAZE_SIZE_BIT) | x;
   }
   /** @brief 位置の取得 */
-  const Position getPosition() const { return Position(x, y); }
+  Position getPosition() const { return Position(x, y); }
   /** @brief 方向の取得 */
-  const Direction getDirection() const {
+  Direction getDirection() const {
     // return z == 0 ? Direction::East : Direction::North;
     return z << 1; /*< 高速化 */
   }
   /**
    * @brief 表示用演算子のオーバーロード． ( x, y, d) の形式
    */
-  friend std::ostream &operator<<(std::ostream &os, const WallIndex &i);
+  friend std::ostream &operator<<(std::ostream &os, const WallIndex i);
   /**
    * @brief 壁がフィールド内か判定する関数
    * x,y が (0,0)と(MAZE_SIZE-1,MAZE_SIZE-1)の間かつ，z が外周上にいない
@@ -431,12 +443,12 @@ public:
    * @param d 隣接方向
    * @return const WallIndex 隣接壁
    */
-  const WallIndex next(const Direction d) const;
+  WallIndex next(const Direction d) const;
   /**
    * @brief 現在壁に隣接する，柱ではない6方向を取得
    * @return const std::array<Direction, 6>
    */
-  const std::array<Direction, 6> getNextDirection6() const {
+  std::array<Direction, 6> getNextDirection6() const {
     const auto d = getDirection();
     return {{
         d + Direction::Front,
@@ -463,8 +475,6 @@ private:
     case Direction::South:
       y--;
       break;
-    default:
-      break;
     }
   }
 };
@@ -483,17 +493,22 @@ using WallIndexes = std::vector<WallIndex>;
  * - 実体は 16bit の整数
  */
 struct WallRecord {
-  int x : 6;          /**< @brief 区画のx座標 */
-  int y : 6;          /**< @brief 区画のy座標 */
-  unsigned int d : 3; /**< @brief 壁の方向 */
-  unsigned int b : 1; /**< @brief 壁の有無 */
+  union {
+    struct {
+      int x : 6;          /**< @brief 区画のx座標 */
+      int y : 6;          /**< @brief 区画のy座標 */
+      unsigned int d : 3; /**< @brief 壁の方向 */
+      unsigned int b : 1; /**< @brief 壁の有無 */
+    } __attribute__((__packed__));
+    uint16_t data;
+  };
   /**
    * @brief コンストラクタ
    */
   WallRecord() {}
   WallRecord(const int8_t x, const int8_t y, const Direction d, const bool b)
       : x(x), y(y), d(d), b(b) {}
-  WallRecord(const Position &p, const Direction d, const bool b)
+  WallRecord(const Position p, const Direction d, const bool b)
       : x(p.x), y(p.y), d(d), b(b) {}
   /** @brief 区画の取得 */
   const Position getPosition() const { return Position(x, y); }
@@ -501,7 +516,7 @@ struct WallRecord {
   const Direction getDirection() const { return d; }
   /** @brief 表示 */
   friend std::ostream &operator<<(std::ostream &os, const WallRecord &obj);
-} __attribute__((__packed__));
+};
 static_assert(sizeof(WallRecord) == 2, "size error"); /**< @brief size check */
 
 /**
@@ -525,7 +540,7 @@ public:
    * @param start スタート区画
    */
   Maze(const Positions &goals = Positions(),
-       const Position &start = Position(0, 0))
+       const Position start = Position(0, 0))
       : goals(goals), start(start) {
     reset();
   }
@@ -540,8 +555,8 @@ public:
    * @brief 壁の有無を返す
    * @return true: 壁あり，false: 壁なし
    */
-  bool isWall(const WallIndex &i) const { return isWallBase(wall, i); }
-  bool isWall(const Position &p, const Direction d) const {
+  bool isWall(const WallIndex i) const { return isWallBase(wall, i); }
+  bool isWall(const Position p, const Direction d) const {
     return isWallBase(wall, WallIndex(p, d));
   }
   bool isWall(const int8_t x, const int8_t y, const Direction d) const {
@@ -551,10 +566,10 @@ public:
    * @brief 壁を更新をする
    * @param b 壁の有無 true:壁あり，false:壁なし
    */
-  void setWall(const WallIndex &i, const bool b) {
+  void setWall(const WallIndex i, const bool b) {
     return setWallBase(wall, i, b);
   }
-  void setWall(const Position &p, const Direction d, const bool b) {
+  void setWall(const Position p, const Direction d, const bool b) {
     return setWallBase(wall, WallIndex(p, d), b);
   }
   void setWall(const int8_t x, const int8_t y, const Direction d,
@@ -565,8 +580,8 @@ public:
    * @brief 壁が探索済みかを返す
    * @return true: 探索済み，false: 未探索
    */
-  bool isKnown(const WallIndex &i) const { return isWallBase(known, i); }
-  bool isKnown(const Position &p, const Direction d) const {
+  bool isKnown(const WallIndex i) const { return isWallBase(known, i); }
+  bool isKnown(const Position p, const Direction d) const {
     return isWallBase(known, WallIndex(p, d));
   }
   bool isKnown(const int8_t x, const int8_t y, const Direction d) const {
@@ -576,10 +591,10 @@ public:
    * @brief 壁の既知を更新する
    * @param b 壁の未知既知 true:既知，false:未知
    */
-  void setKnown(const WallIndex &i, const bool b) {
+  void setKnown(const WallIndex i, const bool b) {
     return setWallBase(known, i, b);
   }
-  void setKnown(const Position &p, const Direction d, const bool b) {
+  void setKnown(const Position p, const Direction d, const bool b) {
     return setWallBase(known, WallIndex(p, d), b);
   }
   void setKnown(const int8_t x, const int8_t y, const Direction d,
@@ -590,8 +605,8 @@ public:
    * @brief 通過可能かどうかを返す
    * @return true:既知かつ壁なし，false:それ以外
    */
-  bool canGo(const WallIndex &i) const { return isKnown(i) && !isWall(i); }
-  bool canGo(const Position &p, const Direction d) const {
+  bool canGo(const WallIndex i) const { return isKnown(i) && !isWall(i); }
+  bool canGo(const Position p, const Direction d) const {
     return canGo(WallIndex(p, d));
   }
   /**
@@ -602,7 +617,7 @@ public:
    * @param b 壁の有無
    * @return true: 正常に更新された, false: 既知の情報と不一致だった
    */
-  bool updateWall(const Position &p, const Direction d, const bool b,
+  bool updateWall(const Position p, const Direction d, const bool b,
                   const bool pushLog = true);
   /**
    *  @brief 直前に更新した壁を見探索状態にリセットする
@@ -614,13 +629,13 @@ public:
    * @param p 区画の座標
    * @return 壁の数 0~4
    */
-  int8_t wallCount(const Position &p) const;
+  int8_t wallCount(const Position p) const;
   /**
    * @brief 引数区画に隣接する未知壁の数を返す
    * @param p 区画の座標
    * @return 既知壁の数 0~4
    */
-  int8_t unknownCount(const Position &p) const;
+  int8_t unknownCount(const Position p) const;
   /**
    * @brief 迷路の表示
    */
@@ -655,9 +670,13 @@ public:
    * @param is *.maze 形式のファイルの input-stream
    */
   bool parse(std::istream &is);
-  bool parse(std::string filepath) {
+  bool parse(const std::string &filepath) {
     std::ifstream ifs(filepath);
     return ifs ? parse(ifs) : false;
+  }
+  friend std::istream &operator>>(std::istream &is, Maze &maze) {
+    maze.parse(is);
+    return is;
   }
   /**
    * @brief 配列から迷路を読み込むパーサ
@@ -688,10 +707,10 @@ public:
   /**
    * @brief 既知部分の迷路サイズを返す．計算量を減らすために使用．
    */
-  const int8_t &getMinX() const { return min_x; }
-  const int8_t &getMinY() const { return min_y; }
-  const int8_t &getMaxX() const { return max_x; }
-  const int8_t &getMaxY() const { return max_y; }
+  int8_t getMinX() const { return min_x; }
+  int8_t getMinY() const { return min_y; }
+  int8_t getMaxX() const { return max_x; }
+  int8_t getMaxY() const { return max_y; }
   /**
    * @brief 壁ログをファイルに追記保存する関数
    */
@@ -718,13 +737,13 @@ protected:
    * @brief 壁の確認のベース関数．迷路外を参照すると壁ありと返す．
    */
   bool isWallBase(const std::bitset<WallIndex::SIZE> &wall,
-                  const WallIndex &i) const {
-    return i.isInsideOfField() ? wall[i.getIndex()] : true; //< 範囲外は壁ありに
+                  const WallIndex i) const {
+    return !i.isInsideOfField() || wall[i.getIndex()]; //< 範囲外は壁ありに
   }
   /**
    * @brief 壁の更新のベース関数．迷路外を参照しても無視される．
    */
-  void setWallBase(std::bitset<WallIndex::SIZE> &wall, const WallIndex &i,
+  void setWallBase(std::bitset<WallIndex::SIZE> &wall, const WallIndex i,
                    const bool b) const {
     if (i.isInsideOfField()) //< 範囲外アクセスの防止
       wall[i.getIndex()] = b;

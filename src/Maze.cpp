@@ -11,8 +11,13 @@
 
 namespace MazeLib {
 
+/* Direction */
+const std::array<Direction, 4> Direction::Along4 = {East, North, West, South};
+const std::array<Direction, 4> Direction::Diag4 = {NorthEast, NorthWest,
+                                                   SouthWest, SouthEast};
+
 /* Position */
-const Position Position::next(const Direction d) const {
+Position Position::next(const Direction d) const {
   switch (d) {
   case Direction::East:
     return Position(x + 1, y);
@@ -35,7 +40,7 @@ const Position Position::next(const Direction d) const {
     return *this;
   }
 }
-const Position Position::rotate(const Direction d) const {
+Position Position::rotate(const Direction d) const {
   switch (d) {
   case Direction::East:
     return Position(x, y);
@@ -50,8 +55,8 @@ const Position Position::rotate(const Direction d) const {
     return *this;
   }
 }
-std::ostream &operator<<(std::ostream &os, const Position &p) {
-  return os << "(" << std::setw(2) << (int)p.x << ", " << std::setw(2)
+std::ostream &operator<<(std::ostream &os, const Position p) {
+  return os << "( " << std::setw(2) << (int)p.x << ", " << std::setw(2)
             << (int)p.y << ")";
 }
 
@@ -62,7 +67,7 @@ std::ostream &operator<<(std::ostream &os, const Pose &pose) {
 }
 
 /* WallIndex */
-const WallIndex WallIndex::next(const Direction d) const {
+WallIndex WallIndex::next(const Direction d) const {
   switch (d) {
   case Direction::East:
     return WallIndex(x + 1, y, z);
@@ -85,7 +90,7 @@ const WallIndex WallIndex::next(const Direction d) const {
     return WallIndex(x, y, z);
   }
 }
-std::ostream &operator<<(std::ostream &os, const WallIndex &i) {
+std::ostream &operator<<(std::ostream &os, const WallIndex i) {
   return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
             << (int)i.y << ", " << i.getDirection().toChar() << ")";
 }
@@ -110,17 +115,19 @@ void Maze::reset(const bool set_start_wall, const bool set_range_full) {
   }
   wallRecords.clear();
 }
-int8_t Maze::wallCount(const Position &p) const {
-  const auto &dirs = Direction::getAlong4();
+int8_t Maze::wallCount(const Position p) const {
+  const auto &dirs = Direction::Along4;
   return std::count_if(dirs.cbegin(), dirs.cend(),
+                       //  [&](const auto d) { return isWall(p, d); });
                        [&](const Direction d) { return isWall(p, d); });
 }
-int8_t Maze::unknownCount(const Position &p) const {
-  const auto &dirs = Direction::getAlong4();
+int8_t Maze::unknownCount(const Position p) const {
+  const auto &dirs = Direction::Along4;
   return std::count_if(dirs.cbegin(), dirs.cend(),
+                       //  [&](const auto d) { return !isKnown(p, d); });
                        [&](const Direction d) { return !isKnown(p, d); });
 }
-bool Maze::updateWall(const Position &p, const Direction d, const bool b,
+bool Maze::updateWall(const Position p, const Direction d, const bool b,
                       const bool pushLog) {
   /* 既知の壁と食い違いがあったら未知壁としてreturn */
   if (isKnown(p, d) && isWall(p, d) != b) {
@@ -210,10 +217,10 @@ bool Maze::parse(const std::vector<std::string> &data, const int maze_size) {
   for (const auto xr : {true, false})
     for (const auto yr : {false, true})
       for (const auto xy : {false, true})
-        for (const auto b0 : Direction::getAlong4())
-          for (const auto b1 : Direction::getAlong4())
-            for (const auto b2 : Direction::getAlong4())
-              for (const auto b3 : Direction::getAlong4()) {
+        for (const auto b0 : Direction::Along4)
+          for (const auto b1 : Direction::Along4)
+            for (const auto b2 : Direction::Along4)
+              for (const auto b3 : Direction::Along4) {
                 const std::array<Direction, 4> bit_to_dir_map{{b0, b1, b2, b3}};
                 reset(false);
                 int diffs = 0;
@@ -263,18 +270,18 @@ void Maze::print(std::ostream &os, const int maze_size) const {
           os << " G ";
         else
           os << "   ";
-        os << (isKnown(x, y, Direction::East)
-                   ? (isWall(x, y, Direction::East) ? "|" : " ")
-                   : ".");
+        const auto k = isKnown(x, y, Direction::East);
+        const auto w = isWall(x, y, Direction::East);
+        os << (k ? (w ? '|' : ' ') : '.');
       }
       os << std::endl;
     }
-    for (int8_t x = 0; x < maze_size; ++x)
-      os << "+"
-         << (isKnown(x, y, Direction::South)
-                 ? (isWall(x, y, Direction::South) ? "---" : "   ")
-                 : " . ");
-    os << "+" << std::endl;
+    for (int8_t x = 0; x < maze_size; ++x) {
+      const auto k = isKnown(x, y, Direction::South);
+      const auto w = isWall(x, y, Direction::South);
+      os << '+' << (k ? (w ? "---" : "   ") : " . ");
+    }
+    os << '+' << std::endl;
   }
 }
 void Maze::print(const Directions &dirs, const Position &start,
@@ -291,7 +298,7 @@ void Maze::print(const Directions &dirs, const Position &start,
       for (uint8_t x = 0; x <= maze_size; ++x) {
         /* Vertical Wall */
         const auto it =
-            std::find_if(path.cbegin(), path.cend(), [&](const Pose pose) {
+            std::find_if(path.cbegin(), path.cend(), [&](const Pose &pose) {
               return WallIndex(pose.p, pose.d) ==
                      WallIndex(Position(x, y), Direction::West);
             });
@@ -317,7 +324,7 @@ void Maze::print(const Directions &dirs, const Position &start,
     }
     for (uint8_t x = 0; x < maze_size; ++x) {
       /* Pillar */
-      os << "+";
+      os << '+';
       /* Horizontal Wall */
       const auto it =
           std::find_if(path.cbegin(), path.cend(), [&](const Pose pose) {
@@ -327,12 +334,12 @@ void Maze::print(const Directions &dirs, const Position &start,
       const auto w = maze.isWall(x, y, Direction::South);
       const auto k = maze.isKnown(x, y, Direction::South);
       if (it != path.cend())
-        os << C_YE << " " << it->d << " " << C_NO;
+        os << C_YE << ' ' << it->d << ' ' << C_NO;
       else
         os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
     }
     /* Last Pillar */
-    os << "+" << std::endl;
+    os << '+' << std::endl;
   }
 }
 void Maze::print(const Positions &positions, std::ostream &os,
@@ -369,14 +376,14 @@ void Maze::print(const Positions &positions, std::ostream &os,
     }
     for (uint8_t x = 0; x < maze_size; ++x) {
       /* Pillar */
-      os << "+";
+      os << '+';
       /* Horizontal Wall */
       const auto w = maze.isWall(x, y, Direction::South);
       const auto k = maze.isKnown(x, y, Direction::South);
       os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
     }
     /* Last Pillar */
-    os << "+" << std::endl;
+    os << '+' << std::endl;
   }
 }
 bool Maze::backupWallRecordsToFile(const std::string &filepath,

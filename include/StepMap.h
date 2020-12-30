@@ -38,7 +38,7 @@ public:
   step_t getStep(const int8_t x, const int8_t y) const {
     return getStep(Position(x, y));
   }
-  step_t getStep(const Position &p) const {
+  step_t getStep(const Position p) const {
     return p.isInsideOfField() ? step_map[p.getIndex()] : STEP_MAX;
   }
   /**
@@ -48,7 +48,7 @@ public:
   void setStep(const int8_t x, const int8_t y, const step_t step) {
     return setStep(Position(x, y), step);
   }
-  void setStep(const Position &p, const step_t step) {
+  void setStep(const Position p, const step_t step) {
     if (p.isInsideOfField())
       step_map[p.getIndex()] = step;
   }
@@ -89,17 +89,14 @@ public:
    * @return const Directions スタートからゴールへの最短経路の方向列．
    *                    経路がない場合は空配列となる．
    */
-  const Directions calcShortestDirections(const Maze &maze,
-                                          const Position &start,
-                                          const Positions &dest,
-                                          const bool known_only,
-                                          const bool simple);
+  Directions calcShortestDirections(const Maze &maze, const Position &start,
+                                    const Positions &dest,
+                                    const bool known_only, const bool simple);
   /**
    * @brief スタートからゴールまでの最短経路を導出する関数
    */
-  const Directions calcShortestDirections(const Maze &maze,
-                                          const bool known_only,
-                                          const bool simple) {
+  Directions calcShortestDirections(const Maze &maze, const bool known_only,
+                                    const bool simple) {
     return calcShortestDirections(maze, maze.getStart(), maze.getGoals(),
                                   known_only, simple);
   }
@@ -107,21 +104,21 @@ public:
    * @brief ステップマップから次に行くべき方向を計算する関数
    * @return 既知区間の最終区画
    */
-  const Pose calcNextDirections(const Maze &maze, const Pose &start,
-                                Directions &nextDirectionsKnown,
-                                Directions &nextDirectionCandidates) const;
+  Pose calcNextDirections(const Maze &maze, const Pose &start,
+                          Directions &nextDirectionsKnown,
+                          Directions &nextDirectionCandidates) const;
   /**
    * @brief ステップマップにより次に行くべき方向列を生成する
    */
-  const Directions getStepDownDirections(const Maze &maze, const Pose &start,
-                                         Pose &end, const bool known_only,
-                                         const bool break_unknown) const;
+  Directions getStepDownDirections(const Maze &maze, const Pose &start,
+                                   Pose &end, const bool known_only,
+                                   const bool break_unknown) const;
   /**
    * @brief 引数区画の周囲の未知壁の確認優先順位を生成する関数
    * @return const Directions 行くべき方向の優先順位
    */
-  const Directions getNextDirectionCandidates(const Maze &maze,
-                                              const Pose &focus) const;
+  Directions getNextDirectionCandidates(const Maze &maze,
+                                        const Pose &focus) const;
   /**
    * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
    * @param maze 迷路の参照
