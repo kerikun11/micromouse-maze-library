@@ -4,7 +4,7 @@
 
 ### 動作確認済みの環境
 
-- Windows 10 (MSYS2 MinGW)
+- Windows 10 (MSYS2 MinGW 64 bit)
 - Ubuntu 20.04
 - Arch Linux (Manjaro Linux 20)
 
@@ -54,14 +54,14 @@ yay -S --needed git make cmake gcc \
     qt5-base
 # MSYS2 MinGW 64bit
 pacman -S --needed git make \
-    mingw-w64-x86_64-cmake \
-    mingw-w64-x86_64-toolchain \
-    mingw-w64-x86_64-python-matplotlib \
-    mingw-w64-x86_64-pybind11 \
-    mingw-w64-x86_64-doxygen \
-    mingw-w64-x86_64-graphviz \
-    mingw-w64-x86_64-lcov \
-    mingw-w64-x86_64-qt5
+    $MINGW_PACKAGE_PREFIX-cmake \
+    $MINGW_PACKAGE_PREFIX-toolchain \
+    $MINGW_PACKAGE_PREFIX-python-matplotlib \
+    $MINGW_PACKAGE_PREFIX-pybind11 \
+    $MINGW_PACKAGE_PREFIX-doxygen \
+    $MINGW_PACKAGE_PREFIX-graphviz \
+    $MINGW_PACKAGE_PREFIX-lcov \
+    $MINGW_PACKAGE_PREFIX-qt5
 ```
 
 --------------------------------------------------------------------------------
@@ -76,8 +76,8 @@ cd micromouse-maze-library
 ## 作業ディレクトリを作成
 mkdir build
 cd build
-## 初期化 (Makefile の生成)
-cmake .. # MSYS2 の場合 -G "MSYS Makefiles" オプションを付加
+## 初期化 (Makefile の生成); MSYS2 の場合 -G"MSYS Makefiles" オプションを付加
+cmake .. ${MSYSTEM:+-G"MSYS Makefiles"}
 ## ビルド
 make
 ```
@@ -98,7 +98,7 @@ make search
 
 --------------------------------------------------------------------------------
 
-## リファレンスの生成
+### リファレンスの生成
 
 コード中のコメントは [Doxygen](http://www.doxygen.jp/) に準拠しているので，API リファレンスを自動生成することができる．
 
@@ -115,7 +115,7 @@ open docs/html/index.html
 
 --------------------------------------------------------------------------------
 
-## ユニットテスト
+### ユニットテスト
 
 [GoogleTest](https://github.com/google/googletest) によるユニットテストと [LCOV](https://github.com/linux-test-project/lcov) によるカバレッジテストを実行する
 
