@@ -1,10 +1,14 @@
 # author: Ryotaro Onuki <kerikun11+github@gmail.com>
 # date: 2020.12.25
 
-# GoogleTest
-add_subdirectory(googletest)
+# find GoogleTest
+find_package(GTest)
+if(NOT GTEST_FOUND)
+  message(WARNING "GoogleTest not found in your environment! skipping...")
+  RETURN()
+endif()
 
-# give a target
+# make a target to test
 set(TARGET_NAME "test")
 file(GLOB SRC_FILES
   ${CMAKE_HOME_DIRECTORY}/src/*.cpp
@@ -13,10 +17,10 @@ file(GLOB SRC_FILES
 add_executable(${TARGET_NAME} ${SRC_FILES})
 target_include_directories(${TARGET_NAME}
   PRIVATE ${CMAKE_HOME_DIRECTORY}/include
-  PRIVATE ${gtest_build_include_dirs}
+  PRIVATE ${GTEST_INCLUDE_DIRS}
 )
 target_compile_options(${TARGET_NAME} PRIVATE --coverage -g -O0)
-target_link_libraries(${TARGET_NAME} PRIVATE gtest)
+target_link_libraries(${TARGET_NAME} PRIVATE ${GTEST_LIBRARIES})
 target_link_options(${TARGET_NAME} PRIVATE --coverage)
 # make a custom target to run
 add_custom_target("${TARGET_NAME}_run"
@@ -26,15 +30,14 @@ add_custom_target("${TARGET_NAME}_run"
   USES_TERMINAL
 )
 
-# make a custom target to run
+# make a custom target to run lcov
 set(CUSTOM_TARGET_NAME "lcov")
 set(INFO_FILENAME "${CMAKE_PROJECT_NAME}.info")
 add_custom_target(${CUSTOM_TARGET_NAME}
-  COMMAND type lcov &>/dev/null
-  && lcov --quiet --output ${INFO_FILENAME} --capture --directory ${CMAKE_CURRENT_BINARY_DIR}
-  && lcov --quiet --output ${INFO_FILENAME} --extract ${INFO_FILENAME} ${CMAKE_HOME_DIRECTORY}/{src,include}/*
-  && lcov --summary ${INFO_FILENAME}
-  && genhtml --quiet ${INFO_FILENAME} --output ${CMAKE_CURRENT_BINARY_DIR}/html
+  COMMAND lcov --quiet --output ${INFO_FILENAME} --capture --directory ${CMAKE_CURRENT_BINARY_DIR}
+  COMMAND lcov --quiet --output ${INFO_FILENAME} --extract ${INFO_FILENAME} ${CMAKE_HOME_DIRECTORY}/{src,include}/*
+  COMMAND lcov --summary ${INFO_FILENAME}
+  COMMAND genhtml --quiet ${INFO_FILENAME} --output ${CMAKE_CURRENT_BINARY_DIR}/html
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   USES_TERMINAL
 )

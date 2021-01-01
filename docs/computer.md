@@ -6,9 +6,9 @@
 
 ### 動作確認済みの環境
 
-- Windows 10 (MSYS2 MinGW 64 bit)
 - Ubuntu 20.04
 - Arch Linux (Manjaro Linux 20)
+- Windows 10 (MSYS2 MinGW 64 bit)
 
 --------------------------------------------------------------------------------
 
@@ -28,6 +28,8 @@
   - リファレンスの自動生成のために必要
     - doxygen
     - graphviz
+  - ユニットテストのために必要
+    - gtest
   - カバレッジテストのために必要
     - lcov
   - Qt GUI アプリのために必要
@@ -45,14 +47,14 @@ apt install git make cmake gcc g++ \
     python3-distutils \
     python3-pybind11 \
     doxygen graphviz \
-    lcov \
+    libgtest-dev lcov \
     qt5-default
 # Arch Linux
 yay -S --needed git make cmake gcc \
     python-matplotlib \
     pybind11 \
     doxygen graphviz \
-    lcov \
+    gtest lcov \
     qt5-base
 # MSYS2 MinGW 64bit
 pacman -S --needed git make \
@@ -62,6 +64,7 @@ pacman -S --needed git make \
     $MINGW_PACKAGE_PREFIX-pybind11 \
     $MINGW_PACKAGE_PREFIX-doxygen \
     $MINGW_PACKAGE_PREFIX-graphviz \
+    $MINGW_PACKAGE_PREFIX-gtest \
     $MINGW_PACKAGE_PREFIX-lcov \
     $MINGW_PACKAGE_PREFIX-qt5
 ```
