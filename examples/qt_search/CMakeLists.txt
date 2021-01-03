@@ -24,17 +24,14 @@ add_executable(${TARGET_NAME}
   ${UI_HEADERS}
   ${CODE_FILES}
 )
-target_include_directories(${TARGET_NAME}
-  PRIVATE ${CMAKE_HOME_DIRECTORY}/include # mazelib
-)
 target_link_libraries(${TARGET_NAME}
   Qt5::Widgets
-  mazelib
+  ${MICROMOUSE_MAZE_LIBRARY}
 )
 ## qt_search
 add_custom_target(qt_search
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  DEPENDS ${TARGET_NAME} mazelib
+  DEPENDS ${TARGET_NAME}
   USES_TERMINAL
 )

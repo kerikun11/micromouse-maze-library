@@ -6,9 +6,11 @@
 
 ### 動作確認済みの環境
 
-- Ubuntu 20.04
-- Arch Linux (Manjaro Linux 20)
-- Windows 10 (MSYS2 MinGW 64 bit)
+- Linux
+  - Ubuntu 20.04
+  - Manjaro Linux 20.0.3
+- Windows
+  - [MSYS2 MinGW 64 bit](https://www.msys2.org/)
 
 --------------------------------------------------------------------------------
 
@@ -73,8 +75,12 @@ pacman -S --needed git make \
 
 ### リポジトリの取得
 
+このリポジトリは [CMake](https://cmake.org/) プロジェクトになっている．
+
+はじめに以下のコマンドで初期化する．
+
 ```sh
-## 迷路データ (サブモジュール) を含めて複製
+## 迷路データ (サブモジュール) を含めて clone
 git clone --recursive https://github.com/kerikun11/micromouse-maze-library.git
 ## 移動
 cd micromouse-maze-library
@@ -87,6 +93,8 @@ cmake .. ${MSYSTEM:+-G"MSYS Makefiles"}
 make
 ```
 
+以降，コマンド `make` は，この `build` ディレクトリで実行すること．
+
 --------------------------------------------------------------------------------
 
 ### 探索走行
@@ -94,8 +102,6 @@ make
 サンプルコード [/examples/search/main.cpp](/examples/search/main.cpp) を実行するコマンドの例
 
 ```sh
-# CMake により初期化された作業ディレクトリへ移動する
-cd build
 ## 実行 (examples/search/main.cpp を実行)
 make search
 ## コマンドラインにアニメーションが流れる
@@ -108,11 +114,9 @@ make search
 コード中のコメントは [Doxygen](http://www.doxygen.jp/) に準拠しているので，API リファレンスを自動生成することができる．
 
 ```sh
-# CMake により初期化された作業ディレクトリへ移動する
-cd build
 # ドキュメントの自動生成
 make docs
-# ブラウザで開く
+# ブラウザで開く (open コマンドは環境依存)
 open docs/html/index.html
 ```
 
@@ -125,13 +129,11 @@ open docs/html/index.html
 [GoogleTest](https://github.com/google/googletest) によるユニットテストと [LCOV](https://github.com/linux-test-project/lcov) によるカバレッジテストを実行する
 
 ```sh
-# CMake により初期化された作業ディレクトリへ移動する
-cd build
 # テストを実行
 make test_run
 # カバレッジ結果の収集
 make lcov
-# ブラウザで開く
+# ブラウザで開く (open コマンドは環境依存)
 open test/html/index.html
 # カバレッジのクリア
 make lcov_clean

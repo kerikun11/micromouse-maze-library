@@ -15,7 +15,7 @@ public:
     for (int z = 0; z < 2; ++z)
       for (int x = -1; x < MazeLib::MAZE_SIZE; ++x)
         for (int y = -1; y < MazeLib::MAZE_SIZE; ++y)
-          if (z == 0 && y >= 0 || z == 1 && x >= 0) {
+          if ((z == 0 && y >= 0) || (z == 1 && x >= 0)) {
             const auto wi = MazeLib::WallIndex(x, y, z);
             const auto wl =
                 scene->addLine(getWallLine(wi), getWallPen(true, true));
