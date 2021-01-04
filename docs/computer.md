@@ -99,7 +99,7 @@ make
 
 ### 探索走行
 
-サンプルコード [/examples/search/main.cpp](/examples/search/main.cpp) を実行するコマンドの例
+サンプルコード [examples/search/main.cpp](/examples/search/main.cpp) を実行するコマンドの例
 
 ```sh
 ## 実行 (examples/search/main.cpp を実行)
@@ -120,7 +120,7 @@ make docs
 open docs/html/index.html
 ```
 
-上記コマンドにより `/build/docs/html/index.html` にリファレンスが生成される．
+上記コマンドにより `build/docs/html/index.html` にリファレンスが生成される．
 
 --------------------------------------------------------------------------------
 
@@ -129,14 +129,14 @@ open docs/html/index.html
 [GoogleTest](https://github.com/google/googletest) によるユニットテストと [LCOV](https://github.com/linux-test-project/lcov) によるカバレッジテストを実行する
 
 ```sh
+# カバレッジ結果の初期化
+make lcov_init
 # テストを実行
 make test_run
 # カバレッジ結果の収集
 make lcov
-# ブラウザで開く (open コマンドは環境依存)
+# ブラウザでカバレッジ結果をみる (open コマンドは環境依存)
 open test/html/index.html
-# カバレッジのクリア
-make lcov_clean
 ```
 
-上記コマンドにより `/build/test/html/index.html` にカバレッジ結果が生成される．
+上記コマンドにより `build/test/html/index.html` にカバレッジ結果が生成される．

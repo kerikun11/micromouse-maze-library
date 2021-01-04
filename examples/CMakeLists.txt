@@ -19,5 +19,5 @@ add_subdirectory(pi)
 add_subdirectory(search)
 
 ## add qt examples
-add_subdirectory(qt_maze)
-add_subdirectory(qt_search)
+add_subdirectory(qt_maze EXCLUDE_FROM_ALL)
+add_subdirectory(qt_search EXCLUDE_FROM_ALL)

@@ -4,11 +4,11 @@
 # give a name
 set(CUSTOM_TARGET_NAME "contest")
 set(TARGET_NAME example_${CUSTOM_TARGET_NAME})
-# make a target
+# make a executable
 file(GLOB SRC_FILES *.cpp)
 add_executable(${TARGET_NAME} ${SRC_FILES})
 target_link_libraries(${TARGET_NAME} PRIVATE ${MICROMOUSE_MAZE_LIBRARY})
-# make a custom target to run
+# make a custom target to run example
 add_custom_target(${CUSTOM_TARGET_NAME}
   COMMAND clear && ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
