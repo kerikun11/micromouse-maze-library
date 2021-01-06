@@ -2,7 +2,10 @@
     "name": "MazeLib",
     "description": "Maze Solver for MicroMouse",
     "keywords": "micromouse,maze",
-    "repository": "https://github.com/kerikun11/micromouse-maze-library.git",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kerikun11/micromouse-maze-library.git"
+    },
     "authors": {
         "name": "Ryotaro Onuki",
         "email": "kerikun11+github@gmail.com",
