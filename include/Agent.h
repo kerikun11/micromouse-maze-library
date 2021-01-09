@@ -16,6 +16,10 @@ namespace MazeLib {
  */
 class Agent {
 public:
+  /**
+   * @brief 通常のコンストラクタ
+   * @param maze 更新に用いる迷路への参照(書き込み権限あり)
+   */
   Agent(Maze &maze) : maze(maze), searchAlgorithm(maze) {}
   /**
    * @brief 初期化
@@ -42,8 +46,6 @@ public:
   bool isSolvable() { return searchAlgorithm.isSolvable(); }
   /**
    * @brief 現在地を更新
-   * @param p 区画座標
-   * @param d 絶対方向
    */
   void updateCurrentPose(const Pose &new_pose) {
     current_pose = new_pose;
@@ -86,7 +88,7 @@ public:
   }
   /**
    * @brief 最短経路を導出
-   * @param diagonal true: 斜めあり, false: 斜めなし
+   * @param diag_enabled true: 斜めあり, false: 斜めなし
    * @return true: 成功, false: 失敗
    */
   bool calcShortestDirections(const bool diag_enabled) {

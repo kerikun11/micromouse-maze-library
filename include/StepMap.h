@@ -32,8 +32,7 @@ public:
   void reset(const step_t step = STEP_MAX) { step_map.fill(step); }
   /**
    * @brief ステップの取得
-   * @param p 区画の座標
-   * @return ステップ
+   * @details 盤面外なら `STEP_MAX` を返す
    */
   step_t getStep(const int8_t x, const int8_t y) const {
     return getStep(Position(x, y));
@@ -43,7 +42,7 @@ public:
   }
   /**
    * @brief ステップの更新
-   * @param p 区画の座標
+   * @details 盤面外なら何もしない
    */
   void setStep(const int8_t x, const int8_t y, const step_t step) {
     return setStep(Position(x, y), step);
@@ -53,7 +52,7 @@ public:
       step_map[p.getIndex()] = step;
   }
   /**
-   * @brief ステップマップの配列を取得
+   * @brief ステップマップの生配列への参照を取得
    */
   const auto &getMapArray() const { return step_map; }
   /**
@@ -74,7 +73,7 @@ public:
                  std::ostream &os = std::cout) const;
   /**
    * @brief ステップマップの更新
-   * @param dest ステップを0とする，目的地の区画の集合
+   * @param dest ステップを0とする目的地の区画の集合(順不同)
    * @param known_only true:未知壁は通過不可能，false:未知壁は通過可能とする
    * @param simple 台形加速を考慮せず，隣接区画のコストをすべて1にする
    */
@@ -84,7 +83,7 @@ public:
    * @brief 与えられた区画間の最短経路を導出する関数
    * @param maze 迷路の参照
    * @param start 始点区画
-   * @param goals ゴール区画の集合
+   * @param dest 目的地区画の集合(順不同)
    * @param known_only 既知壁のみモードかどうか
    * @return const Directions スタートからゴールへの最短経路の方向列．
    *                    経路がない場合は空配列となる．

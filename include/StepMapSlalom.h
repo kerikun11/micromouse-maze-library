@@ -129,7 +129,7 @@ public:
         unsigned int z : 1;
         unsigned int nd : 3; /**< @brief direction of the node */
       } __attribute__((__packed__));
-      uint16_t data;
+      uint16_t data; /**< @brief for access to the entire data */
     };
 
   public:

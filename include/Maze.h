@@ -208,7 +208,7 @@ public:
       int8_t x; /**< @brief 迷路区画のx座標成分 */
       int8_t y; /**< @brief 迷路区画のy座標成分 */
     };
-    uint16_t data;
+    uint16_t data; /**< データ全体へのアクセス用 */
   };
 
 public:
@@ -363,7 +363,7 @@ public:
       int8_t y : 7;  /**< @brief 区画座標のy成分 */
       uint8_t z : 1; /**< @brief 区画内の壁の位置．0:East, 1:North */
     };
-    uint16_t data;
+    uint16_t data; /**< データ全体へのアクセス用 */
   };
 
 public:
@@ -500,7 +500,7 @@ struct WallRecord {
       unsigned int d : 3; /**< @brief 壁の方向 */
       unsigned int b : 1; /**< @brief 壁の有無 */
     } __attribute__((__packed__));
-    uint16_t data;
+    uint16_t data; /**< データ全体へのアクセス用 */
   };
   /**
    * @brief コンストラクタ
@@ -645,7 +645,7 @@ public:
    * @brief パス付きの迷路の表示
    * @param start パスのスタート座標
    * @param dirs 移動方向の配列
-   * @param of output-stream
+   * @param os output-stream
    */
   void print(const Directions &dirs, const Position &start = Position(0, 0),
              std::ostream &os = std::cout,
