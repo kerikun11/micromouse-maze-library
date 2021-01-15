@@ -113,7 +113,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setStep</b> (const <a
 <tr class="separator:a3b0fff1fbe5cd71cbcb26619f4bf9d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb6b02693ab2345aac19e91f6284a05f"><td class="memItemLeft" align="right" valign="top"><a id="abb6b02693ab2345aac19e91f6284a05f"></a>
 const auto &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#abb6b02693ab2345aac19e91f6284a05f">getMapArray</a> () const</td></tr>
-<tr class="memdesc:abb6b02693ab2345aac19e91f6284a05f"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップマップの配列を取得 <br /></td></tr>
+<tr class="memdesc:abb6b02693ab2345aac19e91f6284a05f"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップマップの生配列への参照を取得 <br /></td></tr>
 <tr class="separator:abb6b02693ab2345aac19e91f6284a05f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8820317c6b0257db1789bbdc355fe7cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a8820317c6b0257db1789bbdc355fe7cb">print</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> &amp;p=<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(-1, -1), const <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html">Direction</a> <a class="el" href="../../d1/de8/Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>=<a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html#a45d12960450cee7631c77462a977b211">Direction::Max</a>, std::ostream &amp;os=std::cout) const</td></tr>
 <tr class="memdesc:a8820317c6b0257db1789bbdc355fe7cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップの表示  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a8820317c6b0257db1789bbdc355fe7cb">More...</a><br /></td></tr>
@@ -331,7 +331,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
   <table class="params">
     <tr><td class="paramname">maze</td><td>迷路の参照 </td></tr>
     <tr><td class="paramname">start</td><td>始点区画 </td></tr>
-    <tr><td class="paramname">goals</td><td>ゴール区画の集合 </td></tr>
+    <tr><td class="paramname">dest</td><td>目的地区画の集合(順不同) </td></tr>
     <tr><td class="paramname">known_only</td><td>既知壁のみモードかどうか </td></tr>
   </table>
   </dd>
@@ -406,13 +406,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><div class="memdoc">
 
 <p>ステップの取得 </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">p</td><td>区画の座標 </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>ステップ </dd></dl>
+<p>盤面外なら <code>STEP_MAX</code> を返す </p>
 
 </div>
 </div>
@@ -539,12 +533,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><div class="memdoc">
 
 <p>ステップの更新 </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">p</td><td>区画の座標 </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>盤面外なら何もしない </p>
 
 </div>
 </div>
@@ -589,7 +578,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 <p>ステップマップの更新 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">dest</td><td>ステップを0とする，目的地の区画の集合 </td></tr>
+    <tr><td class="paramname">dest</td><td>ステップを0とする目的地の区画の集合(順不同) </td></tr>
     <tr><td class="paramname">known_only</td><td>true:未知壁は通過不可能，false:未知壁は通過可能とする </td></tr>
     <tr><td class="paramname">simple</td><td>台形加速を考慮せず，隣接区画のコストをすべて1にする </td></tr>
   </table>
