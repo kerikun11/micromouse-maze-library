@@ -119,17 +119,17 @@ public:
 #else
     RobotBase::printInfo(show_maze);
 #endif
-    std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, Left: %3d, "
-                "Right: %3d, Back: %3d\n",
-                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
+    std::printf("Estimated Time: %2d:%02d, Step: %4d, "
+                "F: %3d, L: %3d, R: %3d, B: %3d, Walls: %3d\n",
+                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b,
+                (int)maze.getWallRecords().size());
     // std::printf("It took %5d [us], the max is %5d [us]\n", t_dur, t_dur_max);
   }
   void printResult() const {
-    std::printf("Estimated Time: %2d:%02d, Step: %4d, Forward: %3d, "
-                "Left: %3d, Right: %3d, Back: %3d\n",
-                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b);
-    std::cout << "Found Walls:    \t" << maze.getWallRecords().size()
-              << std::endl;
+    std::printf("Estimated Time: %2d:%02d, Step: %4d, "
+                "F: %3d, L: %3d, R: %3d, B: %3d, Walls: %3d\n",
+                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b,
+                (int)maze.getWallRecords().size());
   }
   bool fastRun(const bool diag_enabled) {
     /* 最短経路の導出 */
