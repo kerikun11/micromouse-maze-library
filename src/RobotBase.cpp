@@ -129,6 +129,12 @@ bool RobotBase::generalSearchRun() {
     }
     /* 走行が終わるのを待つ */
     waitForEndAction();
+    /* 探索中断を確認 */
+    if (break_flag) {
+      logi << "the break flag was set" << std::endl;
+      stopDequeue();
+      return false;
+    }
     /* 壁を確認 */
     bool left, front, right;
     senseWalls(left, front, right);
