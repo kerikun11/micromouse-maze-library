@@ -5,7 +5,7 @@
  * @date 2021-01-25
  * @copyright Copyright (c) 2021 Ryotaro Onuki
  */
-#include <Maze.h> /*< for logi */
+#include <Maze.h> /*< for maze_logi */
 #include <SPIFFS.h>
 #include <iostream>
 
@@ -14,11 +14,11 @@ int test_meas(const std::string &mazedata_dir);
 
 void setup() {
   SPIFFS.begin(true);
-  logi << "Hello, this is ESP32 :)" << std::endl;
+  maze_logi << "Hello, this is ESP32 :)" << std::endl;
 }
 
 void loop() {
   test_meas("/spiffs/");
-  logi << "End" << std::endl;
+  maze_logi << "End" << std::endl;
   vTaskDelay(portMAX_DELAY);
 }

@@ -43,7 +43,7 @@ bool RobotBase::positionIdentifyRun() {
 bool RobotBase::endFastRunBackingToStartRun() {
   /* エラー処理 */
   if (getShortestDirections().empty()) {
-    logw << "ShortestDirections are empty!" << std::endl;
+    maze_logw << "ShortestDirections are empty!" << std::endl;
     return false;
   }
   /* 現在位置を最短後の位置に移す */
@@ -93,7 +93,7 @@ void RobotBase::queueNextDirections(const Directions &nextDirections) {
       turnbackSave();
       break;
     default:
-      logw << "invalid direction" << std::endl;
+      maze_loge << "invalid direction" << std::endl;
     }
     updateCurrentPose(current_pose.next(nextDirection));
     if (break_flag)
@@ -116,7 +116,7 @@ bool RobotBase::generalSearchRun() {
     queueNextDirections(getNextDirections());
     /* 探索中断を確認 */
     if (break_flag) {
-      logi << "the break flag was set" << std::endl;
+      maze_logw << "the break flag was set" << std::endl;
       stopDequeue();
       return false;
     }
@@ -131,7 +131,7 @@ bool RobotBase::generalSearchRun() {
     waitForEndAction();
     /* 探索中断を確認 */
     if (break_flag) {
-      logi << "the break flag was set" << std::endl;
+      maze_logw << "the break flag was set" << std::endl;
       stopDequeue();
       return false;
     }
@@ -143,7 +143,7 @@ bool RobotBase::generalSearchRun() {
     /* 壁のない方向へ1マス移動 */
     Direction nextDirection;
     if (!determineNextDirection(current_pose, nextDirection)) {
-      loge << "I can't go anywhere! " << std::endl;
+      maze_logw << "I can't go anywhere! " << std::endl;
       stopDequeue();
       return false;
     }

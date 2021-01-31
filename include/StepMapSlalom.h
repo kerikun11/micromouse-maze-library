@@ -228,7 +228,7 @@ public:
       case Direction::SouthEast:
         return z == 1 ? Direction::Left45 : Direction::Right45;
       default:
-        logw << "Invalid Direction: " << nd << std::endl;
+        maze_loge << "Invalid Direction: " << nd << std::endl;
         return Direction::Max;
       }
     }

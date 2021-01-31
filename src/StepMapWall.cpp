@@ -235,7 +235,7 @@ Direction StepMapWall::convertDirection(const Direction d, const WallIndex &i) {
   case Direction::SouthEast:
     return i.z == 0 ? Direction::South : Direction::East;
   default:
-    logw << "invalid direction" << std::endl;
+    maze_loge << "invalid direction" << std::endl;
     return Direction::Max;
   }
 }

@@ -38,7 +38,7 @@ protected:
     /* 袋小路以外の転回検出 */
     if (action == SearchAction::ROTATE_180 &&
         maze_target.wallCount(real.p) != 3)
-      logi << "it's not dead end!" << std::endl, getc(stdin);
+      maze_logi << "it's not dead end!" << std::endl, getc(stdin);
 #endif
     CLRobotBase::queueAction(action);
   }
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
       shortest_dirs = map.calcShortestDirections(
           maze, maze.getStart(), maze.getGoals(), known_only, simple);
       if (shortest_dirs.empty())
-        loge << "Failed!" << std::endl;
+        maze_loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
       const auto t_s = std::chrono::system_clock().now();
       shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
       if (shortest_dirs.empty())
-        loge << "Failed!" << std::endl;
+        maze_loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);

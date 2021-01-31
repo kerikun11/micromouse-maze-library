@@ -94,7 +94,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       next_directions.state = State::IMPOSSIBLE;
       return result;
     default:
-      logw << "invalid result" << std::endl;
+      maze_loge << "invalid result" << std::endl;
       return SearchAlgorithm::Error;
     }
   }
@@ -112,7 +112,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       next_directions.state = State::IMPOSSIBLE;
       return result;
     default:
-      logw << "invalid result" << std::endl;
+      maze_loge << "invalid result" << std::endl;
       return SearchAlgorithm::Error;
     }
   }
@@ -130,7 +130,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       next_directions.state = State::IMPOSSIBLE;
       return result;
     default:
-      logw << "invalid result" << std::endl;
+      maze_loge << "invalid result" << std::endl;
       return SearchAlgorithm::Error;
     }
   }
@@ -148,7 +148,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       next_directions.state = State::IMPOSSIBLE;
       return result;
     default:
-      logw << "invalid result" << std::endl;
+      maze_loge << "invalid result" << std::endl;
       return SearchAlgorithm::Error;
     }
   }
@@ -166,7 +166,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
     next_directions.state = State::IMPOSSIBLE;
     return result;
   default:
-    logw << "invalid result" << std::endl;
+    maze_loge << "invalid result" << std::endl;
     return SearchAlgorithm::Error;
   }
   /* reached start */

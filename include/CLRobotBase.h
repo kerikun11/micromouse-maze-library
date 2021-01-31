@@ -134,7 +134,7 @@ public:
   bool fastRun(const bool diag_enabled) {
     /* 最短経路の導出 */
     if (!calcShortestDirections(diag_enabled)) {
-      loge << "Failed to find shortest path!" << std::endl;
+      maze_logw << "Failed to find shortest path!" << std::endl;
       return false;
     }
     /* 現在位置をスタートに設定 */
@@ -148,7 +148,7 @@ public:
   bool endFastRunBackingToStartRun() {
     /* エラー処理 */
     if (getShortestDirections().empty()) {
-      logw << "ShortestDirections are empty!" << std::endl;
+      maze_logw << "ShortestDirections are empty!" << std::endl;
       return false;
     }
     /* real を最短後の位置に移す */
@@ -223,8 +223,8 @@ protected:
   }
   virtual void discrepancyWithKnownWall() override {
     if (getState() != SearchAlgorithm::IDENTIFYING_POSITION) {
-      logw << "There was a discrepancy with known information! "
-           << getCurrentPose() << std::endl;
+      maze_logw << "There was a discrepancy with known information! "
+                << getCurrentPose() << std::endl;
     }
   }
   virtual void backupMazeToFlash() override {
@@ -237,7 +237,7 @@ protected:
         action != SearchAction::ST_FULL && getNextDirections().size() == 0 &&
         !maze.isWall(current_pose.p, current_pose.d)) {
       printInfo();
-      logw << "not straight in unknown accel" << std::endl;
+      maze_logw << "not straight in unknown accel" << std::endl;
       getc(stdin);
     }
     unknown_accel_prev = getState() != SearchAlgorithm::GOING_TO_GOAL &&
@@ -258,7 +258,7 @@ protected:
       break;
     case RobotBase::START_INIT:
       if (real_visit_goal == false)
-        loge << "Reached Start without Going to Goal!" << std::endl;
+        maze_logw << "Reached Start without Going to Goal!" << std::endl;
       break;
     case RobotBase::ST_HALF_STOP:
       break;
@@ -302,14 +302,15 @@ protected:
     case RobotBase::ST_HALF:
       break;
     default:
-      logw << "invalid action" << std::endl;
+      maze_loge << "invalid action" << std::endl;
       break;
     }
     action_prev = action;
   }
   virtual void crashed() {
-    loge << "The robot crashed into the wall! fake_offset:\t" << fake_offset
-         << "\tcur:\t" << current_pose << "\treal:\t" << real << std::endl;
+    maze_loge << "The robot crashed into the wall! fake_offset:\t"
+              << fake_offset << "\tcur:\t" << current_pose << "\treal:\t"
+              << real << std::endl;
     setBreakFlag();
   }
   virtual float getTimeCost(const SearchAction action) {
@@ -333,7 +334,7 @@ protected:
     case RobotBase::ST_HALF:
       return segment / 2 / velocity;
     default:
-      logw << "invalid action" << std::endl;
+      maze_loge << "invalid action" << std::endl;
       return 0;
     }
   }

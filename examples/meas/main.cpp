@@ -13,7 +13,7 @@ protected:
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.p == maze.getStart() && action != ST_HALF_STOP)
-      logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
+      maze_logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
 #endif
     CLRobotBase::queueAction(action);
   }
@@ -85,7 +85,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
     const auto p_maze_target = std::make_unique<Maze>();
     Maze &maze_target = *p_maze_target;
     if (!maze_target.parse(mazedata_dir + filename)) {
-      loge << "File Parse Error!" << std::endl;
+      maze_loge << "File Parse Error!" << std::endl;
       continue;
     }
 
@@ -96,7 +96,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
     robot.replaceGoals(maze_target.getGoals());
     const auto t_s = std::chrono::system_clock().now();
     if (!robot.searchRun())
-      loge << "Failed to Find a Path to Goal!" << std::endl;
+      maze_loge << "Failed to Find a Path to Goal!" << std::endl;
     const auto t_e = std::chrono::system_clock().now();
     const auto t_search =
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s)
@@ -113,8 +113,8 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
     csv << "," << t_search;
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirections(diag_enabled)) {
-        loge << "Failed to Find a Shortest Path! "
-             << (diag_enabled ? "diag" : "no_diag") << std::endl;
+        maze_loge << "Failed to Find a Shortest Path! "
+                  << (diag_enabled ? "diag" : "no_diag") << std::endl;
         continue;
       }
       const auto path_cost = robot.getSearchAlgorithm().getShortestCost();
@@ -131,11 +131,11 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
       robot.calcShortestDirections(diag_enabled);
       if (at.getSearchAlgorithm().getShortestCost() !=
           robot.getSearchAlgorithm().getShortestCost()) {
-        logw << "searched path is not shortest! "
-             << (diag_enabled ? "(diag)" : "(no_diag)") << std::endl;
-        logw << "real: " << at.getSearchAlgorithm().getShortestCost()
-             << " searched: " << robot.getSearchAlgorithm().getShortestCost()
-             << std::endl;
+        maze_logw << "searched path is not shortest! "
+                  << (diag_enabled ? "(diag)" : "(no_diag)") << std::endl;
+        maze_logw << "real: " << at.getSearchAlgorithm().getShortestCost()
+                  << " searched: "
+                  << robot.getSearchAlgorithm().getShortestCost() << std::endl;
         // at.printPath(); robot.printPath();
       }
     }
@@ -169,8 +169,8 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
           robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
           const bool res = robot.positionIdentifyRun();
           if (!res)
-            loge << "Failed to Identify! fake_offset: " << robot.fake_offset
-                 << std::endl;
+            maze_loge << "Failed to Identify! fake_offset: "
+                      << robot.fake_offset << std::endl;
           /* save result */
           id_cost_max = std::max(id_cost_max, robot.cost);
           id_cost_min = std::min(id_cost_min, robot.cost);
@@ -205,7 +205,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
         const auto t_s = std::chrono::system_clock().now();
         shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
         if (shortest_dirs.empty())
-          loge << "Failed!" << std::endl;
+          maze_loge << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
         const auto us =
             std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
@@ -231,7 +231,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
         const auto t_s = std::chrono::system_clock().now();
         shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
         if (shortest_dirs.empty())
-          loge << "Failed!" << std::endl;
+          maze_loge << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
         const auto us =
             std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);

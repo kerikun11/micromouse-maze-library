@@ -57,31 +57,34 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 #define C_NO "\x1b[0m"  /**< @brief ANSI Escape Sequence RESET */
 #endif
 
-/*
- * ログ出力 stream
- */
+/** @brief 引数を文字列リテラルに変換するマクロ */
+#define MAZE_TO_STRING_SUPPORT(n) #n
+#define MAZE_TO_STRING(n) MAZE_TO_STRING_SUPPORT(n)
+/** @brief 行番号の文字列リテラルを返すマクロ */
+#define MAZE_LINENO MAZE_TO_STRING(__LINE__)
+
 /** @brief Log Stream (Error) */
-#ifndef loge
+#ifndef maze_loge
 #if 1
-#define loge (std::cout << C_RE "[E][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
+#define maze_loge (std::cout << C_RE "[E][" __FILE__ ":" MAZE_LINENO "]\t" C_NO)
 #else
-#define loge std::ostream(0)
+#define maze_loge std::ostream(0)
 #endif
 #endif
 /** @brief Log Stream (Warning) */
-#ifndef logw
+#ifndef maze_logw
 #if 1
-#define logw (std::cout << C_YE "[W][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
+#define maze_logw (std::cout << C_YE "[W][" __FILE__ ":" MAZE_LINENO "]\t" C_NO)
 #else
-#define logw std::ostream(0)
+#define maze_logw std::ostream(0)
 #endif
 #endif
 /** @brief Log Stream (Info) */
-#ifndef logi
+#ifndef maze_logi
 #if 1
-#define logi (std::cout << C_GR "[I][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
+#define maze_logi (std::cout << C_GR "[I][" __FILE__ ":" MAZE_LINENO "]\t" C_NO)
 #else
-#define logi std::ostream(0)
+#define maze_logi std::ostream(0)
 #endif
 #endif
 
