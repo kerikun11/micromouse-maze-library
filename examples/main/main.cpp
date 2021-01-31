@@ -46,15 +46,15 @@ protected:
 
 #endif
 
-int main(void) {
+int main(int argc, char *argv[]) {
   setvbuf(stdout, (char *)NULL, _IONBF, 0);
 
 #if 1
   /* Preparation */
-  const std::string mazedata_dir = "../mazedata/data/";
-  const std::string filename = "32MM2019HX.maze";
+  const std::string filepath =
+      argc > 1 ? std::string(argv[1]) : "../mazedata/data/32MM2019HX.maze";
   Maze maze_target;
-  if (!maze_target.parse((mazedata_dir + filename).c_str()))
+  if (!maze_target.parse(filepath))
     return -1;
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
   CLRobot &robot = *p_robot;
