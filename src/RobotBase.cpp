@@ -9,6 +9,8 @@
 namespace MazeLib {
 
 void RobotBase::reset() {
+  /* 迷路をリセット */
+  Agent::reset();
   /* 探索中断をクリア */
   setBreakFlag(false);
   /* 自己位置同定をクリア */
@@ -71,6 +73,8 @@ void RobotBase::turnbackSave() {
   queueAction(ST_HALF_STOP);
   waitForEndAction();
   stopDequeue();
+  if (break_flag)
+    return;
   backupMazeToFlash();
   queueAction(ROTATE_180);
   queueAction(ST_HALF);
@@ -78,6 +82,8 @@ void RobotBase::turnbackSave() {
 }
 void RobotBase::queueNextDirections(const Directions &nextDirections) {
   for (const auto nextDirection : nextDirections) {
+    if (break_flag)
+      return;
     const auto relative_d = Direction(nextDirection - current_pose.d);
     switch (relative_d) {
     case Direction::Front:
@@ -96,8 +102,6 @@ void RobotBase::queueNextDirections(const Directions &nextDirections) {
       maze_loge << "invalid direction" << std::endl;
     }
     updateCurrentPose(current_pose.next(nextDirection));
-    if (break_flag)
-      return;
   }
 }
 bool RobotBase::generalSearchRun() {
@@ -112,14 +116,14 @@ bool RobotBase::generalSearchRun() {
     const auto status = calcNextDirections(); /*< 時間がかかる処理！ */
     const auto newState = getState();
     calcNextDirectionsPostCallback(prevState, newState);
-    /* 既知区間移動をキューにつめる */
-    queueNextDirections(getNextDirections());
     /* 探索中断を確認 */
     if (break_flag) {
       maze_logw << "the break flag was set" << std::endl;
       stopDequeue();
       return false;
     }
+    /* 既知区間移動をキューにつめる */
+    queueNextDirections(getNextDirections());
     /* 最短経路導出結果を確認 */
     if (status == SearchAlgorithm::Reached)
       break;
