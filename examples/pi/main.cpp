@@ -68,7 +68,7 @@ int test_position_identify() {
   /* Position Identification Run */
   robot.display = 1;
   robot.fake_offset = robot.real = Pose(Position(4, 1), Direction::East);
-  robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
+  robot.updateMaze(maze_pi); /*< 探索直後の迷路に置き換える */
   // robot.resetLastWalls(robot.getMaze().getWallRecords().size() / 2);
   robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
   bool res = robot.positionIdentifyRun();
@@ -99,7 +99,7 @@ int test_position_identify() {
           continue; /*< スタートは除外 */
         /* set fake offset */
         robot.fake_offset = robot.real = Pose(Position(x, y), d);
-        robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
+        robot.updateMaze(maze_pi); /*< 探索直後の迷路に置き換える */
         // robot.resetLastWalls(robot.getMaze().getWallRecords().size() / 2);
         robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
         robot.display = 1;

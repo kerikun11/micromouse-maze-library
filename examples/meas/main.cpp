@@ -164,7 +164,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
           if (maze_target.isWall(p, d + Direction::Back))
             continue; /*< 壁上からは除外 */
           robot.fake_offset = robot.real = Pose(p, d);
-          robot.setMaze(maze_pi); /*< 探索直後の迷路に置き換える */
+          robot.updateMaze(maze_pi); /*< 探索直後の迷路に置き換える */
           // robot.resetLastWalls(maze_pi.getWallRecords().size() / 5);
           robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
           const bool res = robot.positionIdentifyRun();

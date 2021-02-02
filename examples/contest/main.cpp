@@ -99,7 +99,7 @@ int main(void) {
   {
     auto m = robot.getMaze();
     m.resetLastWalls(12);
-    robot.setMaze(m);
+    robot.updateMaze(m);
   }
 
   robot.display = 1;
@@ -111,7 +111,7 @@ int main(void) {
   {
     auto m = robot.getMaze();
     m.resetLastWalls(12);
-    robot.setMaze(m);
+    robot.updateMaze(m);
   }
   robot.wait();
 

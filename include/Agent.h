@@ -20,7 +20,8 @@ public:
    * @brief 通常のコンストラクタ
    * @param maze 更新に用いる迷路への参照(書き込み権限あり)
    */
-  Agent(Maze &maze) : maze(maze), searchAlgorithm(maze) {}
+  Agent() : searchAlgorithm(maze) {}
+  Agent(const Maze &maze) : maze(maze), searchAlgorithm(this->maze) {}
   /**
    * @brief 初期化
    */
@@ -155,6 +156,10 @@ public:
    */
   const Maze &getMaze() const { return maze; }
   /**
+   * @brief 迷路を更新
+   */
+  void updateMaze(const Maze &new_maze) { maze = new_maze; }
+  /**
    * @brief Get the Search Algorithm object
    */
   const SearchAlgorithm &getSearchAlgorithm() const { return searchAlgorithm; }
@@ -185,7 +190,7 @@ public:
   int getMatchCount() const { return next_directions.match_count; }
 
 protected:
-  Maze &maze;                         /**< 使用する迷路の参照 */
+  Maze maze;                          /**< 使用する迷路 */
   Pose current_pose;                  /**< 現在の姿勢 */
   bool isForceBackToStart = false;    /**< 強制帰還モード */
   bool isForceGoingToGoal = false;    /**< 強制終点訪問モード */

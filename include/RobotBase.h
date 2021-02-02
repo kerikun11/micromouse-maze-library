@@ -96,7 +96,7 @@ public:
   }
 
 public:
-  RobotBase(Maze &maze) : Agent(maze) { reset(); }
+  RobotBase() { reset(); }
   void reset();
   bool searchRun();
   bool positionIdentifyRun();

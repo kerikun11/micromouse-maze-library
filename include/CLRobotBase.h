@@ -18,7 +18,7 @@ namespace MazeLib {
  */
 class CLRobotBase : public RobotBase {
 public:
-  CLRobotBase(Maze &maze_target) : RobotBase(maze), maze_target(maze_target) {}
+  CLRobotBase(Maze &maze_target) : maze_target(maze_target) {}
 
   void printDoubleMaze(std::array<const Maze *, 2> maze,
                        std::array<const Pose *, 2> pose,
@@ -164,7 +164,6 @@ public:
       step = f = l = r = b = cost = 0;
     return RobotBase::positionIdentifyRun();
   }
-  void setMaze(const Maze &new_maze) { maze = new_maze; }
 
 public:
   int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
@@ -183,7 +182,6 @@ public:
   bool real_visit_goal = false;
 
 protected:
-  Maze maze;
   SearchAction action_prev = SearchAction::START_STEP;
   bool unknown_accel_prev = false;
 
