@@ -22,7 +22,7 @@ public:
 
 public:
   /**
-   * @brief コンストラクタ
+   * @brief デフォルトコンストラクタ
    */
   StepMap();
   /**

@@ -190,16 +190,17 @@ public:
   int getMatchCount() const { return next_directions.match_count; }
 
 protected:
-  Maze maze;                          /**< 使用する迷路 */
-  Pose current_pose;                  /**< 現在の姿勢 */
-  bool isForceBackToStart = false;    /**< 強制帰還モード */
-  bool isForceGoingToGoal = false;    /**< 強制終点訪問モード */
-  bool isPositionIdentifying = false; /**< 自己位置同定モード */
+  Maze maze;                          /**< @brief 使用する迷路 */
+  Pose current_pose;                  /**< @brief 現在の姿勢 */
+  bool isForceBackToStart = false;    /**< @brief 強制帰還モード */
+  bool isForceGoingToGoal = false;    /**< @brief 強制終点訪問モード */
+  bool isPositionIdentifying = false; /**< @brief 自己位置同定モード */
 
 private:
-  SearchAlgorithm searchAlgorithm;                 /**< 探索器 */
-  SearchAlgorithm::NextDirections next_directions; /**< 次に行く既知方向配列 */
-  Directions shortest_dirs; /**< 最短経路の方向配列 */
+  SearchAlgorithm searchAlgorithm; /**< @brief 探索器 */
+  SearchAlgorithm::NextDirections
+      next_directions;      /**< @brief 次に行く既知方向配列 */
+  Directions shortest_dirs; /**< @brief 最短経路の方向配列 */
 };
 
 } // namespace MazeLib

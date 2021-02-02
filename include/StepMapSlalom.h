@@ -101,8 +101,7 @@ public:
     }
     /**
      * @brief コストテーブルを生成する関数
-     *
-     * 各マス数ごとのコストは不変なので高速化のために予め計算しておく
+     * @details 各マス数ごとのコストは不変なので高速化のために予め計算しておく
      */
     void genCostTable() {
       const float seg_a = 90.0f;
@@ -116,8 +115,8 @@ public:
 
   /**
    * @brief スラローム走行のノードの Index．
-   *
-   * 「各区画中央の4方位」または「 各壁上の4方位」，の位置姿勢を一意に識別する．
+   * @details 「各区画中央の4方位」または「
+   * 各壁上の4方位」，の位置姿勢を一意に識別する．
    */
   class Index {
   private:
@@ -152,6 +151,7 @@ public:
     /** @brief 区画中央のコンストラクタ */
     Index(const int8_t x, const int8_t y, const Direction nd)
         : x(x), y(y), z(0), nd(nd) {}
+    /** @brief 区画中央のコンストラクタ */
     Index(const Position p, const Direction nd)
         : x(p.x), y(p.y), z(0), nd(nd) {}
     /** @brief 壁上のコンストラクタ */
@@ -174,8 +174,7 @@ public:
     }
     /**
      * @brief 迷路中の Index をuniqueな通し番号として表現したID
-     *
-     * 取りうる値を 0-11 に収めるために、bit shift を行っている
+     * @details 取りうる値を 0-11 に収めるために、bit shift を行っている
      * @return uint16_t ID
      */
     uint16_t getIndex() const {
@@ -186,7 +185,7 @@ public:
     }
     /**
      * @brief 座標の冗長を一意にする．
-     * d を East or North のどちらかにそろえる
+     * @details d を East or North のどちらかにそろえる
      */
     void uniquify(const Direction d) {
       z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
@@ -264,7 +263,7 @@ public:
    *
    * @param maze 迷路オブジェクト
    * @param edge_cost エッジコストオブジェクト
-   * @param dest 目的地
+   * @param dest 目的地の集合
    * @param known_only 既知壁のみを通過可能とする
    * @param diag_enabled 斜め走行を有効化する
    */
@@ -273,11 +272,11 @@ public:
   /**
    * @brief 最短経路を導出する
    *
-   * @param maze
-   * @param edge_cost
-   * @param shortest_dirs
-   * @param known_only
-   * @param diag_enabled
+   * @param maze 迷路オブジェクト
+   * @param edge_cost エッジコストオブジェクト
+   * @param shortest_dirs 最短経路を格納するための動的配列
+   * @param known_only 既知壁のみを通行可能とする
+   * @param diag_enabled 斜め走行を有効化する
    * @return true 成功
    * @return false 失敗．ゴールにたどり着けなかった
    */
@@ -304,9 +303,8 @@ public:
 
   /**
    * @brief 目的地の区画集合を Indexes に変換する関数
-   *
-   * 目的地区画のうち壁のない入射 Index を抽出．すべて区画の中央の Index
-   *
+   * @details 目的区画のうち壁のない入射 Index を抽出．すべて区画の中央の Index
+   * 
    * @param src
    * @return const Indexes
    */

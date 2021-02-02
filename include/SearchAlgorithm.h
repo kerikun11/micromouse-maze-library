@@ -21,22 +21,22 @@ public:
    * @brief 進むべき方向の計算結果
    */
   enum Result : uint8_t {
-    Processing, /**< 現探索状態を継続 */
-    Reached,    /**< 現探索状態が完了 */
-    Error,      /**< エラーが発生 */
+    Processing, /**< @brief 現探索状態を継続 */
+    Reached,    /**< @brief 現探索状態が完了 */
+    Error,      /**< @brief エラーが発生 */
   };
   /**
    * @brief 探索状態を列挙
    */
   enum State : uint8_t {
-    START,                  /**< 初期位置，初期姿勢 */
-    SEARCHING_FOR_GOAL,     /**< ゴール区画を探索中 */
-    SEARCHING_ADDITIONALLY, /**< 追加探索中 */
-    BACKING_TO_START,       /**< スタートに戻っている */
-    REACHED_START,          /**< スタートに戻ってきた */
-    IMPOSSIBLE,             /**< ゴールは到達不可能な場所 */
-    IDENTIFYING_POSITION,   /**< 自己位置同定中 */
-    GOING_TO_GOAL,          /**< ゴールへ向かっている */
+    START,                  /**< @brief 初期位置，初期姿勢 */
+    SEARCHING_FOR_GOAL,     /**< @brief ゴール区画を探索中 */
+    SEARCHING_ADDITIONALLY, /**< @brief 追加探索中 */
+    BACKING_TO_START,       /**< @brief スタートに戻っている */
+    REACHED_START,          /**< @brief スタートに戻ってきた */
+    IMPOSSIBLE,             /**< @brief ゴールは到達不可能な場所 */
+    IDENTIFYING_POSITION,   /**< @brief 自己位置同定中 */
+    GOING_TO_GOAL,          /**< @brief ゴールへ向かっている */
   };
   /**
    * @brief Stateの表示用文字列を返す関数
@@ -46,17 +46,27 @@ public:
    * @brief 計算結果の構造体
    */
   struct NextDirections {
-    State state = State::START;           /**< 探索状態 */
-    Directions next_directions_known;     /**< 既地区間移動候補列 */
-    Directions next_direction_candidates; /**< 未知区間移動候補順位 */
-    bool unknown_accel_flag = false; /**< 未知区間加速可能フラグ */
-    Pose known_end;                  /**< 既地区間終了時の姿勢 */
-    int match_count = 0;             /**< 自己位置同定の候補数 */
+    State state = State::START;       /**< @brief 探索状態 */
+    Directions next_directions_known; /**< @brief 既地区間移動候補列 */
+    Directions next_direction_candidates; /**< @brief 未知区間移動候補順位 */
+    bool unknown_accel_flag = false; /**< @brief 未知区間加速可能フラグ */
+    Pose known_end;      /**< @brief 既地区間終了時の姿勢 */
+    int match_count = 0; /**< @brief 自己位置同定の候補数 */
   };
 
 public:
+  /**
+   * @brief デフォルトコンストラクタ
+   * @param maze 使用する迷路への参照
+   */
   SearchAlgorithm(Maze &maze) : maze(maze) {}
+  /**
+   * @brief 探索が完全に終了しているかどうかを返す関数
+   */
   bool isComplete();
+  /**
+   * @brief 探索によって可解かどうかを返す関数
+   */
   bool isSolvable();
 
   /**
@@ -119,14 +129,14 @@ public:
   }
 
 protected:
-  Maze &maze;                    /**< 使用する迷路の参照 */
-  StepMap step_map;              /**< 使用するステップマップ */
-  StepMapWall step_map_wall;     /**< 使用するステップマップ */
-  StepMapSlalom step_map_slalom; /**< 使用するステップマップ */
+  Maze &maze;                /**< @brief 使用する迷路の参照 */
+  StepMap step_map;          /**< @brief 使用するステップマップ */
+  StepMapWall step_map_wall; /**< @brief 使用するステップマップ */
+  StepMapSlalom step_map_slalom; /**< @brief 使用するステップマップ */
 
 private:
-  Maze idMaze;       /**< 自己位置同定に使用する迷路 */
-  Position idOffset; /**< 自己位置同定迷路の始点位置 */
+  Maze idMaze;       /**< @brief 自己位置同定に使用する迷路 */
+  Position idOffset; /**< @brief 自己位置同定迷路の始点位置 */
 
   /**
    * @brief ステップマップにより最短経路上になりうる区画を洗い出す
