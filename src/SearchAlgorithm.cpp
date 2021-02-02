@@ -543,13 +543,21 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsBackingToStart(
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsGoingToGoal(
     SearchAlgorithm::NextDirections &next_directions,
     const Pose &current_pose) {
-  auto &nextDirectionCandidates = next_directions.next_direction_candidates;
   const auto &goals = maze.getGoals();
+  /* 最短経路で帰れる場合はそれで帰る */
+  next_directions.next_direction_candidates.clear();
+  next_directions.next_directions_known =
+      step_map.calcShortestDirections(maze, current_pose.p, goals, true, false);
+  if (std::find(goals.cbegin(), goals.cend(), next_directions.known_end.p) !=
+      goals.cend())
+    return Reached;
+  /* 未知壁を含む場合 */
+  auto &nextDirectionCandidates = next_directions.next_direction_candidates;
   calcNextDirectionsInAdvance(maze, goals, current_pose, next_directions);
+  /* ゴール判定 */
   const auto next_p =
       current_pose.p.next(nextDirectionCandidates[0] + Direction::Back);
-  const auto it = std::find_if(goals.cbegin(), goals.cend(),
-                               [next_p](const auto p) { return next_p == p; });
+  const auto it = std::find(goals.cbegin(), goals.cend(), next_p);
   if (it != goals.cend())
     return Reached;
   return nextDirectionCandidates.empty() ? Error : Processing;
