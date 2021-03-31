@@ -17,6 +17,9 @@ set(DOXYGEN_MACRO_EXPANSION YES)
 set(DOXYGEN_EXPAND_ONLY_PREDEF YES)
 set(DOXYGEN_PREDEFINED __attribute__((__packed__)))
 set(DOXYGEN_CREATE_SUBDIRS YES) # to resolve src code link
+set(DOXYGEN_CALL_GRAPH YES)
+set(DOXYGEN_CALLER_GRAPH YES)
+set(DOXYGEN_OUTPUT_LANGUAGE Japanese)
 
 # set library version
 find_package(Git)
