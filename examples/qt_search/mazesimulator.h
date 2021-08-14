@@ -25,7 +25,7 @@ class MainWindow;
 class MazeSimulator : public MazeLib::RobotBase {
 public:
   MazeSimulator(Ui::MainWindow *ui, QGraphicsScene *scene)
-      : RobotBase(maze), ui(ui), scene(scene) {
+      : ui(ui), scene(scene) {
     loop->connect(timer, SIGNAL(timeout()), loop, SLOT(quit()));
   }
 
@@ -269,8 +269,8 @@ protected:
           << getCurrentPose() << std::endl;
     }
   }
-  virtual void
-  queueAction(const SearchAction action __attribute__((unused))) override {
+  virtual void queueAction(const SearchAction action
+                           __attribute__((unused))) override {
     /* draw */
     draw();
     /* block */
