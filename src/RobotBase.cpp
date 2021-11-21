@@ -2,7 +2,8 @@
  * @file RobotBase.cpp
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief ロボットのベース
- * @date 2017.10.30
+ * @copyright Copyright (c) 2018 Ryotaro Onuki
+ * @date 2018.05.20
  */
 #include "RobotBase.h"
 

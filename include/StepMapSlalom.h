@@ -2,6 +2,7 @@
  * @file StepMapSlalom.h
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief スラロームのコストベースのステップマップを表現するクラス
+ * @copyright Copyright (c) 2019 Ryotaro Onuki
  * @date 2019-08-17
  */
 #pragma once

@@ -2,6 +2,7 @@
  * @file SearchAlgorithm.cpp
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路の探索アルゴリズムを扱うクラス
+ * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017.11.05
  */
 #include "SearchAlgorithm.h"

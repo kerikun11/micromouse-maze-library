@@ -2,6 +2,7 @@
  * @file StepMap.h
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路のステップマップを扱うクラス
+ * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017-11-05
  */
 #pragma once

@@ -2,6 +2,7 @@
  * @file Maze.cpp
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路クラスを定義
+ * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017.10.30
  */
 #include "Maze.h"
