@@ -229,7 +229,7 @@ bool Maze::parse(const std::vector<std::string> &data, const int maze_size) {
                   for (int8_t x = 0; x < maze_size; ++x) {
                     const int8_t xd = xr ? x : (maze_size - x - 1);
                     const int8_t yd = yr ? y : (maze_size - y - 1);
-                    const char c = xy ? data[xd][yd] : data[yd][xd];
+                    const signed char c = xy ? data[xd][yd] : data[yd][xd];
                     uint8_t h = 0;
                     if ('0' <= c && c <= '9')
                       h = c - '0';
