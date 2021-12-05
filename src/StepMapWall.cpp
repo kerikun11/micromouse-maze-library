@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2019 Ryotaro Onuki
  * @date 2019-08-17
  */
-#include "StepMapWall.h"
+#include "MazeLib/StepMapWall.h"
 
 #include <algorithm> /*< for std::sort */
 #include <cmath>     /*< for std::sqrt, std::pow */

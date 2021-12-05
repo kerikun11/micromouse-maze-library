@@ -5,7 +5,7 @@
  * @date 2021-01-25
  * @copyright Copyright (c) 2021 Ryotaro Onuki
  */
-#include <Maze.h> /*< for maze_logi */
+#include <MazeLib/Maze.h> /*< for maze_logi */
 #include <SPIFFS.h>
 #include <iostream>
 

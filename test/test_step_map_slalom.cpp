@@ -1,5 +1,5 @@
-#include "StepMapSlalom.h"
-#include "gtest/gtest.h"
+#include "MazeLib/StepMapSlalom.h"
+#include <gtest/gtest.h>
 
 using namespace MazeLib;
 

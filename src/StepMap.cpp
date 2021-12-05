@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017.11.05
  */
-#include "StepMap.h"
+#include "MazeLib/StepMap.h"
 
 #include <algorithm> /*< for std::sort */
 #include <cmath>     /*< for std::sqrt, std::pow */

@@ -7,10 +7,10 @@
  */
 #pragma once
 
-#include "Maze.h"
-#include "StepMap.h"
-#include "StepMapSlalom.h"
-#include "StepMapWall.h"
+#include "MazeLib/Maze.h"
+#include "MazeLib/StepMap.h"
+#include "MazeLib/StepMapSlalom.h"
+#include "MazeLib/StepMapWall.h"
 
 namespace MazeLib {
 /**

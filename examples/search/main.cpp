@@ -8,8 +8,8 @@
 /*
  * 迷路ライブラリのインクルード
  */
-#include "Maze.h"
-#include "StepMap.h"
+#include "MazeLib/Maze.h"
+#include "MazeLib/StepMap.h"
 
 /*
  * 標準ライブラリのインクルード

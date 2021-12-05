@@ -6,7 +6,7 @@
  * @date 2019-09-11
  */
 
-#include "StepMapSlalom.h"
+#include "MazeLib/StepMapSlalom.h"
 
 #include <algorithm> /*< for std::find_if, etc. */
 #include <functional>

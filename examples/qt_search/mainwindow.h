@@ -1,15 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "mazesimulator.h"
+#include "ui_mainwindow.h"
+
+#include <MazeLib/Maze.h>
+#include <MazeLib/StepMapSlalom.h>
+
 #include <QFileDialog>
 #include <QMainWindow>
 #include <QMessageBox>
-
-#include "ui_mainwindow.h"
-
-#include "Maze.h"
-#include "StepMapSlalom.h"
-#include "mazesimulator.h"
 
 namespace Ui {
 class MainWindow;

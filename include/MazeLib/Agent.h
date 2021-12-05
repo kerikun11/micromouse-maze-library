@@ -7,8 +7,8 @@
  */
 #pragma once
 
-#include "Maze.h"
-#include "SearchAlgorithm.h"
+#include "MazeLib/Maze.h"
+#include "MazeLib/SearchAlgorithm.h"
 
 namespace MazeLib {
 

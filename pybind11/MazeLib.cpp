@@ -5,11 +5,10 @@
  * @date 2020-06-11
  * @copyright Copyright (c) 2020 Ryotaro Onuki
  */
-#include <Maze.h>
-#include <StepMap.h>
-#include <StepMapWall.h>
-
-#include <StepMapSlalom.h>
+#include <MazeLib/Maze.h>
+#include <MazeLib/StepMap.h>
+#include <MazeLib/StepMapSlalom.h>
+#include <MazeLib/StepMapWall.h>
 
 #include <pybind11/iostream.h>
 #include <pybind11/operators.h>
@@ -146,8 +145,7 @@ PYBIND11_MODULE(MazeLib, m) {
   py::class_<WallRecord>(m, "WallRecord")
       .def(py::init<>())
       .def(py::init<int8_t, int8_t, Direction, bool>(), py::arg("x") = 0,
-           py::arg("y") = 0, py::arg("d") = Direction::Max,
-           py::arg("b") = false)
+           py::arg("y") = 0, py::arg("d") = 0, py::arg("b") = false)
       .def(py::init<const Position &, const Direction, bool>())
       .def("getPosition", &WallRecord::getPosition)
       .def("getDirection", &WallRecord::getDirection)

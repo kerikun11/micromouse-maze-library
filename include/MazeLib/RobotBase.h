@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "Agent.h"
+#include "MazeLib/Agent.h"
 #include <algorithm> //< std::replace
 
 namespace MazeLib {

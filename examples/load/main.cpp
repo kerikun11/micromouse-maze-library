@@ -1,4 +1,4 @@
-#include "Maze.h"
+#include "MazeLib/Maze.h"
 
 using namespace MazeLib;
 

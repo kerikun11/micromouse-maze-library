@@ -1,8 +1,8 @@
+#include <MazeLib/Maze.h>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLineItem>
 #include <QtWidgets/QGraphicsView>
-
-#include <Maze.h>
 
 class QMazeView : public QGraphicsView {
 public:

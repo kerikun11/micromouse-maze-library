@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "Maze.h"
+#include "MazeLib/Maze.h"
 #include <limits> /*< for std::numeric_limits */
 
 namespace MazeLib {

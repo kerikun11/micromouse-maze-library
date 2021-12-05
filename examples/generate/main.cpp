@@ -1,12 +1,12 @@
+#include "MazeLib/CLRobotBase.h"
+#include "MazeLib/Maze.h"
+#include "MazeLib/StepMap.h"
+#include "MazeLib/StepMapSlalom.h"
+
 #include <algorithm>
 #include <queue>
 #include <random>
 #include <stack>
-
-#include "CLRobotBase.h"
-#include "Maze.h"
-#include "StepMap.h"
-#include "StepMapSlalom.h"
 
 using namespace MazeLib;
 

@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017.11.05
  */
-#include "SearchAlgorithm.h"
+#include "MazeLib/SearchAlgorithm.h"
 
 #include <algorithm>
 

@@ -1,6 +1,11 @@
 #ifndef MAZESIMULATOR_H
 #define MAZESIMULATOR_H
 
+#include "ui_mainwindow.h"
+
+#include <MazeLib/Maze.h>
+#include <MazeLib/RobotBase.h>
+
 #include <QEventLoop>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
@@ -8,10 +13,6 @@
 #include <QTimer>
 
 #include <sstream>
-
-#include "Maze.h"
-#include "RobotBase.h"
-#include "ui_mainwindow.h"
 
 using namespace MazeLib;
 

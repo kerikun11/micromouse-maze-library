@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2018 Ryotaro Onuki
  * @date 2018.05.20
  */
-#include "Agent.h"
+#include "MazeLib/Agent.h"
 
 namespace MazeLib {
 

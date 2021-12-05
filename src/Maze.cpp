@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017.10.30
  */
-#include "Maze.h"
+#include "MazeLib/Maze.h"
 
 #include <algorithm> //< for std::find(), std::count_if()
 #include <iomanip>   //< for std::setw()
