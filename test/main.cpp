@@ -2,11 +2,9 @@
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief unit test of micromouse maze library
  * @date 2020-03-18
- *
- * @copyright Copyright (c) 2020
- *
+ * @copyright Copyright (c) 2020 Ryotaro Onuki
  */
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 int main(int argc, char *argv[]) {
   ::testing::InitGoogleTest(&argc, argv);

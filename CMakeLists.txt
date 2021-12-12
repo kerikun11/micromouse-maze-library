@@ -10,7 +10,7 @@ set(CMAKE_BUILD_TYPE Release)
 ## global build options
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
-set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
+set(CMAKE_CXX_EXTENSIONS OFF) # without compiler extensions like gnu++11
 add_compile_options(-fdiagnostics-color=always) # colorized output for gcc
 add_compile_options(-mno-ms-bitfields) # for use of '__attribute__((__packed__))' on MSYS
 

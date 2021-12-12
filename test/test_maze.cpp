@@ -1,5 +1,6 @@
-#include "Maze.h"
-#include "gtest/gtest.h"
+#include "MazeLib/Maze.h"
+#include <gtest/gtest.h>
+#include <algorithm>
 
 using namespace MazeLib;
 

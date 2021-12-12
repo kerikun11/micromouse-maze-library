@@ -2,9 +2,10 @@
  * @file StepMap.cpp
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路のステップマップを扱うクラス
+ * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017.11.05
  */
-#include "StepMap.h"
+#include "MazeLib/StepMap.h"
 
 #include <algorithm> /*< for std::sort */
 #include <cmath>     /*< for std::sqrt, std::pow */
@@ -175,13 +176,17 @@ void StepMap::update(const Maze &maze, const Positions &dest,
       /* 直線で行けるところまで更新する */
       auto next = focus;
       for (int8_t i = 1; i <= max_straight; ++i) {
+        /* 計算を高速化するため展開範囲を制限 */
+        if (next.x > max_x || next.y > max_y || next.x < min_x ||
+            next.y < min_y)
+          break;
         /* 壁あり or 既知壁のみで未知壁 ならば次へ */
         const auto next_wi = WallIndex(next, d);
         if (maze.isWall(next_wi) || (known_only && !maze.isKnown(next_wi)))
           break;
         next = next.next(d); /*< 移動 */
         /* 直線加速を考慮したステップを算出 */
-        const auto next_step = focus_step + (simple ? 1 : step_table[i]);
+        const auto next_step = focus_step + step_table[i];
         const auto next_index = next.getIndex();
         if (step_map[next_index] <= next_step)
           break;                          /*< 更新の必要がない */
