@@ -65,9 +65,9 @@ public:
 private:
   /** @brief 迷路中のステップ数 */
   std::array<step_t, WallIndex::SIZE> step_map;
-  /** @brief 台形加速を考慮したコストテーブル (壁沿い) */
+  /** @brief 台形加速を考慮した移動コストテーブル (壁沿い方向) */
   std::array<step_t, MAZE_SIZE * 2> step_table_along;
-  /** @brief 台形加速を考慮したコストテーブル (斜め) */
+  /** @brief 台形加速を考慮した移動コストテーブル (斜め方向) */
   std::array<step_t, MAZE_SIZE * 2> step_table_diag;
 
   /**

@@ -1,7 +1,7 @@
 /**
  * @file StepMap.h
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
- * @brief マイクロマウスの迷路のステップマップを扱うクラス
+ * @brief マイクロマウスの迷路の区画ベースのステップマップを扱うクラスを定義
  * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017-11-05
  */
@@ -13,7 +13,7 @@
 namespace MazeLib {
 
 /**
- * @brief 足立法のためのステップマップを管理するクラス
+ * @brief 区画ベースのステップマップを管理するクラス
  */
 class StepMap {
 public:
@@ -24,6 +24,7 @@ public:
 public:
   /**
    * @brief デフォルトコンストラクタ
+   * @details 台形加速のコストテーブルを計算する処理を含む
    */
   StepMap();
   /**
@@ -38,6 +39,10 @@ public:
   step_t getStep(const int8_t x, const int8_t y) const {
     return getStep(Position(x, y));
   }
+  /**
+   * @brief ステップの取得
+   * @details 盤面外なら `STEP_MAX` を返す
+   */
   step_t getStep(const Position p) const {
     return p.isInsideOfField() ? step_map[p.getIndex()] : STEP_MAX;
   }
@@ -48,12 +53,16 @@ public:
   void setStep(const int8_t x, const int8_t y, const step_t step) {
     return setStep(Position(x, y), step);
   }
+  /**
+   * @brief ステップの更新
+   * @details 盤面外なら何もしない
+   */
   void setStep(const Position p, const step_t step) {
     if (p.isInsideOfField())
       step_map[p.getIndex()] = step;
   }
   /**
-   * @brief ステップマップの生配列への参照を取得
+   * @brief ステップマップの生配列への参照を取得 (読み取り専用)
    */
   const auto &getMapArray() const { return step_map; }
   /**
@@ -131,8 +140,9 @@ public:
                                        const bool diag_enabled);
 
 protected:
-  std::array<step_t, Position::SIZE> step_map; /**< @brief ステップ数*/
-  /** @brief 台形加速を考慮したコストテーブル (壁沿い) */
+  /** @brief 迷路中のステップ数 */
+  std::array<step_t, Position::SIZE> step_map;
+  /** @brief 台形加速を考慮した移動コストテーブル (壁沿い方向) */
   std::array<step_t, MAZE_SIZE> step_table;
 
   /**

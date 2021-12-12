@@ -23,7 +23,7 @@ public:
    */
   static constexpr cost_t CostMax = std::numeric_limits<cost_t>::max();
   /**
-   * @brief スラロームのインデックス
+   * @brief 最短走行のスラロームのインデックス
    */
   enum Slalom : int8_t { F45, F90, F135, F180, FV90, FS90, FMAX };
   /**
@@ -80,7 +80,6 @@ public:
 
     /**
      * @brief 台形加速を考慮したコストを生成する関数
-     *
      * @param i マスの数
      * @param am 最大加速度
      * @param vs 始点速度
@@ -261,7 +260,6 @@ public:
              std::ostream &os = std::cout) const;
   /**
    * @brief コストマップの更新
-   *
    * @param maze 迷路オブジェクト
    * @param edge_cost エッジコストオブジェクト
    * @param dest 目的地の集合
@@ -272,7 +270,6 @@ public:
               const bool known_only, const bool diag_enabled);
   /**
    * @brief 最短経路を導出する
-   *
    * @param maze 迷路オブジェクト
    * @param edge_cost エッジコストオブジェクト
    * @param shortest_dirs 最短経路を格納するための動的配列
@@ -286,7 +283,6 @@ public:
                               const bool diag_enabled);
   /**
    * @brief コストマップを辿って経路を生成する
-   *
    * @param path 経路を格納する配列
    * @return true 成功
    * @return false ゴールにたどりつけなかった
@@ -294,7 +290,6 @@ public:
   bool genPathFromMap(Indexes &path) const;
   /**
    * @brief コストマップから最短経路のコストを取得する
-   *
    * @return cost_t 最短経路のコスト
    */
   cost_t getShortestCost() const {
@@ -305,14 +300,12 @@ public:
   /**
    * @brief 目的地の区画集合を Indexes に変換する関数
    * @details 目的区画のうち壁のない入射 Index を抽出．すべて区画の中央の Index
-   * 
    * @param src
    * @return const Indexes
    */
   static Indexes convertDestinations(const Positions &src);
   /**
    * @brief ノード列を方向列に変換する関数
-   *
    * @param path
    * @param diag_enabled
    * @return const Directions
