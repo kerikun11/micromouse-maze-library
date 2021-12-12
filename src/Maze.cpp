@@ -2,9 +2,10 @@
  * @file Maze.cpp
  * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路クラスを定義
+ * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017.10.30
  */
-#include "Maze.h"
+#include "MazeLib/Maze.h"
 
 #include <algorithm> //< for std::find(), std::count_if()
 #include <iomanip>   //< for std::setw()
@@ -36,7 +37,7 @@ Position Position::next(const Direction d) const {
   case Direction::SouthEast:
     return Position(x + 1, y - 1);
   default:
-    logw << d << std::endl;
+    maze_loge << d << std::endl;
     return *this;
   }
 }
@@ -51,7 +52,7 @@ Position Position::rotate(const Direction d) const {
   case Direction::South:
     return Position(y, -x);
   default:
-    logw << d << std::endl;
+    maze_loge << d << std::endl;
     return *this;
   }
 }
@@ -86,7 +87,7 @@ WallIndex WallIndex::next(const Direction d) const {
   case Direction::SouthEast:
     return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
   default:
-    logw << d << std::endl;
+    maze_loge << d << std::endl;
     return WallIndex(x, y, z);
   }
 }
@@ -228,7 +229,7 @@ bool Maze::parse(const std::vector<std::string> &data, const int maze_size) {
                   for (int8_t x = 0; x < maze_size; ++x) {
                     const int8_t xd = xr ? x : (maze_size - x - 1);
                     const int8_t yd = yr ? y : (maze_size - y - 1);
-                    const char c = xy ? data[xd][yd] : data[yd][xd];
+                    const signed char c = xy ? data[xd][yd] : data[yd][xd];
                     uint8_t h = 0;
                     if ('0' <= c && c <= '9')
                       h = c - '0';
@@ -403,7 +404,7 @@ bool Maze::backupWallRecordsToFile(const std::string &filepath,
   /* WallRecords を追記 */
   std::ofstream of(filepath, std::ios::binary | std::ios::app);
   if (of.fail()) {
-    loge << "failed to open file! " << filepath << std::endl;
+    maze_logw << "failed to open file! " << filepath << std::endl;
     return false;
   }
   while (backup_counter < wallRecords.size()) {
@@ -416,7 +417,7 @@ bool Maze::backupWallRecordsToFile(const std::string &filepath,
 bool Maze::restoreWallRecordsFromFile(const std::string &filepath) {
   std::ifstream f(filepath, std::ios::binary);
   if (f.fail()) {
-    loge << "failed to open file! " << filepath << std::endl;
+    maze_logw << "failed to open file! " << filepath << std::endl;
     return false;
   }
   backup_counter = 0;

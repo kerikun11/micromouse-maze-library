@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['p_66',['p',['../df/ddb/structMazeLib_1_1Pose.html#a1792c8b1b5634a5ad3292282b085b6ae',1,'MazeLib::Pose']]],
-  ['parse_67',['parse',['../d8/d25/classMazeLib_1_1Maze.html#aeaf471afcf3c3562c815707aa1b04952',1,'MazeLib::Maze::parse(std::istream &amp;is)'],['../d8/d25/classMazeLib_1_1Maze.html#a30984abe3487ae22e173c4d2312fd25f',1,'MazeLib::Maze::parse(const std::vector&lt; std::string &gt; &amp;data, const int maze_size)']]],
-  ['pose_68',['Pose',['../df/ddb/structMazeLib_1_1Pose.html',1,'MazeLib']]],
-  ['position_69',['Position',['../d0/ddc/structMazeLib_1_1Position.html',1,'MazeLib::Position'],['../d0/ddc/structMazeLib_1_1Position.html#a273bddbcc328c127be9453db54707ef6',1,'MazeLib::Position::Position()'],['../d0/ddc/structMazeLib_1_1Position.html#aeb482522ab6fbcfd2224719296f05d1f',1,'MazeLib::Position::Position(const int8_t x, const int8_t y)']]],
-  ['positions_70',['Positions',['../dc/d56/namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853',1,'MazeLib']]],
-  ['print_71',['print',['../d8/d25/classMazeLib_1_1Maze.html#a4bf3567bf0f819bd253abdb93c8fbbf6',1,'MazeLib::Maze::print(std::ostream &amp;os=std::cout, const int maze_size=MAZE_SIZE) const'],['../d8/d25/classMazeLib_1_1Maze.html#af775ecb92e486f0d868ed0af676127cd',1,'MazeLib::Maze::print(const Directions &amp;dirs, const Position &amp;start=Position(0, 0), std::ostream &amp;os=std::cout, const size_t maze_size=MAZE_SIZE) const'],['../d8/d25/classMazeLib_1_1Maze.html#a5f0e86eb04966b5eae64db3dcfff1e33',1,'MazeLib::Maze::print(const Positions &amp;positions, std::ostream &amp;os=std::cout, const size_t maze_size=MAZE_SIZE) const'],['../d9/da9/classMazeLib_1_1StepMap.html#a8820317c6b0257db1789bbdc355fe7cb',1,'MazeLib::StepMap::print()']]]
+  ['relativedirection_77',['RelativeDirection',['../d3/d5c/classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60',1,'MazeLib::Direction']]],
+  ['reset_78',['reset',['../d8/d25/classMazeLib_1_1Maze.html#ae550859cb46898c9cf4a74c254488e46',1,'MazeLib::Maze::reset()'],['../d9/da9/classMazeLib_1_1StepMap.html#abe105dfa5e71b6a5d98bd6185d48b63c',1,'MazeLib::StepMap::reset()']]],
+  ['resetlastwalls_79',['resetLastWalls',['../d8/d25/classMazeLib_1_1Maze.html#a02951c0204c5f8fc3553b0208f7bf7f6',1,'MazeLib::Maze']]],
+  ['restorewallrecordsfromfile_80',['restoreWallRecordsFromFile',['../d8/d25/classMazeLib_1_1Maze.html#afabe3d1808634f5ae23c26331184c80d',1,'MazeLib::Maze']]],
+  ['rotate_81',['rotate',['../d0/ddc/structMazeLib_1_1Position.html#a4aac1630ca560a2139a781b90202dbb0',1,'MazeLib::Position::rotate(const Direction d) const'],['../d0/ddc/structMazeLib_1_1Position.html#ae9660ebc8676cf177c8a96bb129abf3c',1,'MazeLib::Position::rotate(const Direction d, const Position center) const']]]
 ];

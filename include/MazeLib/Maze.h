@@ -1,7 +1,8 @@
 /**
  * @file Maze.h
- * @author Ryotaro Onuki (GitHub: kerikun11)
+ * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路を扱うクラスを定義
+ * @copyright Copyright (c) 2017 Ryotaro Onuki
  * @date 2017.10.30
  */
 #pragma once
@@ -22,11 +23,11 @@ namespace MazeLib {
 /**
  * @brief 迷路の1辺の区画数の定数．
  */
-static constexpr int MAZE_SIZE = 16;
+static constexpr int MAZE_SIZE = 32;
 /**
  * @brief 少数部分の切り上げ関数．
  */
-constexpr int ceil(const float f) { return int(f) + (f != float(int(f))); }
+constexpr int ceil(const float f) { return int(f) + (f > float(int(f))); }
 /**
  * @brief 迷路の1辺の区画数の bit 数．bit shift などに用いる．
  */
@@ -57,38 +58,41 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 #define C_NO "\x1b[0m"  /**< @brief ANSI Escape Sequence RESET */
 #endif
 
-/*
- * ログ出力 stream
- */
+/** @brief 引数を文字列リテラルに変換するマクロ */
+#define MAZE_TO_STRING_SUPPORT(n) #n
+/** @brief 引数を文字列リテラルに変換するマクロの補助 */
+#define MAZE_TO_STRING(n) MAZE_TO_STRING_SUPPORT(n)
+/** @brief 行番号の文字列リテラルを返すマクロ */
+#define MAZE_LINENO MAZE_TO_STRING(__LINE__)
+
 /** @brief Log Stream (Error) */
-#ifndef loge
+#ifndef maze_loge
 #if 1
-#define loge (std::cout << C_RE "[E][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
+#define maze_loge (std::cout << C_RE "[E][" __FILE__ ":" MAZE_LINENO "]\t" C_NO)
 #else
-#define loge std::ostream(0)
+#define maze_loge std::ostream(0)
 #endif
 #endif
 /** @brief Log Stream (Warning) */
-#ifndef logw
+#ifndef maze_logw
 #if 1
-#define logw (std::cout << C_YE "[W][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
+#define maze_logw (std::cout << C_YE "[W][" __FILE__ ":" MAZE_LINENO "]\t" C_NO)
 #else
-#define logw std::ostream(0)
+#define maze_logw std::ostream(0)
 #endif
 #endif
 /** @brief Log Stream (Info) */
-#ifndef logi
+#ifndef maze_logi
 #if 1
-#define logi (std::cout << C_GR "[I][" __FILE__ ":" << __LINE__ << "]\t" C_NO)
+#define maze_logi (std::cout << C_GR "[I][" __FILE__ ":" MAZE_LINENO "]\t" C_NO)
 #else
-#define logi std::ostream(0)
+#define maze_logi std::ostream(0)
 #endif
 #endif
 
 /**
  * @brief 迷路上の方向を表す．
- *
- * 実体は 8bit の整数．
+ * @details 実体は 8bit の整数．
  * 絶対方向 or 相対方向の8方位を表現することができる．
  * コンストラクタにより8方位(0-7)に自動的に収められるので，
  * 加法，減法により相対方向を計算することができる．
@@ -142,7 +146,11 @@ public:
     Right,
     Right45,
   };
-  /** @brief 方向の総数．for文などで使える． */
+  /**
+   * @brief 方向の総数．for文などで使える．
+   * @details Direction 型ではなく int8_t 型なことに注意．
+   * (Direction 型は 0-7 の整数)
+   */
   static constexpr int8_t Max = 8;
 
 public:
@@ -160,8 +168,9 @@ public:
    * @brief 整数へのキャスト．相対方向などの演算に使える．
    */
   operator int8_t() const { return d; }
-  /** @brief 斜めかどうかの判定 */
+  /** @brief 壁沿い方向かどうかの判定 */
   bool isAlong() const { return (d & 1) == 0; }
+  /** @brief 斜め方向かどうかの判定 */
   bool isDiag() const { return (d & 1) == 1; }
   /** @brief 表示用char型へのキャスト */
   char toChar() const { return ">'^`<,v.X"[d]; }
@@ -186,9 +195,8 @@ using Directions = std::vector<Direction>;
 
 /**
  * @brief 迷路の区画の位置(座標)を定義．
- *
+ * @details 実体は 16bit の整数．
  * 左下の区画が (0,0) の (x,y) 平面．
- * 実体は 16bit の整数．
  * ```
  * +--------+--------+
  * | (0, 1) | (1, 1) |
@@ -208,7 +216,7 @@ public:
       int8_t x; /**< @brief 迷路区画のx座標成分 */
       int8_t y; /**< @brief 迷路区画のy座標成分 */
     };
-    uint16_t data; /**< データ全体へのアクセス用 */
+    uint16_t data; /**< @brief データ全体へのアクセス用 */
   };
 
 public:
@@ -223,8 +231,8 @@ public:
   Position(const int8_t x, const int8_t y) : x(x), y(y) {}
   /**
    * @brief 迷路内の区画の一意な通し番号となるIDを取得する
-   *
-   * 迷路外の区画の場合未定義動作となる．use Position::isInsideOfField()
+   * @details 迷路外の区画の場合未定義動作となる．
+   * Position::isInsideOfField() を使って
    * @return uint16_t 通し番号ID
    */
   uint16_t getIndex() const { return (x << MAZE_SIZE_BIT) | y; }
@@ -269,6 +277,12 @@ public:
    * @return const Position
    */
   Position rotate(const Direction d) const;
+  /**
+   * @brief 座標を回転変換する
+   * @param d 回転角度, 4方位のみ
+   * @param center 回転中心座標
+   * @return const Position
+   */
   Position rotate(const Direction d, const Position center) const {
     return center + (*this - center).rotate(d);
   }
@@ -286,7 +300,7 @@ using Positions = std::vector<Position>;
 
 /**
  * @brief Position と Direction をまとめた型．位置姿勢．
- *
+ * @details アライメント制約により実体は 4Bytes．
  * 位置姿勢は，区画とそこに向かう方向で特定する．
  * 現在区画から出る方向ではないことに注意する．
  * ```
@@ -318,11 +332,12 @@ public:
   /** @brief stream での表示 */
   friend std::ostream &operator<<(std::ostream &os, const Pose &pose);
 };
+static_assert(sizeof(Pose) == 4, "size error"); /**< @brief size check */
 
 /**
  * @brief 区画ベースではなく，壁ベースの管理ID
- *
- * uint16_t にキャストすると，全部の壁が通し番号になったIDを取得できるのが特徴
+ * @details uint16_t にキャストすることで全部の壁が通し番号になったIDを
+ * 取得できるという特徴がある．
  * 迷路内部の壁の総数 WallIndex::SIZE 個の配列を確保しておけば，
  * 取得したIDをインデックスとして使える．そのとき， WallIndex が
  * 迷路の内部にあるかどうか確認すること．(配列の範囲外アクセス防止)
@@ -336,15 +351,15 @@ public:
  *   => (x, y, z) : Wall Index
  * +-------------+-------------+-------------+
  * |             |             |             |
+ * |     Cell   Wall           |             |
  * |             |             |             |
- * |             |             |             |
- * +-------------+- (x, y, 1) -+-------------+
+ * +--- z = 1 ---+- (x, y, 1) -+-------------+
  * |             |             |             |
  * |    (x-1, y, 0)  [ x, y]  (x, y, 0)      |
  * |             |             |             |
  * +--- z = 1 ---+- (x,y-1,1) -+-------------+
  * |             |             |             |
- * |    Cell   z = 0           |             |
+ * |           z = 0         z = 0           |
  * |             |             |             |
  * +-------------+-------------+-------------+
  * ```
@@ -363,7 +378,7 @@ public:
       int8_t y : 7;  /**< @brief 区画座標のy成分 */
       uint8_t z : 1; /**< @brief 区画内の壁の位置．0:East, 1:North */
     };
-    uint16_t data; /**< データ全体へのアクセス用 */
+    uint16_t data; /**< @brief データ全体へのアクセス用 */
   };
 
 public:
@@ -463,7 +478,7 @@ public:
 private:
   /**
    * @brief 方向の冗長性を除去してユニークにする関数
-   * 基本的にコンストラクタで使われるので，ユーザーが使うことはない．
+   * @details 基本的にコンストラクタで使われるので，ユーザーが使うことはない．
    * @param d 壁の方向 (4方位)
    */
   void uniquify(const Direction d) {
@@ -487,12 +502,15 @@ using WallIndexes = std::vector<WallIndex>;
 
 /**
  * @brief 区画位置，方向，壁の有無を保持する構造体．
- *
+ * @details
+ * - 実体は 16bit の整数
  * - 探索の記録などに用いる
  * - サイズを小さくするためにビットフィールド構造体を用いている
- * - 実体は 16bit の整数
  */
 struct WallRecord {
+  /**
+   * @brief データメンバの共用体
+   */
   union {
     struct {
       int x : 6;          /**< @brief 区画のx座標 */
@@ -500,7 +518,7 @@ struct WallRecord {
       unsigned int d : 3; /**< @brief 壁の方向 */
       unsigned int b : 1; /**< @brief 壁の有無 */
     } __attribute__((__packed__));
-    uint16_t data; /**< データ全体へのアクセス用 */
+    uint16_t data; /**< @brief データ全体へのアクセス用 */
   };
   /**
    * @brief コンストラクタ
@@ -526,11 +544,12 @@ using WallRecords = std::vector<WallRecord>;
 
 /**
  * @brief 迷路の壁情報を管理するクラス
- *
+ * @details
  * - 壁情報とスタート位置とゴール位置の集合などを保持する
  * - 壁の有無の確認は，isWall()
  * - 壁の既知未知の確認は，isKnown()
  * - 壁の更新は，updateWall() によって行う
+ * - 壁のバックアップ用に WallRecords 情報も管理する
  */
 class Maze {
 public:
@@ -603,19 +622,21 @@ public:
   }
   /**
    * @brief 通過可能かどうかを返す
-   * @return true:既知かつ壁なし，false:それ以外
+   * @return true: 既知かつ壁なし
+   * @return false: それ以外
    */
-  bool canGo(const WallIndex i) const { return isKnown(i) && !isWall(i); }
+  bool canGo(const WallIndex i) const { return !isWall(i) && isKnown(i); }
   bool canGo(const Position p, const Direction d) const {
     return canGo(WallIndex(p, d));
   }
   /**
    * @brief 既知の壁情報と照らしあわせながら，壁を更新する関数
-   *        既知の壁と非一致した場合，未知壁にして return する
+   * @details 既知の壁と非一致した場合，未知壁にして return する
    * @param p 区画の座標
    * @param d 壁の方向
    * @param b 壁の有無
-   * @return true: 正常に更新された, false: 既知の情報と不一致だった
+   * @return true: 正常に更新された
+   * @return false: 既知の情報と不一致だった
    */
   bool updateWall(const Position p, const Direction d, const bool b,
                   const bool pushLog = true);
@@ -658,8 +679,7 @@ public:
              const size_t maze_size = MAZE_SIZE) const;
   /**
    * @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
-   *
-   * テキスト形式．S: スタート区画(単数)，G: ゴール区画(複数)
+   * @details テキスト形式．S: スタート区画(単数)，G: ゴール区画(複数可)
    * ```
    * +---+---+
    * |     G |
@@ -674,6 +694,13 @@ public:
     std::ifstream ifs(filepath);
     return ifs ? parse(ifs) : false;
   }
+  /**
+   * @brief 入力ストリームの迷路データをパースする
+   * @details 使用例: Maze maze; maze << std::cin;
+   * @param is テキスト形式の迷路データを含む入力ストリーム
+   * @param maze パース結果を書き出す迷路の参照
+   * @return std::istream& 引数の is をそのまま返す
+   */
   friend std::istream &operator>>(std::istream &is, Maze &maze) {
     maze.parse(is);
     return is;
@@ -741,7 +768,7 @@ protected:
     return !i.isInsideOfField() || wall[i.getIndex()]; //< 範囲外は壁ありに
   }
   /**
-   * @brief 壁の更新のベース関数．迷路外を参照しても無視される．
+   * @brief 壁の更新のベース関数．迷路外を参照すると無視される．
    */
   void setWallBase(std::bitset<WallIndex::SIZE> &wall, const WallIndex i,
                    const bool b) const {

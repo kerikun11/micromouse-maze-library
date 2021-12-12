@@ -10,7 +10,7 @@ var searchData=
   ['getnextdirectioncandidates_30',['getNextDirectionCandidates',['../d9/da9/classMazeLib_1_1StepMap.html#ac277a78faec8d3d924dabcaa7a7b69ed',1,'MazeLib::StepMap']]],
   ['getposition_31',['getPosition',['../d6/d8d/structMazeLib_1_1WallIndex.html#a56ade7d0b00e25b55a4dbf9a9c047674',1,'MazeLib::WallIndex::getPosition()'],['../dc/dd5/structMazeLib_1_1WallRecord.html#af26c5441d5914acc81e6b42b6af1b682',1,'MazeLib::WallRecord::getPosition()']]],
   ['getstart_32',['getStart',['../d8/d25/classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1',1,'MazeLib::Maze']]],
-  ['getstep_33',['getStep',['../d9/da9/classMazeLib_1_1StepMap.html#a637f3f49d407fb3cc1b66dab75c95dea',1,'MazeLib::StepMap']]],
+  ['getstep_33',['getStep',['../d9/da9/classMazeLib_1_1StepMap.html#a637f3f49d407fb3cc1b66dab75c95dea',1,'MazeLib::StepMap::getStep(const int8_t x, const int8_t y) const'],['../d9/da9/classMazeLib_1_1StepMap.html#aae48b8fd35e7cf3274588d257ecc609f',1,'MazeLib::StepMap::getStep(const Position p) const']]],
   ['getstepdowndirections_34',['getStepDownDirections',['../d9/da9/classMazeLib_1_1StepMap.html#a82474af635f286d73d58c57a713bb330',1,'MazeLib::StepMap']]],
   ['getwallrecords_35',['getWallRecords',['../d8/d25/classMazeLib_1_1Maze.html#abe279f341fe7ebb2220ef75e2536fe4e',1,'MazeLib::Maze']]],
   ['goals_36',['goals',['../d8/d25/classMazeLib_1_1Maze.html#a7c87e7687f33d87b83dc86d8de3a1640',1,'MazeLib::Maze']]]
