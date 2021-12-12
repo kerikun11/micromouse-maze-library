@@ -31,7 +31,7 @@ PYBIND11_MODULE(MazeLib, m) {
 
   /* Direction */
   py::class_<Direction> direction(m, "Direction");
-  direction.attr("Max") = py::cast(Direction::Max);
+  direction.attr("Max") = (int8_t)Direction::Max;
   direction.attr("ALong4") = py::cast(Direction::Along4);
   direction.attr("Diag4") = py::cast(Direction::Diag4);
   direction.def(py::init<int>())
@@ -66,12 +66,11 @@ PYBIND11_MODULE(MazeLib, m) {
       .export_values();
   py::implicitly_convertible<Direction::AbsoluteDirection, Direction>();
   py::implicitly_convertible<Direction::RelativeDirection, Direction>();
-  //   py::class_<Directions>(m, "Directions");
   py::bind_vector<Directions>(m, "Directions");
 
   /* Position */
   py::class_<Position> position(m, "Position");
-  position.attr("SIZE") = py::cast(Position::SIZE);
+  position.attr("SIZE") = (int)Position::SIZE;
   position.def(py::init<int8_t, int8_t>(), py::arg("x") = 0, py::arg("y") = 0)
       .def_readwrite("x", &Position::x)
       .def_readwrite("y", &Position::y)
@@ -94,7 +93,6 @@ PYBIND11_MODULE(MazeLib, m) {
            })
       //
       ;
-  //   py::class_<Positions>(m, "Positions");
   py::bind_vector<Positions>(m, "Positions");
 
   /* Pose */
@@ -115,7 +113,7 @@ PYBIND11_MODULE(MazeLib, m) {
 
   /* WallIndex */
   py::class_<WallIndex> wall_index(m, "WallIndex");
-  wall_index.attr("SIZE") = py::cast(WallIndex::SIZE);
+  wall_index.attr("SIZE") = (int)WallIndex::SIZE;
   wall_index
       //  .def(py::init<int8_t, int8_t, int8_t>(), py::arg("x") = 0,
       //       py::arg("y") = 0, py::arg("z") = 0)

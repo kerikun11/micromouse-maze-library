@@ -239,7 +239,6 @@ public:
   }
 
 protected:
-  Maze maze;
   Maze maze_target;
 
   virtual void senseWalls(bool &left, bool &front, bool &right) override {
