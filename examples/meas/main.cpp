@@ -33,29 +33,30 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
 #if 1
   for (int year = 2018; year >= 2014; --year)
     filenames.push_back("21MM" + std::to_string(year) + "HX_Taiwan.maze");
-  for (int year = 2019; year >= 2012; --year)
+  for (int year = 2020; year >= 2012; --year)
     filenames.push_back("16MM" + std::to_string(year) + "CX.maze");
-  for (int year = 2017; year >= 2015; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "C_Chubu.maze");
-  for (int year = 2019; year >= 2017; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "H_Chubu.maze");
-  for (int year = 2019; year >= 2017; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "H_Tashiro.maze");
   for (int year = 2020; year >= 2017; --year)
     filenames.push_back("16MM" + std::to_string(year) + "H_student.maze");
   for (int year = 2020; year >= 2017; --year)
     filenames.push_back("16MM" + std::to_string(year) + "C_student.maze");
+  for (int year = 2019; year >= 2017; --year)
+    filenames.push_back("16MM" + std::to_string(year) + "H_Tashiro.maze");
+  for (int year = 2019; year >= 2017; --year)
+    filenames.push_back("16MM" + std::to_string(year) + "H_Chubu.maze");
+  for (int year = 2019; year >= 2016; --year)
+    filenames.push_back("16MM" + std::to_string(year) + "H_Kansai.maze");
+  for (int year = 2017; year >= 2015; --year)
+    filenames.push_back("16MM" + std::to_string(year) + "C_Chubu.maze");
   for (const auto filename : {
+           "16MM2021H_Kansai.maze",
            "16MM2019H_semi.maze",
            "16MM2019H_Kyushu.maze",
-           "16MM2019H_Kansai.maze",
            "16MM2019H_Kanazawa.maze",
            "16MM2019H_Hokuriku.maze",
            "16MM2019H_East.maze",
            "16MM2019H_Cheese.maze",
            "16MM2018H_semi.maze",
            "16MM2017HX_pre.maze",
-           "16MM2017H_Kansai.maze",
            "16MM2017H_Cheese.maze",
            "16MM2017CX_pre.maze",
            "16MM2017C_East.maze",
