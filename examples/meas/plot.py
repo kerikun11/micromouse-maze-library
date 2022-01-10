@@ -8,7 +8,7 @@ plt.rcParams["font.family"] = "IPAGothic"
 # ============================================================================ #
 # load measurement.csv
 raw = np.loadtxt('./build/measurement.csv', delimiter=',',
-                 dtype='unicode', encoding='utf-8')
+                 dtype='unicode', encoding='utf-8', skiprows=1)
 raw = np.flipud(raw)
 
 # ============================================================================ #
@@ -28,8 +28,8 @@ bottom += step[:, 2]
 p_s_r = plt.bar(year, step[:, 3], bottom=bottom, label='Right')
 bottom += step[:, 3]
 p_s_b = plt.bar(year, step[:, 4], bottom=bottom, label='Back')
-plt.title("最短経路探索に要した総歩数の比較")
-# plt.title("全探索に要した総歩数の比較")
+plt.title("最短経路探索に要する総歩数の比較")
+# plt.title("全探索に要する総歩数の比較")
 plt.xlabel("全日本マイクロマウス大会 32x32迷路 [年]")
 plt.ylabel("歩数 [歩]")
 

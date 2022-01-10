@@ -167,10 +167,10 @@ public:
   }
 
 public:
-  int step = 0, f = 0, l = 0, r = 0, b = 0; /**< 探索の評価のためのカウンタ */
+  int step = 0, f = 0, l = 0, r = 0, b = 0; /*< 探索の評価のためのカウンタ */
   float cost = 0;                           /*< 探索時間 [秒] */
-  size_t max_id_wall = 0;
-  size_t min_id_wall = MAZE_SIZE * MAZE_SIZE * 4;
+  size_t walls_pi_max = 0;
+  size_t walls_pi_min = MAZE_SIZE * MAZE_SIZE * 4;
   int t_s;
   int t_e;
   int t_dur = 0;
@@ -212,12 +212,10 @@ protected:
       return;
     /* State Change has occurred */
     if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      min_id_wall =
-          std::min(min_id_wall,
-                   getSearchAlgorithm().getIdMaze().getWallRecords().size());
-      max_id_wall =
-          std::max(max_id_wall,
-                   getSearchAlgorithm().getIdMaze().getWallRecords().size());
+      const auto walls =
+          getSearchAlgorithm().getIdMaze().getWallRecords().size();
+      walls_pi_min = std::min(walls_pi_min, walls);
+      walls_pi_max = std::max(walls_pi_max, walls);
     }
   }
   virtual void discrepancyWithKnownWall() override {

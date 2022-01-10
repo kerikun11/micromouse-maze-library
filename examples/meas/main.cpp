@@ -22,6 +22,12 @@ protected:
 int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
   /* save file */
   std::ofstream csv("measurement.csv");
+  csv << "filename,search_time,cost_s,step,step_f,step_l,step_r,step_b,walls,"
+         "calc_dur_max,dur_search,shortest_time_ms_along,shortest_time_ms_diag"
+#if PI_ENABLED
+         ",pi_calc_dur_max,pi_cost_min,pi_cost_max,pi_walls_min,pi_walls_max"
+#endif
+      << std::endl;
   /* queue test files */
   std::vector<std::string> filenames;
 #if 0
@@ -145,8 +151,8 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
 #if PI_ENABLED
     /* Position Identification Run */
     robot.t_dur_max = 0;
-    float id_cost_max = 0;    /*< 探索時間 [秒] */
-    float id_cost_min = 1e6f; /*< 探索時間 [秒] */
+    float pi_cost_max = 0;    /*< 探索時間 [秒] */
+    float pi_cost_min = 1e6f; /*< 探索時間 [秒] */
     const auto p_step_map = std::make_unique<StepMap>();
     StepMap &step_map = *p_step_map;
     const auto p_maze_pi = std::make_unique<Maze>();
@@ -173,23 +179,23 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
             maze_loge << "Failed to Identify! fake_offset: "
                       << robot.fake_offset << std::endl;
           /* save result */
-          id_cost_max = std::max(id_cost_max, robot.cost);
-          id_cost_min = std::min(id_cost_min, robot.cost);
+          pi_cost_max = std::max(pi_cost_max, robot.cost);
+          pi_cost_min = std::min(pi_cost_min, robot.cost);
         }
     /* print result */
     std::cout << "P.I. Max Calc:\t" << robot.t_dur_max << "\t[us]" << std::endl;
-    std::cout << "P.I. Time:\t" << (int(id_cost_min) / 60) % 60 << ":"
-              << std::setw(2) << std::setfill('0') << int(id_cost_min) % 60
-              << "\t" << (int(id_cost_max) / 60) % 60 << ":" << std::setw(2)
-              << std::setfill('0') << int(id_cost_max) % 60 << std::setfill(' ')
+    std::cout << "P.I. Time:\t" << (int(pi_cost_min) / 60) % 60 << ":"
+              << std::setw(2) << std::setfill('0') << int(pi_cost_min) % 60
+              << "\t" << (int(pi_cost_max) / 60) % 60 << ":" << std::setw(2)
+              << std::setfill('0') << int(pi_cost_max) % 60 << std::setfill(' ')
               << std::endl;
-    std::cout << "P.I. wall:\t" << robot.min_id_wall << "\t"
-              << robot.max_id_wall << std::endl;
+    std::cout << "P.I. wall:\t" << robot.walls_pi_min << "\t"
+              << robot.walls_pi_max << std::endl;
     csv << "," << robot.t_dur_max;
-    csv << "," << id_cost_min;
-    csv << "," << id_cost_max;
-    csv << "," << robot.min_id_wall;
-    csv << "," << robot.max_id_wall;
+    csv << "," << pi_cost_min;
+    csv << "," << pi_cost_max;
+    csv << "," << robot.walls_pi_min;
+    csv << "," << robot.walls_pi_max;
 #endif
 
 #if 0
