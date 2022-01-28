@@ -4,9 +4,15 @@
 
 using namespace MazeLib;
 
+static std::string save_dir = "./";
+// static std::string save_dir = "/spiffs/";
+
 class CLRobot : public CLRobotBase {
 public:
-  CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
+  CLRobot(Maze &maze_target, const std::string &name)
+      : CLRobotBase(maze_target), name(name) {
+    csv.open(save_dir + name + ".csv", std::ios::out);
+  }
 
 protected:
   virtual void queueAction(const SearchAction action) override {
@@ -17,88 +23,102 @@ protected:
 #endif
     CLRobotBase::queueAction(action);
   }
+  virtual void calcNextDirectionsPostCallback(
+      SearchAlgorithm::State prevState __attribute__((unused)),
+      SearchAlgorithm::State newState __attribute__((unused))) override {
+    CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
+    csv << t_dur << std::endl;
+  }
+
+private:
+  std::string name;
+  std::ofstream csv;
 };
 
 int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
   /* save file */
   std::ofstream csv("measurement.csv");
-  csv << "filename,search_time,cost_s,step,step_f,step_l,step_r,step_b,walls,"
-         "calc_dur_max,dur_search,shortest_time_ms_along,shortest_time_ms_diag"
+  csv << "name\tsearch_time\tcost_s\tstep\tstep_f\tstep_l\tstep_r\tstep_"
+         "b\twalls\t"
+         "calc_dur_max\tdur_search\tshortest_time_ms_along\tshortest_time_ms_"
+         "diag"
 #if PI_ENABLED
-         ",pi_calc_dur_max,pi_cost_min,pi_cost_max,pi_walls_min,pi_walls_max"
+         "\tpi_calc_dur_max\tpi_cost_min\tpi_cost_max\tpi_walls_min\tpi_walls_"
+         "max"
 #endif
       << std::endl;
   /* queue test files */
-  std::vector<std::string> filenames;
+  std::vector<std::string> names;
 #if 0
-  // filenames.push_back("32_unknown.maze");
-  filenames.push_back("32MM2019HX.maze");
+  // names.push_back("32_unknown");
+  // names.push_back("32MM2019HX");
+  names.push_back("32MM2015HX");
 #else
   for (int year = 2019; year >= 2010; --year)
-    filenames.push_back("32MM" + std::to_string(year) + "HX.maze");
+    names.push_back("32MM" + std::to_string(year) + "HX");
 #if 1
   for (int year = 2018; year >= 2014; --year)
-    filenames.push_back("21MM" + std::to_string(year) + "HX_Taiwan.maze");
+    names.push_back("21MM" + std::to_string(year) + "HX_Taiwan");
   for (int year = 2020; year >= 2012; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "CX.maze");
+    names.push_back("16MM" + std::to_string(year) + "CX");
   for (int year = 2020; year >= 2017; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "H_student.maze");
+    names.push_back("16MM" + std::to_string(year) + "H_student");
   for (int year = 2020; year >= 2017; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "C_student.maze");
+    names.push_back("16MM" + std::to_string(year) + "C_student");
   for (int year = 2019; year >= 2017; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "H_Tashiro.maze");
+    names.push_back("16MM" + std::to_string(year) + "H_Tashiro");
   for (int year = 2019; year >= 2017; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "H_Chubu.maze");
+    names.push_back("16MM" + std::to_string(year) + "H_Chubu");
   for (int year = 2019; year >= 2016; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "H_Kansai.maze");
+    names.push_back("16MM" + std::to_string(year) + "H_Kansai");
   for (int year = 2017; year >= 2015; --year)
-    filenames.push_back("16MM" + std::to_string(year) + "C_Chubu.maze");
-  for (const auto filename : {
-           "16MM2021H_Kansai.maze",
-           "16MM2019H_semi.maze",
-           "16MM2019H_Kyushu.maze",
-           "16MM2019H_Kanazawa.maze",
-           "16MM2019H_Hokuriku.maze",
-           "16MM2019H_East.maze",
-           "16MM2019H_Cheese.maze",
-           "16MM2018H_semi.maze",
-           "16MM2017HX_pre.maze",
-           "16MM2017H_Cheese.maze",
-           "16MM2017CX_pre.maze",
-           "16MM2017C_East.maze",
-           "16MM2016C_Kyushu.maze",
-           "09MM2019C_Cheese.maze",
-           "08MM2016CF_pre.maze",
+    names.push_back("16MM" + std::to_string(year) + "C_Chubu");
+  for (const auto name : {
+           "16MM2021H_Kansai",
+           "16MM2019H_semi",
+           "16MM2019H_Kyushu",
+           "16MM2019H_Kanazawa",
+           "16MM2019H_Hokuriku",
+           "16MM2019H_East",
+           "16MM2019H_Cheese",
+           "16MM2018H_semi",
+           "16MM2017HX_pre",
+           "16MM2017H_Cheese",
+           "16MM2017CX_pre",
+           "16MM2017C_East",
+           "16MM2016C_Kyushu",
+           "09MM2019C_Cheese",
+           "08MM2016CF_pre",
        })
-    filenames.push_back(filename);
+    names.push_back(name);
 #endif
 #if 0
-  for (const auto filename : {
-           "04_test.maze",
-           "32_fake.maze",
-           "32_no_wall.maze",
-           "32_unknown.maze",
+  for (const auto name : {
+           "04_test",
+           "32_fake",
+           "32_no_wall",
+           "32_unknown",
        })
-    filenames.push_back(filename);
+    names.push_back(name);
 #endif
 #endif
   /* analyze for each maze */
-  for (const auto &filename : filenames) {
+  for (const auto &name : names) {
     std::cout << std::endl;
-    std::cout << "Maze File: \t" << filename << std::endl;
-    csv << filename;
+    std::cout << "Maze: \t" << name << std::endl;
+    csv << name;
 
     /* Maze Target */
     const auto p_maze_target = std::make_unique<Maze>();
     Maze &maze_target = *p_maze_target;
-    if (!maze_target.parse(mazedata_dir + filename)) {
+    if (!maze_target.parse(mazedata_dir + name + ".maze")) {
       maze_loge << "File Parse Error!" << std::endl;
       continue;
     }
 
 #if 1
     /* Search Run */
-    const auto p_robot = std::make_unique<CLRobot>(maze_target);
+    const auto p_robot = std::make_unique<CLRobot>(maze_target, name);
     CLRobot &robot = *p_robot;
     robot.replaceGoals(maze_target.getGoals());
     const auto t_s = std::chrono::system_clock().now();
@@ -109,15 +129,15 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s)
             .count();
     robot.printResult();
-    csv << "," << int(robot.cost / 60) << ":" << std::setw(2)
+    csv << "\t" << int(robot.cost / 60) << ":" << std::setw(2)
         << std::setfill('0') << int(robot.cost) % 60;
-    csv << "," << robot.cost << "," << robot.step << "," << robot.f << ","
-        << robot.l << "," << robot.r << "," << robot.b;
-    csv << "," << robot.getMaze().getWallRecords().size();
+    csv << "\t" << robot.cost << "\t" << robot.step << "\t" << robot.f << "\t"
+        << robot.l << "\t" << robot.r << "\t" << robot.b;
+    csv << "\t" << robot.getMaze().getWallRecords().size();
     std::cout << "Max Calc Time:\t" << robot.t_dur_max << "\t[us]" << std::endl;
-    csv << "," << robot.t_dur_max;
+    csv << "\t" << robot.t_dur_max;
     // std::cout << "Total Search:\t" << t_search << "\t[us]" << std::endl;
-    csv << "," << t_search;
+    csv << "\t" << t_search;
     for (const auto diag_enabled : {false, true}) {
       if (!robot.calcShortestDirections(diag_enabled)) {
         maze_loge << "Failed to Find a Shortest Path! "
@@ -127,7 +147,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
       const auto path_cost = robot.getSearchAlgorithm().getShortestCost();
       // std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
       //           << path_cost << "\t[ms]" << std::endl;
-      csv << "," << path_cost;
+      csv << "\t" << path_cost;
       robot.fastRun(diag_enabled);
       // robot.printPath();
       robot.endFastRunBackingToStartRun();
@@ -191,11 +211,11 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
               << std::endl;
     std::cout << "P.I. wall:\t" << robot.walls_pi_min << "\t"
               << robot.walls_pi_max << std::endl;
-    csv << "," << robot.t_dur_max;
-    csv << "," << pi_cost_min;
-    csv << "," << pi_cost_max;
-    csv << "," << robot.walls_pi_min;
-    csv << "," << robot.walls_pi_max;
+    csv << "\t" << robot.t_dur_max;
+    csv << "\t" << pi_cost_min;
+    csv << "\t" << pi_cost_max;
+    csv << "\t" << robot.walls_pi_min;
+    csv << "\t" << robot.walls_pi_max;
 #endif
 
 #if 0
@@ -279,6 +299,14 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
       std::cout << "StepSla " << (diag_enabled ? "diag" : "no_d") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
       // map.print(maze, path);
+    }
+#endif
+
+#if 0
+    std::ifstream f(save_dir + name + ".csv");
+    std::string line;
+    while (std::getline(f, line)) {
+      std::cout << line << std::endl;
     }
 #endif
 
