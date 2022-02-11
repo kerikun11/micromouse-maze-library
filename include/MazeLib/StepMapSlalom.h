@@ -33,6 +33,7 @@ public:
   public:
     /**
      * @brief 走行パラメータの構造体
+     * @attention コストの合計が 65,535 [ms] を超えないように注意。
      */
     struct RunParameter {
       RunParameter() {}

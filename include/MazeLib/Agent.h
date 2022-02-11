@@ -93,8 +93,11 @@ public:
    * @param diag_enabled true: 斜めあり, false: 斜めなし
    * @return true: 成功, false: 失敗
    */
-  bool calcShortestDirections(const bool diag_enabled) {
-    return searchAlgorithm.calcShortestDirections(shortest_dirs, diag_enabled);
+  bool calcShortestDirections(
+      const bool diag_enabled,
+      const StepMapSlalom::EdgeCost &edge_cost = StepMapSlalom::EdgeCost{}) {
+    return searchAlgorithm.calcShortestDirections(shortest_dirs, diag_enabled,
+                                                  edge_cost);
   }
   /**
    * @brief 探索を中止してスタート区画へ強制的に戻る
