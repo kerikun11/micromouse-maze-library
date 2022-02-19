@@ -170,16 +170,16 @@ void StepMap::update(const Maze &maze, const Positions &dest,
     /* 注目する区画を取得 */
     const auto &&focus = std::move(q.front());
     q.pop();
+    /* 計算を高速化するため展開範囲を制限 */
+    if (focus.x > max_x || focus.y > max_y || focus.x < min_x ||
+        focus.y < min_y)
+      continue;
     const auto focus_step = step_map[focus.getIndex()];
     /* 周辺を走査 */
     for (const auto d : Direction::Along4) {
       /* 直線で行けるところまで更新する */
       auto next = focus;
       for (int8_t i = 1; i <= max_straight; ++i) {
-        /* 計算を高速化するため展開範囲を制限 */
-        if (next.x > max_x || next.y > max_y || next.x < min_x ||
-            next.y < min_y)
-          break;
         /* 壁あり or 既知壁のみで未知壁 ならば次へ */
         const auto next_wi = WallIndex(next, d);
         if (maze.isWall(next_wi) || (known_only && !maze.isKnown(next_wi)))

@@ -133,23 +133,24 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
     /* 注目する壁を取得 */
     const auto &&focus = std::move(q.front());
     q.pop();
+    /* 計算を高速化するため展開範囲を制限 */
+    if (focus.x > max_x || focus.y > max_y || focus.x < min_x ||
+        focus.y < min_y)
+      continue;
     const auto focus_step = step_map[focus.getIndex()];
     /* 周辺を走査 */
     for (const auto d : focus.getNextDirection6()) {
+      const auto &step_table =
+          (d.isAlong() ? step_table_along : step_table_diag);
       /* 直線で行けるところまで更新する */
       auto next = focus;
       for (int8_t i = 1; i <= max_straight; ++i) {
         next = next.next(d); /*< 移動 */
-        /* 計算を高速化するため展開範囲を制限 */
-        if (next.x > max_x || next.y > max_y || next.x < min_x ||
-            next.y < min_y)
-          break;
         /* 壁あり or 既知壁のみで未知壁 ならば次へ */
         if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
           break;
         /* 直線加速を考慮したステップを算出 */
-        const auto next_step = focus_step + (d.isAlong() ? step_table_along[i]
-                                                         : step_table_diag[i]);
+        const auto next_step = focus_step + step_table[i];
         const auto next_index = next.getIndex();
         if (step_map[next_index] <= next_step)
           break;                          /*< 更新の必要がない */
