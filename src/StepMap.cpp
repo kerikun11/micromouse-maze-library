@@ -168,7 +168,7 @@ void StepMap::update(const Maze &maze, const Positions &dest,
   /* ステップの更新がなくなるまで更新処理 */
   while (!q.empty()) {
     /* 注目する区画を取得 */
-    const auto &&focus = std::move(q.front());
+    const auto focus = q.front();
     q.pop();
     /* 計算を高速化するため展開範囲を制限 */
     if (focus.x > max_x || focus.y > max_y || focus.x < min_x ||
