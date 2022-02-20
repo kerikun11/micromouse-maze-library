@@ -37,7 +37,8 @@ private:
 
 int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
   /* save file */
-  std::ofstream csv("measurement.csv");
+  std::ofstream csv(save_dir + "measurement.csv");
+  // std::stringstream csv;
   csv << "name\tsearch_time\tcost_s\tstep\tstep_f\tstep_l\tstep_r\tstep_"
          "b\twalls\t"
          "calc_dur_max\tdur_search\tshortest_time_ms_along\tshortest_time_ms_"
@@ -52,7 +53,8 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
 #if 0
   // names.push_back("32_unknown");
   // names.push_back("32MM2019HX");
-  names.push_back("32MM2015HX");
+  // names.push_back("32MM2015HX"); // max calc time is longest in 32x32
+  names.push_back("16MM2014CX"); // max calc time is longest in 16x16
 #else
   for (int year = 2019; year >= 2010; --year)
     names.push_back("32MM" + std::to_string(year) + "HX");
@@ -313,6 +315,10 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
     csv << std::endl;
   }
   std::cout << std::endl << "Measurement End" << std::endl;
+
+#if 0
+  std::cout << std::endl << csv.rdbuf() << std::endl;
+#endif
 
   return 0;
 }

@@ -14,6 +14,7 @@ int test_meas(const std::string &mazedata_dir);
 
 void setup() {
   SPIFFS.begin(true);
+  vTaskDelay(pdMS_TO_TICKS(1000));
   maze_logi << "Hello, this is ESP32 :)" << std::endl;
 }
 
