@@ -9,14 +9,14 @@ using namespace MazeLib;
 std::ofstream csv("main.csv");
 
 class CLRobot : public CLRobotBase {
-public:
-  CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
+ public:
+  CLRobot(Maze& maze_target) : CLRobotBase(maze_target) {}
   bool display = 0;
 
-protected:
-  virtual void
-  calcNextDirectionsPostCallback(SearchAlgorithm::State prevState,
-                                 SearchAlgorithm::State newState) override {
+ protected:
+  virtual void calcNextDirectionsPostCallback(
+      SearchAlgorithm::State prevState,
+      SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
     csv << t_dur << std::endl;
     if (newState == prevState)
@@ -46,7 +46,7 @@ protected:
 
 #endif
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 #if 1
   /* Preparation */
   const std::string filepath =
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
   if (!maze_target.parse(filepath))
     return -1;
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
-  CLRobot &robot = *p_robot;
+  CLRobot& robot = *p_robot;
   robot.replaceGoals(maze_target.getGoals());
 #endif
 
@@ -75,10 +75,11 @@ int main(int argc, char *argv[]) {
 
 #if 1
   /* Show Result */
-  std::printf("Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
-              "Left: %3d, Right: %3d, Back: %3d\n",
-              ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step,
-              robot.f, robot.l, robot.r, robot.b);
+  std::printf(
+      "Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
+      "Left: %3d, Right: %3d, Back: %3d\n",
+      ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step, robot.f,
+      robot.l, robot.r, robot.b);
   for (bool diag_enabled : {false, true}) {
     robot.calcShortestDirections(diag_enabled);
     robot.printPath();

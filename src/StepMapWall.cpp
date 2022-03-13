@@ -14,8 +14,9 @@
 
 namespace MazeLib {
 
-void StepMapWall::print(const Maze &maze, const WallIndex &index,
-                        std::ostream &os) const {
+void StepMapWall::print(const Maze& maze,
+                        const WallIndex& index,
+                        std::ostream& os) const {
   int maze_size = MAZE_SIZE;
   for (int8_t y = maze_size - 1; y >= -1; --y) {
     for (int8_t x = 0; x <= maze_size; ++x) {
@@ -57,9 +58,10 @@ void StepMapWall::print(const Maze &maze, const WallIndex &index,
     }
   }
 }
-void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
-                        std::ostream &os) const {
-  const auto exists = [&](const WallIndex &i) {
+void StepMapWall::print(const Maze& maze,
+                        const WallIndexes& indexes,
+                        std::ostream& os) const {
+  const auto exists = [&](const WallIndex& i) {
     return std::find(indexes.cbegin(), indexes.cend(), i) != indexes.cend();
   };
   for (int8_t y = MAZE_SIZE - 1; y >= -1; --y) {
@@ -92,8 +94,10 @@ void StepMapWall::print(const Maze &maze, const WallIndexes &indexes,
     }
   }
 }
-void StepMapWall::print(const Maze &maze, const Directions &shortest_dirs,
-                        const WallIndex &start, std::ostream &os) const {
+void StepMapWall::print(const Maze& maze,
+                        const Directions& shortest_dirs,
+                        const WallIndex& start,
+                        std::ostream& os) const {
   auto i = start;
   WallIndexes shortest_indexes;
   shortest_indexes.push_back(i);
@@ -103,8 +107,10 @@ void StepMapWall::print(const Maze &maze, const Directions &shortest_dirs,
   }
   print(maze, shortest_indexes, os);
 }
-void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
-                         const bool known_only, const bool simple) {
+void StepMapWall::update(const Maze& maze,
+                         const WallIndexes& dest,
+                         const bool known_only,
+                         const bool simple) {
   /* 計算を高速化するため，迷路の大きさを制限 */
   int8_t min_x = maze.getMinX();
   int8_t max_x = maze.getMaxX();
@@ -138,7 +144,7 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
     const auto focus_step = step_map[focus.getIndex()];
     /* 周辺を走査 */
     for (const auto d : focus.getNextDirection6()) {
-      const auto &step_table =
+      const auto& step_table =
           (d.isAlong() ? step_table_along : step_table_diag);
       /* 直線で行けるところまで更新する */
       auto next = focus;
@@ -158,9 +164,9 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
     }
   }
 }
-Directions StepMapWall::calcShortestDirections(const Maze &maze,
-                                               const WallIndex &start,
-                                               const WallIndexes &dest,
+Directions StepMapWall::calcShortestDirections(const Maze& maze,
+                                               const WallIndex& start,
+                                               const WallIndexes& dest,
                                                const bool known_only,
                                                const bool simple) {
   /* ステップマップを更新 */
@@ -171,9 +177,9 @@ Directions StepMapWall::calcShortestDirections(const Maze &maze,
   /* ゴール判定 */
   return step_map[end.getIndex()] == 0 ? shortest_dirs : Directions{};
 }
-Directions StepMapWall::getStepDownDirections(const Maze &maze,
-                                              const WallIndex &start,
-                                              WallIndex &end,
+Directions StepMapWall::getStepDownDirections(const Maze& maze,
+                                              const WallIndex& start,
+                                              WallIndex& end,
                                               const bool known_only,
                                               const bool break_unknown
                                               __attribute__((unused))) const {
@@ -205,13 +211,13 @@ Directions StepMapWall::getStepDownDirections(const Maze &maze,
     /* 現在地のステップより大きかったらなんかおかしい */
     if (step_map[end.getIndex()] <= min_step)
       break;
-    end = end.next(min_d);          //< 位置を更新
-    shortest_dirs.push_back(min_d); //< 既知区間移動
+    end = end.next(min_d);           //< 位置を更新
+    shortest_dirs.push_back(min_d);  //< 既知区間移動
   }
   return shortest_dirs;
 }
-WallIndexes StepMapWall::convertDestinations(const Maze &maze,
-                                             const Positions &positions) {
+WallIndexes StepMapWall::convertDestinations(const Maze& maze,
+                                             const Positions& positions) {
   WallIndexes dest;
   for (const auto p : positions)
     for (const auto d : Direction::Along4)
@@ -219,28 +225,29 @@ WallIndexes StepMapWall::convertDestinations(const Maze &maze,
         dest.push_back(WallIndex(p, d));
   return dest;
 }
-Direction StepMapWall::convertDirection(const Direction d, const WallIndex &i) {
+Direction StepMapWall::convertDirection(const Direction d, const WallIndex& i) {
   switch (d) {
-  case Direction::East:
-  case Direction::North:
-  case Direction::West:
-  case Direction::South:
-    return d;
-  case Direction::NorthEast:
-    return i.z == 0 ? Direction::North : Direction::East;
-  case Direction::SouthWest:
-    return i.z == 0 ? Direction::South : Direction::West;
-  case Direction::NorthWest:
-    return i.z == 0 ? Direction::North : Direction::West;
-  case Direction::SouthEast:
-    return i.z == 0 ? Direction::South : Direction::East;
-  default:
-    maze_loge << "invalid direction" << std::endl;
-    return Direction::Max;
+    case Direction::East:
+    case Direction::North:
+    case Direction::West:
+    case Direction::South:
+      return d;
+    case Direction::NorthEast:
+      return i.z == 0 ? Direction::North : Direction::East;
+    case Direction::SouthWest:
+      return i.z == 0 ? Direction::South : Direction::West;
+    case Direction::NorthWest:
+      return i.z == 0 ? Direction::North : Direction::West;
+    case Direction::SouthEast:
+      return i.z == 0 ? Direction::South : Direction::East;
+    default:
+      maze_loge << "invalid direction" << std::endl;
+      return Direction::Max;
   }
 }
 Directions StepMapWall::convertWallIndexDirectionsToPositionDirections(
-    const Directions &src, const WallIndex &start) {
+    const Directions& src,
+    const WallIndex& start) {
   Directions dirs;
   dirs.push_back(Direction::North);
   auto i = start;
@@ -250,8 +257,8 @@ Directions StepMapWall::convertWallIndexDirectionsToPositionDirections(
   }
   return dirs;
 }
-void StepMapWall::appendStraightDirections(const Maze &maze,
-                                           Directions &shortest_dirs) {
+void StepMapWall::appendStraightDirections(const Maze& maze,
+                                           Directions& shortest_dirs) {
   auto i = WallIndex(0, 0, 1);
   for (const auto d : shortest_dirs)
     i = i.next(d);
@@ -276,8 +283,10 @@ void StepMapWall::appendStraightDirections(const Maze &maze,
  * @param seg 1マスの長さ
  * @return StepMap::step_t コスト
  */
-static StepMapWall::step_t gen_cost_impl(const int i, const float am,
-                                         const float vs, const float vm,
+static StepMapWall::step_t gen_cost_impl(const int i,
+                                         const float am,
+                                         const float vs,
+                                         const float vm,
                                          const float seg) {
   const auto d = seg * i; /*< i 区画分の走行距離 */
   /* グラフの面積から時間を求める */
@@ -309,4 +318,4 @@ void StepMapWall::calcStraightStepTable() {
   }
 }
 
-}; // namespace MazeLib
+};  // namespace MazeLib

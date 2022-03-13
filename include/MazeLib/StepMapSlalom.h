@@ -8,6 +8,7 @@
 #pragma once
 
 #include "MazeLib/Maze.h"
+
 #include <limits> /*< for std::numeric_limits */
 
 namespace MazeLib {
@@ -16,7 +17,7 @@ namespace MazeLib {
  * @brief スラロームのコストベースのステップマップを表現するクラス
  */
 class StepMapSlalom {
-public:
+ public:
   using cost_t = uint16_t; /**< @brief 時間コストの型 [ms] */
   /**
    * @brief コストの最大値
@@ -30,7 +31,7 @@ public:
    * @brief エッジコストの管理
    */
   class EdgeCost {
-  public:
+   public:
     /**
      * @brief 走行パラメータの構造体
      * @attention コストの合計が 65,535 [ms] を超えないように注意。
@@ -53,8 +54,8 @@ public:
       }};
     };
 
-  public:
-    EdgeCost(const RunParameter &rp = RunParameter()) : rp(rp) {
+   public:
+    EdgeCost(const RunParameter& rp = RunParameter()) : rp(rp) {
       genCostTable();
     }
     cost_t getEdgeCostAlong(const int n) const {
@@ -66,13 +67,13 @@ public:
     cost_t getEdgeCostSlalom(const Slalom p) const {
       return rp.slalom_cost_table[p]; /*< [ms] */
     }
-    const RunParameter &getRunParameter() const { return rp; }
-    void setRunParameter(const RunParameter &rp) {
+    const RunParameter& getRunParameter() const { return rp; }
+    void setRunParameter(const RunParameter& rp) {
       this->rp = rp;
       genCostTable();
     }
 
-  private:
+   private:
     RunParameter rp; /**< @brief 走行パラメータ */
     /** @brief 台形加速を考慮したコストテーブル (壁沿い) */
     std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
@@ -88,8 +89,11 @@ public:
      * @param seg 1マスの長さ
      * @return StepMap::step_t コスト
      */
-    static cost_t gen_cost_impl(const int i, const float am, const float vs,
-                                const float vm, const float seg) {
+    static cost_t gen_cost_impl(const int i,
+                                const float am,
+                                const float vs,
+                                const float vm,
+                                const float seg) {
       const auto d = seg * i; /*< i 区画分の走行距離 */
       /* グラフの面積から時間を求める */
       const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
@@ -120,7 +124,7 @@ public:
    * 各壁上の4方位」，の位置姿勢を一意に識別する．
    */
   class Index {
-  private:
+   private:
     union {
       struct {
         int x : 6; /**< @brief x coordinate of the cell */
@@ -132,13 +136,13 @@ public:
       uint16_t data; /**< @brief for access to the entire data */
     };
 
-  public:
+   public:
     /**
      * @brief 迷路中の Index の総数．for文などに使える．
      */
     static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 12;
 
-  public:
+   public:
     /** @brief デフォルトコンストラクタ */
     Index() {}
     /** @brief 成分を受け取ってそのまま代入するコンストラクタ */
@@ -191,12 +195,12 @@ public:
     void uniquify(const Direction d) {
       z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
       switch (d) {
-      case Direction::West:
-        x--;
-        break;
-      case Direction::South:
-        y--;
-        break;
+        case Direction::West:
+          x--;
+          break;
+        case Direction::South:
+          y--;
+          break;
       }
     }
     /** @brief 区画 */
@@ -214,22 +218,22 @@ public:
       return nd.isAlong() ? WallIndex(Position(x, y), nd) : WallIndex(x, y, z);
     }
     /** @brief 表示 */
-    friend std::ostream &operator<<(std::ostream &os, const Index &i);
+    friend std::ostream& operator<<(std::ostream& os, const Index& i);
     /**
      * @brief 斜め方向に向いているときの区画への相対方向(±45度)を返す
      * @return const Direction Direction::Left45 or Direction::Right45
      */
     Direction getRelativeDirectionDiagToAlong() const {
       switch (nd) {
-      case Direction::NorthEast:
-      case Direction::SouthWest:
-        return z == 0 ? Direction::Left45 : Direction::Right45;
-      case Direction::NorthWest:
-      case Direction::SouthEast:
-        return z == 1 ? Direction::Left45 : Direction::Right45;
-      default:
-        maze_loge << "Invalid Direction: " << nd << std::endl;
-        return Direction::Max;
+        case Direction::NorthEast:
+        case Direction::SouthWest:
+          return z == 0 ? Direction::Left45 : Direction::Right45;
+        case Direction::NorthWest:
+        case Direction::SouthEast:
+          return z == 1 ? Direction::Left45 : Direction::Right45;
+        default:
+          maze_loge << "Invalid Direction: " << nd << std::endl;
+          return Direction::Max;
       }
     }
     /**
@@ -252,13 +256,14 @@ public:
    */
   using Indexes = std::vector<Index>;
 
-public:
+ public:
   StepMapSlalom() {}
   /**
    * @brief 迷路に Indexes を表示する関数
    */
-  void print(const Maze &maze, const Indexes &indexes,
-             std::ostream &os = std::cout) const;
+  void print(const Maze& maze,
+             const Indexes& indexes,
+             std::ostream& os = std::cout) const;
   /**
    * @brief コストマップの更新
    * @param maze 迷路オブジェクト
@@ -267,8 +272,11 @@ public:
    * @param known_only 既知壁のみを通過可能とする
    * @param diag_enabled 斜め走行を有効化する
    */
-  void update(const Maze &maze, const EdgeCost &edge_cost, const Indexes &dest,
-              const bool known_only, const bool diag_enabled);
+  void update(const Maze& maze,
+              const EdgeCost& edge_cost,
+              const Indexes& dest,
+              const bool known_only,
+              const bool diag_enabled);
   /**
    * @brief 最短経路を導出する
    * @param maze 迷路オブジェクト
@@ -279,8 +287,10 @@ public:
    * @return true 成功
    * @return false 失敗．ゴールにたどり着けなかった
    */
-  bool calcShortestDirections(const Maze &maze, const EdgeCost &edge_cost,
-                              Directions &shortest_dirs, const bool known_only,
+  bool calcShortestDirections(const Maze& maze,
+                              const EdgeCost& edge_cost,
+                              Directions& shortest_dirs,
+                              const bool known_only,
                               const bool diag_enabled);
   /**
    * @brief コストマップを辿って経路を生成する
@@ -288,7 +298,7 @@ public:
    * @return true 成功
    * @return false ゴールにたどりつけなかった
    */
-  bool genPathFromMap(Indexes &path) const;
+  bool genPathFromMap(Indexes& path) const;
   /**
    * @brief コストマップから最短経路のコストを取得する
    * @return cost_t 最短経路のコスト
@@ -304,17 +314,17 @@ public:
    * @param src
    * @return const Indexes
    */
-  static Indexes convertDestinations(const Positions &src);
+  static Indexes convertDestinations(const Positions& src);
   /**
    * @brief ノード列を方向列に変換する関数
    * @param path
    * @param diag_enabled
    * @return const Directions
    */
-  static Directions indexes2directions(const Indexes &path,
+  static Directions indexes2directions(const Indexes& path,
                                        const bool diag_enabled);
 
-private:
+ private:
   /** @brief スタートのノードの Index */
   const Index index_start = Index(Position(0, 0), Direction::North);
   /** @brief 迷路上の最短経路候補の移動元を格納するマップ */
@@ -322,4 +332,4 @@ private:
   std::array<cost_t, Index::SIZE> cost_map; /**< @brief 迷路上のコストマップ */
 };
 
-} // namespace MazeLib
+}  // namespace MazeLib

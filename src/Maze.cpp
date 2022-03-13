@@ -7,8 +7,8 @@
  */
 #include "MazeLib/Maze.h"
 
-#include <algorithm> //< for std::find(), std::count_if()
-#include <iomanip>   //< for std::setw()
+#include <algorithm>  //< for std::find(), std::count_if()
+#include <iomanip>    //< for std::setw()
 
 namespace MazeLib {
 
@@ -20,49 +20,49 @@ const std::array<Direction, 4> Direction::Diag4 = {NorthEast, NorthWest,
 /* Position */
 Position Position::next(const Direction d) const {
   switch (d) {
-  case Direction::East:
-    return Position(x + 1, y);
-  case Direction::NorthEast:
-    return Position(x + 1, y + 1);
-  case Direction::North:
-    return Position(x, y + 1);
-  case Direction::NorthWest:
-    return Position(x - 1, y + 1);
-  case Direction::West:
-    return Position(x - 1, y);
-  case Direction::SouthWest:
-    return Position(x - 1, y - 1);
-  case Direction::South:
-    return Position(x, y - 1);
-  case Direction::SouthEast:
-    return Position(x + 1, y - 1);
-  default:
-    maze_loge << d << std::endl;
-    return *this;
+    case Direction::East:
+      return Position(x + 1, y);
+    case Direction::NorthEast:
+      return Position(x + 1, y + 1);
+    case Direction::North:
+      return Position(x, y + 1);
+    case Direction::NorthWest:
+      return Position(x - 1, y + 1);
+    case Direction::West:
+      return Position(x - 1, y);
+    case Direction::SouthWest:
+      return Position(x - 1, y - 1);
+    case Direction::South:
+      return Position(x, y - 1);
+    case Direction::SouthEast:
+      return Position(x + 1, y - 1);
+    default:
+      maze_loge << d << std::endl;
+      return *this;
   }
 }
 Position Position::rotate(const Direction d) const {
   switch (d) {
-  case Direction::East:
-    return Position(x, y);
-  case Direction::North:
-    return Position(-y, x);
-  case Direction::West:
-    return Position(-x, -y);
-  case Direction::South:
-    return Position(y, -x);
-  default:
-    maze_loge << d << std::endl;
-    return *this;
+    case Direction::East:
+      return Position(x, y);
+    case Direction::North:
+      return Position(-y, x);
+    case Direction::West:
+      return Position(-x, -y);
+    case Direction::South:
+      return Position(y, -x);
+    default:
+      maze_loge << d << std::endl;
+      return *this;
   }
 }
-std::ostream &operator<<(std::ostream &os, const Position p) {
+std::ostream& operator<<(std::ostream& os, const Position p) {
   return os << "( " << std::setw(2) << (int)p.x << ", " << std::setw(2)
             << (int)p.y << ")";
 }
 
 /* Pose */
-std::ostream &operator<<(std::ostream &os, const Pose &pose) {
+std::ostream& operator<<(std::ostream& os, const Pose& pose) {
   return os << "( " << std::setw(2) << (int)pose.p.x << ", " << std::setw(2)
             << (int)pose.p.y << ", " << pose.d.toChar() << ")";
 }
@@ -70,34 +70,34 @@ std::ostream &operator<<(std::ostream &os, const Pose &pose) {
 /* WallIndex */
 WallIndex WallIndex::next(const Direction d) const {
   switch (d) {
-  case Direction::East:
-    return WallIndex(x + 1, y, z);
-  case Direction::NorthEast:
-    return WallIndex(x + (1 - z), y + z, 1 - z);
-  case Direction::North:
-    return WallIndex(x, y + 1, z);
-  case Direction::NorthWest:
-    return WallIndex(x - z, y + z, 1 - z);
-  case Direction::West:
-    return WallIndex(x - 1, y, z);
-  case Direction::SouthWest:
-    return WallIndex(x - z, y - (1 - z), 1 - z);
-  case Direction::South:
-    return WallIndex(x, y - 1, z);
-  case Direction::SouthEast:
-    return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
-  default:
-    maze_loge << d << std::endl;
-    return WallIndex(x, y, z);
+    case Direction::East:
+      return WallIndex(x + 1, y, z);
+    case Direction::NorthEast:
+      return WallIndex(x + (1 - z), y + z, 1 - z);
+    case Direction::North:
+      return WallIndex(x, y + 1, z);
+    case Direction::NorthWest:
+      return WallIndex(x - z, y + z, 1 - z);
+    case Direction::West:
+      return WallIndex(x - 1, y, z);
+    case Direction::SouthWest:
+      return WallIndex(x - z, y - (1 - z), 1 - z);
+    case Direction::South:
+      return WallIndex(x, y - 1, z);
+    case Direction::SouthEast:
+      return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
+    default:
+      maze_loge << d << std::endl;
+      return WallIndex(x, y, z);
   }
 }
-std::ostream &operator<<(std::ostream &os, const WallIndex i) {
+std::ostream& operator<<(std::ostream& os, const WallIndex i) {
   return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
             << (int)i.y << ", " << i.getDirection().toChar() << ")";
 }
 
 /* WallRecord */
-std::ostream &operator<<(std::ostream &os, const WallRecord &obj) {
+std::ostream& operator<<(std::ostream& os, const WallRecord& obj) {
   return os << "( " << std::setw(2) << (int)obj.x << ", " << std::setw(2)
             << (int)obj.y << ", " << obj.getDirection().toChar() << ", "
             << (obj.b ? "true" : "false") << ")";
@@ -111,24 +111,26 @@ void Maze::reset(const bool set_start_wall, const bool set_range_full) {
   max_x = max_y = set_range_full ? (MAZE_SIZE - 1) : 0;
   backup_counter = 0;
   if (set_start_wall) {
-    updateWall(Position(0, 0), Direction::East, true);   //< start cell
-    updateWall(Position(0, 0), Direction::North, false); //< start cell
+    updateWall(Position(0, 0), Direction::East, true);    //< start cell
+    updateWall(Position(0, 0), Direction::North, false);  //< start cell
   }
   wallRecords.clear();
 }
 int8_t Maze::wallCount(const Position p) const {
-  const auto &dirs = Direction::Along4;
+  const auto& dirs = Direction::Along4;
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        //  [&](const auto d) { return isWall(p, d); });
                        [&](const Direction d) { return isWall(p, d); });
 }
 int8_t Maze::unknownCount(const Position p) const {
-  const auto &dirs = Direction::Along4;
+  const auto& dirs = Direction::Along4;
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        //  [&](const auto d) { return !isKnown(p, d); });
                        [&](const Direction d) { return !isKnown(p, d); });
 }
-bool Maze::updateWall(const Position p, const Direction d, const bool b,
+bool Maze::updateWall(const Position p,
+                      const Direction d,
+                      const bool b,
                       const bool pushLog) {
   /* 既知の壁と食い違いがあったら未知壁としてreturn */
   if (isKnown(p, d) && isWall(p, d) != b) {
@@ -167,12 +169,12 @@ void Maze::resetLastWalls(const int num) {
     updateWall(wr.getPosition(), wr.getDirection(), wr.b);
   return;
 }
-bool Maze::parse(std::istream &is) {
+bool Maze::parse(std::istream& is) {
   /* determine the maze size */
   /* get file size */
-  is.seekg(0, std::ios::end); //< move the position to end
+  is.seekg(0, std::ios::end);  //< move the position to end
   const int file_size = 1 + is.tellg();
-  is.seekg(0, std::ios::beg); //< restore the position to begin
+  is.seekg(0, std::ios::beg);  //< restore the position to begin
   /* estimated (minimum) file size [byte] : F = (4*M + 1 + 1) * (2*M + 1) */
   /* using quadratic formula, we have: M = (sqrt(2*F) - 2) / 4 */
   const int maze_size = (std::sqrt(2 * file_size) - 2) / 4;
@@ -180,19 +182,19 @@ bool Maze::parse(std::istream &is) {
     return false; /*< file size error */
   /* reset existing maze */
   reset(), goals.clear();
-  char c; //< temporal variable to use next
+  char c;  //< temporal variable to use next
   for (int8_t y = maze_size; y >= 0; --y) {
     /* vertiacal walls and cells */
     if (y != maze_size) {
-      is.ignore(10, '|'); //< skip until next '|'
+      is.ignore(10, '|');  //< skip until next '|'
       for (int8_t x = 0; x < maze_size; ++x) {
-        is.ignore(1); //< skip a space
+        is.ignore(1);  //< skip a space
         c = is.get();
         if (c == 'S')
           start = Position(x, y);
         else if (c == 'G')
           goals.push_back(Position(x, y));
-        is.ignore(1); //< skip a space
+        is.ignore(1);  //< skip a space
         c = is.get();
         if (c == '|')
           Maze::updateWall(Position(x, y), Direction::East, true, false);
@@ -202,7 +204,7 @@ bool Maze::parse(std::istream &is) {
     }
     /* horizontal walls and pillars */
     for (uint8_t x = 0; x < maze_size; ++x) {
-      is >> c; //< skip until next '+' or 'o'
+      is >> c;  //< skip until next '+' or 'o'
       std::string s;
       for (int i = 0; i < 3; ++i)
         s += (char)is.get();
@@ -214,7 +216,7 @@ bool Maze::parse(std::istream &is) {
   }
   return true;
 }
-bool Maze::parse(const std::vector<std::string> &data, const int maze_size) {
+bool Maze::parse(const std::vector<std::string>& data, const int maze_size) {
   for (const auto xr : {true, false})
     for (const auto yr : {false, true})
       for (const auto xy : {false, true})
@@ -259,7 +261,7 @@ bool Maze::parse(const std::vector<std::string> &data, const int maze_size) {
               }
   return false;
 }
-void Maze::print(std::ostream &os, const int maze_size) const {
+void Maze::print(std::ostream& os, const int maze_size) const {
   for (int8_t y = maze_size; y >= 0; --y) {
     if (y != maze_size) {
       os << '|';
@@ -285,21 +287,23 @@ void Maze::print(std::ostream &os, const int maze_size) const {
     os << '+' << std::endl;
   }
 }
-void Maze::print(const Directions &dirs, const Position &start,
-                 std::ostream &os, const size_t maze_size) const {
+void Maze::print(const Directions& dirs,
+                 const Position& start,
+                 std::ostream& os,
+                 const size_t maze_size) const {
   /* preparation */
   std::vector<Pose> path;
   Position p = start;
   for (const auto d : dirs)
     path.push_back({p, d}), p = p.next(d);
-  const auto &maze = *this;
+  const auto& maze = *this;
   /* start to draw maze */
   for (int8_t y = maze_size; y >= 0; --y) {
     if (y != (int)maze_size) {
       for (uint8_t x = 0; x <= maze_size; ++x) {
         /* Vertical Wall */
         const auto it =
-            std::find_if(path.cbegin(), path.cend(), [&](const Pose &pose) {
+            std::find_if(path.cbegin(), path.cend(), [&](const Pose& pose) {
               return WallIndex(pose.p, pose.d) ==
                      WallIndex(Position(x, y), Direction::West);
             });
@@ -343,14 +347,15 @@ void Maze::print(const Directions &dirs, const Position &start,
     os << '+' << std::endl;
   }
 }
-void Maze::print(const Positions &positions, std::ostream &os,
+void Maze::print(const Positions& positions,
+                 std::ostream& os,
                  const size_t maze_size) const {
   /* preparation */
-  const auto exists = [&](const Position &p) {
+  const auto exists = [&](const Position& p) {
     return std::find(positions.cbegin(), positions.cend(), p) !=
            positions.cend();
   };
-  const auto &maze = *this;
+  const auto& maze = *this;
   /* start to draw maze */
   for (int8_t y = maze_size; y >= 0; --y) {
     if (y != (int)maze_size) {
@@ -387,7 +392,7 @@ void Maze::print(const Positions &positions, std::ostream &os,
     os << '+' << std::endl;
   }
 }
-bool Maze::backupWallRecordsToFile(const std::string &filepath,
+bool Maze::backupWallRecordsToFile(const std::string& filepath,
                                    const bool clear) {
   /* 変更なし */
   if (!clear && backup_counter == wallRecords.size())
@@ -408,13 +413,13 @@ bool Maze::backupWallRecordsToFile(const std::string &filepath,
     return false;
   }
   while (backup_counter < wallRecords.size()) {
-    const auto &wr = wallRecords[backup_counter];
-    of.write(reinterpret_cast<const char *>(&wr), sizeof(wr));
+    const auto& wr = wallRecords[backup_counter];
+    of.write(reinterpret_cast<const char*>(&wr), sizeof(wr));
     backup_counter++;
   }
   return true;
 }
-bool Maze::restoreWallRecordsFromFile(const std::string &filepath) {
+bool Maze::restoreWallRecordsFromFile(const std::string& filepath) {
   std::ifstream f(filepath, std::ios::binary);
   if (f.fail()) {
     maze_logw << "failed to open file! " << filepath << std::endl;
@@ -424,7 +429,7 @@ bool Maze::restoreWallRecordsFromFile(const std::string &filepath) {
   reset();
   while (!f.eof()) {
     WallRecord wr;
-    f.read(reinterpret_cast<char *>(&wr), sizeof(WallRecord));
+    f.read(reinterpret_cast<char*>(&wr), sizeof(WallRecord));
     Position p = Position(wr.x, wr.y);
     Direction d = Direction(wr.d);
     bool b = wr.b;
@@ -434,4 +439,4 @@ bool Maze::restoreWallRecordsFromFile(const std::string &filepath) {
   return true;
 }
 
-} // namespace MazeLib
+}  // namespace MazeLib

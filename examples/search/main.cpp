@@ -14,8 +14,8 @@
 /*
  * 標準ライブラリの読み込み
  */
-#include <algorithm> //< for std::find
-#include <thread>    //< for std::this_thread::sleep_for
+#include <algorithm>  //< for std::find
+#include <thread>     //< for std::this_thread::sleep_for
 
 /**
  * @brief 名前空間の展開
@@ -28,17 +28,17 @@ using namespace MazeLib;
  */
 void MoveRobot(const Direction relative_dir) {
   switch (relative_dir) {
-  case Direction::Front:
-    return /* <直進の処理> */;
-  case Direction::Left:
-    return /* <左ターンの処理> */;
-  case Direction::Right:
-    return /* <右ターンの処理> */;
-  case Direction::Back:
-    return /* <引き返しの処理> */;
-  default:
-    maze_loge << "invalid direction: " << relative_dir << std::endl;
-    return;
+    case Direction::Front:
+      return /* <直進の処理> */;
+    case Direction::Left:
+      return /* <左ターンの処理> */;
+    case Direction::Right:
+      return /* <右ターンの処理> */;
+    case Direction::Back:
+      return /* <引き返しの処理> */;
+    default:
+      maze_loge << "invalid direction: " << relative_dir << std::endl;
+      return;
   }
 }
 
@@ -49,8 +49,10 @@ void MoveRobot(const Direction relative_dir) {
  * @param pos 迷路上の位置
  * @param dir 進行方向
  */
-void ShowAnimation(const StepMap &step_map, const Maze &maze,
-                   const Position &pos, const Direction &dir) {
+void ShowAnimation(const StepMap& step_map,
+                   const Maze& maze,
+                   const Position& pos,
+                   const Direction& dir) {
   std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
   step_map.print(maze, pos, dir);
   std::cout << "Searching for goal" << std::endl;
@@ -60,9 +62,9 @@ void ShowAnimation(const StepMap &step_map, const Maze &maze,
 /**
  * @brief 探索走行のアルゴリズム
  */
-int SearchRun(Maze &maze, const Maze &maze_target) {
+int SearchRun(Maze& maze, const Maze& maze_target) {
   /* 探索テスト */
-  StepMap step_map; //< 経路導出に使用するステップマップ
+  StepMap step_map;  //< 経路導出に使用するステップマップ
   /* 現在方向は，現在区画に向かう方向を表す．
    * 現在区画から出る方向ではないことに注意する．
    * +---+---+---+ 例
@@ -73,8 +75,8 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
    * | S |       | <--- (0, 0)
    * +---+---+---+
    */
-  Position current_pos = Position(0, 0);    //< 現在の区画位置
-  Direction current_dir = Direction::North; //< 現在向いている方向
+  Position current_pos = Position(0, 0);     //< 現在の区画位置
+  Direction current_dir = Direction::North;  //< 現在向いている方向
   /* 1. ゴールへ向かう探索走行 */
   while (1) {
     /* 壁を確認．ここでは maze_target を参照しているが，実際には壁を見る */
@@ -89,7 +91,7 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
     maze.updateWall(current_pos, current_dir + Direction::Left, wall_left);
     maze.updateWall(current_pos, current_dir + Direction::Right, wall_right);
     /* 現在地のゴール判定 */
-    const auto &goals = maze.getGoals();
+    const auto& goals = maze.getGoals();
     if (std::find(goals.cbegin(), goals.cend(), current_pos) != goals.cend())
       break;
     /* 現在地からゴールへの移動経路を，未知壁はないものとして導出 */
@@ -196,7 +198,7 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
 /**
  * @brief 最短走行のアルゴリズム
  */
-int ShortestRun(const Maze &maze) {
+int ShortestRun(const Maze& maze) {
   /* スタートからゴールまでの最短経路導出 */
   StepMap step_map;
   const auto shortest_dirs = step_map.calcShortestDirections(

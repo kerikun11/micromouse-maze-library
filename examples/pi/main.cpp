@@ -1,11 +1,12 @@
 #include "MazeLib/CLRobotBase.h"
+
 #include <thread>
 
 using namespace MazeLib;
 
 class CLRobot : public CLRobotBase {
-public:
-  CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
+ public:
+  CLRobot(Maze& maze_target) : CLRobotBase(maze_target) {}
   bool display = 0;
   void printInfo() {
     CLRobotBase::printInfoDoubleMaze();
@@ -14,10 +15,10 @@ public:
               << std::endl;
   }
 
-protected:
-  virtual void
-  calcNextDirectionsPostCallback(SearchAlgorithm::State prevState,
-                                 SearchAlgorithm::State newState) override {
+ protected:
+  virtual void calcNextDirectionsPostCallback(
+      SearchAlgorithm::State prevState,
+      SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
     if (newState == prevState)
       return;
@@ -54,14 +55,14 @@ int test_position_identify() {
   if (!maze_target.parse((mazedata_dir + filename).c_str()))
     return -1;
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
-  CLRobot &robot = *p_robot;
+  CLRobot& robot = *p_robot;
   robot.replaceGoals(maze_target.getGoals());
   robot.searchRun();
   // robot.printInfo();
 
   /* 探索終了時の迷路を保存 */
   const auto p_maze_pi = std::make_unique<Maze>();
-  Maze &maze_pi = *p_maze_pi;
+  Maze& maze_pi = *p_maze_pi;
   maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
 
 #if 1
@@ -84,7 +85,7 @@ int test_position_identify() {
 #if 1
   /* Position Identification Run */
   const auto p_step_map = std::make_unique<StepMap>();
-  StepMap &step_map = *p_step_map;
+  StepMap& step_map = *p_step_map;
   /* 迷路的に行き得る区画を洗い出す */
   step_map.update(maze_target, {maze_target.getStart()}, true, true);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
@@ -118,4 +119,6 @@ int test_position_identify() {
   return 0;
 }
 
-int main(void) { return test_position_identify(); }
+int main(void) {
+  return test_position_identify();
+}

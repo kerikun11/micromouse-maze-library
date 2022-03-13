@@ -9,7 +9,8 @@
 
 namespace MazeLib {
 
-void Agent::printInfo(const bool show_maze, const Pose &pose,
+void Agent::printInfo(const bool show_maze,
+                      const Pose& pose,
                       const SearchAlgorithm::State state) const {
   /* 迷路を表示 */
   if (show_maze) {
@@ -38,4 +39,4 @@ void Agent::printInfo(const bool show_maze, const Pose &pose,
     std::cout << "Match Count: \t" << getMatchCount() << std::endl;
 }
 
-} // namespace MazeLib
+}  // namespace MazeLib

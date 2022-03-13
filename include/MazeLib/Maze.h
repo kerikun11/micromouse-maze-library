@@ -27,7 +27,9 @@ static constexpr int MAZE_SIZE = 32;
 /**
  * @brief 少数部分の切り上げ関数．
  */
-constexpr int ceil(const float f) { return int(f) + (f > float(int(f))); }
+constexpr int ceil(const float f) {
+  return int(f) + (f > float(int(f)));
+}
 /**
  * @brief 迷路の1辺の区画数の bit 数．bit shift などに用いる．
  */
@@ -119,7 +121,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
  * ```
  */
 class Direction {
-public:
+ public:
   /**
    * @brief 絶対方向の列挙型． 0-7 の整数
    */
@@ -153,7 +155,7 @@ public:
    */
   static constexpr int8_t Max = 8;
 
-public:
+ public:
   /**
    * @brief デフォルトコンストラクタ．そのまま格納．
    */
@@ -175,7 +177,7 @@ public:
   /** @brief 表示用char型へのキャスト */
   char toChar() const { return ">'^`<,v.X"[d]; }
   /** @brief stream での表示 */
-  friend std::ostream &operator<<(std::ostream &os, const Direction d) {
+  friend std::ostream& operator<<(std::ostream& os, const Direction d) {
     return os << d.toChar();
   }
   /** @brief for文用の斜めでない絶対4方向 */
@@ -183,7 +185,7 @@ public:
   /** @brief for文用の斜めの絶対4方向 */
   static const std::array<Direction, 4> Diag4;
 
-private:
+ private:
   int8_t d; /**< @brief 方向の実体, コンストラクタによって確実に 0-7 に収める */
 };
 static_assert(sizeof(Direction) == 1, "size error"); /**< @brief size check */
@@ -206,11 +208,11 @@ using Directions = std::vector<Direction>;
  * ```
  */
 struct Position {
-public:
+ public:
   /** @brief フィールドの区画数．配列確保などで使える． */
   static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX;
 
-public:
+ public:
   union {
     struct {
       int8_t x; /**< @brief 迷路区画のx座標成分 */
@@ -219,7 +221,7 @@ public:
     uint16_t data; /**< @brief データ全体へのアクセス用 */
   };
 
-public:
+ public:
   /**
    * @brief ゼロ初期化のデフォルトコンストラクタ
    */
@@ -289,7 +291,7 @@ public:
   /**
    * @brief stream での表示． (  x,  y) の形式
    */
-  friend std::ostream &operator<<(std::ostream &os, const Position p);
+  friend std::ostream& operator<<(std::ostream& os, const Position p);
 };
 static_assert(sizeof(Position) == 2, "size error"); /**< @brief size check */
 
@@ -314,11 +316,11 @@ using Positions = std::vector<Position>;
  * ```
  */
 struct Pose {
-public:
+ public:
   Position p;  /**< @brief 位置 */
   Direction d; /**< @brief 姿勢 */
 
-public:
+ public:
   Pose() {}
   Pose(const Position p, const Direction d) : p(p), d(d) {}
   /**
@@ -330,7 +332,7 @@ public:
     return Pose(p.next(next_direction), next_direction);
   }
   /** @brief stream での表示 */
-  friend std::ostream &operator<<(std::ostream &os, const Pose &pose);
+  friend std::ostream& operator<<(std::ostream& os, const Pose& pose);
 };
 static_assert(sizeof(Pose) == 4, "size error"); /**< @brief size check */
 
@@ -371,7 +373,7 @@ struct WallIndex {
    */
   static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 2;
 
-public:
+ public:
   union {
     struct {
       int8_t x;      /**< @brief 区画座標のx成分 */
@@ -381,7 +383,7 @@ public:
     uint16_t data; /**< @brief データ全体へのアクセス用 */
   };
 
-public:
+ public:
   /**
    * @brief デフォルトコンストラク
    */
@@ -396,7 +398,7 @@ public:
    * @param p 区画位置
    * @param d 区画内方向．4方位
    */
-  WallIndex(const Position &p, const Direction d) : x(p.x), y(p.y) {
+  WallIndex(const Position& p, const Direction d) : x(p.x), y(p.y) {
     uniquify(d);
   }
   /**
@@ -436,7 +438,7 @@ public:
   /**
    * @brief 表示用演算子のオーバーロード． ( x, y, d) の形式
    */
-  friend std::ostream &operator<<(std::ostream &os, const WallIndex i);
+  friend std::ostream& operator<<(std::ostream& os, const WallIndex i);
   /**
    * @brief 壁がフィールド内か判定する関数
    * x,y が (0,0)と(MAZE_SIZE-1,MAZE_SIZE-1)の間かつ，z が外周上にいない
@@ -475,7 +477,7 @@ public:
     }};
   }
 
-private:
+ private:
   /**
    * @brief 方向の冗長性を除去してユニークにする関数
    * @details 基本的にコンストラクタで使われるので，ユーザーが使うことはない．
@@ -484,12 +486,12 @@ private:
   void uniquify(const Direction d) {
     z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
     switch (d) {
-    case Direction::West:
-      x--;
-      break;
-    case Direction::South:
-      y--;
-      break;
+      case Direction::West:
+        x--;
+        break;
+      case Direction::South:
+        y--;
+        break;
     }
   }
 };
@@ -533,7 +535,7 @@ struct WallRecord {
   /** @brief 方向の取得 */
   const Direction getDirection() const { return d; }
   /** @brief 表示 */
-  friend std::ostream &operator<<(std::ostream &os, const WallRecord &obj);
+  friend std::ostream& operator<<(std::ostream& os, const WallRecord& obj);
 };
 static_assert(sizeof(WallRecord) == 2, "size error"); /**< @brief size check */
 
@@ -552,13 +554,13 @@ using WallRecords = std::vector<WallRecord>;
  * - 壁のバックアップ用に WallRecords 情報も管理する
  */
 class Maze {
-public:
+ public:
   /**
    * @brief デフォルトコンストラクタ
    * @param goals ゴール区画の集合
    * @param start スタート区画
    */
-  Maze(const Positions &goals = Positions(),
+  Maze(const Positions& goals = Positions(),
        const Position start = Position(0, 0))
       : goals(goals), start(start) {
     reset();
@@ -591,7 +593,9 @@ public:
   void setWall(const Position p, const Direction d, const bool b) {
     return setWallBase(wall, WallIndex(p, d), b);
   }
-  void setWall(const int8_t x, const int8_t y, const Direction d,
+  void setWall(const int8_t x,
+               const int8_t y,
+               const Direction d,
                const bool b) {
     return setWallBase(wall, WallIndex(Position(x, y), d), b);
   }
@@ -616,7 +620,9 @@ public:
   void setKnown(const Position p, const Direction d, const bool b) {
     return setWallBase(known, WallIndex(p, d), b);
   }
-  void setKnown(const int8_t x, const int8_t y, const Direction d,
+  void setKnown(const int8_t x,
+                const int8_t y,
+                const Direction d,
                 const bool b) {
     return setWallBase(known, WallIndex(Position(x, y), d), b);
   }
@@ -638,7 +644,9 @@ public:
    * @return true: 正常に更新された
    * @return false: 既知の情報と不一致だった
    */
-  bool updateWall(const Position p, const Direction d, const bool b,
+  bool updateWall(const Position p,
+                  const Direction d,
+                  const bool b,
                   const bool pushLog = true);
   /**
    *  @brief 直前に更新した壁を見探索状態にリセットする
@@ -660,7 +668,7 @@ public:
   /**
    * @brief 迷路の表示
    */
-  void print(std::ostream &os = std::cout,
+  void print(std::ostream& os = std::cout,
              const int maze_size = MAZE_SIZE) const;
   /**
    * @brief パス付きの迷路の表示
@@ -668,14 +676,16 @@ public:
    * @param dirs 移動方向の配列
    * @param os output-stream
    */
-  void print(const Directions &dirs, const Position &start = Position(0, 0),
-             std::ostream &os = std::cout,
+  void print(const Directions& dirs,
+             const Position& start = Position(0, 0),
+             std::ostream& os = std::cout,
              const size_t maze_size = MAZE_SIZE) const;
   /**
    * @brief 位置のハイライト付きの迷路の表示
    * @param positions ハイライト位置s
    */
-  void print(const Positions &positions, std::ostream &os = std::cout,
+  void print(const Positions& positions,
+             std::ostream& os = std::cout,
              const size_t maze_size = MAZE_SIZE) const;
   /**
    * @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
@@ -689,8 +699,8 @@ public:
    * ```
    * @param is *.maze 形式のファイルの input-stream
    */
-  bool parse(std::istream &is);
-  bool parse(const std::string &filepath) {
+  bool parse(std::istream& is);
+  bool parse(const std::string& filepath) {
     std::ifstream ifs(filepath);
     return ifs ? parse(ifs) : false;
   }
@@ -701,7 +711,7 @@ public:
    * @param maze パース結果を書き出す迷路の参照
    * @return std::istream& 引数の is をそのまま返す
    */
-  friend std::istream &operator>>(std::istream &is, Maze &maze) {
+  friend std::istream& operator>>(std::istream& is, Maze& maze) {
     maze.parse(is);
     return is;
   }
@@ -710,27 +720,27 @@ public:
    * @param data 各区画16進表記の文字列配列
    * 例：{"abaf", "1234", "abab", "aaff"}
    */
-  bool parse(const std::vector<std::string> &data, const int maze_size);
+  bool parse(const std::vector<std::string>& data, const int maze_size);
   /**
    * @brief ゴール区画の集合を更新
    */
-  void setGoals(const Positions &goals) { this->goals = goals; }
+  void setGoals(const Positions& goals) { this->goals = goals; }
   /**
    * @brief スタート区画を更新
    */
-  void setStart(const Position &start) { this->start = start; }
+  void setStart(const Position& start) { this->start = start; }
   /**
    * @brief ゴール区画の集合を取得
    */
-  const Positions &getGoals() const { return goals; }
+  const Positions& getGoals() const { return goals; }
   /**
    * @brief スタート区画を取得
    */
-  const Position &getStart() const { return start; }
+  const Position& getStart() const { return start; }
   /**
    * @brief 壁ログを取得
    */
-  const WallRecords &getWallRecords() const { return wallRecords; }
+  const WallRecords& getWallRecords() const { return wallRecords; }
   /**
    * @brief 既知部分の迷路サイズを返す．計算量を減らすために使用．
    */
@@ -741,14 +751,14 @@ public:
   /**
    * @brief 壁ログをファイルに追記保存する関数
    */
-  bool backupWallRecordsToFile(const std::string &filepath,
+  bool backupWallRecordsToFile(const std::string& filepath,
                                const bool clear = false);
   /**
    * @brief 壁ログファイルから壁情報を復元する関数
    */
-  bool restoreWallRecordsFromFile(const std::string &filepath);
+  bool restoreWallRecordsFromFile(const std::string& filepath);
 
-protected:
+ protected:
   std::bitset<WallIndex::SIZE> wall;  /**< @brief 壁情報 */
   std::bitset<WallIndex::SIZE> known; /**< @brief 壁の既知未知情報 */
   Positions goals;                    /**< @brief ゴール区画の集合 */
@@ -763,18 +773,19 @@ protected:
   /**
    * @brief 壁の確認のベース関数．迷路外を参照すると壁ありと返す．
    */
-  bool isWallBase(const std::bitset<WallIndex::SIZE> &wall,
+  bool isWallBase(const std::bitset<WallIndex::SIZE>& wall,
                   const WallIndex i) const {
-    return !i.isInsideOfField() || wall[i.getIndex()]; //< 範囲外は壁ありに
+    return !i.isInsideOfField() || wall[i.getIndex()];  //< 範囲外は壁ありに
   }
   /**
    * @brief 壁の更新のベース関数．迷路外を参照すると無視される．
    */
-  void setWallBase(std::bitset<WallIndex::SIZE> &wall, const WallIndex i,
+  void setWallBase(std::bitset<WallIndex::SIZE>& wall,
+                   const WallIndex i,
                    const bool b) const {
-    if (i.isInsideOfField()) //< 範囲外アクセスの防止
+    if (i.isInsideOfField())  //< 範囲外アクセスの防止
       wall[i.getIndex()] = b;
   }
 };
 
-} // namespace MazeLib
+}  // namespace MazeLib

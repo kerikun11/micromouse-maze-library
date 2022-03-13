@@ -18,12 +18,16 @@ StepMap::StepMap() {
   calcStraightStepTable();
   reset();
 }
-void StepMap::print(const Maze &maze, const Position &p, const Direction d,
-                    std::ostream &os) const {
+void StepMap::print(const Maze& maze,
+                    const Position& p,
+                    const Direction d,
+                    std::ostream& os) const {
   return print(maze, {d}, p.next(d + Direction::Back), os);
 }
-void StepMap::print(const Maze &maze, const Directions &dirs,
-                    const Position &start, std::ostream &os) const {
+void StepMap::print(const Maze& maze,
+                    const Directions& dirs,
+                    const Position& start,
+                    std::ostream& os) const {
   /* preparation */
   std::vector<Pose> path;
   Position p = start;
@@ -35,8 +39,8 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
     if (step != STEP_MAX)
       max_step = std::max(max_step, step);
   const bool simple = (max_step < 999);
-  const auto find = [&](const WallIndex &i) {
-    return std::find_if(path.cbegin(), path.cend(), [&](const Pose &pose) {
+  const auto find = [&](const WallIndex& i) {
+    return std::find_if(path.cbegin(), path.cend(), [&](const Pose& pose) {
       return WallIndex(pose.p, pose.d) == i;
     });
   };
@@ -82,12 +86,16 @@ void StepMap::print(const Maze &maze, const Directions &dirs,
     os << '+' << std::endl;
   }
 }
-void StepMap::printFull(const Maze &maze, const Position &p, const Direction d,
-                        std::ostream &os) const {
+void StepMap::printFull(const Maze& maze,
+                        const Position& p,
+                        const Direction d,
+                        std::ostream& os) const {
   return printFull(maze, {d}, p.next(d + Direction::Back), os);
 }
-void StepMap::printFull(const Maze &maze, const Directions &dirs,
-                        const Position &start, std::ostream &os) const {
+void StepMap::printFull(const Maze& maze,
+                        const Directions& dirs,
+                        const Position& start,
+                        std::ostream& os) const {
   std::vector<Pose> path;
   Position p = start;
   for (const auto d : dirs) {
@@ -141,8 +149,10 @@ void StepMap::printFull(const Maze &maze, const Directions &dirs,
     os << '+' << std::endl;
   }
 }
-void StepMap::update(const Maze &maze, const Positions &dest,
-                     const bool known_only, const bool simple) {
+void StepMap::update(const Maze& maze,
+                     const Positions& dest,
+                     const bool known_only,
+                     const bool simple) {
   /* 計算を高速化するため，迷路の大きさを制限 */
   int8_t min_x = maze.getMinX();
   int8_t max_x = maze.getMaxX();
@@ -196,9 +206,9 @@ void StepMap::update(const Maze &maze, const Positions &dest,
     }
   }
 }
-Directions StepMap::calcShortestDirections(const Maze &maze,
-                                           const Position &start,
-                                           const Positions &dest,
+Directions StepMap::calcShortestDirections(const Maze& maze,
+                                           const Position& start,
+                                           const Positions& dest,
                                            const bool known_only,
                                            const bool simple) {
   /* ステップマップを更新 */
@@ -209,16 +219,19 @@ Directions StepMap::calcShortestDirections(const Maze &maze,
   /* ゴール判定 */
   return step_map[end.p.getIndex()] == 0 ? shortest_dirs : Directions{};
 }
-Pose StepMap::calcNextDirections(const Maze &maze, const Pose &start,
-                                 Directions &nextDirectionsKnown,
-                                 Directions &nextDirectionCandidates) const {
+Pose StepMap::calcNextDirections(const Maze& maze,
+                                 const Pose& start,
+                                 Directions& nextDirectionsKnown,
+                                 Directions& nextDirectionCandidates) const {
   Pose end;
   nextDirectionsKnown = getStepDownDirections(maze, start, end, false, true);
   nextDirectionCandidates = getNextDirectionCandidates(maze, end);
   return end;
 }
-Directions StepMap::getStepDownDirections(const Maze &maze, const Pose &start,
-                                          Pose &end, const bool known_only,
+Directions StepMap::getStepDownDirections(const Maze& maze,
+                                          const Pose& start,
+                                          Pose& end,
+                                          const bool known_only,
                                           const bool break_unknown) const {
   /* ステップマップから既知区間進行方向列を生成 */
   Directions shortest_dirs;
@@ -260,8 +273,8 @@ Directions StepMap::getStepDownDirections(const Maze &maze, const Pose &start,
   }
   return shortest_dirs;
 }
-Directions StepMap::getNextDirectionCandidates(const Maze &maze,
-                                               const Pose &focus) const {
+Directions StepMap::getNextDirectionCandidates(const Maze& maze,
+                                               const Pose& focus) const {
   /* 直線優先で進行方向の候補を抽出．全方位 STEP_MAX だと空になる */
   Directions dirs;
   for (const auto d : {focus.d + Direction::Front, focus.d + Direction::Left,
@@ -289,8 +302,8 @@ Directions StepMap::getNextDirectionCandidates(const Maze &maze,
 #endif
   return dirs;
 }
-void StepMap::appendStraightDirections(const Maze &maze,
-                                       Directions &shortest_dirs,
+void StepMap::appendStraightDirections(const Maze& maze,
+                                       Directions& shortest_dirs,
                                        const bool known_only,
                                        const bool diag_enabled) {
   /* ゴール区画までたどる */
@@ -337,8 +350,10 @@ void StepMap::appendStraightDirections(const Maze &maze,
  * @param seg 1マスの長さ
  * @return StepMap::step_t コスト
  */
-static StepMap::step_t gen_cost_impl(const int i, const float am,
-                                     const float vs, const float vm,
+static StepMap::step_t gen_cost_impl(const int i,
+                                     const float am,
+                                     const float vs,
+                                     const float vm,
                                      const float seg) {
   const auto d = seg * i; /*< i 区画分の走行距離 */
   /* グラフの面積から時間を求める */
@@ -364,4 +379,4 @@ void StepMap::calcStraightStepTable() {
     step_table[i] /= scaling_factor;
 }
 
-} // namespace MazeLib
+}  // namespace MazeLib

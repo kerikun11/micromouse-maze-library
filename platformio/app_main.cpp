@@ -10,7 +10,7 @@
 #include <iostream>
 
 /* defined in examples/meas/main.cpp */
-int test_meas(const std::string &mazedata_dir);
+int test_meas(const std::string& mazedata_dir);
 
 void setup() {
   SPIFFS.begin(true);

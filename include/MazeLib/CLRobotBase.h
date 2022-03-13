@@ -8,6 +8,7 @@
 #pragma once
 
 #include "MazeLib/RobotBase.h"
+
 #include <chrono>
 #include <cstdio>  /*< for std::printf */
 #include <iomanip> /*< for std::setw */
@@ -18,8 +19,8 @@ namespace MazeLib {
  * @brief 時間計測や可視化を含むコマンドラインテスト用の RobotBase
  */
 class CLRobotBase : public RobotBase {
-public:
-  CLRobotBase(Maze &maze_target) : maze_target(maze_target) {
+ public:
+  CLRobotBase(Maze& maze_target) : maze_target(maze_target) {
     replaceGoals(maze_target.getGoals());
   }
   void printInfo(const bool show_maze = true) {
@@ -42,10 +43,11 @@ public:
     std::cout << "Real Pose:\t" << real << std::endl;
   }
   void printSearchResult() const {
-    std::printf("SearchTime: %2d:%02d, Step: %4d, "
-                "F: %4d, L: %3d, R: %3d, B: %3d, Walls: %4d\n",
-                int(cost / 60) % 60, int(cost) % 60, step, f, l, r, b,
-                int(maze.getWallRecords().size()));
+    std::printf(
+        "SearchTime: %2d:%02d, Step: %4d, "
+        "F: %4d, L: %3d, R: %3d, B: %3d, Walls: %4d\n",
+        int(cost / 60) % 60, int(cost) % 60, step, f, l, r, b,
+        int(maze.getWallRecords().size()));
   }
   void printFastResult(const bool diag_enabled, const bool show_maze = false) {
     /* 最短走行時間の表示 */
@@ -57,7 +59,7 @@ public:
     }
     /* 最短経路の比較 */
     const auto p_at = std::make_unique<Agent>(maze_target);
-    Agent &at = *p_at;
+    Agent& at = *p_at;
     at.calcShortestDirections(diag_enabled);
     calcShortestDirections(diag_enabled);
     if (at.getSearchAlgorithm().getShortestCost() !=
@@ -111,7 +113,7 @@ public:
     return true;
   }
 
-public:
+ public:
   int step = 0, f = 0, l = 0, r = 0, b = 0; /*< 探索の評価のためのカウンタ */
   float cost = 0;                           /*< 探索時間 [秒] */
   size_t walls_pi_max = 0;
@@ -121,17 +123,17 @@ public:
   int t_dur = 0;
   int t_dur_max = 0;
 
-public:
-  Maze &maze_target;
+ public:
+  Maze& maze_target;
   Pose fake_offset;
   Pose real;
   bool real_visit_goal = false;
 
-protected:
+ protected:
   SearchAction action_prev = SearchAction::START_STEP;
   bool unknown_accel_prev = false;
 
-  virtual void senseWalls(bool &left, bool &front, bool &right) override {
+  virtual void senseWalls(bool& left, bool& front, bool& right) override {
     left = !maze_target.canGo(real.p, real.d + Direction::Left);
     front = !maze_target.canGo(real.p, real.d + Direction::Front);
     right = !maze_target.canGo(real.p, real.d + Direction::Right);
@@ -191,61 +193,61 @@ protected:
       real_visit_goal = true;
     cost += getTimeCost(action);
     switch (action) {
-    case RobotBase::START_STEP:
-      real.p = Position(0, 1);
-      real.d = Direction::North;
-      real_visit_goal = false;
-      f++;
-      step++;
-      break;
-    case RobotBase::START_INIT:
-      if (real_visit_goal == false)
-        maze_logw << "Reached Start without Going to Goal!" << std::endl;
-      break;
-    case RobotBase::ST_HALF_STOP:
-      break;
-    case RobotBase::TURN_L:
-      real.d = real.d + Direction::Left;
-      if (!maze_target.canGo(real.p, real.d))
-        crashed();
-      real.p = real.p.next(real.d);
-      l++;
-      step++;
-      break;
-    case RobotBase::TURN_R:
-      real.d = real.d + Direction::Right;
-      if (!maze_target.canGo(real.p, real.d))
-        crashed();
-      real.p = real.p.next(real.d);
-      r++;
-      step++;
-      break;
-    case RobotBase::ROTATE_180:
-      real.d = real.d + Direction::Back;
-      if (!maze_target.canGo(real.p, real.d))
-        crashed();
-      real.p = real.p.next(real.d);
-      b++;
-      step++;
-      break;
-    case RobotBase::ST_FULL:
-      if (!maze_target.canGo(real.p, real.d))
-        crashed();
-      real.p = real.p.next(real.d);
-      /* 未知区間加速 */
-      if (getUnknownAccelFlag() && action_prev == action)
-        cost -= getTimeCost(action) / 3;
-      /* 既知区間加速 */
-      if (getNextDirections().size() > 1 && action_prev == action)
-        cost -= getTimeCost(action) / 2;
-      f++;
-      step++;
-      break;
-    case RobotBase::ST_HALF:
-      break;
-    default:
-      maze_loge << "invalid action" << std::endl;
-      break;
+      case RobotBase::START_STEP:
+        real.p = Position(0, 1);
+        real.d = Direction::North;
+        real_visit_goal = false;
+        f++;
+        step++;
+        break;
+      case RobotBase::START_INIT:
+        if (real_visit_goal == false)
+          maze_logw << "Reached Start without Going to Goal!" << std::endl;
+        break;
+      case RobotBase::ST_HALF_STOP:
+        break;
+      case RobotBase::TURN_L:
+        real.d = real.d + Direction::Left;
+        if (!maze_target.canGo(real.p, real.d))
+          crashed();
+        real.p = real.p.next(real.d);
+        l++;
+        step++;
+        break;
+      case RobotBase::TURN_R:
+        real.d = real.d + Direction::Right;
+        if (!maze_target.canGo(real.p, real.d))
+          crashed();
+        real.p = real.p.next(real.d);
+        r++;
+        step++;
+        break;
+      case RobotBase::ROTATE_180:
+        real.d = real.d + Direction::Back;
+        if (!maze_target.canGo(real.p, real.d))
+          crashed();
+        real.p = real.p.next(real.d);
+        b++;
+        step++;
+        break;
+      case RobotBase::ST_FULL:
+        if (!maze_target.canGo(real.p, real.d))
+          crashed();
+        real.p = real.p.next(real.d);
+        /* 未知区間加速 */
+        if (getUnknownAccelFlag() && action_prev == action)
+          cost -= getTimeCost(action) / 3;
+        /* 既知区間加速 */
+        if (getNextDirections().size() > 1 && action_prev == action)
+          cost -= getTimeCost(action) / 2;
+        f++;
+        step++;
+        break;
+      case RobotBase::ST_HALF:
+        break;
+      default:
+        maze_loge << "invalid action" << std::endl;
+        break;
     }
     action_prev = action;
   }
@@ -259,33 +261,33 @@ protected:
     const float velocity = 300.0f;
     const float segment = 90.0f;
     switch (action) {
-    case RobotBase::START_STEP:
-      return 3.0f;
-    case RobotBase::START_INIT:
-      return 3.0f;
-    case RobotBase::ST_HALF_STOP:
-      return segment / 2 / velocity;
-    case RobotBase::TURN_L:
-      return 71 / velocity;
-    case RobotBase::TURN_R:
-      return 71 / velocity;
-    case RobotBase::ROTATE_180:
-      return 3.0f;
-    case RobotBase::ST_FULL:
-      return segment / velocity;
-    case RobotBase::ST_HALF:
-      return segment / 2 / velocity;
-    default:
-      maze_loge << "invalid action" << std::endl;
-      return 0;
+      case RobotBase::START_STEP:
+        return 3.0f;
+      case RobotBase::START_INIT:
+        return 3.0f;
+      case RobotBase::ST_HALF_STOP:
+        return segment / 2 / velocity;
+      case RobotBase::TURN_L:
+        return 71 / velocity;
+      case RobotBase::TURN_R:
+        return 71 / velocity;
+      case RobotBase::ROTATE_180:
+        return 3.0f;
+      case RobotBase::ST_FULL:
+        return segment / velocity;
+      case RobotBase::ST_HALF:
+        return segment / 2 / velocity;
+      default:
+        maze_loge << "invalid action" << std::endl;
+        return 0;
     }
   }
 
-protected:
-  void printDoubleMaze(std::array<const Maze *, 2> maze,
-                       std::array<const Pose *, 2> pose,
-                       std::array<const StepMap *, 2> step_map,
-                       std::ostream &os) const {
+ protected:
+  void printDoubleMaze(std::array<const Maze*, 2> maze,
+                       std::array<const Pose*, 2> pose,
+                       std::array<const StepMap*, 2> step_map,
+                       std::ostream& os) const {
     /* preparation */
     const int maze_size = MAZE_SIZE;
     bool simple[2];
@@ -365,4 +367,4 @@ protected:
   }
 };
 
-} // namespace MazeLib
+}  // namespace MazeLib

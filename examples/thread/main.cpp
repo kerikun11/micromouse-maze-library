@@ -1,11 +1,12 @@
 #include "MazeLib/CLRobotBase.h"
+
 #include <thread>
 
 using namespace MazeLib;
 
 class CLRobot : public CLRobotBase {
-public:
-  CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
+ public:
+  CLRobot(Maze& maze_target) : CLRobotBase(maze_target) {}
   bool positionIdentifyRun() {
     /* Position Identification Run */
     StepMap step_map;
@@ -36,7 +37,7 @@ public:
     return true;
   }
 
-protected:
+ protected:
   virtual void queueAction(const SearchAction action) override {
 #if 0
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
@@ -47,9 +48,9 @@ protected:
   }
 };
 
-void thread_maze(const std::string &name) {
+void thread_maze(const std::string& name) {
   /* Maze Target */
-  const std::string &mazedata_dir = "../mazedata/data/";
+  const std::string& mazedata_dir = "../mazedata/data/";
   const auto filepath = mazedata_dir + name + ".maze";
   Maze maze_target;
   if (!maze_target.parse(filepath)) {
@@ -119,10 +120,10 @@ int main(void) {
 
   /* analyze for each maze */
   std::vector<std::thread> threads;
-  for (const auto &name : names) {
+  for (const auto& name : names) {
     threads.push_back(std::thread([&] { thread_maze(name); }));
   }
-  for (std::thread &th : threads) {
+  for (std::thread& th : threads) {
     th.join();
   }
 

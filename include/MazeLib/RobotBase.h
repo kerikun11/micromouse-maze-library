@@ -8,7 +8,8 @@
 #pragma once
 
 #include "MazeLib/Agent.h"
-#include <algorithm> //< std::replace
+
+#include <algorithm>  //< std::replace
 
 namespace MazeLib {
 
@@ -16,7 +17,7 @@ namespace MazeLib {
  * @brief 迷路を探索ロボットの基底クラス．継承して仮想関数内を埋めて使用する．
  */
 class RobotBase : public Agent {
-public:
+ public:
   enum SearchAction : char {
     START_STEP = '1',
     START_INIT = '2',
@@ -71,9 +72,9 @@ public:
     /* 最初の直線前と最後の直線後を連結して完了 */
     return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
   }
-  static std::string
-  convertDirectionsToSearch(const Directions dirs,
-                            const Direction start_d = Direction::North) {
+  static std::string convertDirectionsToSearch(
+      const Directions dirs,
+      const Direction start_d = Direction::North) {
     if (dirs.empty())
       return "";
     std::string path;
@@ -81,22 +82,22 @@ public:
     for (int i = 1; i < (int)dirs.size(); ++i) {
       const auto nextDir = dirs[i];
       switch (Direction(nextDir - prevDir)) {
-      case Direction::Front:
-        path += RobotBase::SearchAction::ST_FULL;
-        break;
-      case Direction::Left:
-        path += RobotBase::SearchAction::TURN_L;
-        break;
-      case Direction::Right:
-        path += RobotBase::SearchAction::TURN_R;
-        break;
+        case Direction::Front:
+          path += RobotBase::SearchAction::ST_FULL;
+          break;
+        case Direction::Left:
+          path += RobotBase::SearchAction::TURN_L;
+          break;
+        case Direction::Right:
+          path += RobotBase::SearchAction::TURN_R;
+          break;
       }
       prevDir = nextDir;
     }
     return path;
   }
 
-public:
+ public:
   RobotBase() { reset(); }
   void reset();
   bool searchRun();
@@ -106,7 +107,7 @@ public:
     this->break_flag = break_flag;
   }
 
-protected:
+ protected:
   bool break_flag = false; /*< 探索を中断させるフラグ */
 
   /**
@@ -116,9 +117,9 @@ protected:
   virtual void queueAction(const SearchAction action __attribute__((unused))) {}
   virtual void startDequeue() {}
   virtual void waitForEndAction() {}
-  virtual void senseWalls(bool &left __attribute__((unused)),
-                          bool &front __attribute__((unused)),
-                          bool &right __attribute__((unused))) {}
+  virtual void senseWalls(bool& left __attribute__((unused)),
+                          bool& front __attribute__((unused)),
+                          bool& right __attribute__((unused))) {}
   virtual void stopDequeue() {}
   virtual void calcNextDirectionsPreCallback() {}
   virtual void calcNextDirectionsPostCallback(SearchAlgorithm::State prevState
@@ -128,12 +129,12 @@ protected:
   virtual void discrepancyWithKnownWall() {}
   virtual void backupMazeToFlash() {}
 
-protected:
+ protected:
   /**
    * @brief 処理関数
    */
   void turnbackSave();
-  void queueNextDirections(const Directions &nextDirections);
+  void queueNextDirections(const Directions& nextDirections);
   bool generalSearchRun();
 
   /**
@@ -145,7 +146,7 @@ protected:
    * @param to 置換後文字列
    * @return int 置換した数
    */
-  static int replace(std::string &src, std::string from, std::string to) {
+  static int replace(std::string& src, std::string from, std::string to) {
     if (from.empty())
       return 0;
     auto pos = src.find(from);
@@ -202,4 +203,4 @@ protected:
   }
 };
 
-} // namespace MazeLib
+}  // namespace MazeLib

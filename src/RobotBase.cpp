@@ -81,26 +81,26 @@ void RobotBase::turnbackSave() {
   queueAction(ST_HALF);
   startDequeue();
 }
-void RobotBase::queueNextDirections(const Directions &nextDirections) {
+void RobotBase::queueNextDirections(const Directions& nextDirections) {
   for (const auto nextDirection : nextDirections) {
     if (break_flag)
       return;
     const auto relative_d = Direction(nextDirection - current_pose.d);
     switch (relative_d) {
-    case Direction::Front:
-      queueAction(ST_FULL);
-      break;
-    case Direction::Left:
-      queueAction(TURN_L);
-      break;
-    case Direction::Right:
-      queueAction(TURN_R);
-      break;
-    case Direction::Back:
-      turnbackSave();
-      break;
-    default:
-      maze_loge << "invalid direction" << std::endl;
+      case Direction::Front:
+        queueAction(ST_FULL);
+        break;
+      case Direction::Left:
+        queueAction(TURN_L);
+        break;
+      case Direction::Right:
+        queueAction(TURN_R);
+        break;
+      case Direction::Back:
+        turnbackSave();
+        break;
+      default:
+        maze_loge << "invalid direction" << std::endl;
     }
     updateCurrentPose(current_pose.next(nextDirection));
   }
@@ -167,4 +167,4 @@ bool RobotBase::generalSearchRun() {
   return true;
 }
 
-} // namespace MazeLib
+}  // namespace MazeLib

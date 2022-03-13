@@ -18,9 +18,11 @@ class MainWindow;
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
-public:
-  MainWindow(QWidget *parent = 0)
-      : QMainWindow(parent), ui(new Ui::MainWindow), scene(new QGraphicsScene),
+ public:
+  MainWindow(QWidget* parent = 0)
+      : QMainWindow(parent),
+        ui(new Ui::MainWindow),
+        scene(new QGraphicsScene),
         maze_simulator(ui, scene) {
     ui->setupUi(this);
     ui->fileSeectEdit->setText("../mazedata/data/32MM2016HX.maze");
@@ -30,7 +32,7 @@ public:
 
   ~MainWindow() { delete ui; }
 
-private slots:
+ private slots:
 
   void on_fileSelectButton_clicked() {
     QFileInfo fileinfo = QFileDialog::getOpenFileName(
@@ -81,7 +83,7 @@ private slots:
       //    rp.vm_a *= factor * factor;
       //    rp.vm_d *= factor * factor;
       //    StepMapSlalom::EdgeCost edge_cost(rp);
-      const auto &maze = maze_simulator.getMazeTarget();
+      const auto& maze = maze_simulator.getMazeTarget();
       if (!maze_simulator.drawShortest(maze, true, edge_cost)) {
         QMessageBox box(QMessageBox::Warning, "Path Error",
                         "Failed to Find any Shortest Path!");
@@ -101,7 +103,7 @@ private slots:
       //    rp.vm_a *= factor * factor;
       //    rp.vm_d *= factor * factor;
       //    StepMapSlalom::EdgeCost edge_cost(rp);
-      const auto &maze = maze_simulator.getMazeTarget();
+      const auto& maze = maze_simulator.getMazeTarget();
       if (!maze_simulator.drawShortest(maze, false, edge_cost)) {
         QMessageBox box(QMessageBox::Warning, "Path Error",
                         "Failed to Find any Shortest Path!");
@@ -112,7 +114,7 @@ private slots:
   }
 
   void on_stepmapSimpleButton_clicked() {
-    const auto &maze = maze_simulator.getMazeTarget();
+    const auto& maze = maze_simulator.getMazeTarget();
     if (!maze_simulator.drawShortestStepMap(maze, true)) {
       QMessageBox box(QMessageBox::Warning, "Path Error",
                       "Failed to Find any Shortest Path!");
@@ -122,7 +124,7 @@ private slots:
   }
 
   void on_stepmapTrapezoidButton_clicked() {
-    const auto &maze = maze_simulator.getMazeTarget();
+    const auto& maze = maze_simulator.getMazeTarget();
     if (!maze_simulator.drawShortestStepMap(maze, false)) {
       QMessageBox box(QMessageBox::Warning, "Path Error",
                       "Failed to Find any Shortest Path!");
@@ -132,7 +134,7 @@ private slots:
   }
 
   void on_stepmapWallSimpleButton_clicked() {
-    const auto &maze = maze_simulator.getMazeTarget();
+    const auto& maze = maze_simulator.getMazeTarget();
     if (!maze_simulator.drawShortestStepMapWall(maze, true)) {
       QMessageBox box(QMessageBox::Warning, "Path Error",
                       "Failed to Find any Shortest Path!");
@@ -142,7 +144,7 @@ private slots:
   }
 
   void on_stepmapWallTrapezoidButton_clicked() {
-    const auto &maze = maze_simulator.getMazeTarget();
+    const auto& maze = maze_simulator.getMazeTarget();
     if (!maze_simulator.drawShortestStepMapWall(maze, false)) {
       QMessageBox box(QMessageBox::Warning, "Path Error",
                       "Failed to Find any Shortest Path!");
@@ -194,13 +196,13 @@ private slots:
 
   void on_saveImageButton_clicked() {
     auto filepath = QFileInfo(ui->fileSeectEdit->text());
-    scene->clearSelection(); // Selections would also render to the file
-    scene->setSceneRect(scene->itemsBoundingRect()); // Re-shrink the scene to
-                                                     // it's bounding contents
+    scene->clearSelection();  // Selections would also render to the file
+    scene->setSceneRect(scene->itemsBoundingRect());  // Re-shrink the scene to
+                                                      // it's bounding contents
     QImage image(scene->sceneRect().size().toSize(),
-                 QImage::Format_ARGB32); // Create the image with the exact size
-                                         // of the shrunk scene
-    image.fill(Qt::transparent);         // Start all pixels transparent
+                 QImage::Format_ARGB32);  // Create the image with the exact
+                                          // size of the shrunk scene
+    image.fill(Qt::transparent);  // Start all pixels transparent
 
     QPainter painter(&image);
     scene->render(&painter);
@@ -281,9 +283,9 @@ private slots:
     on_shortestNoDiagButton_clicked();
   }
 
-private:
-  Ui::MainWindow *ui;
-  QGraphicsScene *scene;
+ private:
+  Ui::MainWindow* ui;
+  QGraphicsScene* scene;
   MazeSimulator maze_simulator;
   StepMapSlalom::EdgeCost edge_cost;
 
@@ -303,4 +305,4 @@ private:
   }
 };
 
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

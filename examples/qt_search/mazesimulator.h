@@ -24,8 +24,8 @@ class MainWindow;
  * @brief The MazeSimulator class
  */
 class MazeSimulator : public MazeLib::RobotBase {
-public:
-  MazeSimulator(Ui::MainWindow *ui, QGraphicsScene *scene)
+ public:
+  MazeSimulator(Ui::MainWindow* ui, QGraphicsScene* scene)
       : ui(ui), scene(scene) {
     loop->connect(timer, SIGNAL(timeout()), loop, SLOT(quit()));
   }
@@ -57,7 +57,7 @@ public:
     //            cell2posX(s), cell2posY(i), pen);
     //        }
   }
-  void drawMaze(const Maze &maze) {
+  void drawMaze(const Maze& maze) {
     /* Print Walls */
     for (int x = 0; x < MazeLib::MAZE_SIZE + 1; ++x)
       for (int y = 0; y < MazeLib::MAZE_SIZE + 1; ++y) {
@@ -95,7 +95,7 @@ public:
     //        scene->addText("G", font)->setPos((p.x + 0.2) * w, (s - p.y -
     //        0.95) * w);
   }
-  void drawStep(const StepMap &map) {
+  void drawStep(const StepMap& map) {
     for (int x = 0; x < MazeLib::MAZE_SIZE; ++x)
       for (int y = 0; y < MazeLib::MAZE_SIZE; ++y) {
         QFont font;
@@ -109,7 +109,7 @@ public:
         QPen pen(Qt::red);
       }
   }
-  void drawPose(const Pose &pose) {
+  void drawPose(const Pose& pose) {
     /* Draw Machine */
     const auto p = pose.p;
     const auto d = pose.d;
@@ -124,8 +124,9 @@ public:
                          cell2posY(p.y) - wall_unit_px / 2));
     scene->addPolygon(pol, QPen(Qt::yellow), QBrush(Qt::yellow));
   }
-  bool drawShortest(const Maze &maze, const bool diag_enabled,
-                    const StepMapSlalom::EdgeCost &edge_cost = {}) {
+  bool drawShortest(const Maze& maze,
+                    const bool diag_enabled,
+                    const StepMapSlalom::EdgeCost& edge_cost = {}) {
     Maze maze_tmp = maze;
     SearchAlgorithm sa(maze_tmp);
     Directions dirs;
@@ -153,7 +154,7 @@ public:
     }
     return true;
   }
-  bool drawShortestStepMap(const Maze &maze, const bool simple) {
+  bool drawShortestStepMap(const Maze& maze, const bool simple) {
     Maze maze_tmp = maze;
     const bool known_only = 0;
     const bool diag_enabled = false;
@@ -180,7 +181,7 @@ public:
     }
     return true;
   }
-  bool drawShortestStepMapWall(const Maze &maze, const bool simple) {
+  bool drawShortestStepMapWall(const Maze& maze, const bool simple) {
     Maze maze_tmp = maze;
     const bool known_only = 0;
     const bool diag_enabled = true;
@@ -209,8 +210,8 @@ public:
     return true;
   }
 
-  const Maze &getMazeTarget() { return maze_target; }
-  void setMazeTarget(const Maze &maze) { maze_target = maze; }
+  const Maze& getMazeTarget() { return maze_target; }
+  void setMazeTarget(const Maze& maze) { maze_target = maze; }
   void drawStatus() {
     std::stringstream ss;
     ss << "State: " << SearchAlgorithm::getStateString(getState());
@@ -238,11 +239,11 @@ public:
       loop->exit();
   }
 
-protected:
+ protected:
   Maze maze_target;
 
-  virtual void senseWalls(bool &left, bool &front, bool &right) override {
-    const auto &pose = getCurrentPose();
+  virtual void senseWalls(bool& left, bool& front, bool& right) override {
+    const auto& pose = getCurrentPose();
     left = !maze_target.canGo(pose.p, pose.d + Direction::Left);
     front = !maze_target.canGo(pose.p, pose.d + Direction::Front);
     right = !maze_target.canGo(pose.p, pose.d + Direction::Right);
@@ -280,18 +281,18 @@ protected:
     /* release */
   }
 
-private:
-  QEventLoop *loop = new QEventLoop();
-  QTimer *timer = new QTimer();
-  Ui::MainWindow *ui;
-  QGraphicsScene *scene;
+ private:
+  QEventLoop* loop = new QEventLoop();
+  QTimer* timer = new QTimer();
+  Ui::MainWindow* ui;
+  QGraphicsScene* scene;
   int wall_unit_px = 24 * 32 / MAZE_SIZE + 4;
   int pillar_px = 2 * 32 / MAZE_SIZE;
   int line_px = pillar_px;
   int wall_px = wall_unit_px - pillar_px;
   int font_size = 10 * 32 / MAZE_SIZE;
 
-  QPoint getGraphicPointByPose(const Pose &pose,
+  QPoint getGraphicPointByPose(const Pose& pose,
                                const bool on_the_wall = false) {
     const auto p = pose.p;
     QPoint p1;
@@ -304,26 +305,28 @@ private:
     return QPoint(p1.x() + cell2posX(p.x) + wall_unit_px / 2,
                   p1.y() + cell2posY(p.y) - wall_unit_px / 2);
   }
-  QGraphicsItem *addWall(QGraphicsScene *scene, MazeLib::Pose pose,
-                         const QPen &pen) {
+  QGraphicsItem* addWall(QGraphicsScene* scene,
+                         MazeLib::Pose pose,
+                         const QPen& pen) {
     int x = pose.p.x;
     int y = pose.p.y;
     MazeLib::Direction d = pose.d;
     switch (d) {
-    case MazeLib::Direction::East:
-      return scene->addLine(cell2posX(x + 1), cell2posY(y), cell2posX(x + 1),
-                            cell2posY(y) - wall_unit_px, pen);
-    case MazeLib::Direction::North:
-      return scene->addLine(cell2posX(x), cell2posY(y + 1),
-                            cell2posX(x) + wall_unit_px, cell2posY(y + 1), pen);
-    case MazeLib::Direction::West:
-      return scene->addLine(cell2posX(x), cell2posY(y), cell2posX(x),
-                            cell2posY(y) - wall_unit_px, pen);
-    case MazeLib::Direction::South:
-      return scene->addLine(cell2posX(x), cell2posY(y),
-                            cell2posX(x) + wall_unit_px, cell2posY(y), pen);
-    default:
-      break;
+      case MazeLib::Direction::East:
+        return scene->addLine(cell2posX(x + 1), cell2posY(y), cell2posX(x + 1),
+                              cell2posY(y) - wall_unit_px, pen);
+      case MazeLib::Direction::North:
+        return scene->addLine(cell2posX(x), cell2posY(y + 1),
+                              cell2posX(x) + wall_unit_px, cell2posY(y + 1),
+                              pen);
+      case MazeLib::Direction::West:
+        return scene->addLine(cell2posX(x), cell2posY(y), cell2posX(x),
+                              cell2posY(y) - wall_unit_px, pen);
+      case MazeLib::Direction::South:
+        return scene->addLine(cell2posX(x), cell2posY(y),
+                              cell2posX(x) + wall_unit_px, cell2posY(y), pen);
+      default:
+        break;
     }
     return nullptr;
   }
@@ -338,4 +341,4 @@ private:
   }
 };
 
-#endif // MAZESIMULATOR_H
+#endif  // MAZESIMULATOR_H

@@ -10,7 +10,7 @@
 
 using namespace MazeLib;
 
-void poll(Maze &maze) {
+void poll(Maze& maze) {
   /* random generator */
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
@@ -43,7 +43,7 @@ void poll(Maze &maze) {
     }
 }
 
-void dig(Maze &maze) {
+void dig(Maze& maze) {
   /* random generator */
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
@@ -124,7 +124,7 @@ void dig(Maze &maze) {
   }
 }
 
-void setGoalLongest(Maze &maze) {
+void setGoalLongest(Maze& maze) {
   StepMap map;
   map.update(maze, {maze.getStart()}, false, false);
   StepMap::step_t max_step = 0;
@@ -181,16 +181,17 @@ int main(void) {
 #if 1
   /* Preparation */
   const auto p_robot = std::make_unique<CLRobotBase>(maze);
-  CLRobotBase &robot = *p_robot;
+  CLRobotBase& robot = *p_robot;
   robot.replaceGoals(maze.getGoals());
   /* Search Run */
   robot.searchRun();
   /* Show Result */
   // robot.printInfo();
-  std::printf("Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
-              "Left: %3d, Right: %3d, Back: %3d\n",
-              ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step,
-              robot.f, robot.l, robot.r, robot.b);
+  std::printf(
+      "Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
+      "Left: %3d, Right: %3d, Back: %3d\n",
+      ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step, robot.f,
+      robot.l, robot.r, robot.b);
   // for (bool diag_enabled : {false, true}) {
   //   robot.calcShortestDirections(diag_enabled);
   //   std::cout << "Estimated Shortest Time "

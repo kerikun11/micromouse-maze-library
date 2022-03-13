@@ -1,4 +1,5 @@
 #include "MazeLib/CLRobotBase.h"
+
 #include <gtest/gtest.h>
 
 using namespace MazeLib;
@@ -36,7 +37,7 @@ TEST(CLRobotBase, CLRobotBase) {
   /* StepMap */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
-    const Maze &maze = maze_target;
+    const Maze& maze = maze_target;
     StepMap map;
     auto shortest_dirs = map.calcShortestDirections(
         maze, maze.getStart(), maze.getGoals(), known_only, simple);
@@ -52,7 +53,7 @@ TEST(CLRobotBase, CLRobotBase) {
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
-    const Maze &maze = maze_target;
+    const Maze& maze = maze_target;
     StepMapWall map;
     auto shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
     EXPECT_FALSE(shortest_dirs.empty());
@@ -67,7 +68,7 @@ TEST(CLRobotBase, CLRobotBase) {
   /* StepMapSlalom */
   for (const auto diag_enabled : {false, true}) {
     const bool known_only = 0;
-    const Maze &maze = maze_target;
+    const Maze& maze = maze_target;
     StepMapSlalom map;
     StepMapSlalom::Indexes shortest_indexes;
     map.update(maze, StepMapSlalom::EdgeCost(),
@@ -111,7 +112,7 @@ TEST(CLRobotBase, fake) {
   /* StepMap */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
-    const Maze &maze = maze_target;
+    const Maze& maze = maze_target;
     StepMap map;
     auto shortest_dirs = map.calcShortestDirections(
         maze, maze.getStart(), maze.getGoals(), known_only, simple);
@@ -127,7 +128,7 @@ TEST(CLRobotBase, fake) {
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool known_only = 0;
-    const Maze &maze = maze_target;
+    const Maze& maze = maze_target;
     StepMapWall map;
     auto shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
     EXPECT_TRUE(shortest_dirs.empty());
@@ -142,7 +143,7 @@ TEST(CLRobotBase, fake) {
   /* StepMapSlalom */
   for (const auto diag_enabled : {false, true}) {
     const bool known_only = 0;
-    const Maze &maze = maze_target;
+    const Maze& maze = maze_target;
     StepMapSlalom map;
     StepMapSlalom::Indexes shortest_indexes;
     map.update(maze, StepMapSlalom::EdgeCost(),

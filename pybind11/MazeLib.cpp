@@ -39,7 +39,7 @@ PYBIND11_MODULE(MazeLib, m) {
       //   .def("Along4", &Direction::Along4)
       //   .def("Diag4", &Direction::Diag4)
       .def("__str__", &Direction::toChar)
-      .def("__int__", [](const Direction &d) { return uint8_t(d); })
+      .def("__int__", [](const Direction& d) { return uint8_t(d); })
       .def(py::self == py::self)
       .def(py::self != py::self)
       //
@@ -86,7 +86,7 @@ PYBIND11_MODULE(MazeLib, m) {
                                                               py::const_),
            py::arg("d"), py::arg("center") = Position())
       .def("__str__",
-           [](const Position &obj) {
+           [](const Position& obj) {
              std::stringstream ss;
              ss << obj;
              return ss.str();
@@ -97,13 +97,13 @@ PYBIND11_MODULE(MazeLib, m) {
 
   /* Pose */
   py::class_<Pose>(m, "Pose")
-      .def(py::init<Position &, Direction>(), py::arg("p") = Position(),
+      .def(py::init<Position&, Direction>(), py::arg("p") = Position(),
            py::arg("d") = Direction())
       .def_readwrite("p", &Pose::p)
       .def_readwrite("d", &Pose::d)
       .def("next", &Pose::next)
       .def("__str__",
-           [](const Pose &obj) {
+           [](const Pose& obj) {
              std::stringstream ss;
              ss << obj;
              return ss.str();
@@ -118,7 +118,7 @@ PYBIND11_MODULE(MazeLib, m) {
       //  .def(py::init<int8_t, int8_t, int8_t>(), py::arg("x") = 0,
       //       py::arg("y") = 0, py::arg("z") = 0)
       .def(py::init<int8_t, int8_t, int8_t>())
-      .def(py::init<const Position &, const Direction>())
+      .def(py::init<const Position&, const Direction>())
       //  .def(py::init<const uint16_t>())
       .def(py::init<const uint16_t>(), py::arg("index") = 0)
       .def(py::self == py::self)
@@ -127,7 +127,7 @@ PYBIND11_MODULE(MazeLib, m) {
       .def("getPosition", &WallIndex::getPosition)
       .def("getDirection", &WallIndex::getDirection)
       .def("__str__",
-           [](const WallIndex &obj) {
+           [](const WallIndex& obj) {
              std::stringstream ss;
              ss << obj;
              return ss.str();
@@ -144,7 +144,7 @@ PYBIND11_MODULE(MazeLib, m) {
       .def(py::init<>())
       .def(py::init<int8_t, int8_t, Direction, bool>(), py::arg("x") = 0,
            py::arg("y") = 0, py::arg("d") = 0, py::arg("b") = false)
-      .def(py::init<const Position &, const Direction, bool>())
+      .def(py::init<const Position&, const Direction, bool>())
       .def("getPosition", &WallRecord::getPosition)
       .def("getDirection", &WallRecord::getDirection)
       //
@@ -154,7 +154,7 @@ PYBIND11_MODULE(MazeLib, m) {
   /* Maze */
   py::class_<Maze>(m, "Maze")
       .def(py::init<>())
-      .def(py::init<const Positions &, const Position &>(), //
+      .def(py::init<const Positions&, const Position&>(),  //
            py::arg("goals") = Positions(), py::arg("start") = Position(0, 0))
       .def("reset", &Maze::reset, py::arg("set_start_wall") = true,
            py::arg("set_range_full") = false)
@@ -204,26 +204,26 @@ PYBIND11_MODULE(MazeLib, m) {
       .def("unknownCount", &Maze::unknownCount)
       /* print */
       .def("print",
-           [](const Maze &maze) {
+           [](const Maze& maze) {
              py::scoped_ostream_redirect stream(
                  std::cout, py::module::import("sys").attr("stdout"));
              maze.print();
            })
       .def("print",
-           [](const Maze &maze, const int maze_size) {
+           [](const Maze& maze, const int maze_size) {
              py::scoped_ostream_redirect stream(
                  std::cout, py::module::import("sys").attr("stdout"));
              maze.print(std::cout, maze_size);
            })
       .def("print",
-           [](const Maze &maze, const Directions &dirs, const Position &start,
+           [](const Maze& maze, const Directions& dirs, const Position& start,
               const int maze_size) {
              py::scoped_ostream_redirect stream(
                  std::cout, py::module::import("sys").attr("stdout"));
              maze.print(dirs, start, std::cout, maze_size);
            })
       /* parse */
-      .def("parse", py::overload_cast<const std::string &>(&Maze::parse))
+      .def("parse", py::overload_cast<const std::string&>(&Maze::parse))
       /* setters and getters */
       .def("setGoals", &Maze::setGoals)
       .def("setStart", &Maze::setStart)
@@ -241,7 +241,7 @@ PYBIND11_MODULE(MazeLib, m) {
   py::class_<StepMap>(m, "StepMap")
       .def(py::init<>())
       .def("calcShortestDirections",
-           py::overload_cast<const Maze &, const bool, const bool>(
+           py::overload_cast<const Maze&, const bool, const bool>(
                &StepMap::calcShortestDirections),
            py::arg("maze"), py::arg("known_only") = true,
            py::arg("simple") = false)
@@ -256,7 +256,7 @@ PYBIND11_MODULE(MazeLib, m) {
   py::class_<StepMapWall>(m, "StepMapWall")
       .def(py::init<>())
       .def("calcShortestDirections",
-           py::overload_cast<const Maze &, const bool, const bool>(
+           py::overload_cast<const Maze&, const bool, const bool>(
                &StepMapWall::calcShortestDirections),
            py::arg("maze"), py::arg("known_only") = true,
            py::arg("simple") = false)
@@ -288,8 +288,8 @@ PYBIND11_MODULE(MazeLib, m) {
       //      py::arg("diag_enabled") = true)
       .def(
           "calcShortestDirections",
-          [](StepMapSlalom &map, const Maze &maze,
-             const StepMapSlalom::EdgeCost &edge_cost, const bool known_only,
+          [](StepMapSlalom& map, const Maze& maze,
+             const StepMapSlalom::EdgeCost& edge_cost, const bool known_only,
              const bool diag_enabled) {
             Directions shortest_dirs;
             map.calcShortestDirections(maze, edge_cost, shortest_dirs,

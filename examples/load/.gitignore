@@ -12,7 +12,7 @@
 # Compiled MEX binaries (all platforms)
 *.mex*
 
-# Simulink Code Generation	
+# Simulink Code Generation
 slprj/
 
 # public library

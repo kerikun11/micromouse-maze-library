@@ -1,4 +1,5 @@
 #include "MazeLib/Maze.h"
+
 #include <gtest/gtest.h>
 #include <algorithm>
 

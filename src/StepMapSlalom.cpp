@@ -18,70 +18,70 @@ namespace MazeLib {
 /* Index */
 StepMapSlalom::Index StepMapSlalom::Index::next(const Direction nd) const {
   switch (getNodeDirection()) {
-  case Direction::East:
-  case Direction::North:
-  case Direction::West:
-  case Direction::South:
-    return nd.isAlong() ? Index(getPosition().next(nd), nd)
-                        : Index(getWallIndex().next(nd), nd);
-  case Direction::NorthEast:
-    switch (nd) {
     case Direction::East:
-      return Index(x + 1, y + 1, nd);
     case Direction::North:
-      return Index(x + 1, y + 1, nd);
     case Direction::West:
-      return Index(x, y + 1, nd);
     case Direction::South:
-      return Index(x + 1, y, nd);
+      return nd.isAlong() ? Index(getPosition().next(nd), nd)
+                          : Index(getWallIndex().next(nd), nd);
+    case Direction::NorthEast:
+      switch (nd) {
+        case Direction::East:
+          return Index(x + 1, y + 1, nd);
+        case Direction::North:
+          return Index(x + 1, y + 1, nd);
+        case Direction::West:
+          return Index(x, y + 1, nd);
+        case Direction::South:
+          return Index(x + 1, y, nd);
+        default:
+          return Index(WallIndex(x, y, z).next(nd), nd);
+      }
+    case Direction::NorthWest:
+      switch (nd) {
+        case Direction::East:
+          return Index(x + 1, y + 1, nd);
+        case Direction::North:
+          return Index(x, y + 1, nd);
+        case Direction::West:
+          return Index(x - 1, y + 1, nd);
+        case Direction::South:
+          return Index(x - 1, y, nd);
+        default:
+          return Index(WallIndex(x, y, z).next(nd), nd);
+      }
+    case Direction::SouthWest:
+      switch (nd) {
+        case Direction::East:
+          return Index(x + 1, y - 1, nd);
+        case Direction::North:
+          return Index(x - 1, y + 1, nd);
+        case Direction::West:
+          return Index(x - 1, y, nd);
+        case Direction::South:
+          return Index(x, y - 1, nd);
+        default:
+          return Index(WallIndex(x, y, z).next(nd), nd);
+      }
+    case Direction::SouthEast:
+      switch (nd) {
+        case Direction::East:
+          return Index(x + 1, y, nd);
+        case Direction::North:
+          return Index(x + 1, y + 1, nd);
+        case Direction::West:
+          return Index(x, y - 1, nd);
+        case Direction::South:
+          return Index(x + 1, y - 1, nd);
+        default:
+          return Index(WallIndex(x, y, z).next(nd), nd);
+      }
     default:
-      return Index(WallIndex(x, y, z).next(nd), nd);
-    }
-  case Direction::NorthWest:
-    switch (nd) {
-    case Direction::East:
-      return Index(x + 1, y + 1, nd);
-    case Direction::North:
-      return Index(x, y + 1, nd);
-    case Direction::West:
-      return Index(x - 1, y + 1, nd);
-    case Direction::South:
-      return Index(x - 1, y, nd);
-    default:
-      return Index(WallIndex(x, y, z).next(nd), nd);
-    }
-  case Direction::SouthWest:
-    switch (nd) {
-    case Direction::East:
-      return Index(x + 1, y - 1, nd);
-    case Direction::North:
-      return Index(x - 1, y + 1, nd);
-    case Direction::West:
-      return Index(x - 1, y, nd);
-    case Direction::South:
-      return Index(x, y - 1, nd);
-    default:
-      return Index(WallIndex(x, y, z).next(nd), nd);
-    }
-  case Direction::SouthEast:
-    switch (nd) {
-    case Direction::East:
-      return Index(x + 1, y, nd);
-    case Direction::North:
-      return Index(x + 1, y + 1, nd);
-    case Direction::West:
-      return Index(x, y - 1, nd);
-    case Direction::South:
-      return Index(x + 1, y - 1, nd);
-    default:
-      return Index(WallIndex(x, y, z).next(nd), nd);
-    }
-  default:
-    maze_loge << "Invalid Direction: " << nd << std::endl;
-    return Index(x, y, z, nd);
+      maze_loge << "Invalid Direction: " << nd << std::endl;
+      return Index(x, y, z, nd);
   }
 }
-std::ostream &operator<<(std::ostream &os, const StepMapSlalom::Index &i) {
+std::ostream& operator<<(std::ostream& os, const StepMapSlalom::Index& i) {
   if (i.getNodeDirection().isAlong())
     return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
               << (int)i.y << ", " << i.getNodeDirection().toChar() << ")";
@@ -92,9 +92,9 @@ std::ostream &operator<<(std::ostream &os, const StepMapSlalom::Index &i) {
 
 /* StepMapSlalom */
 
-bool StepMapSlalom::calcShortestDirections(const Maze &maze,
-                                           const EdgeCost &edge_cost,
-                                           Directions &shortest_dirs,
+bool StepMapSlalom::calcShortestDirections(const Maze& maze,
+                                           const EdgeCost& edge_cost,
+                                           Directions& shortest_dirs,
                                            const bool known_only,
                                            const bool diag_enabled) {
   const auto dest = convertDestinations(maze.getGoals());
@@ -105,8 +105,10 @@ bool StepMapSlalom::calcShortestDirections(const Maze &maze,
   shortest_dirs = indexes2directions(path, diag_enabled);
   return true;
 }
-void StepMapSlalom::update(const Maze &maze, const EdgeCost &edge_cost,
-                           const Indexes &dest, const bool known_only,
+void StepMapSlalom::update(const Maze& maze,
+                           const EdgeCost& edge_cost,
+                           const Indexes& dest,
+                           const bool known_only,
                            const bool diag_enabled) {
   /* 全ノードのコストを最大値に設定 */
   const auto cost = CostMax;
@@ -128,7 +130,7 @@ void StepMapSlalom::update(const Maze &maze, const EdgeCost &edge_cost,
     q.push(i);
   }
   /* known_only を考慮した壁の判定式を用意 */
-  const auto canGo = [&](const WallIndex &i) {
+  const auto canGo = [&](const WallIndex& i) {
     if (maze.isWall(i) || (known_only && !maze.isKnown(i)))
       return false;
     return true;
@@ -136,14 +138,14 @@ void StepMapSlalom::update(const Maze &maze, const EdgeCost &edge_cost,
   /* 更新がなくなるまで更新 */
   while (!q.empty()) {
 #if STEP_MAP_USE_PRIORITY_QUEUE
-    const auto &&focus = std::move(q.top());
+    const auto&& focus = std::move(q.top());
 #else
-    const auto &&focus = std::move(q.front());
+    const auto&& focus = std::move(q.front());
 #endif
     q.pop();
     const auto focus_cost = cost_map[focus.getIndex()];
     /* キューに追加する関数を用意 */
-    const auto pushAndContinue = [&](const Index &next,
+    const auto pushAndContinue = [&](const Index& next,
                                      const cost_t edge_cost) {
       const auto next_cost = focus_cost + edge_cost;
       const auto next_index = next.getIndex();
@@ -197,9 +199,9 @@ void StepMapSlalom::update(const Maze &maze, const EdgeCost &edge_cost,
         }
       } else {
         /* 斜めなしのターン */
-        const auto p_f = focus.getPosition().next(nd); //< i.e. vector front
+        const auto p_f = focus.getPosition().next(nd);  //< i.e. vector front
         for (const auto d90 : {nd + Direction::Left, nd + Direction::Right})
-          if (canGo(WallIndex(p_f, d90))) //< 90度方向の壁
+          if (canGo(WallIndex(p_f, d90)))  //< 90度方向の壁
             pushAndContinue(Index(p_f, d90), edge_cost.getEdgeCostSlalom(FS90));
       }
     } else { /* 壁の中央（斜めありの場合しかありえない） */
@@ -238,7 +240,7 @@ void StepMapSlalom::update(const Maze &maze, const EdgeCost &edge_cost,
     }
   }
 }
-bool StepMapSlalom::genPathFromMap(Indexes &path) const {
+bool StepMapSlalom::genPathFromMap(Indexes& path) const {
   path.clear();
   auto i = index_start.opposite();
   while (1) {
@@ -251,10 +253,11 @@ bool StepMapSlalom::genPathFromMap(Indexes &path) const {
   }
   return true;
 }
-void StepMapSlalom::print(const Maze &maze, const Indexes &indexes,
-                          std::ostream &os) const {
-  const auto exists = [&](const Index &i) {
-    return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index &ii) {
+void StepMapSlalom::print(const Maze& maze,
+                          const Indexes& indexes,
+                          std::ostream& os) const {
+  const auto exists = [&](const Index& i) {
+    return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index& ii) {
              if (i.getNodeDirection().isAlong() !=
                  ii.getNodeDirection().isAlong())
                return false;
@@ -292,15 +295,15 @@ void StepMapSlalom::print(const Maze &maze, const Indexes &indexes,
     }
   }
 }
-StepMapSlalom::Indexes
-StepMapSlalom::convertDestinations(const Positions &src) {
+StepMapSlalom::Indexes StepMapSlalom::convertDestinations(
+    const Positions& src) {
   Indexes dest;
   for (const auto p : src)
     for (const auto nd : Direction::Along4)
       dest.push_back(Index(p, nd));
   return dest;
 }
-Directions StepMapSlalom::indexes2directions(const Indexes &path,
+Directions StepMapSlalom::indexes2directions(const Indexes& path,
                                              const bool diag_enabled) {
   if (!diag_enabled) {
     Directions dirs;
@@ -320,90 +323,90 @@ Directions StepMapSlalom::indexes2directions(const Indexes &path,
         Direction(path[i + 1].getNodeDirection() - path[i].getNodeDirection());
     if (nd.isAlong()) {
       switch (rel_nd) {
-      case Direction::Front:
-        for (int j = 0; j < std::abs(rel_p.x) + std::abs(rel_p.y); ++j)
+        case Direction::Front:
+          for (int j = 0; j < std::abs(rel_p.x) + std::abs(rel_p.y); ++j)
+            dirs.push_back(nd);
+          break;
+        case Direction::Left45:
           dirs.push_back(nd);
-        break;
-      case Direction::Left45:
-        dirs.push_back(nd);
-        dirs.push_back(nd + Direction::Left);
-        break;
-      case Direction::Right45:
-        dirs.push_back(nd);
-        dirs.push_back(nd + Direction::Right);
-        break;
-      case Direction::Left:
-        dirs.push_back(nd);
-        dirs.push_back(nd + Direction::Left);
-        break;
-      case Direction::Right:
-        dirs.push_back(nd);
-        dirs.push_back(nd + Direction::Right);
-        break;
-      case Direction::Left135:
-        dirs.push_back(nd);
-        dirs.push_back(nd + Direction::Left);
-        dirs.push_back(nd + Direction::Back);
-        break;
-      case Direction::Right135:
-        dirs.push_back(nd);
-        dirs.push_back(nd + Direction::Right);
-        dirs.push_back(nd + Direction::Back);
-        break;
-      case Direction::Back:
-        dirs.push_back(nd);
-        if (rel_p.rotate(-nd).y > 0) {
+          dirs.push_back(nd + Direction::Left);
+          break;
+        case Direction::Right45:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Direction::Right);
+          break;
+        case Direction::Left:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Direction::Left);
+          break;
+        case Direction::Right:
+          dirs.push_back(nd);
+          dirs.push_back(nd + Direction::Right);
+          break;
+        case Direction::Left135:
+          dirs.push_back(nd);
           dirs.push_back(nd + Direction::Left);
           dirs.push_back(nd + Direction::Back);
-        } else {
+          break;
+        case Direction::Right135:
+          dirs.push_back(nd);
           dirs.push_back(nd + Direction::Right);
           dirs.push_back(nd + Direction::Back);
-        }
-        break;
-      default:
-        maze_loge << "invalid Direction" << std::endl;
-        break;
+          break;
+        case Direction::Back:
+          dirs.push_back(nd);
+          if (rel_p.rotate(-nd).y > 0) {
+            dirs.push_back(nd + Direction::Left);
+            dirs.push_back(nd + Direction::Back);
+          } else {
+            dirs.push_back(nd + Direction::Right);
+            dirs.push_back(nd + Direction::Back);
+          }
+          break;
+        default:
+          maze_loge << "invalid Direction" << std::endl;
+          break;
       }
     } else {
       switch (rel_nd) {
-      case Direction::Front:
-        for (auto index = path[i]; index != path[i + 1];
-             index = index.next(index.getNodeDirection())) {
-          const auto nd_45 = index.getRelativeDirectionDiagToAlong();
-          dirs.push_back(index.getNodeDirection() + nd_45);
-        }
-        break;
-      case Direction::Left45:
-        dirs.push_back(nd + Direction::Left45);
-        break;
-      case Direction::Right45:
-        dirs.push_back(nd + Direction::Right45);
-        break;
-      case Direction::Left:
-        /* V90 */
-        dirs.push_back(nd + Direction::Left45);
-        dirs.push_back(nd + Direction::Left135);
-        break;
-      case Direction::Right:
-        /* V90 */
-        dirs.push_back(nd + Direction::Right45);
-        dirs.push_back(nd + Direction::Right135);
-        break;
-      case Direction::Left135:
-        dirs.push_back(nd + Direction::Left45);
-        dirs.push_back(nd + Direction::Left135);
-        break;
-      case Direction::Right135:
-        dirs.push_back(nd + Direction::Right45);
-        dirs.push_back(nd + Direction::Right135);
-        break;
-      default:
-        maze_loge << "invalid Direction" << std::endl;
-        break;
+        case Direction::Front:
+          for (auto index = path[i]; index != path[i + 1];
+               index = index.next(index.getNodeDirection())) {
+            const auto nd_45 = index.getRelativeDirectionDiagToAlong();
+            dirs.push_back(index.getNodeDirection() + nd_45);
+          }
+          break;
+        case Direction::Left45:
+          dirs.push_back(nd + Direction::Left45);
+          break;
+        case Direction::Right45:
+          dirs.push_back(nd + Direction::Right45);
+          break;
+        case Direction::Left:
+          /* V90 */
+          dirs.push_back(nd + Direction::Left45);
+          dirs.push_back(nd + Direction::Left135);
+          break;
+        case Direction::Right:
+          /* V90 */
+          dirs.push_back(nd + Direction::Right45);
+          dirs.push_back(nd + Direction::Right135);
+          break;
+        case Direction::Left135:
+          dirs.push_back(nd + Direction::Left45);
+          dirs.push_back(nd + Direction::Left135);
+          break;
+        case Direction::Right135:
+          dirs.push_back(nd + Direction::Right45);
+          dirs.push_back(nd + Direction::Right135);
+          break;
+        default:
+          maze_loge << "invalid Direction" << std::endl;
+          break;
       }
     }
   }
   return dirs;
 }
 
-} // namespace MazeLib
+}  // namespace MazeLib

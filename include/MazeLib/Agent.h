@@ -16,13 +16,13 @@ namespace MazeLib {
  * @brief 自己位置や探索状態などを保持するクラス
  */
 class Agent {
-public:
+ public:
   /**
    * @brief 通常のコンストラクタ
    * @param maze 更新に用いる迷路への参照(書き込み権限あり)
    */
   Agent() : searchAlgorithm(maze) {}
-  Agent(const Maze &maze) : maze(maze), searchAlgorithm(this->maze) {}
+  Agent(const Maze& maze) : maze(maze), searchAlgorithm(this->maze) {}
   /**
    * @brief 初期化
    */
@@ -37,7 +37,7 @@ public:
   /**
    * @brief ゴール区画を変更する関数
    */
-  void replaceGoals(const Positions &goals) { maze.setGoals(goals); }
+  void replaceGoals(const Positions& goals) { maze.setGoals(goals); }
   /**
    * @brief 探索が完了しているかどうかを返す関数
    */
@@ -49,15 +49,15 @@ public:
   /**
    * @brief 現在地を更新
    */
-  void updateCurrentPose(const Pose &new_pose) {
+  void updateCurrentPose(const Pose& new_pose) {
     current_pose = new_pose;
     searchAlgorithm.updatePose(getState(), current_pose, isForceGoingToGoal);
   }
   /**
    * @brief 次に行くべき方向を取得する
    */
-  bool determineNextDirection(const Pose &pose,
-                              Direction &nextDirection) const {
+  bool determineNextDirection(const Pose& pose,
+                              Direction& nextDirection) const {
     return searchAlgorithm.determineNextDirection(
         getState(), pose, next_directions.next_direction_candidates,
         nextDirection);
@@ -65,11 +65,13 @@ public:
   /**
    * @brief 壁を更新
    */
-  bool updateWall(const Pose &pose, const bool left, const bool front,
+  bool updateWall(const Pose& pose,
+                  const bool left,
+                  const bool front,
                   const bool right) {
     return searchAlgorithm.updateWall(getState(), pose, left, front, right);
   }
-  bool updateWall(const Position &p, const Direction d, const bool b) {
+  bool updateWall(const Position& p, const Direction d, const bool b) {
     return searchAlgorithm.updateWall(getState(), p, d, b);
   }
   /**
@@ -95,7 +97,7 @@ public:
    */
   bool calcShortestDirections(
       const bool diag_enabled,
-      const StepMapSlalom::EdgeCost &edge_cost = StepMapSlalom::EdgeCost{}) {
+      const StepMapSlalom::EdgeCost& edge_cost = StepMapSlalom::EdgeCost{}) {
     return searchAlgorithm.calcShortestDirections(shortest_dirs, diag_enabled,
                                                   edge_cost);
   }
@@ -126,19 +128,19 @@ public:
   /**
    * @brief 探索状態の取得
    */
-  const SearchAlgorithm::State &getState() const {
+  const SearchAlgorithm::State& getState() const {
     return next_directions.state;
   }
   /**
    * @brief 次に行くべき方向配列の計算結果を取得
    */
-  const Directions &getNextDirections() const {
+  const Directions& getNextDirections() const {
     return next_directions.next_directions_known;
   }
   /**
    * @brief 次に行くべき方向配列の計算結果を取得
    */
-  const Directions &getNextDirectionCandidates() const {
+  const Directions& getNextDirectionCandidates() const {
     return next_directions.next_direction_candidates;
   }
   /**
@@ -150,23 +152,23 @@ public:
   /**
    * @brief 現在姿勢を取得
    */
-  const Pose &getCurrentPose() const { return current_pose; }
+  const Pose& getCurrentPose() const { return current_pose; }
   /**
    * @brief 最短経路の方向配列の計算結果を取得
    */
-  const Directions &getShortestDirections() const { return shortest_dirs; }
+  const Directions& getShortestDirections() const { return shortest_dirs; }
   /**
    * @brief 迷路を取得
    */
-  const Maze &getMaze() const { return maze; }
+  const Maze& getMaze() const { return maze; }
   /**
    * @brief 迷路を更新
    */
-  void updateMaze(const Maze &new_maze) { maze = new_maze; }
+  void updateMaze(const Maze& new_maze) { maze = new_maze; }
   /**
    * @brief Get the Search Algorithm object
    */
-  const SearchAlgorithm &getSearchAlgorithm() const { return searchAlgorithm; }
+  const SearchAlgorithm& getSearchAlgorithm() const { return searchAlgorithm; }
   /**
    * @brief 探索状態の表示
    *
@@ -182,7 +184,8 @@ public:
    * @param pose ハイライトする区画姿勢
    * @param state 探索状態
    */
-  void printInfo(const bool show_maze, const Pose &pose,
+  void printInfo(const bool show_maze,
+                 const Pose& pose,
                  const SearchAlgorithm::State state) const;
   /**
    * @brief 最短経路の表示
@@ -193,18 +196,18 @@ public:
    */
   int getMatchCount() const { return next_directions.match_count; }
 
-protected:
+ protected:
   Maze maze;                          /**< @brief 使用する迷路 */
   Pose current_pose;                  /**< @brief 現在の姿勢 */
   bool isForceBackToStart = false;    /**< @brief 強制帰還モード */
   bool isForceGoingToGoal = false;    /**< @brief 強制終点訪問モード */
   bool isPositionIdentifying = false; /**< @brief 自己位置同定モード */
 
-private:
+ private:
   SearchAlgorithm searchAlgorithm; /**< @brief 探索器 */
   SearchAlgorithm::NextDirections
       next_directions;      /**< @brief 次に行く既知方向配列 */
   Directions shortest_dirs; /**< @brief 最短経路の方向配列 */
 };
 
-} // namespace MazeLib
+}  // namespace MazeLib

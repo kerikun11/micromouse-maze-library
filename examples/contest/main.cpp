@@ -5,8 +5,8 @@
 using namespace MazeLib;
 
 class CLRobot : public CLRobotBase {
-public:
-  CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
+ public:
+  CLRobot(Maze& maze_target) : CLRobotBase(maze_target) {}
   bool display = false;
 
   void wait() {
@@ -16,10 +16,10 @@ public:
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
 
-protected:
-  virtual void
-  calcNextDirectionsPostCallback(SearchAlgorithm::State prevState,
-                                 SearchAlgorithm::State newState) override {
+ protected:
+  virtual void calcNextDirectionsPostCallback(
+      SearchAlgorithm::State prevState,
+      SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
     if (newState == prevState)
       return;
@@ -83,7 +83,7 @@ int main(void) {
   if (!maze_target.parse((mazedata_dir + filename).c_str()))
     return -1;
   const auto p_robot = std::make_unique<CLRobot>(maze_target);
-  CLRobot &robot = *p_robot;
+  CLRobot& robot = *p_robot;
   robot.replaceGoals(maze_target.getGoals());
 
 #if 1
@@ -129,7 +129,7 @@ int main(void) {
   robot.wait();
   robot.fastRun(false);
   robot.wait();
-  robot.setForceBackToStart(); //< time-up
+  robot.setForceBackToStart();  //< time-up
   robot.endFastRunBackingToStartRun();
 
   /* 4. 3rd Fast Run */

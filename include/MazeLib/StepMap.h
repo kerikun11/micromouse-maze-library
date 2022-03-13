@@ -8,6 +8,7 @@
 #pragma once
 
 #include "MazeLib/Maze.h"
+
 #include <limits> /*< for std::numeric_limits */
 
 namespace MazeLib {
@@ -16,12 +17,12 @@ namespace MazeLib {
  * @brief 区画ベースのステップマップを管理するクラス
  */
 class StepMap {
-public:
+ public:
   using step_t = uint16_t; /**< @brief ステップの型 */
   static constexpr step_t STEP_MAX =
       std::numeric_limits<step_t>::max(); /**< @brief 最大ステップ値 */
 
-public:
+ public:
   /**
    * @brief デフォルトコンストラクタ
    * @details 台形加速のコストテーブルを計算する処理を含む
@@ -64,30 +65,36 @@ public:
   /**
    * @brief ステップマップの生配列への参照を取得 (読み取り専用)
    */
-  const auto &getMapArray() const { return step_map; }
+  const auto& getMapArray() const { return step_map; }
   /**
    * @brief ステップの表示
    * @param p ハイライト区画
    */
-  void print(const Maze &maze, const Position &p = Position(-1, -1),
+  void print(const Maze& maze,
+             const Position& p = Position(-1, -1),
              const Direction d = Direction::Max,
-             std::ostream &os = std::cout) const;
-  void print(const Maze &maze, const Directions &dirs,
-             const Position &start = Position(0, 0),
-             std::ostream &os = std::cout) const;
-  void printFull(const Maze &maze, const Position &p = Position(-1, -1),
+             std::ostream& os = std::cout) const;
+  void print(const Maze& maze,
+             const Directions& dirs,
+             const Position& start = Position(0, 0),
+             std::ostream& os = std::cout) const;
+  void printFull(const Maze& maze,
+                 const Position& p = Position(-1, -1),
                  const Direction d = Direction::Max,
-                 std::ostream &os = std::cout) const;
-  void printFull(const Maze &maze, const Directions &dirs,
-                 const Position &start = Position(0, 0),
-                 std::ostream &os = std::cout) const;
+                 std::ostream& os = std::cout) const;
+  void printFull(const Maze& maze,
+                 const Directions& dirs,
+                 const Position& start = Position(0, 0),
+                 std::ostream& os = std::cout) const;
   /**
    * @brief ステップマップの更新
    * @param dest ステップを0とする目的地の区画の集合(順不同)
    * @param known_only true:未知壁は通過不可能，false:未知壁は通過可能とする
    * @param simple 台形加速を考慮せず，隣接区画のコストをすべて1にする
    */
-  void update(const Maze &maze, const Positions &dest, const bool known_only,
+  void update(const Maze& maze,
+              const Positions& dest,
+              const bool known_only,
               const bool simple);
   /**
    * @brief 与えられた区画間の最短経路を導出する関数
@@ -98,13 +105,16 @@ public:
    * @return const Directions スタートからゴールへの最短経路の方向列．
    *                    経路がない場合は空配列となる．
    */
-  Directions calcShortestDirections(const Maze &maze, const Position &start,
-                                    const Positions &dest,
-                                    const bool known_only, const bool simple);
+  Directions calcShortestDirections(const Maze& maze,
+                                    const Position& start,
+                                    const Positions& dest,
+                                    const bool known_only,
+                                    const bool simple);
   /**
    * @brief スタートからゴールまでの最短経路を導出する関数
    */
-  Directions calcShortestDirections(const Maze &maze, const bool known_only,
+  Directions calcShortestDirections(const Maze& maze,
+                                    const bool known_only,
                                     const bool simple) {
     return calcShortestDirections(maze, maze.getStart(), maze.getGoals(),
                                   known_only, simple);
@@ -113,33 +123,36 @@ public:
    * @brief ステップマップから次に行くべき方向を計算する関数
    * @return 既知区間の最終区画
    */
-  Pose calcNextDirections(const Maze &maze, const Pose &start,
-                          Directions &nextDirectionsKnown,
-                          Directions &nextDirectionCandidates) const;
+  Pose calcNextDirections(const Maze& maze,
+                          const Pose& start,
+                          Directions& nextDirectionsKnown,
+                          Directions& nextDirectionCandidates) const;
   /**
    * @brief ステップマップにより次に行くべき方向列を生成する
    */
-  Directions getStepDownDirections(const Maze &maze, const Pose &start,
-                                   Pose &end, const bool known_only,
+  Directions getStepDownDirections(const Maze& maze,
+                                   const Pose& start,
+                                   Pose& end,
+                                   const bool known_only,
                                    const bool break_unknown) const;
   /**
    * @brief 引数区画の周囲の未知壁の確認優先順位を生成する関数
    * @return const Directions 行くべき方向の優先順位
    */
-  Directions getNextDirectionCandidates(const Maze &maze,
-                                        const Pose &focus) const;
+  Directions getNextDirectionCandidates(const Maze& maze,
+                                        const Pose& focus) const;
   /**
    * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
    * @param maze 迷路の参照
    * @param shortest_dirs 追記元の方向列．これ自体に追記される．
    * @param diag_enabled 斜めありなし
    */
-  static void appendStraightDirections(const Maze &maze,
-                                       Directions &shortest_dirs,
+  static void appendStraightDirections(const Maze& maze,
+                                       Directions& shortest_dirs,
                                        const bool known_only,
                                        const bool diag_enabled);
 
-protected:
+ protected:
   /** @brief 迷路中のステップ数 */
   std::array<step_t, Position::SIZE> step_map;
   /** @brief 台形加速を考慮した移動コストテーブル (壁沿い方向) */
@@ -152,4 +165,4 @@ protected:
   void calcStraightStepTable();
 };
 
-} // namespace MazeLib
+}  // namespace MazeLib

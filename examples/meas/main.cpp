@@ -8,13 +8,13 @@ static std::string save_dir = "./";
 // static std::string save_dir = "/spiffs/";
 
 class CLRobot : public CLRobotBase {
-public:
-  CLRobot(Maze &maze_target, const std::string &name)
+ public:
+  CLRobot(Maze& maze_target, const std::string& name)
       : CLRobotBase(maze_target), name(name) {
     csv.open(save_dir + name + ".csv", std::ios::out);
   }
 
-protected:
+ protected:
   virtual void queueAction(const SearchAction action) override {
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
@@ -30,12 +30,12 @@ protected:
     csv << t_dur << std::endl;
   }
 
-private:
+ private:
   std::string name;
   std::ofstream csv;
 };
 
-int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
+int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
   /* save file */
   std::ofstream csv(save_dir + "measurement.csv");
   // std::stringstream csv;
@@ -108,14 +108,14 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
 #endif
 #endif
   /* analyze for each maze */
-  for (const auto &name : names) {
+  for (const auto& name : names) {
     std::cout << std::endl;
     std::cout << "Maze: \t" << name << std::endl;
     csv << name;
 
     /* Maze Target */
     const auto p_maze_target = std::make_unique<Maze>();
-    Maze &maze_target = *p_maze_target;
+    Maze& maze_target = *p_maze_target;
     if (!maze_target.parse(mazedata_dir + name + ".maze")) {
       maze_loge << "File Parse Error!" << std::endl;
       continue;
@@ -124,7 +124,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
 #if 1
     /* Search Run */
     const auto p_robot = std::make_unique<CLRobot>(maze_target, name);
-    CLRobot &robot = *p_robot;
+    CLRobot& robot = *p_robot;
     robot.replaceGoals(maze_target.getGoals());
     const auto t_s = std::chrono::system_clock().now();
     if (!robot.searchRun())
@@ -157,7 +157,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
       // robot.printPath();
       /* Shortest Path Comparison */
       const auto p_at = std::make_unique<Agent>(maze_target);
-      Agent &at = *p_at;
+      Agent& at = *p_at;
       at.calcShortestDirections(diag_enabled);
       robot.calcShortestDirections(diag_enabled);
       if (at.getSearchAlgorithm().getShortestCost() !=
@@ -178,9 +178,9 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
     float pi_cost_max = 0;    /*< 探索時間 [秒] */
     float pi_cost_min = 1e6f; /*< 探索時間 [秒] */
     const auto p_step_map = std::make_unique<StepMap>();
-    StepMap &step_map = *p_step_map;
+    StepMap& step_map = *p_step_map;
     const auto p_maze_pi = std::make_unique<Maze>();
-    Maze &maze_pi = *p_maze_pi;
+    Maze& maze_pi = *p_maze_pi;
     maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
     /* 迷路的に行き得る区画を洗い出す */
     step_map.update(maze_target, {maze_target.getStart()}, true, true);
@@ -325,4 +325,6 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
   return 0;
 }
 
-int main(void) { return test_meas(); }
+int main(void) {
+  return test_meas();
+}
