@@ -27,7 +27,6 @@ TEST(CLRobotBase, CLRobotBase) {
     EXPECT_TRUE(robot.getSearchAlgorithm().getShortestCost());
     EXPECT_TRUE(robot.fastRun(diag_enabled));
     robot.printPath();
-    EXPECT_TRUE(robot.endFastRunBackingToStartRun());
   }
 
   /* Other Run */
