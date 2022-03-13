@@ -117,8 +117,6 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
     max_y = std::max(p.y, max_y);
   }
   min_x -= 1, min_y -= 1, max_x += 2, max_y += 2; /*< 外周を許す */
-  /* 直線優先 */
-  const int max_straight = simple ? 1 : MAZE_SIZE * 2;
   /* 全区画のステップを最大値に設定 */
   const auto step = STEP_MAX;
   step_map.fill(step);
@@ -144,13 +142,13 @@ void StepMapWall::update(const Maze &maze, const WallIndexes &dest,
           (d.isAlong() ? step_table_along : step_table_diag);
       /* 直線で行けるところまで更新する */
       auto next = focus;
-      for (int8_t i = 1; i <= max_straight; ++i) {
+      for (int8_t i = 1;; ++i) {
         next = next.next(d); /*< 移動 */
         /* 壁あり or 既知壁のみで未知壁 ならば次へ */
         if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
           break;
         /* 直線加速を考慮したステップを算出 */
-        const auto next_step = focus_step + step_table[i];
+        const auto next_step = focus_step + (simple ? i : step_table[i]);
         const auto next_index = next.getIndex();
         if (step_map[next_index] <= next_step)
           break;                          /*< 更新の必要がない */

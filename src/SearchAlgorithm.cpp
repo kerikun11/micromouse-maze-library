@@ -448,7 +448,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
   /* 最短経路上の未知区画を目的地とする */
   Positions candidates; /*< 最短経路になりうる区画 */
   if (!findShortestCandidates(candidates, current_pose))
-    return Error;
+    return Error; /*< 迷路の異常 */
   if (candidates.empty())
     return Reached; /*< 探索完了 */
   /* 既知区間移動方向列を生成 */
@@ -457,19 +457,13 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
       maze, current_pose, nextDirectionsKnown, nextDirectionCandidates);
   /* 未知区間加速の判定 */
   if (!nextDirectionCandidates.empty() && nextDirectionCandidates[0] == end.d) {
-    /* 直進後 */
-    // findShortestCandidates(candidates, current_pose.next(end.d));
-    // if (candidates.empty()) //<
-    // 最短候補が空の場合はスタート区画への帰還を想定
-    //   step_map.update(maze, {maze.getStart()}, false, false);
-    // else
-    //   step_map.update(maze, candidates, false, false);
+    /* 直進が2連続か確認 */
     const auto nnd_candidates =
         step_map.getNextDirectionCandidates(maze, end.next(end.d));
     if (!nnd_candidates.empty() && nnd_candidates[0] == end.d)
       next_directions.unknown_accel_flag = true;
   }
-  /* 未知区間の移動優先順位を生成．仮壁を立てて事前に進む候補を改良する */
+  /* 未知区間の移動優先順位を生成．仮壁を立てて事前候補を改良する */
   Directions nextDirectionCandidatesAdvanced;
   WallIndexes wall_backup; /*< 仮壁を立てるのでバックアップを作成 */
   while (1) {

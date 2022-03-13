@@ -179,14 +179,14 @@ void StepMap::update(const Maze &maze, const Positions &dest,
     for (const auto d : Direction::Along4) {
       /* 直線で行けるところまで更新する */
       auto next = focus;
-      for (int8_t i = 1; i <= max_straight; ++i) {
+      for (int8_t i = 1;; ++i) {
         /* 壁あり or 既知壁のみで未知壁 ならば次へ */
         const auto next_wi = WallIndex(next, d);
         if (maze.isWall(next_wi) || (known_only && !maze.isKnown(next_wi)))
           break;
         next = next.next(d); /*< 移動 */
         /* 直線加速を考慮したステップを算出 */
-        const auto next_step = focus_step + step_table[i];
+        const auto next_step = focus_step + (simple ? i : step_table[i]);
         const auto next_index = next.getIndex();
         if (step_map[next_index] <= next_step)
           break;                          /*< 更新の必要がない */

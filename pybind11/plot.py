@@ -8,11 +8,10 @@ import sys
 
 
 def plot_maze():
+    filepath = '../mazedata/data/32MM2021HX.maze'
     # filepath = '../mazedata/data/32MM2019HX.maze'
-    # filepath = '../mazedata/data/32MM2018HX.maze'
-    # filepath = '../mazedata/data/32MM2015HX.maze'
     # filepath = '../mazedata/data/16MM2019CX.maze'
-    filepath = '../mazedata/data/16MM2019H_semi.maze'
+    # filepath = '../mazedata/data/16MM2021H_semi.maze'
 
     # if argument exists, the filepath is overridden.
     if len(sys.argv) >= 2:

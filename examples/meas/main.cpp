@@ -56,6 +56,8 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
   // names.push_back("32MM2015HX"); // max calc time is longest in 32x32
   names.push_back("16MM2014CX"); // max calc time is longest in 16x16
 #else
+  for (int year = 2021; year >= 2021; --year)
+    names.push_back("32MM" + std::to_string(year) + "HX");
   for (int year = 2019; year >= 2010; --year)
     names.push_back("32MM" + std::to_string(year) + "HX");
 #if 1
@@ -76,6 +78,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
   for (int year = 2017; year >= 2015; --year)
     names.push_back("16MM" + std::to_string(year) + "C_Chubu");
   for (const auto name : {
+           "16MM2021H_semi",
            "16MM2021H_Kansai",
            "16MM2019H_semi",
            "16MM2019H_Kyushu",

@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 #if 1
   /* Preparation */
   const std::string filepath =
-      argc > 1 ? std::string(argv[1]) : "../mazedata/data/32MM2019HX.maze";
+      argc > 1 ? std::string(argv[1]) : "../mazedata/data/32MM2021HX.maze";
   Maze maze_target;
   if (!maze_target.parse(filepath))
     return -1;
