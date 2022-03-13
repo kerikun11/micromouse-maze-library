@@ -6,16 +6,16 @@
  */
 
 /*
- * 迷路ライブラリのインクルード
+ * 迷路ライブラリの読み込み
  */
 #include "MazeLib/Maze.h"
 #include "MazeLib/StepMap.h"
 
 /*
- * 標準ライブラリのインクルード
+ * 標準ライブラリの読み込み
  */
 #include <algorithm> //< for std::find
-#include <thread>    //< for sleep function
+#include <thread>    //< for std::this_thread::sleep_for
 
 /**
  * @brief 名前空間の展開
@@ -40,6 +40,21 @@ void MoveRobot(const Direction relative_dir) {
     maze_loge << "invalid direction: " << relative_dir << std::endl;
     return;
   }
+}
+
+/**
+ * @brief アニメーション状に迷路を表示する関数
+ * @param step_map 表示するステップマップ
+ * @param maze 表示する迷路
+ * @param pos 迷路上の位置
+ * @param dir 進行方向
+ */
+void ShowAnimation(const StepMap &step_map, const Maze &maze,
+                   const Position &pos, const Direction &dir) {
+  std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+  step_map.print(maze, pos, dir);
+  std::cout << "Searching for goal" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 /**
@@ -97,9 +112,7 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
       current_pos = current_pos.next(next_dir);
       current_dir = next_dir;
       /* アニメーション表示 */
-      step_map.print(maze, current_pos, current_dir);
-      std::cout << "Searching for goal" << std::endl;
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      ShowAnimation(step_map, maze, current_pos, current_dir);
     }
   }
   /* 2. 最短経路上の未知区画をつぶす探索走行 */
@@ -148,9 +161,7 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
       current_pos = current_pos.next(next_dir);
       current_dir = next_dir;
       /* アニメーション表示 */
-      step_map.print(maze, current_pos, current_dir);
-      std::cout << "Finding shortest path" << std::endl;
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      ShowAnimation(step_map, maze, current_pos, current_dir);
     }
   }
   /* 3. スタート区画へ戻る走行 */
@@ -175,9 +186,7 @@ int SearchRun(Maze &maze, const Maze &maze_target) {
       current_pos = current_pos.next(next_dir);
       current_dir = next_dir;
       /* アニメーション表示 */
-      step_map.print(maze, current_pos, current_dir);
-      std::cout << "Going back to start" << std::endl;
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      ShowAnimation(step_map, maze, current_pos, current_dir);
     }
   }
   /* 正常終了 */
@@ -207,9 +216,7 @@ int ShortestRun(const Maze &maze) {
     current_pos = current_pos.next(next_dir);
     current_dir = next_dir;
     /* アニメーション表示 */
-    step_map.print(maze, current_pos, current_dir);
-    std::cout << "Shortest Run" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    ShowAnimation(step_map, maze, current_pos, current_dir);
   }
   /* 最短経路の表示 */
   maze.print(shortest_dirs);
@@ -221,8 +228,12 @@ int ShortestRun(const Maze &maze) {
  * @brief main 関数
  */
 int main(void) {
+  /* 画面のクリア */
+  std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+  std::cout << "\x1b[J";  /*< カーソル以下を消去 */
+
   /* シミュレーションに用いる迷路の選択 */
-  const std::string file_path = "../mazedata/data/16MM2019CX.maze";
+  const std::string file_path = "../mazedata/data/16MM2018CX.maze";
 
   /* 正解の迷路を用意 */
   Maze maze_target;
@@ -231,7 +242,7 @@ int main(void) {
     std::cerr << "Failed to Parse Maze: " << file_path << std::endl;
     return -1;
   }
-  /* 表示 */
+  /* 正解の迷路の表示 */
   maze_target.print();
 
   /* 探索用の迷路を用意 */
