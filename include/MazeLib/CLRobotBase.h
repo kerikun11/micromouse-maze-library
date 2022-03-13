@@ -9,8 +9,10 @@
 
 #include "MazeLib/RobotBase.h"
 #include <chrono>
-#include <cstdio>
-#include <iomanip> /*< for std::setw() */
+#include <cstdio>  /*< for std::printf */
+#include <iomanip> /*< for std::setw */
+
+#define SHOW_DOUBLE_MAZE 0
 
 namespace MazeLib {
 
@@ -19,95 +21,15 @@ namespace MazeLib {
  */
 class CLRobotBase : public RobotBase {
 public:
-  CLRobotBase(Maze &maze_target) : maze_target(maze_target) {}
-
-  void printDoubleMaze(std::array<const Maze *, 2> maze,
-                       std::array<const Pose *, 2> pose,
-                       std::array<const StepMap *, 2> step_map,
-                       std::ostream &os) const {
-    /* preparation */
-    const int maze_size = MAZE_SIZE;
-    bool simple[2];
-    for (int i = 0; i < 2; ++i) {
-      StepMap::step_t max_step = 0;
-      for (const auto step : step_map[i]->getMapArray())
-        if (step != StepMap::STEP_MAX)
-          max_step = std::max(max_step, step);
-      simple[i] = (max_step < 999);
-    }
-    /* start to draw maze */
-    for (int8_t y = maze_size; y >= 0; --y) {
-      if (y != maze_size) {
-        for (int i = 0; i < 2; ++i) {
-          for (uint8_t x = 0; x <= maze_size; ++x) {
-            /* Vertical Wall */
-            const auto w = maze[i]->isWall(x, y, Direction::West);
-            const auto k = maze[i]->isKnown(x, y, Direction::West);
-            const auto d = pose[i]->d;
-            if (WallIndex(pose[i]->p.next(d + Direction::Back), d) ==
-                WallIndex(Position(x, y), Direction::West))
-              os << "\e[43m"
-                 << "\e[34m" << d << C_NO;
-            else
-              os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
-            /* Cell */
-            if (x != maze_size) {
-              if (i == 0) {
-                if (Position(x, y) == maze[i]->getStart())
-                  os << C_BL << " S " << C_NO;
-                else if (std::find(maze[i]->getGoals().cbegin(),
-                                   maze[i]->getGoals().cend(),
-                                   Position(x, y)) !=
-                         maze[i]->getGoals().cend())
-                  os << C_BL << " G " << C_NO;
-                else
-                  os << "   ";
-              } else if (step_map[i]->getStep(x, y) == StepMap::STEP_MAX)
-                os << C_CY << "999" << C_NO;
-              else if (step_map[i]->getStep(x, y) == 0)
-                os << C_YE << std::setw(3) << step_map[i]->getStep(x, y)
-                   << C_NO;
-              else if (simple[i])
-                os << C_CY << std::setw(3) << step_map[i]->getStep(x, y)
-                   << C_NO;
-              else
-                os << C_CY << std::setw(3) << step_map[i]->getStep(x, y) / 100
-                   << C_NO;
-            }
-          }
-          os << "   ";
-        }
-        os << std::endl;
-      }
-      for (int i = 0; i < 2; ++i) {
-        for (uint8_t x = 0; x < maze_size; ++x) {
-          /* Pillar */
-          os << "+";
-          /* Horizontal Wall */
-          const auto w = maze[i]->isWall(x, y, Direction::South);
-          const auto k = maze[i]->isKnown(x, y, Direction::South);
-          const auto d = pose[i]->d;
-          if (WallIndex(pose[i]->p.next(d + Direction::Back), d) ==
-              WallIndex(Position(x, y), Direction::South))
-            os << " "
-               << "\e[43m"
-               << "\e[34m" << pose[i]->d << C_NO << " ";
-          else
-            os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
-        }
-        /* Last Pillar */
-        os << "+";
-        os << "   ";
-      }
-      os << std::endl;
-    }
+  CLRobotBase(Maze &maze_target) : maze_target(maze_target) {
+    replaceGoals(maze_target.getGoals());
   }
   void printInfo(const bool show_maze = true) {
-#if 0
+#if SHOW_DOUBLE_MAZE
     if (show_maze) {
       std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
       printDoubleMaze(
-          {&maze_target, state == SearchAlgorithm::IDENTIFYING_POSITION
+          {&maze_target, getState() == SearchAlgorithm::IDENTIFYING_POSITION
                              ? &getSearchAlgorithm().getIdMaze()
                              : &maze},
           {&real, &current_pose},
@@ -120,17 +42,43 @@ public:
 #else
     RobotBase::printInfo(show_maze);
 #endif
-    std::printf("Estimated Time: %2d:%02d, Step: %4d, "
-                "F: %3d, L: %3d, R: %3d, B: %3d, Walls: %3d\n",
-                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b,
-                (int)maze.getWallRecords().size());
-    // std::printf("It took %5d [us], the max is %5d [us]\n", t_dur, t_dur_max);
+    printSearchResult();
   }
-  void printResult() const {
-    std::printf("Estimated Time: %2d:%02d, Step: %4d, "
-                "F: %3d, L: %3d, R: %3d, B: %3d, Walls: %3d\n",
-                ((int)cost / 60) % 60, ((int)cost) % 60, step, f, l, r, b,
-                (int)maze.getWallRecords().size());
+  void printSearchResult() const {
+    std::printf("SearchTime: %2d:%02d, Step: %4d, "
+                "F: %4d, L: %3d, R: %3d, B: %3d, Walls: %4d\n",
+                int(cost / 60) % 60, int(cost) % 60, step, f, l, r, b,
+                int(maze.getWallRecords().size()));
+  }
+  void printFastResult(const bool diag_enabled, const bool show_maze = false) {
+    /* 最短走行時間の表示 */
+    const auto path_cost = getSearchAlgorithm().getShortestCost();
+    std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
+              << path_cost << "\t[ms]" << std::endl;
+    if (show_maze) {
+      printPath();
+    }
+    /* 最短経路の比較 */
+    const auto p_at = std::make_unique<Agent>(maze_target);
+    Agent &at = *p_at;
+    at.calcShortestDirections(diag_enabled);
+    calcShortestDirections(diag_enabled);
+    if (at.getSearchAlgorithm().getShortestCost() !=
+        getSearchAlgorithm().getShortestCost()) {
+      maze_logw << "searched path is not shortest! "
+                << (diag_enabled ? "(diag)" : "(no_diag)") << std::endl;
+      maze_logw << "real: " << at.getSearchAlgorithm().getShortestCost()
+                << " searched: " << getSearchAlgorithm().getShortestCost()
+                << std::endl;
+      // at.printPath(), robot.printPath();
+    }
+  }
+  bool searchRun() {
+    if (!RobotBase::searchRun()) {
+      maze_loge << "searchRun failed." << std::endl;
+      return false;
+    }
+    return true;
   }
   bool fastRun(const bool diag_enabled) {
     /* 最短経路の導出 */
@@ -138,32 +86,32 @@ public:
       maze_logw << "Failed to find shortest path!" << std::endl;
       return false;
     }
-    /* 現在位置をスタートに設定 */
+    /* 現在位置をスタート区画に設定 */
     const auto pose = Pose(maze.getStart(), getShortestDirections()[0]);
     updateCurrentPose(pose);
     real = pose;
-    /* 移動 */
+    /* 最短走行後の位置に移動 */
     queueNextDirections(getShortestDirections());
-    return true;
-  }
-  bool endFastRunBackingToStartRun() {
-    /* エラー処理 */
-    if (getShortestDirections().empty()) {
-      maze_logw << "ShortestDirections are empty!" << std::endl;
-      return false;
-    }
-    /* real を最短後の位置に移す */
+    /* real を最短後の位置に移動 */
     Position p = maze.getStart();
     for (const auto d : getShortestDirections())
       p = p.next(d);
     real = Pose(p, getShortestDirections().back());
-    /* 基底関数を呼ぶ */
-    return RobotBase::endFastRunBackingToStartRun();
+    /* スタート区画に帰る */
+    if (!endFastRunBackingToStartRun()) {
+      maze_loge << "endFastRunBackingToStartRun failed." << std::endl;
+      return false;
+    }
+    return true;
   }
-  bool positionIdentifyRun(const bool reset_step = true) {
-    if (reset_step)
+  bool positionIdentifyRun(const bool reset_cost = true) {
+    if (reset_cost)
       step = f = l = r = b = cost = 0;
-    return RobotBase::positionIdentifyRun();
+    if (!RobotBase::positionIdentifyRun()) {
+      maze_loge << "positionIdentifyRun failed." << std::endl;
+      return false;
+    }
+    return true;
   }
 
 public:
@@ -333,6 +281,89 @@ protected:
     default:
       maze_loge << "invalid action" << std::endl;
       return 0;
+    }
+  }
+
+protected:
+  void printDoubleMaze(std::array<const Maze *, 2> maze,
+                       std::array<const Pose *, 2> pose,
+                       std::array<const StepMap *, 2> step_map,
+                       std::ostream &os) const {
+    /* preparation */
+    const int maze_size = MAZE_SIZE;
+    bool simple[2];
+    for (int i = 0; i < 2; ++i) {
+      StepMap::step_t max_step = 0;
+      for (const auto step : step_map[i]->getMapArray())
+        if (step != StepMap::STEP_MAX)
+          max_step = std::max(max_step, step);
+      simple[i] = (max_step < 999);
+    }
+    /* start to draw maze */
+    for (int8_t y = maze_size; y >= 0; --y) {
+      if (y != maze_size) {
+        for (int i = 0; i < 2; ++i) {
+          for (uint8_t x = 0; x <= maze_size; ++x) {
+            /* Vertical Wall */
+            const auto w = maze[i]->isWall(x, y, Direction::West);
+            const auto k = maze[i]->isKnown(x, y, Direction::West);
+            const auto d = pose[i]->d;
+            if (WallIndex(pose[i]->p.next(d + Direction::Back), d) ==
+                WallIndex(Position(x, y), Direction::West))
+              os << "\e[43m"
+                 << "\e[34m" << d << C_NO;
+            else
+              os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
+            /* Cell */
+            if (x != maze_size) {
+              if (i == 0) {
+                if (Position(x, y) == maze[i]->getStart())
+                  os << C_BL << " S " << C_NO;
+                else if (std::find(maze[i]->getGoals().cbegin(),
+                                   maze[i]->getGoals().cend(),
+                                   Position(x, y)) !=
+                         maze[i]->getGoals().cend())
+                  os << C_BL << " G " << C_NO;
+                else
+                  os << "   ";
+              } else if (step_map[i]->getStep(x, y) == StepMap::STEP_MAX)
+                os << C_CY << "999" << C_NO;
+              else if (step_map[i]->getStep(x, y) == 0)
+                os << C_YE << std::setw(3) << step_map[i]->getStep(x, y)
+                   << C_NO;
+              else if (simple[i])
+                os << C_CY << std::setw(3) << step_map[i]->getStep(x, y)
+                   << C_NO;
+              else
+                os << C_CY << std::setw(3) << step_map[i]->getStep(x, y) / 100
+                   << C_NO;
+            }
+          }
+          os << "   ";
+        }
+        os << std::endl;
+      }
+      for (int i = 0; i < 2; ++i) {
+        for (uint8_t x = 0; x < maze_size; ++x) {
+          /* Pillar */
+          os << "+";
+          /* Horizontal Wall */
+          const auto w = maze[i]->isWall(x, y, Direction::South);
+          const auto k = maze[i]->isKnown(x, y, Direction::South);
+          const auto d = pose[i]->d;
+          if (WallIndex(pose[i]->p.next(d + Direction::Back), d) ==
+              WallIndex(Position(x, y), Direction::South))
+            os << " "
+               << "\e[43m"
+               << "\e[34m" << pose[i]->d << C_NO << " ";
+          else
+            os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
+        }
+        /* Last Pillar */
+        os << "+";
+        os << "   ";
+      }
+      os << std::endl;
     }
   }
 };

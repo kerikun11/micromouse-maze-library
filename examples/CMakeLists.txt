@@ -21,6 +21,7 @@ add_subdirectory(main)
 add_subdirectory(meas)
 add_subdirectory(pi)
 add_subdirectory(search)
+add_subdirectory(thread)
 
 ## add qt examples
 add_subdirectory(qt_maze EXCLUDE_FROM_ALL)

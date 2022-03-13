@@ -20,7 +20,7 @@ TEST(CLRobotBase, CLRobotBase) {
   EXPECT_FALSE(robot.isComplete());
   EXPECT_TRUE(robot.searchRun());
   robot.printInfo();
-  robot.printResult();
+  robot.printSearchResult();
   for (const auto diag_enabled : {false, true}) {
     EXPECT_TRUE(robot.calcShortestDirections(diag_enabled));
     EXPECT_TRUE(robot.getSearchAlgorithm().getShortestCost());
@@ -96,7 +96,7 @@ TEST(CLRobotBase, fake) {
   robot.resetLastWalls();
   EXPECT_FALSE(robot.searchRun());
   robot.printInfo();
-  robot.printResult();
+  robot.printSearchResult();
   for (const auto diag_enabled : {false, true}) {
     EXPECT_FALSE(robot.calcShortestDirections(diag_enabled));
     EXPECT_FALSE(robot.endFastRunBackingToStartRun());

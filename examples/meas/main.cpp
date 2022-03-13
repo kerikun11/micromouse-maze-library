@@ -133,7 +133,7 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
     const auto t_search =
         std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s)
             .count();
-    robot.printResult();
+    robot.printSearchResult();
     csv << "\t" << int(robot.cost / 60) << ":" << std::setw(2)
         << std::setfill('0') << int(robot.cost) % 60;
     csv << "\t" << robot.cost << "\t" << robot.step << "\t" << robot.f << "\t"
@@ -155,7 +155,6 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
       csv << "\t" << path_cost;
       robot.fastRun(diag_enabled);
       // robot.printPath();
-      robot.endFastRunBackingToStartRun();
       /* Shortest Path Comparison */
       const auto p_at = std::make_unique<Agent>(maze_target);
       Agent &at = *p_at;
