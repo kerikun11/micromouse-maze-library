@@ -325,7 +325,4 @@ int test_meas(const std::string &mazedata_dir = "../mazedata/data/") {
   return 0;
 }
 
-int main(void) {
-  setvbuf(stdout, (char *)NULL, _IONBF, 0);
-  return test_meas();
-}
+int main(void) { return test_meas(); }

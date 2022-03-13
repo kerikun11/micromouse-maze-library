@@ -12,8 +12,6 @@
 #include <cstdio>  /*< for std::printf */
 #include <iomanip> /*< for std::setw */
 
-#define SHOW_DOUBLE_MAZE 0
-
 namespace MazeLib {
 
 /**
@@ -25,7 +23,10 @@ public:
     replaceGoals(maze_target.getGoals());
   }
   void printInfo(const bool show_maze = true) {
-#if SHOW_DOUBLE_MAZE
+    RobotBase::printInfo(show_maze);
+    printSearchResult();
+  }
+  void printInfoDoubleMaze(const bool show_maze = true) {
     if (show_maze) {
       std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
       printDoubleMaze(
@@ -38,11 +39,7 @@ public:
           std::cout);
     }
     RobotBase::printInfo(false);
-    // std::cout << "Real Pose:\t" << real << std::endl;
-#else
-    RobotBase::printInfo(show_maze);
-#endif
-    printSearchResult();
+    std::cout << "Real Pose:\t" << real << std::endl;
   }
   void printSearchResult() const {
     std::printf("SearchTime: %2d:%02d, Step: %4d, "

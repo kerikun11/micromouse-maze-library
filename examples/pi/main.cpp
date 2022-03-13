@@ -8,8 +8,8 @@ public:
   CLRobot(Maze &maze_target) : CLRobotBase(maze_target) {}
   bool display = 0;
   void printInfo() {
-    CLRobotBase::printInfo();
-    std::cout << "P.I. wall:\t"
+    CLRobotBase::printInfoDoubleMaze();
+    std::cout << "P.I. walls:\t"
               << getSearchAlgorithm().getIdMaze().getWallRecords().size()
               << std::endl;
   }
@@ -118,7 +118,4 @@ int test_position_identify() {
   return 0;
 }
 
-int main(void) {
-  setvbuf(stdout, (char *)NULL, _IONBF, 0);
-  return test_position_identify();
-}
+int main(void) { return test_position_identify(); }

@@ -73,7 +73,6 @@ protected:
 };
 
 int main(void) {
-  setvbuf(stdout, (char *)NULL, _IONBF, 0);
   std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
   std::cout << "\x1b[J";  /*< カーソル以下を消去 */
 

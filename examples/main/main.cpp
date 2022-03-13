@@ -47,8 +47,6 @@ protected:
 #endif
 
 int main(int argc, char *argv[]) {
-  setvbuf(stdout, (char *)NULL, _IONBF, 0);
-
 #if 1
   /* Preparation */
   const std::string filepath =
