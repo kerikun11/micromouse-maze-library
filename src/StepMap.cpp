@@ -165,8 +165,6 @@ void StepMap::update(const Maze& maze,
     max_y = std::max(p.y, max_y);
   }
   min_x -= 1, min_y -= 1, max_x += 2, max_y += 2; /*< 外周を許す */
-  /* 直線優先 */
-  const int max_straight = simple ? 1 : MAZE_SIZE * 2;
   /* 全区画のステップを最大値に設定 */
   reset();
   /* ステップの更新予約のキュー */

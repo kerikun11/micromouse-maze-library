@@ -6,3 +6,7 @@ build-*
 
 # VSCode
 .vscode/
+
+## PlatformIO
+.pio
+/platformio-device-monitor-*.log
