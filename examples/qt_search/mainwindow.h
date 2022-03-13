@@ -202,7 +202,7 @@ class MainWindow : public QMainWindow {
     QImage image(scene->sceneRect().size().toSize(),
                  QImage::Format_ARGB32);  // Create the image with the exact
                                           // size of the shrunk scene
-    image.fill(Qt::transparent);  // Start all pixels transparent
+    image.fill(Qt::transparent);          // Start all pixels transparent
 
     QPainter painter(&image);
     scene->render(&painter);

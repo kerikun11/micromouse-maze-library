@@ -1,9 +1,9 @@
 /**
  * @file SearchAlgorithm.h
- * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路の探索アルゴリズムを扱うクラス
- * @copyright Copyright (c) 2017 Ryotaro Onuki
- * @date 2017.11.05
+ * @author Ryotaro Onuki <kerikun11+github@gmail.com>
+ * @date 2017-11-05
+ * @copyright Copyright 2017 Ryotaro Onuki <kerikun11+github@gmail.com>
  */
 #pragma once
 

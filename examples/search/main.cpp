@@ -1,7 +1,7 @@
 /**
  * @file main.cpp
- * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief 迷路探索アルゴリズムの使用例
+ * @author Ryotaro Onuki <kerikun11+github@gmail.com>
  * @date 2019-08-29
  */
 

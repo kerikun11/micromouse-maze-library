@@ -1,9 +1,9 @@
 /**
  * @file ctrl.cpp
- * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief this files defines a python module implemented in C++
+ * @author Ryotaro Onuki <kerikun11+github@gmail.com>
  * @date 2020-06-11
- * @copyright Copyright (c) 2020 Ryotaro Onuki
+ * @copyright Copyright 2020 Ryotaro Onuki <kerikun11+github@gmail.com>
  */
 #include <MazeLib/Maze.h>
 #include <MazeLib/StepMap.h>

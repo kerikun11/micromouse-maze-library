@@ -1,9 +1,9 @@
 /**
  * @file StepMapWall.h
- * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief 壁ベースのステップマップを表現するクラス
- * @copyright Copyright (c) 2019 Ryotaro Onuki
+ * @author Ryotaro Onuki <kerikun11+github@gmail.com>
  * @date 2019-08-17
+ * @copyright Copyright 2019 Ryotaro Onuki <kerikun11+github@gmail.com>
  */
 #pragma once
 

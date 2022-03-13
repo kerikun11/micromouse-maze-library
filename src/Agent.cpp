@@ -1,9 +1,9 @@
 /**
  * @file Agent.cpp
- * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief 現在位置，探索状態を管理するクラスを定義するファイル
- * @copyright Copyright (c) 2018 Ryotaro Onuki
- * @date 2018.05.20
+ * @author Ryotaro Onuki <kerikun11+github@gmail.com>
+ * @date 2018-05-20
+ * @copyright Copyright 2018 Ryotaro Onuki <kerikun11+github@gmail.com>
  */
 #include "MazeLib/Agent.h"
 

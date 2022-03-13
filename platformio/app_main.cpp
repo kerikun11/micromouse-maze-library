@@ -1,9 +1,9 @@
 /**
  * @file app_main.cpp
- * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief MicroMouse Maze Library のマイコン上での実行時間計測コード
+ * @author Ryotaro Onuki <kerikun11+github@gmail.com>
  * @date 2021-01-25
- * @copyright Copyright (c) 2021 Ryotaro Onuki
+ * @copyright Copyright 2021 Ryotaro Onuki <kerikun11+github@gmail.com>
  */
 #include <MazeLib/Maze.h> /*< for maze_logi */
 #include <SPIFFS.h>

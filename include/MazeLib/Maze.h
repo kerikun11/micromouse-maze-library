@@ -1,9 +1,9 @@
 /**
  * @file Maze.h
- * @author Ryotaro Onuki (kerikun11+github@gmail.com)
  * @brief マイクロマウスの迷路を扱うクラスを定義
- * @copyright Copyright (c) 2017 Ryotaro Onuki
- * @date 2017.10.30
+ * @author Ryotaro Onuki <kerikun11+github@gmail.com>
+ * @date 2017-10-30
+ * @copyright Copyright 2017 Ryotaro Onuki <kerikun11+github@gmail.com>
  */
 #pragma once
 
