@@ -25,7 +25,7 @@ const char* SearchAlgorithm::getStateString(const State s) {
   };
   return str[s];
 }
-bool SearchAlgorithm::isComplete() {
+bool SearchAlgorithm::isCompleted() {
   Positions candidates;
   if (!findShortestCandidates(candidates))
     return false;
@@ -377,7 +377,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallRecords& idWallRecords,
   return candidates_count;
 }
 const Directions SearchAlgorithm::findMatchDirectionCandidates(
-    const Position& cur_p,
+    const Position& current_position,
     const Pose& target) const {
   const int min_diff = 0; /*< 許容食い違い壁数 */
   /* パターンマッチング開始 */
@@ -387,7 +387,7 @@ const Directions SearchAlgorithm::findMatchDirectionCandidates(
     int diffs = 0; /*< idWallRecords のうち，既知の食い違いの壁の数を格納 */
     for (const auto wr : idMaze.getWallRecords()) {
       const auto maze_p =
-          target.p + (wr.getPosition() - cur_p).rotate(offset_d);
+          target.p + (wr.getPosition() - current_position).rotate(offset_d);
       const auto maze_d = wr.d + offset_d;
       /* 既知かつ食い違い壁をカウント */
       if (maze.isKnown(maze_p, maze_d) && maze.isWall(maze_p, maze_d) != wr.b)

@@ -23,10 +23,12 @@ void RobotBase::reset() {
 }
 bool RobotBase::searchRun() {
   /* 既に探索済みなら正常終了 */
-  if (!isForceGoingToGoal && isComplete())
+  if (!isForceGoingToGoal && isCompleted())
     return true;
   /* 探索中断をクリア */
   setBreakFlag(false);
+  /* 自己位置同定をクリア */
+  setPositionIdentifying(false);
   /* スタートのアクションをキュー */
   queueAction(START_STEP);
   updateCurrentPose(Pose(Position(0, 1), Direction::North));
@@ -34,10 +36,10 @@ bool RobotBase::searchRun() {
   return generalSearchRun();
 }
 bool RobotBase::positionIdentifyRun() {
-  /* 自己位置同定の初期化 */
-  setPositionIdentifying();
   /* 探索中断をクリア */
   setBreakFlag(false);
+  /* 自己位置同定の初期化 */
+  setPositionIdentifying();
   /* 最初のアクションをキュー */
   queueAction(ST_HALF);
   /* 走行開始 */
@@ -68,7 +70,7 @@ bool RobotBase::endFastRunBackingToStartRun() {
   return generalSearchRun();
 }
 
-/* private: */
+/* protected: */
 
 void RobotBase::turnbackSave() {
   queueAction(ST_HALF_STOP);
@@ -113,27 +115,23 @@ bool RobotBase::generalSearchRun() {
   while (1) {
     /* 既知区間の走行中に最短経路を導出 */
     calcNextDirectionsPreCallback();
-    const auto prevState = getState();
+    const auto oldState = getState();
     const auto status = calcNextDirections(); /*< 時間がかかる処理！ */
     const auto newState = getState();
-    calcNextDirectionsPostCallback(prevState, newState);
-    /* 探索中断を確認 */
-    if (break_flag) {
-      maze_logw << "the break flag was set" << std::endl;
+    calcNextDirectionsPostCallback(oldState, newState);
+    /* 最短経路導出結果を確認 */
+    if (status == SearchAlgorithm::Error) {
+      maze_logw << "calcNextDirections Error" << std::endl;
       stopDequeue();
       return false;
     }
     /* 既知区間移動をキューにつめる */
-    queueNextDirections(getNextDirections());
-    /* 最短経路導出結果を確認 */
-    if (status == SearchAlgorithm::Reached)
-      break;
-    if (status == SearchAlgorithm::Error) {
-      stopDequeue();
-      return false;
-    }
+    queueNextDirections(getNextDirectionsKnown());
     /* 走行が終わるのを待つ */
     waitForEndAction();
+    /* 探索終了を確認 */
+    if (status == SearchAlgorithm::Reached)
+      break;
     /* 探索中断を確認 */
     if (break_flag) {
       maze_logw << "the break flag was set" << std::endl;
@@ -148,7 +146,7 @@ bool RobotBase::generalSearchRun() {
     /* 壁のない方向へ1マス移動 */
     Direction nextDirection;
     if (!determineNextDirection(current_pose, nextDirection)) {
-      maze_logw << "I can't go anywhere! " << std::endl;
+      maze_logw << "I can't go anywhere!" << std::endl;
       stopDequeue();
       return false;
     }
@@ -158,13 +156,51 @@ bool RobotBase::generalSearchRun() {
   queueAction(ST_HALF_STOP);
   queueAction(START_INIT);
   updateCurrentPose({Position(0, 0), Direction::North});
-  calcNextDirections(); /*< 時間がかかる処理！ */
+  calcNextDirections(); /*< 最終状態に更新 */
   waitForEndAction();
   stopDequeue();
+  /* 迷路情報の保存 */
   backupMazeToFlash();
-  if (break_flag)
+  if (break_flag) {
+    maze_logw << "the break flag was set" << std::endl;
     return false;
+  }
   return true;
+}
+std::string RobotBase::replaceStringSearchToFast(std::string src,
+                                                 bool diag_enabled) {
+  replace(src, "S", "ss");
+  replace(src, "L", "ll");
+  replace(src, "R", "rr");
+  if (diag_enabled) {
+    replace(src, "rllllr", "rlplr"); /**< FV90 */
+    replace(src, "lrrrrl", "lrPrl"); /**< FV90 */
+    replace(src, "sllr", "zlr");     /*< F45 */
+    replace(src, "srrl", "crl");     /*< F45 */
+    replace(src, "rlls", "rlZ");     /*< F45 P */
+    replace(src, "lrrs", "lrC");     /*< F45 P */
+    replace(src, "sllllr", "alr");   /*< F135 */
+    replace(src, "srrrrl", "drl");   /*< F135 */
+    replace(src, "rlllls", "rlA");   /*< F135 P */
+    replace(src, "lrrrrs", "lrD");   /*< F135 P */
+    replace(src, "slllls", "u");     /*< F180 */
+    replace(src, "srrrrs", "U");     /*< F180 */
+    replace(src, "rllr", "rlwlr");   /*< ST_DIAG */
+    replace(src, "lrrl", "lrwrl");   /*< ST_DIAG */
+    replace(src, "slls", "q");       /*< F90 */
+    replace(src, "srrs", "Q");       /*< F90 */
+    replace(src, "rl", "");
+    replace(src, "lr", "");
+    replace(src, "ss", "S");
+  } else {
+    replace(src, "slllls", "u"); /*< F180 */
+    replace(src, "srrrrs", "U"); /*< F180 */
+    replace(src, "slls", "q");   /*< F90 */
+    replace(src, "srrs", "Q");   /*< F90 */
+    replace(src, "ll", "L");     /**< FS90 */
+    replace(src, "rr", "R");     /**< FS90 */
+  }
+  return src;
 }
 
 }  // namespace MazeLib

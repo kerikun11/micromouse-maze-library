@@ -256,9 +256,9 @@ class MazeSimulator : public MazeLib::RobotBase {
   }
   virtual void calcNextDirectionsPreCallback() override {}
   virtual void calcNextDirectionsPostCallback(
-      SearchAlgorithm::State prevState __attribute__((unused)),
-      SearchAlgorithm::State newState __attribute__((unused))) override {
-    if (newState == prevState)
+      SearchAlgorithm::State oldState,
+      SearchAlgorithm::State newState) override {
+    if (newState == oldState)
       return;
     /* State Change has occurred */
   }

@@ -9,6 +9,7 @@
 
 #include "MazeLib/RobotBase.h"
 
+#include <algorithm> /*< for std::find */
 #include <chrono>
 #include <cstdio>  /*< for std::printf */
 #include <iomanip> /*< for std::setw */
@@ -149,16 +150,16 @@ class CLRobotBase : public RobotBase {
     t_s = std::chrono::duration_cast<std::chrono::microseconds>(now).count();
   }
   virtual void calcNextDirectionsPostCallback(
-      SearchAlgorithm::State prevState __attribute__((unused)),
-      SearchAlgorithm::State newState __attribute__((unused))) override {
+      SearchAlgorithm::State oldState,
+      SearchAlgorithm::State newState) override {
     const auto now = std::chrono::steady_clock::now().time_since_epoch();
     t_e = std::chrono::duration_cast<std::chrono::microseconds>(now).count();
     t_dur = t_e - t_s;
     t_dur_max = std::max(t_dur_max, t_dur);
-    if (newState == prevState)
+    if (newState == oldState)
       return;
     /* State Change has occurred */
-    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
+    if (oldState == SearchAlgorithm::IDENTIFYING_POSITION) {
       const auto walls =
           getSearchAlgorithm().getIdMaze().getWallRecords().size();
       walls_pi_min = std::min(walls_pi_min, walls);
@@ -178,7 +179,8 @@ class CLRobotBase : public RobotBase {
 #if 1
     /* 未知区間加速のバグ探し */
     if (unknown_accel_prev && action_prev == SearchAction::ST_FULL &&
-        action != SearchAction::ST_FULL && getNextDirections().size() == 0 &&
+        action != SearchAction::ST_FULL &&
+        getNextDirectionsKnown().size() == 0 &&
         !maze.isWall(current_pose.p, current_pose.d)) {
       printInfo();
       maze_logw << "not straight in unknown accel" << std::endl;
@@ -238,7 +240,7 @@ class CLRobotBase : public RobotBase {
         if (getUnknownAccelFlag() && action_prev == action)
           cost -= getTimeCost(action) / 3;
         /* 既知区間加速 */
-        if (getNextDirections().size() > 1 && action_prev == action)
+        if (getNextDirectionsKnown().size() > 1 && action_prev == action)
           cost -= getTimeCost(action) / 2;
         f++;
         step++;

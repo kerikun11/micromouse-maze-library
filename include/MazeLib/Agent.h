@@ -41,7 +41,7 @@ class Agent {
   /**
    * @brief 探索が完了しているかどうかを返す関数
    */
-  bool isComplete() { return searchAlgorithm.isComplete(); }
+  bool isCompleted() { return searchAlgorithm.isCompleted(); }
   /**
    * @brief ゴールが封印されていないか確認する関数
    */
@@ -120,7 +120,6 @@ class Agent {
     if (yes) {
       searchAlgorithm.positionIdentifyingInit(current_pose);
       next_directions.state = SearchAlgorithm::IDENTIFYING_POSITION;
-      calcNextDirections(); /*< 時間がかかる処理！ */
     } else {
       next_directions.state = SearchAlgorithm::START;
     }
@@ -132,13 +131,13 @@ class Agent {
     return next_directions.state;
   }
   /**
-   * @brief 次に行くべき方向配列の計算結果を取得
+   * @brief 既知区間移動方向列を取得
    */
-  const Directions& getNextDirections() const {
+  const Directions& getNextDirectionsKnown() const {
     return next_directions.next_directions_known;
   }
   /**
-   * @brief 次に行くべき方向配列の計算結果を取得
+   * @brief 壁を確認後に進む方向優先順位を取得
    */
   const Directions& getNextDirectionCandidates() const {
     return next_directions.next_direction_candidates;
@@ -166,7 +165,7 @@ class Agent {
    */
   void updateMaze(const Maze& new_maze) { maze = new_maze; }
   /**
-   * @brief Get the Search Algorithm object
+   * @brief 探索器を取得
    */
   const SearchAlgorithm& getSearchAlgorithm() const { return searchAlgorithm; }
   /**
@@ -192,12 +191,12 @@ class Agent {
    */
   void printPath() const { maze.print(shortest_dirs, maze.getStart()); }
   /**
-   * @brief Get the Match Count Value
+   * @brief 自己位置同定の候補数を取得
    */
   int getMatchCount() const { return next_directions.match_count; }
 
  protected:
-  Maze maze;                          /**< @brief 使用する迷路 */
+  Maze maze;                          /**< @brief 探索に使用する迷路 */
   Pose current_pose;                  /**< @brief 現在の姿勢 */
   bool isForceBackToStart = false;    /**< @brief 強制帰還モード */
   bool isForceGoingToGoal = false;    /**< @brief 強制終点訪問モード */
@@ -206,7 +205,7 @@ class Agent {
  private:
   SearchAlgorithm searchAlgorithm; /**< @brief 探索器 */
   SearchAlgorithm::NextDirections
-      next_directions;      /**< @brief 次に行く既知方向配列 */
+      next_directions;      /**< @brief 計算結果の移動方向配列 */
   Directions shortest_dirs; /**< @brief 最短経路の方向配列 */
 };
 

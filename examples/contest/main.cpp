@@ -18,15 +18,15 @@ class CLRobot : public CLRobotBase {
 
  protected:
   virtual void calcNextDirectionsPostCallback(
-      SearchAlgorithm::State prevState,
+      SearchAlgorithm::State oldState,
       SearchAlgorithm::State newState) override {
-    CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
-    if (newState == prevState)
+    CLRobotBase::calcNextDirectionsPostCallback(oldState, newState);
+    if (newState == oldState)
       return;
     /* State Change has occurred */
-    if (prevState == SearchAlgorithm::SEARCHING_FOR_GOAL) {
+    if (oldState == SearchAlgorithm::SEARCHING_FOR_GOAL) {
     }
-    if (prevState == SearchAlgorithm::IDENTIFYING_POSITION) {
+    if (oldState == SearchAlgorithm::IDENTIFYING_POSITION) {
       if (display) {
         wait();
         printInfo();

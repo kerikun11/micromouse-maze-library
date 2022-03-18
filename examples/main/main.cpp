@@ -15,11 +15,11 @@ class CLRobot : public CLRobotBase {
 
  protected:
   virtual void calcNextDirectionsPostCallback(
-      SearchAlgorithm::State prevState,
+      SearchAlgorithm::State oldState,
       SearchAlgorithm::State newState) override {
-    CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
+    CLRobotBase::calcNextDirectionsPostCallback(oldState, newState);
     csv << t_dur << std::endl;
-    if (newState == prevState)
+    if (newState == oldState)
       return;
     /* State Change has occurred */
   }

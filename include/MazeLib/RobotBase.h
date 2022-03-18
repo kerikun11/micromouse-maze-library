@@ -9,8 +9,6 @@
 
 #include "MazeLib/Agent.h"
 
-#include <algorithm>  //< std::replace
-
 namespace MazeLib {
 
 /**
@@ -49,36 +47,34 @@ class RobotBase : public Agent {
     F180_L = 'u',
     F180_R = 'U',
   };
-  using SearchActions = std::vector<SearchAction>;
-  using FastActions = std::vector<FastAction>;
 
   static std::string pathConvertSearchToFast(std::string src,
-                                             bool diag_enabled) {
+                                             const bool diag_enabled) {
     /* 前後に半分の直線を追加 */
     src = (char)F_ST_HALF + src + (char)F_ST_HALF;
     return replaceStringSearchToFast(src, diag_enabled);
   }
   static std::string pathConvertSearchToKnown(std::string src,
                                               const bool diag_enabled) {
+    /* 直線を半区画に統一 */
     replace(src, "S", "ss");
-    /* 初手ターンを防ぐ */
+    /* 初手ターンを防ぐため、直線を探す */
     auto f = src.find_first_of(F_ST_HALF, 1); /*< 最初の直線を探す */
     auto b = src.find_last_of(F_ST_HALF);     /*< 最後の直線を探す */
     if (f >= b)
-      return src;                       /*< 直線なし */
-    auto fb = src.substr(f, b - f + 1); /*< 直線に挟まれた区間を抽出 */
-    fb = replaceStringSearchToFast(fb,
-                                   diag_enabled); /*< 最短走行パターンに変換 */
+      return src; /*< 直線なし */
+    /* 前後のターンを除いた、直線に挟まれた区間を抽出 */
+    auto fb = src.substr(f, b - f + 1);
+    fb = replaceStringSearchToFast(fb, diag_enabled); /*< 最短パターンに変換 */
     /* 最初の直線前と最後の直線後を連結して完了 */
     return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
   }
-  static std::string convertDirectionsToSearch(
-      const Directions dirs,
-      const Direction start_d = Direction::North) {
+  static std::string convertDirectionsToSearchPath(const Directions& dirs) {
     if (dirs.empty())
       return "";
     std::string path;
-    Direction prevDir = start_d;
+    path.reserve(dirs.size());
+    Direction prevDir = dirs[0];
     for (int i = 1; i < (int)dirs.size(); ++i) {
       const auto nextDir = dirs[i];
       switch (Direction(nextDir - prevDir)) {
@@ -122,7 +118,7 @@ class RobotBase : public Agent {
                           bool& right __attribute__((unused))) {}
   virtual void stopDequeue() {}
   virtual void calcNextDirectionsPreCallback() {}
-  virtual void calcNextDirectionsPostCallback(SearchAlgorithm::State prevState
+  virtual void calcNextDirectionsPostCallback(SearchAlgorithm::State oldState
                                               __attribute__((unused)),
                                               SearchAlgorithm::State newState
                                               __attribute__((unused))) {}
@@ -146,7 +142,9 @@ class RobotBase : public Agent {
    * @param to 置換後文字列
    * @return int 置換した数
    */
-  static int replace(std::string& src, std::string from, std::string to) {
+  static int replace(std::string& src,
+                     const std::string& from,
+                     const std::string& to) {
     if (from.empty())
       return 0;
     auto pos = src.find(from);
@@ -167,40 +165,7 @@ class RobotBase : public Agent {
    * @return std::string 最短パターン文字列
    */
   static std::string replaceStringSearchToFast(std::string src,
-                                               bool diag_enabled) {
-    replace(src, "S", "ss");
-    replace(src, "L", "ll");
-    replace(src, "R", "rr");
-    if (diag_enabled) {
-      replace(src, "rllllr", "rlplr"); /**< FV90 */
-      replace(src, "lrrrrl", "lrPrl"); /**< FV90 */
-      replace(src, "sllr", "zlr");     /*< F45 */
-      replace(src, "srrl", "crl");     /*< F45 */
-      replace(src, "rlls", "rlZ");     /*< F45 P */
-      replace(src, "lrrs", "lrC");     /*< F45 P */
-      replace(src, "sllllr", "alr");   /*< F135 */
-      replace(src, "srrrrl", "drl");   /*< F135 */
-      replace(src, "rlllls", "rlA");   /*< F135 P */
-      replace(src, "lrrrrs", "lrD");   /*< F135 P */
-      replace(src, "slllls", "u");     /*< F180 */
-      replace(src, "srrrrs", "U");     /*< F180 */
-      replace(src, "rllr", "rlwlr");   /*< ST_DIAG */
-      replace(src, "lrrl", "lrwrl");   /*< ST_DIAG */
-      replace(src, "slls", "q");       /*< F90 */
-      replace(src, "srrs", "Q");       /*< F90 */
-      replace(src, "rl", "");
-      replace(src, "lr", "");
-      replace(src, "ss", "S");
-    } else {
-      replace(src, "slllls", "u"); /*< F180 */
-      replace(src, "srrrrs", "U"); /*< F180 */
-      replace(src, "slls", "q");   /*< F90 */
-      replace(src, "srrs", "Q");   /*< F90 */
-      replace(src, "ll", "L");     /**< FS90 */
-      replace(src, "rr", "R");     /**< FS90 */
-    }
-    return src;
-  }
+                                               const bool diag_enabled);
 };
 
 }  // namespace MazeLib

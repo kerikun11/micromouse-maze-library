@@ -18,7 +18,7 @@ TEST(CLRobotBase, CLRobotBase) {
   /* Search Run */
   robot.resetLastWalls();
   EXPECT_TRUE(robot.isSolvable());
-  EXPECT_FALSE(robot.isComplete());
+  EXPECT_FALSE(robot.isCompleted());
   EXPECT_TRUE(robot.searchRun());
   robot.printInfo();
   robot.printSearchResult();
@@ -106,7 +106,7 @@ TEST(CLRobotBase, fake) {
   EXPECT_FALSE(robot.searchRun());
   EXPECT_FALSE(robot.positionIdentifyRun());
   EXPECT_FALSE(robot.isSolvable());
-  EXPECT_FALSE(robot.isComplete());
+  EXPECT_FALSE(robot.isCompleted());
 
   /* StepMap */
   for (const auto simple : {true, false}) {

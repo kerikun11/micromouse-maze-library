@@ -28,7 +28,7 @@ void Agent::printInfo(const bool show_maze,
             << "Unknown Accel: " << (getUnknownAccelFlag() ? "true " : "false")
             << std::endl;
   std::cout << "Known: ";
-  for (const auto d : getNextDirections())
+  for (const auto d : getNextDirectionsKnown())
     std::cout << d.toChar();
   std::cout << std::endl;
   std::cout << "Candidates: ";

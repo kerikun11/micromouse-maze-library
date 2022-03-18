@@ -24,9 +24,9 @@ class CLRobot : public CLRobotBase {
     CLRobotBase::queueAction(action);
   }
   virtual void calcNextDirectionsPostCallback(
-      SearchAlgorithm::State prevState __attribute__((unused)),
-      SearchAlgorithm::State newState __attribute__((unused))) override {
-    CLRobotBase::calcNextDirectionsPostCallback(prevState, newState);
+      SearchAlgorithm::State oldState,
+      SearchAlgorithm::State newState) override {
+    CLRobotBase::calcNextDirectionsPostCallback(oldState, newState);
     csv << t_dur << std::endl;
   }
 

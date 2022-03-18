@@ -13,6 +13,7 @@
 #include "MazeLib/StepMapWall.h"
 
 namespace MazeLib {
+
 /**
  * @brief 迷路探索アルゴリズムを司るクラス
  */
@@ -64,7 +65,7 @@ class SearchAlgorithm {
   /**
    * @brief 探索が完全に終了しているかどうかを返す関数
    */
-  bool isComplete();
+  bool isCompleted();
   /**
    * @brief 探索によって可解かどうかを返す関数
    */
@@ -82,24 +83,56 @@ class SearchAlgorithm {
                   const Position& p,
                   const Direction d,
                   const bool b);
+  /**
+   * @brief 直近の壁情報の削除
+   */
   void resetLastWalls(const State state, const int num = 1);
+  /**
+   * @brief 探索状態に応じた現在姿勢の更新
+   */
   void updatePose(const State& state,
                   Pose& current_pose,
                   bool& isForceGoingToGoal);
 
   /**
-   * @brief 探索
+   * @brief 次に進むべき方向を計算する関数
+   *
+   * @param[out] next_directions 計算結果を格納する構造体
+   * @param[inout] current_pose 現在位置（自己位置同定の場合は変更されうる）
+   * @param[inout] isPositionIdentifying 自己位置同定フラグ
+   * @param[inout] isForceBackToStart 強制帰還フラグ
+   * @param[inout] isForceGoingToGoal 強制ゴール訪問フラグ
+   * @return Result 計算結果
    */
   Result calcNextDirections(NextDirections& next_directions,
                             Pose& current_pose,
                             bool& isPositionIdentifying,
                             bool& isForceBackToStart,
                             bool& isForceGoingToGoal);
-  bool determineNextDirection(const State state,
+  /**
+   * @brief 次に進むべき候補列から次に進むべき方向を決定する関数
+   *
+   * @param[in] pose 現在姿勢
+   * @param[in] nextDirectionCandidates
+   * @param[out] nextDirection 次に進むべき方向
+   * @return true 成功
+   * @return false 失敗
+   */
+  bool determineNextDirection(const Maze& maze,
                               const Pose& pose,
                               const Directions& nextDirectionCandidates,
                               Direction& nextDirection) const;
-  bool determineNextDirection(const Maze& maze,
+  /**
+   * @brief 次に進むべき候補列から次に進むべき方向を決定する関数
+   *
+   * @param[in] state 現在状態
+   * @param[in] pose 現在姿勢
+   * @param[in] nextDirectionCandidates
+   * @param[out] nextDirection 次に進むべき方向
+   * @return true 成功
+   * @return false 失敗
+   */
+  bool determineNextDirection(const State state,
                               const Pose& pose,
                               const Directions& nextDirectionCandidates,
                               Direction& nextDirection) const;
@@ -107,9 +140,9 @@ class SearchAlgorithm {
   /**
    * @brief 最短経路の導出
    *
-   * @param shortest_dirs 最短経路を格納する方向列
-   * @param diag_enabled オプション
-   * @param edge_cost 加速・スラロームの重み
+   * @param[out] shortest_dirs 最短経路を格納する方向列
+   * @param[in] diag_enabled オプション
+   * @param[in] edge_cost 加速・スラロームの重み
    * @return true 成功
    * @return false 失敗
    */
@@ -119,7 +152,9 @@ class SearchAlgorithm {
       const StepMapSlalom::EdgeCost& edge_cost = StepMapSlalom::EdgeCost{});
 
   /**
-   * @brief 自己位置同定
+   * @brief 自己位置同定の初期化
+   *
+   * @param[out] current_pose 初期姿勢
    */
   void positionIdentifyingInit(Pose& current_pose);
 
@@ -146,7 +181,7 @@ class SearchAlgorithm {
   StepMapWall step_map_wall; /**< @brief 使用するステップマップ */
   StepMapSlalom step_map_slalom; /**< @brief 使用するステップマップ */
 
- private:
+ protected:
   Maze idMaze;       /**< @brief 自己位置同定に使用する迷路 */
   Position idOffset; /**< @brief 自己位置同定迷路の始点位置 */
 
@@ -158,9 +193,12 @@ class SearchAlgorithm {
   /**
    * @brief 自己位置同定のパターンにマッチする候補をカウントする
    *
-   * @param idWallRecords
-   * @param ans マッチした解のひとつ
-   * @return int マッチ数, 0: 失敗, 1: 特定, 2-: 複数マッチ
+   * @param idWallRecords[in] 自己位置同定走行の壁ログ
+   * @param ans[out] マッチした解のひとつ
+   * @return int マッチ数, 0: 失敗, 1: 特定, 2-: 複数マッチ (同定中)
+   * @retval 0 失敗
+   * @retval 1 特定
+   * @retval 2- 複数マッチ (同定中)
    */
   int countIdentityCandidates(const WallRecords& idWallRecords,
                               Pose& ans) const;
@@ -168,13 +206,13 @@ class SearchAlgorithm {
    * @brief 特定の区画にマッチする方向の候補を探す
    * スタート区画への訪問を避けるために使用する関数
    *
-   * @param cur_p 注目する区画
-   * @param target 検索対象の区画と方向
+   * @param current_position 注目する区画
+   * @param target_pose 検索対象の区画と方向
    * @return const Directions 注目する区画からの方向列
    */
   const Directions findMatchDirectionCandidates(
       const Position& current_position,
-      const Pose& target) const;
+      const Pose& target_pose) const;
 
   /**
    * @brief 各状態での進行方向列導出関数
