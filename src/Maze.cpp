@@ -156,15 +156,14 @@ bool Maze::updateWall(const Position p,
   }
   return true;
 }
-void Maze::resetLastWalls(const int num) {
+void Maze::resetLastWalls(const int num, const bool set_start_wall) {
+  /* 直近の壁情報を削除 */
   for (int i = 0; i < num && !wallRecords.empty(); ++i)
     wallRecords.pop_back();
-  /* 編集済みの壁情報を取得 */
+  /* 削除後の壁情報を取得 */
   const auto new_wallRecords = wallRecords;
-  /* スタート壁を考慮して迷路をリセット */
-  reset(isWall(getStart(), Direction::East) &&
-        isKnown(getStart(), Direction::East) &&
-        canGo(getStart(), Direction::North));
+  /* スタート壁を考慮して迷路を再構築 */
+  reset(set_start_wall);
   for (const auto wr : new_wallRecords)
     updateWall(wr.getPosition(), wr.getDirection(), wr.b);
   return;
@@ -398,23 +397,23 @@ bool Maze::backupWallRecordsToFile(const std::string& filepath,
   if (!clear && backup_counter == wallRecords.size())
     return true;
   /* 前のデータが残っていたら削除 */
-  std::ifstream fs(filepath, std::ifstream::ate);
-  const auto size = static_cast<size_t>(fs.tellg());
+  std::ifstream ifs(filepath, std::ios::ate);
+  const auto size = static_cast<size_t>(ifs.tellg());
   if (clear || size / sizeof(WallRecord) > backup_counter) {
-    fs.close();
+    ifs.close();
     std::remove(filepath.c_str());
     backup_counter = 0;
   }
-  fs.close();
+  ifs.close();
   /* WallRecords を追記 */
-  std::ofstream of(filepath, std::ios::binary | std::ios::app);
-  if (of.fail()) {
+  std::ofstream ofs(filepath, std::ios::binary | std::ios::app);
+  if (ofs.fail()) {
     maze_logw << "failed to open file! " << filepath << std::endl;
     return false;
   }
   while (backup_counter < wallRecords.size()) {
     const auto& wr = wallRecords[backup_counter];
-    of.write(reinterpret_cast<const char*>(&wr), sizeof(wr));
+    ofs.write(reinterpret_cast<const char*>(&wr), sizeof(wr));
     backup_counter++;
   }
   return true;
@@ -425,7 +424,6 @@ bool Maze::restoreWallRecordsFromFile(const std::string& filepath) {
     maze_logw << "failed to open file! " << filepath << std::endl;
     return false;
   }
-  backup_counter = 0;
   reset();
   while (!f.eof()) {
     WallRecord wr;

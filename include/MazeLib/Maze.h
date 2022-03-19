@@ -649,10 +649,11 @@ class Maze {
                   const bool b,
                   const bool pushLog = true);
   /**
-   *  @brief 直前に更新した壁を見探索状態にリセットする
-   *  @param num リセットする壁の数
+   * @brief 直前に更新した壁を見探索状態にリセットする
+   * @param num 消去する直近の壁の数
+   * @param set_start_wall スタート区画の East と North の壁を設定するかどうか
    */
-  void resetLastWalls(const int num);
+  void resetLastWalls(const int num, const bool set_start_wall = true);
   /**
    * @brief 引数区画の壁の数を返す
    * @param p 区画の座標
