@@ -131,7 +131,7 @@ class MazeDrawer:
             while path:
                 path.pop(0).remove()
         maze = self.maze
-        # step_map
+        # step_map simple
         step_map = MazeLib.StepMap()
         sd = step_map.calcShortestDirections(maze, simple=True)
         if not sd:
@@ -139,7 +139,7 @@ class MazeDrawer:
         MazeLib.StepMap.appendStraightDirections(
             maze, sd, known_only=True, diag_enabled=False)
         self.draw_path(maze.getStart(), sd, color='b', offset=[0.05, 0.05])
-        # step_map_wall
+        # step_map_wall simple
         step_map_wall = MazeLib.StepMapWall()
         sd = step_map_wall.calcShortestDirections(maze, simple=True)
         sd = step_map_wall.convertWallIndexDirectionsToPositionDirections(sd)
@@ -147,14 +147,19 @@ class MazeDrawer:
             maze, sd, known_only=True, diag_enabled=True)
         self.draw_path_wall(maze.getStart(), sd, color='g',
                             offset=[-0.05, -0.05])
-        # step_map_slalom
+        # step_map_slalom diag
         step_map = MazeLib.StepMapSlalom()
-        for diag_enabled in [False, True]:
-            sd = step_map.calcShortestDirections(
-                maze, diag_enabled=diag_enabled)
-            MazeLib.StepMap.appendStraightDirections(
-                maze, sd, known_only=True, diag_enabled=diag_enabled)
-            c = 'y' if diag_enabled else 'c'
-            offset = [-0.02, 0.02] if diag_enabled else [0.02, -0.02]
-            self.draw_path(maze.getStart(), sd, color=c,
-                           diag_enabled=diag_enabled, offset=offset)
+        sd = step_map.calcShortestDirections(maze)
+        MazeLib.StepMap.appendStraightDirections(
+            maze, sd, known_only=True, diag_enabled=True)
+        self.draw_path(maze.getStart(), sd, diag_enabled=True,
+                       color='y', offset=[-0.02, 0.02])
+        # step_map no_diag
+        step_map = MazeLib.StepMap()
+        sd = step_map.calcShortestDirections(maze, simple=False)
+        if not sd:
+            print("Failed to Find any Path!")
+        MazeLib.StepMap.appendStraightDirections(
+            maze, sd, known_only=True, diag_enabled=False)
+        self.draw_path(maze.getStart(), sd, diag_enabled=False,
+                       color='c', offset=[0.02, -0.02])

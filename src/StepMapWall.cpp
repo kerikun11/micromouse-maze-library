@@ -14,6 +14,8 @@
 
 namespace MazeLib {
 
+const WallIndex StepMapWall::START_WALL_INDEX = WallIndex(0, 0, 1);
+
 void StepMapWall::print(const Maze& maze,
                         const WallIndex& index,
                         std::ostream& os) const {
@@ -100,6 +102,7 @@ void StepMapWall::print(const Maze& maze,
                         std::ostream& os) const {
   auto i = start;
   WallIndexes shortest_indexes;
+  shortest_indexes.reserve(shortest_dirs.size() + 1);
   shortest_indexes.push_back(i);
   for (const auto d : shortest_dirs) {
     i = i.next(d);
@@ -225,7 +228,8 @@ WallIndexes StepMapWall::convertDestinations(const Maze& maze,
         dest.push_back(WallIndex(p, d));
   return dest;
 }
-Direction StepMapWall::convertDirection(const Direction d, const WallIndex& i) {
+Direction StepMapWall::convertWallIndexDirection(const WallIndex& i,
+                                                 const Direction d) {
   switch (d) {
     case Direction::East:
     case Direction::North:
@@ -246,20 +250,23 @@ Direction StepMapWall::convertDirection(const Direction d, const WallIndex& i) {
   }
 }
 Directions StepMapWall::convertWallIndexDirectionsToPositionDirections(
-    const Directions& src,
-    const WallIndex& start) {
+    const Directions& src) {
+  if (src.size() < 2)
+    return {};
   Directions dirs;
-  dirs.push_back(Direction::North);
-  auto i = start;
+  dirs.reserve(src.size() + 1);
+  auto i = START_WALL_INDEX;
+  dirs.push_back(Direction::North);  //< start cell
   for (const auto d : src) {
-    dirs.push_back(convertDirection(d, i));
+    dirs.push_back(convertWallIndexDirection(i, d));
     i = i.next(d);
   }
   return dirs;
 }
 void StepMapWall::appendStraightDirections(const Maze& maze,
-                                           Directions& shortest_dirs) {
-  auto i = WallIndex(0, 0, 1);
+                                           Directions& shortest_dirs,
+                                           const WallIndex& start) {
+  auto i = start;
   for (const auto d : shortest_dirs)
     i = i.next(d);
   if (shortest_dirs.size()) {
@@ -307,10 +314,11 @@ void StepMapWall::calcStraightStepTable() {
   const float t_slalom = 388.0f; /*< FV90ターンの時間 [ms] */
   step_table_along[0] = step_table_diag[0] = 0; /*< [0] は使用しない */
   for (int i = 1; i < MAZE_SIZE * 2; ++i) {
+    /* 斜めと斜めなしが交互に来るので、どちらかでターンのコストを考慮 */
     step_table_along[i] = gen_cost_impl(i, am_a, vs, vm_a, seg_a);
     step_table_diag[i] = t_slalom + gen_cost_impl(i - 1, am_d, vs, vm_d, seg_d);
   }
-  /* 最大値を超えないようにスケーリング */
+  /* コストの合計が 65,535 [ms] を超えないようにスケーリング */
   const float scaling_factor = 2;
   for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] /= scaling_factor;

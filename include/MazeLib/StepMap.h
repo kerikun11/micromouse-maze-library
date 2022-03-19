@@ -67,6 +67,10 @@ class StepMap {
    */
   const auto& getMapArray() const { return step_map; }
   /**
+   * @brief ステップのスケーリング係数を取得
+   */
+  const auto getScalingFactor() const { return scaling_factor; }
+  /**
    * @brief ステップの表示
    * @param p ハイライト区画
    */
@@ -157,6 +161,10 @@ class StepMap {
   std::array<step_t, Position::SIZE> step_map;
   /** @brief 台形加速を考慮した移動コストテーブル (壁沿い方向) */
   std::array<step_t, MAZE_SIZE> step_table;
+  /**
+   * @brief コストの合計が 65,535 [ms] を超えないようにスケーリングする係数
+   */
+  static constexpr float scaling_factor = 2;
 
   /**
    * @brief 最短経路導出用の加速を考慮したステップリストを算出する関数

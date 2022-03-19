@@ -238,6 +238,14 @@ struct Position {
    * @return uint16_t 通し番号ID
    */
   uint16_t getIndex() const { return (x << MAZE_SIZE_BIT) | y; }
+  /**
+   * @brief IDからPositionを作成する関数
+   * @param index 通し番号 ID
+   */
+  static Position getPositionFromIndex(const uint16_t index) {
+    return {int8_t(index >> MAZE_SIZE_BIT),
+            int8_t(index & (MAZE_SIZE_MAX - 1))};
+  }
   /** @brief 加法 */
   Position operator+(const Position p) const {
     return Position(x + p.x, y + p.y);
@@ -387,11 +395,11 @@ struct WallIndex {
   /**
    * @brief デフォルトコンストラク
    */
-  WallIndex() : data(0) {}
+  constexpr WallIndex() : data(0) {}
   /**
    * @brief 成分を受け取ってそのまま格納するコンストラクタ
    */
-  WallIndex(const int8_t x, const int8_t y, const uint8_t z)
+  constexpr WallIndex(const int8_t x, const int8_t y, const uint8_t z)
       : x(x), y(y), z(z) {}
   /**
    * @brief 表現の冗長性を除去して格納するコンストラクタ
@@ -406,7 +414,7 @@ struct WallIndex {
    * @param i 壁の通し番号ID．迷路内の壁であること．
    *          迷路外の壁の場合未定義動作となる．
    */
-  WallIndex(const uint16_t i)
+  constexpr WallIndex(const uint16_t i)
       : x(i & (MAZE_SIZE_MAX - 1)),
         y((i >> MAZE_SIZE_BIT) & (MAZE_SIZE_MAX - 1)),
         z(i >> (2 * MAZE_SIZE_BIT)) {}

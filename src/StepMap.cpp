@@ -30,6 +30,7 @@ void StepMap::print(const Maze& maze,
                     std::ostream& os) const {
   /* preparation */
   std::vector<Pose> path;
+  path.reserve(dirs.size());
   Position p = start;
   for (const auto d : dirs)
     path.push_back({p, d}), p = p.next(d);
@@ -97,6 +98,7 @@ void StepMap::printFull(const Maze& maze,
                         const Position& start,
                         std::ostream& os) const {
   std::vector<Pose> path;
+  path.reserve(dirs.size());
   Position p = start;
   for (const auto d : dirs) {
     p = p.next(d);
@@ -275,6 +277,7 @@ Directions StepMap::getNextDirectionCandidates(const Maze& maze,
                                                const Pose& focus) const {
   /* 直線優先で進行方向の候補を抽出．全方位 STEP_MAX だと空になる */
   Directions dirs;
+  dirs.reserve(4);
   for (const auto d : {focus.d + Direction::Front, focus.d + Direction::Left,
                        focus.d + Direction::Right, focus.d + Direction::Back})
     if (!maze.isWall(focus.p, d) && getStep(focus.p.next(d)) != STEP_MAX)
@@ -368,11 +371,11 @@ void StepMap::calcStraightStepTable() {
   const float seg_a = 90.0f;     /*< 区画の長さ [mm] */
   const float t_slalom = 287.0f; /*< 小回り90度ターンの時間 [ms] */
   step_table[0] = 0;             /*< [0] は使用しない */
-  for (int i = 1; i < MAZE_SIZE; ++i)
-    step_table[i] =
-        (step_t)t_slalom + gen_cost_impl(i - 1, am_a, vs, vm_a, seg_a);
-  /* 最大値を超えないようにスケーリング */
-  const float scaling_factor = 2;
+  for (int i = 1; i < MAZE_SIZE; ++i) {
+    /* 1歩目は90度ターンとみなす */
+    step_table[i] = t_slalom + gen_cost_impl(i - 1, am_a, vs, vm_a, seg_a);
+  }
+  /* コストの合計が 65,535 [ms] を超えないようにスケーリング */
   for (int i = 0; i < MAZE_SIZE; ++i)
     step_table[i] /= scaling_factor;
 }

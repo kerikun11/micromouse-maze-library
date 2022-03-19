@@ -164,19 +164,16 @@ int main(void) {
   maze.print(of);
 
   /* StepMapSlalom */
-  for (const auto diag_enabled : {false, true}) {
-    const bool known_only = 0;
-    StepMapSlalom map;
-    StepMapSlalom::Indexes path;
-    StepMapSlalom::EdgeCost edge_cost;
-    map.update(maze, edge_cost,
-               StepMapSlalom::convertDestinations(maze.getGoals()), known_only,
-               diag_enabled);
-    map.genPathFromMap(path);
-    const auto shortest_dirs = map.indexes2directions(path, diag_enabled);
-    std::cout << std::endl;
-    maze.print(shortest_dirs);
-  }
+  const bool known_only = 0;
+  StepMapSlalom map;
+  StepMapSlalom::Indexes path;
+  StepMapSlalom::EdgeCost edge_cost;
+  map.update(maze, edge_cost,
+             StepMapSlalom::convertDestinations(maze.getGoals()), known_only);
+  map.genPathFromMap(path);
+  const auto shortest_dirs = map.indexes2directions(path);
+  std::cout << std::endl;
+  maze.print(shortest_dirs);
 
 #if 1
   /* Preparation */

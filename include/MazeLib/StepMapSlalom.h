@@ -139,6 +139,7 @@ class StepMapSlalom {
    public:
     /**
      * @brief 迷路中の Index の総数．for文などに使える．
+     * @details x * y * (z と nd の表現数)
      */
     static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 12;
 
@@ -264,34 +265,33 @@ class StepMapSlalom {
   void print(const Maze& maze,
              const Indexes& indexes,
              std::ostream& os = std::cout) const;
+  void printFull(const Maze& maze,
+                 const Indexes& indexes,
+                 std::ostream& os = std::cout) const;
   /**
    * @brief コストマップの更新
    * @param maze 迷路オブジェクト
    * @param edge_cost エッジコストオブジェクト
    * @param dest 目的地の集合
    * @param known_only 既知壁のみを通過可能とする
-   * @param diag_enabled 斜め走行を有効化する
    */
   void update(const Maze& maze,
               const EdgeCost& edge_cost,
               const Indexes& dest,
-              const bool known_only,
-              const bool diag_enabled);
+              const bool known_only);
   /**
    * @brief 最短経路を導出する
    * @param maze 迷路オブジェクト
    * @param edge_cost エッジコストオブジェクト
    * @param shortest_dirs 最短経路を格納するための動的配列
    * @param known_only 既知壁のみを通行可能とする
-   * @param diag_enabled 斜め走行を有効化する
    * @return true 成功
    * @return false 失敗．ゴールにたどり着けなかった
    */
   bool calcShortestDirections(const Maze& maze,
                               const EdgeCost& edge_cost,
                               Directions& shortest_dirs,
-                              const bool known_only,
-                              const bool diag_enabled);
+                              const bool known_only);
   /**
    * @brief コストマップを辿って経路を生成する
    * @param path 経路を格納する配列
@@ -318,18 +318,17 @@ class StepMapSlalom {
   /**
    * @brief ノード列を方向列に変換する関数
    * @param path
-   * @param diag_enabled
    * @return const Directions
    */
-  static Directions indexes2directions(const Indexes& path,
-                                       const bool diag_enabled);
+  static Directions indexes2directions(const Indexes& path);
 
  private:
   /** @brief スタートのノードの Index */
   const Index index_start = Index(Position(0, 0), Direction::North);
-  /** @brief 迷路上の最短経路候補の移動元を格納するマップ */
+  /** @brief 迷路上のノードのコストマップ */
+  std::array<cost_t, Index::SIZE> cost_map;
+  /** @brief 迷路上の最短経路候補の移動元ノードを格納するマップ */
   std::array<Index, Index::SIZE> from_map;
-  std::array<cost_t, Index::SIZE> cost_map; /**< @brief 迷路上のコストマップ */
 };
 
 }  // namespace MazeLib

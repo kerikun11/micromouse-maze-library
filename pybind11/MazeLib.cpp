@@ -262,7 +262,7 @@ PYBIND11_MODULE(MazeLib, m) {
            py::arg("simple") = false)
       .def_static("convertWallIndexDirectionsToPositionDirections",
                   &StepMapWall::convertWallIndexDirectionsToPositionDirections,
-                  py::arg("src"), py::arg("start") = WallIndex(0, 0, 1))
+                  py::arg("src"))
       //
       ;
 
@@ -289,15 +289,14 @@ PYBIND11_MODULE(MazeLib, m) {
       .def(
           "calcShortestDirections",
           [](StepMapSlalom& map, const Maze& maze,
-             const StepMapSlalom::EdgeCost& edge_cost, const bool known_only,
-             const bool diag_enabled) {
+             const StepMapSlalom::EdgeCost& edge_cost, const bool known_only) {
             Directions shortest_dirs;
             map.calcShortestDirections(maze, edge_cost, shortest_dirs,
-                                       known_only, diag_enabled);
+                                       known_only);
             return shortest_dirs;
           },
           py::arg("maze"), py::arg("edge_cost") = StepMapSlalom::EdgeCost(),
-          py::arg("known_only") = true, py::arg("diag_enabled") = true)
+          py::arg("known_only") = true)
       //
       ;
 }

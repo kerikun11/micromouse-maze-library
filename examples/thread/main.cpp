@@ -61,16 +61,16 @@ void thread_maze(const std::string& name) {
   /* Search Run */
   CLRobot robot(maze_target);
   robot.searchRun();
-  /* Fast Run */
-  for (const auto diag_enabled : {false, true})
-    robot.fastRun(diag_enabled);
-#if 1
-  /* Position Identification Run */
-  robot.positionIdentifyRun();
-#endif
   /* Show Result */
   std::printf("%-20s", name.c_str());
   robot.printSearchResult();
+#if 1
+  /* Fast Run */
+  for (const auto diag_enabled : {false, true})
+    robot.fastRun(diag_enabled);
+  /* Position Identification Run */
+  robot.positionIdentifyRun();
+#endif
 }
 
 int main(void) {
@@ -78,9 +78,9 @@ int main(void) {
   std::vector<std::string> names;
   for (int year = 2021; year >= 2021; --year)
     names.push_back("32MM" + std::to_string(year) + "HX");
-#if 1
   for (int year = 2019; year >= 2010; --year)
     names.push_back("32MM" + std::to_string(year) + "HX");
+#if 1
   for (int year = 2018; year >= 2014; --year)
     names.push_back("21MM" + std::to_string(year) + "HX_Taiwan");
   for (int year = 2020; year >= 2012; --year)
@@ -120,12 +120,19 @@ int main(void) {
 
   /* analyze for each maze */
   std::vector<std::thread> threads;
+#if 1
+  /* parallel */
+  for (const auto& name : names)
+    threads.push_back(std::thread([&] { thread_maze(name); }));
+  for (std::thread& th : threads)
+    th.join();
+#else
+  /* serial */
   for (const auto& name : names) {
     threads.push_back(std::thread([&] { thread_maze(name); }));
+    threads.back().join();
   }
-  for (std::thread& th : threads) {
-    th.join();
-  }
+#endif
 
   return 0;
 }

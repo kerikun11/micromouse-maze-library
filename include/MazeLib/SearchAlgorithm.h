@@ -171,15 +171,14 @@ class SearchAlgorithm {
   const StepMapWall& getStepMapWall() const { return step_map_wall; }
   const StepMapSlalom& getStepMapSlalom() const { return step_map_slalom; }
   const Maze& getIdMaze() const { return idMaze; }
-  StepMapSlalom::cost_t getShortestCost() const {
-    return getStepMapSlalom().getShortestCost();
-  }
+  uint32_t getShortestCost() const { return cost; }
 
  protected:
   Maze& maze;                /**< @brief 使用する迷路の参照 */
   StepMap step_map;          /**< @brief 使用するステップマップ */
   StepMapWall step_map_wall; /**< @brief 使用するステップマップ */
   StepMapSlalom step_map_slalom; /**< @brief 使用するステップマップ */
+  uint32_t cost;
 
  protected:
   Maze idMaze;       /**< @brief 自己位置同定に使用する迷路 */

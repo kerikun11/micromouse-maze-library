@@ -51,10 +51,14 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
   /* queue test files */
   std::vector<std::string> names;
 #if 0
-  // names.push_back("32_unknown");
-  // names.push_back("32MM2019HX");
+  names.push_back("32MM2019HX");
+  // names.push_back("32MM2010HX");
   // names.push_back("32MM2015HX"); // max calc time is longest in 32x32
-  names.push_back("16MM2014CX"); // max calc time is longest in 16x16
+  // names.push_back("16MM2014CX");  // max calc time is longest in 16x16
+  // names.push_back("32_fake");
+  // names.push_back("32_unknown");
+  // names.push_back("32_no_wall");
+  // names.push_back("32DFS01");
 #else
   for (int year = 2021; year >= 2021; --year)
     names.push_back("32MM" + std::to_string(year) + "HX");
@@ -77,37 +81,26 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
     names.push_back("16MM" + std::to_string(year) + "H_Kansai");
   for (int year = 2017; year >= 2015; --year)
     names.push_back("16MM" + std::to_string(year) + "C_Chubu");
-  for (const auto name : {
-           "16MM2021H_semi",
-           "16MM2021H_Kansai",
-           "16MM2019H_semi",
-           "16MM2019H_Kyushu",
-           "16MM2019H_Kanazawa",
-           "16MM2019H_Hokuriku",
-           "16MM2019H_East",
-           "16MM2019H_Cheese",
-           "16MM2018H_semi",
-           "16MM2017HX_pre",
-           "16MM2017H_Cheese",
-           "16MM2017CX_pre",
-           "16MM2017C_East",
-           "16MM2016C_Kyushu",
-           "09MM2019C_Cheese",
-           "08MM2016CF_pre",
-       })
-    names.push_back(name);
-#endif
-#if 0
-  for (const auto name : {
-           "04_test",
-           "32_fake",
-           "32_no_wall",
-           "32_unknown",
-       })
-    names.push_back(name);
+  names.push_back("16MM2021H_semi");
+  names.push_back("16MM2021H_Kansai");
+  names.push_back("16MM2019H_semi");
+  names.push_back("16MM2019H_Kyushu");
+  names.push_back("16MM2019H_Kanazawa");
+  names.push_back("16MM2019H_Hokuriku");
+  names.push_back("16MM2019H_East");
+  names.push_back("16MM2019H_Cheese");
+  names.push_back("16MM2018H_semi");
+  names.push_back("16MM2017HX_pre");
+  names.push_back("16MM2017H_Cheese");
+  names.push_back("16MM2017CX_pre");
+  names.push_back("16MM2017C_East");
+  names.push_back("16MM2016C_Kyushu");
+  names.push_back("09MM2019C_Cheese");
+  names.push_back("08MM2016CF_pre");
 #endif
 #endif
-  /* analyze for each maze */
+
+  /* test for each maze */
   for (const auto& name : names) {
     std::cout << std::endl;
     std::cout << "Maze: \t" << name << std::endl;
@@ -150,8 +143,8 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
         continue;
       }
       const auto path_cost = robot.getSearchAlgorithm().getShortestCost();
-      // std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
-      //           << path_cost << "\t[ms]" << std::endl;
+      std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
+                << path_cost << "\t[ms]" << std::endl;
       csv << "\t" << path_cost;
       robot.fastRun(diag_enabled);
       // robot.printPath();
@@ -160,14 +153,13 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
       Agent& at = *p_at;
       at.calcShortestDirections(diag_enabled);
       robot.calcShortestDirections(diag_enabled);
-      if (at.getSearchAlgorithm().getShortestCost() !=
-          robot.getSearchAlgorithm().getShortestCost()) {
+      if (at.getShortestDirections() != robot.getShortestDirections()) {
         maze_logw << "searched path is not shortest! "
                   << (diag_enabled ? "(diag)" : "(no_diag)") << std::endl;
         maze_logw << "real: " << at.getSearchAlgorithm().getShortestCost()
                   << " searched: "
                   << robot.getSearchAlgorithm().getShortestCost() << std::endl;
-        // at.printPath(); robot.printPath();
+        // at.printPath(), robot.printPath();
       }
     }
 #endif
@@ -222,13 +214,13 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
     csv << "\t" << robot.walls_pi_max;
 #endif
 
-#if 0
+#if 1
     /* StepMap */
     for (const auto simple : {true, false}) {
       const bool known_only = 0;
-      const Maze &maze = maze_target;
+      const Maze& maze = maze_target;
       const auto p = std::make_unique<StepMap>();
-      StepMap &map = *p;
+      StepMap& map = *p;
       std::chrono::microseconds sum{0};
       const int n = 100;
       Directions shortest_dirs;
@@ -245,16 +237,17 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
       std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
       // map.print(maze, shortest_dirs);
+      // map.printFull(maze, shortest_dirs);
     }
 #endif
 
-#if 0
+#if 1
     /* StepMapWall */
     for (const auto simple : {true, false}) {
       const bool known_only = 0;
-      const Maze &maze = maze_target;
+      const Maze& maze = maze_target;
       const auto p = std::make_unique<StepMapWall>();
-      StepMapWall &map = *p;
+      StepMapWall& map = *p;
       std::chrono::microseconds sum{0};
       const int n = 100;
       Directions shortest_dirs;
@@ -270,39 +263,44 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
       }
       std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
+      StepMapWall::appendStraightDirections(maze, shortest_dirs);
       // map.print(maze, shortest_dirs);
-      // maze.print(
-      //     StepMapWall::convertWallIndexDirectionsToPositionDirections(
-      //         shortest_dirs, WallIndex(Position(0, 0), Direction::North)),
-      //     maze.getStart());
+      // maze.print(StepMapWall::convertWallIndexDirectionsToPositionDirections(
+      //                shortest_dirs),
+      //            maze.getStart());
     }
 #endif
 
-#if 0
+#if 1
     /* StepMapSlalom */
-    for (const auto diag_enabled : {false, true}) {
+    {
       const bool known_only = 0;
-      const Maze &maze = maze_target;
+      const Maze& maze = maze_target;
       const auto p = std::make_unique<StepMapSlalom>();
-      StepMapSlalom &map = *p;
+      StepMapSlalom& map = *p;
       std::chrono::microseconds sum{0};
       const int n = 100;
       StepMapSlalom::Indexes path;
       StepMapSlalom::EdgeCost edge_cost;
+      Directions shortest_dirs;
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
         map.update(maze, edge_cost,
                    StepMapSlalom::convertDestinations(maze.getGoals()),
-                   known_only, diag_enabled);
-        map.genPathFromMap(path);
+                   known_only);
+        if (!map.genPathFromMap(path)) {
+          maze_loge << "Failed!" << std::endl;
+        }
+        shortest_dirs = map.indexes2directions(path);
         const auto t_e = std::chrono::system_clock().now();
         const auto us =
             std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
         sum += us;
       }
-      std::cout << "StepSla " << (diag_enabled ? "diag" : "no_d") << ":\t"
-                << sum.count() / n << "\t[us]" << std::endl;
+      std::cout << "StepMapSlalom:\t" << sum.count() / n << "\t[us]"
+                << std::endl;
       // map.print(maze, path);
+      // maze.print(shortest_dirs);
     }
 #endif
 

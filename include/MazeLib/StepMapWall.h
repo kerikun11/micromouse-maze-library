@@ -23,6 +23,10 @@ class StepMapWall {
    * @brief 最大ステップ値
    */
   static constexpr step_t STEP_MAX = std::numeric_limits<step_t>::max();
+  /**
+   * @brief スタート区画の WallIndex
+   */
+  static const WallIndex START_WALL_INDEX;
 
  public:
   StepMapWall() { calcStraightStepTable(); }
@@ -41,7 +45,7 @@ class StepMapWall {
              std::ostream& os = std::cout) const;
   void print(const Maze& maze,
              const Directions& shortest_dirs,
-             const WallIndex& start = WallIndex(0, 0, 1),
+             const WallIndex& start = START_WALL_INDEX,
              std::ostream& os = std::cout) const;
   void update(const Maze& maze,
               const WallIndexes& dest,
@@ -50,7 +54,7 @@ class StepMapWall {
   Directions calcShortestDirections(const Maze& maze,
                                     const bool known_only,
                                     const bool simple) {
-    return calcShortestDirections(maze, WallIndex(0, 0, 1),
+    return calcShortestDirections(maze, START_WALL_INDEX,
                                   convertDestinations(maze, maze.getGoals()),
                                   known_only, simple);
   }
@@ -66,12 +70,13 @@ class StepMapWall {
                                    const bool break_unknown) const;
   static WallIndexes convertDestinations(const Maze& maze,
                                          const Positions& positions);
-  static Direction convertDirection(const Direction d, const WallIndex& i);
+  static Direction convertWallIndexDirection(const WallIndex& i, const Direction d);
   static Directions convertWallIndexDirectionsToPositionDirections(
-      const Directions& src,
-      const WallIndex& start);
-  static void appendStraightDirections(const Maze& maze,
-                                       Directions& shortest_dirs);
+      const Directions& src);
+  static void appendStraightDirections(
+      const Maze& maze,
+      Directions& shortest_dirs,
+      const WallIndex& start = START_WALL_INDEX);
 
  private:
   /** @brief 迷路中のステップ数 */
