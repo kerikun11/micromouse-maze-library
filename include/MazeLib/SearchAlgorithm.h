@@ -52,7 +52,6 @@ class SearchAlgorithm {
     Directions next_directions_known; /**< @brief 既地区間移動候補列 */
     Directions next_direction_candidates; /**< @brief 未知区間移動候補順位 */
     bool unknown_accel_flag = false; /**< @brief 未知区間加速可能フラグ */
-    Pose known_end;      /**< @brief 既地区間終了時の姿勢 */
     int match_count = 0; /**< @brief 自己位置同定の候補数 */
   };
 

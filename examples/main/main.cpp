@@ -31,7 +31,7 @@ class CLRobot : public CLRobotBase {
   virtual void queueAction(const SearchAction action) override {
     if (display) {
       printInfo();
-      // getc(stdin);
+      getc(stdin);
       // std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 #if 0
@@ -49,8 +49,9 @@ class CLRobot : public CLRobotBase {
 int main(int argc, char* argv[]) {
 #if 1
   /* Preparation */
+  const std::string filepath_default = "../mazedata/data/32MM2021HX.maze";
   const std::string filepath =
-      argc > 1 ? std::string(argv[1]) : "../mazedata/data/32MM2021HX.maze";
+      argc > 1 ? std::string(argv[1]) : filepath_default;
   Maze maze_target;
   if (!maze_target.parse(filepath))
     return -1;

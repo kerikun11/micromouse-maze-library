@@ -58,10 +58,9 @@ TEST(CLRobotBase, CLRobotBase) {
     EXPECT_FALSE(shortest_dirs.empty());
     map.appendStraightDirections(maze, shortest_dirs);
     map.print(maze, shortest_dirs);
-    map.print(maze);
+    map.printPath(maze, shortest_dirs);
     maze.print(StepMapWall::convertWallIndexDirectionsToPositionDirections(
-                   shortest_dirs),
-               maze.getStart());
+        shortest_dirs));
   }
 
   /* StepMapSlalom */
@@ -129,7 +128,7 @@ TEST(CLRobotBase, fake) {
     EXPECT_TRUE(shortest_dirs.empty());
     map.appendStraightDirections(maze, shortest_dirs);
     map.print(maze, shortest_dirs);
-    map.print(maze);
+    map.printPath(maze, shortest_dirs);
     maze.print(StepMapWall::convertWallIndexDirectionsToPositionDirections(
                    shortest_dirs),
                maze.getStart());

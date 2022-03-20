@@ -37,16 +37,28 @@ class StepMapWall {
     if (i.isInsideOfField())
       step_map[i.getIndex()] = step;
   }
-  void print(const Maze& maze,
-             const WallIndex& i = WallIndex(-1, -1, 0),
-             std::ostream& os = std::cout) const;
+  /**
+   * @brief ステップマップの表示
+   */
   void print(const Maze& maze,
              const WallIndexes& indexes,
+             const bool show_full_step = false,
              std::ostream& os = std::cout) const;
   void print(const Maze& maze,
              const Directions& shortest_dirs,
              const WallIndex& start = START_WALL_INDEX,
+             const bool show_full_step = false,
              std::ostream& os = std::cout) const;
+  /**
+   * @brief 迷路上にパスを表示
+   */
+  void printPath(const Maze& maze,
+                 const WallIndexes& indexes,
+                 std::ostream& os = std::cout) const;
+  void printPath(const Maze& maze,
+                 const Directions& shortest_dirs,
+                 const WallIndex& start = START_WALL_INDEX,
+                 std::ostream& os = std::cout) const;
   void update(const Maze& maze,
               const WallIndexes& dest,
               const bool known_only,
@@ -70,7 +82,8 @@ class StepMapWall {
                                    const bool break_unknown) const;
   static WallIndexes convertDestinations(const Maze& maze,
                                          const Positions& positions);
-  static Direction convertWallIndexDirection(const WallIndex& i, const Direction d);
+  static Direction convertWallIndexDirection(const WallIndex& i,
+                                             const Direction d);
   static Directions convertWallIndexDirectionsToPositionDirections(
       const Directions& src);
   static void appendStraightDirections(

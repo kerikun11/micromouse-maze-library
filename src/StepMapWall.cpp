@@ -17,30 +17,43 @@ namespace MazeLib {
 const WallIndex StepMapWall::START_WALL_INDEX = WallIndex(0, 0, 1);
 
 void StepMapWall::print(const Maze& maze,
-                        const WallIndex& index,
+                        const WallIndexes& indexes,
+                        const bool show_full_step,
                         std::ostream& os) const {
-  int maze_size = MAZE_SIZE;
+  const int maze_size = MAZE_SIZE;
+  const auto find = [&](const WallIndex& i) {
+    return std::find(indexes.cbegin(), indexes.cend(), i) != indexes.cend();
+  };
+  step_t max_step = 0;
+  for (const auto step : step_map)
+    if (step != STEP_MAX)
+      max_step = std::max(max_step, step);
+  const bool simple = (max_step < 999);
+  const step_t scaler =
+      step_table_diag[MAZE_SIZE * 2 - 1] - step_table_diag[MAZE_SIZE * 2 - 2];
+  /* start to draw maze */
   for (int8_t y = maze_size - 1; y >= -1; --y) {
-    for (int8_t x = 0; x <= maze_size; ++x) {
+    /* Horizontal Wall Line */
+    for (int8_t x = 0; x < maze_size; ++x) {
       /* Pillar */
       os << '+';
-      if (x == maze_size)
-        break;
       /* Horizontal Wall */
       const auto w = maze.isWall(x, y, Direction::North);
       const auto k = maze.isKnown(x, y, Direction::North);
       const auto i = WallIndex(Position(x, y), Direction::North);
-      const auto s = std::min(int(getStep(i)), 99999);
-      const auto f = i == index;
+      auto s = getStep(i);
+      s = std::min(simple ? s : s / scaler, show_full_step ? 99999 : 999);
+      const auto f = find(i);
       if (w)
-        os << "-----";
+        os << (show_full_step ? "-----" : "---");
       else
-        os << (f ? "\e[43m\e[34m" : (s == 0 ? C_YE : (k ? C_CY : C_RE)))
-           << std::setw(5) << s << C_NO;
+        os << (f ? "\e[43m" C_BL : (s == 0 ? C_YE : (k ? C_BL : C_RE)))
+           << std::setw(show_full_step ? 5 : 3) << s << C_NO;
     }
-    os << std::endl;
+    os << '+' << std::endl;
+    /* Vertical Wall Line */
     if (y != -1) {
-      os << "|  ";
+      os << (show_full_step ? "|  " : "| ");
       for (int8_t x = 0; x < maze_size; ++x) {
         /* Cell */
         os << ' ';
@@ -48,21 +61,37 @@ void StepMapWall::print(const Maze& maze,
         const auto w = maze.isWall(x, y, Direction::East);
         const auto k = maze.isKnown(x, y, Direction::East);
         const auto i = WallIndex(Position(x, y), Direction::East);
-        const auto s = std::min(int(getStep(i)), 99999);
-        const auto f = i == index;
+        auto s = getStep(i);
+        s = std::min(simple ? s : s / scaler, show_full_step ? 99999 : 999);
+        const auto f = find(i);
         if (w)
-          os << "  |  ";
+          os << (show_full_step ? "  |  " : " | ");
         else
-          os << (f ? "\e[43m\e[34m" : (s == 0 ? C_YE : (k ? C_CY : C_RE)))
-             << std::setw(5) << s << C_NO;
+          os << (f ? "\e[43m" C_BL : (s == 0 ? C_YE : (k ? C_BL : C_RE)))
+             << std::setw(show_full_step ? 5 : 3) << s << C_NO;
       }
       os << std::endl;
     }
   }
 }
 void StepMapWall::print(const Maze& maze,
-                        const WallIndexes& indexes,
+                        const Directions& shortest_dirs,
+                        const WallIndex& start,
+                        const bool show_full_step,
                         std::ostream& os) const {
+  auto i = start;
+  WallIndexes shortest_indexes;
+  shortest_indexes.reserve(shortest_dirs.size() + 1);
+  shortest_indexes.push_back(i);
+  for (const auto d : shortest_dirs) {
+    i = i.next(d);
+    shortest_indexes.push_back(i);
+  }
+  print(maze, shortest_indexes, show_full_step, os);
+}
+void StepMapWall::printPath(const Maze& maze,
+                            const WallIndexes& indexes,
+                            std::ostream& os) const {
   const auto exists = [&](const WallIndex& i) {
     return std::find(indexes.cbegin(), indexes.cend(), i) != indexes.cend();
   };
@@ -96,10 +125,10 @@ void StepMapWall::print(const Maze& maze,
     }
   }
 }
-void StepMapWall::print(const Maze& maze,
-                        const Directions& shortest_dirs,
-                        const WallIndex& start,
-                        std::ostream& os) const {
+void StepMapWall::printPath(const Maze& maze,
+                            const Directions& shortest_dirs,
+                            const WallIndex& start,
+                            std::ostream& os) const {
   auto i = start;
   WallIndexes shortest_indexes;
   shortest_indexes.reserve(shortest_dirs.size() + 1);
@@ -108,7 +137,7 @@ void StepMapWall::print(const Maze& maze,
     i = i.next(d);
     shortest_indexes.push_back(i);
   }
-  print(maze, shortest_indexes, os);
+  printPath(maze, shortest_indexes, os);
 }
 void StepMapWall::update(const Maze& maze,
                          const WallIndexes& dest,

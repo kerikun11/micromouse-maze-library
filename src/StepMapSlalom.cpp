@@ -111,6 +111,7 @@ void StepMapSlalom::update(const Maze& maze,
   /* 全ノードのコストを最大値に設定 */
   const auto cost = CostMax;
   cost_map.fill(cost);
+  from_map.fill(index_start);
   /* 更新予約のキュー */
 #define STEP_MAP_USE_PRIORITY_QUEUE 0
 #if STEP_MAP_USE_PRIORITY_QUEUE == 1
@@ -235,17 +236,92 @@ bool StepMapSlalom::genPathFromMap(Indexes& path) const {
   auto i = index_start.opposite();
   while (1) {
     path.push_back(i.opposite());
+    /* ゴールなら終了 */
     if (cost_map[i.getIndex()] == 0)
       break;
-    if (cost_map[i.getIndex()] <= cost_map[from_map[i.getIndex()].getIndex()])
+    /* 移動元を確認 */
+    const auto i_from = from_map[i.getIndex()];
+    if (!i_from.getWallIndex().isInsideOfField())
+      return false;
+    /* コストが減っていなかったらおかしい */
+    if (cost_map[i.getIndex()] <= cost_map[i_from.getIndex()])
       return false;
     i = from_map[i.getIndex()];
   }
+  /* ゴールにたどり着いた */
   return true;
 }
 void StepMapSlalom::print(const Maze& maze,
                           const Indexes& indexes,
                           std::ostream& os) const {
+  const auto exists = [&](const Index& i) {
+    return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index& ii) {
+             if (i.getNodeDirection().isAlong() !=
+                 ii.getNodeDirection().isAlong())
+               return false;
+             if (i.getNodeDirection().isDiag())
+               return i.getWallIndex() == ii.getWallIndex();
+             return i.getPosition() == ii.getPosition();
+           }) != indexes.cend();
+  };
+  const auto get_min_cost_p = [&](int8_t x, int8_t y) {
+    return std::min({
+        cost_map[Index(x, y, 0, Direction::East).getIndex()],
+        cost_map[Index(x, y, 0, Direction::North).getIndex()],
+        cost_map[Index(x, y, 0, Direction::West).getIndex()],
+        cost_map[Index(x, y, 0, Direction::South).getIndex()],
+    });
+  };
+  const auto get_min_cost_w = [&](const WallIndex i) {
+    return std::min({
+        cost_map[Index(i.x, i.y, i.z, Direction::NorthEast).getIndex()],
+        cost_map[Index(i.x, i.y, i.z, Direction::NorthWest).getIndex()],
+        cost_map[Index(i.x, i.y, i.z, Direction::SouthWest).getIndex()],
+        cost_map[Index(i.x, i.y, i.z, Direction::SouthEast).getIndex()],
+    });
+  };
+  /* start to draw maze */
+  for (int8_t y = MAZE_SIZE - 1; y >= -1; --y) {
+    /* Horizontal Wall Line */
+    for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+      os << "+";
+      const auto w = maze.isWall(x, y, Direction::North);
+      const auto k = maze.isKnown(x, y, Direction::North);
+      const auto e = exists(Index(x, y, 1, Direction::NorthEast));
+      /* Horizontal Wall */
+      if (w)
+        os << "---------";
+      else
+        os << "  " << (e ? C_YE : (k ? C_BL : C_RE)) << std::setw(5)
+           << get_min_cost_w(WallIndex(x, y, 1)) << C_NO << "  ";
+    }
+    os << "+" << std::endl;
+    /* Vertical Wall Line */
+    if (y != -1) {
+      os << "|  ";
+      for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
+        /* Cell */
+        if (exists(Index(x, y, 0, Direction::East)))
+          os << C_YE << std::setw(5) << get_min_cost_p(x, y) << C_NO;
+        else
+          os << C_GR << std::setw(5) << get_min_cost_p(x, y) << C_NO;
+        /* Vertical Wall */
+        const auto w = maze.isWall(x, y, Direction::East);
+        const auto k = maze.isKnown(x, y, Direction::East);
+        const auto e = exists(Index(x, y, 0, Direction::NorthEast));
+        if (w)
+          os << "  |  ";
+        else
+          os << (e ? C_YE : (k ? C_BL : C_RE)) << std::setw(5)
+             << get_min_cost_w(WallIndex(x, y, 0)) << C_NO;
+      }
+      os << std::endl;
+    }
+  }
+}
+void StepMapSlalom::printPath(const Maze& maze,
+                              const Indexes& indexes,
+                              std::ostream& os) const {
   const auto exists = [&](const Index& i) {
     return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index& ii) {
              if (i.getNodeDirection().isAlong() !=
@@ -274,57 +350,6 @@ void StepMapSlalom::print(const Maze& maze,
           os << C_YE << " X " << C_NO;
         else
           os << "   ";
-        if (exists(Index(x, y, 0, Direction::NorthEast)))
-          os << C_YE << "X" << C_NO;
-        else
-          os << (maze.isKnown(x, y, Direction::East)
-                     ? (maze.isWall(x, y, Direction::East) ? "|" : " ")
-                     : (C_RE "." C_NO));
-      }
-      os << std::endl;
-    }
-  }
-}
-void StepMapSlalom::printFull(const Maze& maze,
-                              const Indexes& indexes,
-                              std::ostream& os) const {
-  const auto exists = [&](const Index& i) {
-    return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index& ii) {
-             if (i.getNodeDirection().isAlong() !=
-                 ii.getNodeDirection().isAlong())
-               return false;
-             if (i.getNodeDirection().isDiag())
-               return i.getWallIndex() == ii.getWallIndex();
-             return i.getPosition() == ii.getPosition();
-           }) != indexes.cend();
-  };
-  const auto get_min_cost = [&](int8_t x, int8_t y) {
-    return std::min({
-        (cost_t)99999,
-        cost_map[Index(x, y, 0, Direction::East).getIndex()],
-        cost_map[Index(x, y, 0, Direction::North).getIndex()],
-        cost_map[Index(x, y, 0, Direction::West).getIndex()],
-        cost_map[Index(x, y, 0, Direction::South).getIndex()],
-    });
-  };
-  for (int8_t y = MAZE_SIZE - 1; y >= -1; --y) {
-    for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
-      os << "+";
-      if (exists(Index(x, y, 1, Direction::NorthEast)))
-        os << C_YE << std::setw(5) << "     " << C_NO;
-      else
-        os << (maze.isKnown(x, y, Direction::North)
-                   ? (maze.isWall(x, y, Direction::North) ? "-----" : "     ")
-                   : (C_RE "  .  " C_NO));
-    }
-    os << "+" << std::endl;
-    if (y != -1) {
-      os << '|';
-      for (uint8_t x = 0; x < MAZE_SIZE; ++x) {
-        if (exists(Index(x, y, 0, Direction::East)))
-          os << C_YE << std::setw(5) << get_min_cost(x, y) << C_NO;
-        else
-          os << C_CY << std::setw(5) << get_min_cost(x, y) << C_NO;
         if (exists(Index(x, y, 0, Direction::NorthEast)))
           os << C_YE << "X" << C_NO;
         else

@@ -155,7 +155,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       case SearchAlgorithm::Processing:
         return result;
       case SearchAlgorithm::Reached:
-        return SearchAlgorithm::Processing;  //< to reach the goal exactly
+        break; /*< go to next state */
       case SearchAlgorithm::Error:
         next_directions.state = State::IMPOSSIBLE;
         return result;
@@ -234,7 +234,8 @@ void SearchAlgorithm::printMap(const State state, const Pose& pose) const {
   // step_map.printFull(m, pose.p, pose.d);
 }
 bool SearchAlgorithm::findShortestCandidates(Positions& candidates,
-                                             const Pose& current_pose) {
+                                             const Pose& current_pose
+                                             __attribute__((unused))) {
 #if 0
   /* 全探索 */
   candidates.clear();
@@ -569,23 +570,28 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsBackingToStart(
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsGoingToGoal(
     SearchAlgorithm::NextDirections& next_directions,
     const Pose& current_pose) {
+  /* アクセス用の変数を用意 */
   const auto& goals = maze.getGoals();
-  /* 最短経路で帰れる場合はそれで帰る */
-  next_directions.next_direction_candidates.clear();
-  next_directions.next_directions_known =
-      step_map.calcShortestDirections(maze, current_pose.p, goals, true, false);
-  if (std::find(goals.cbegin(), goals.cend(), next_directions.known_end.p) !=
-      goals.cend())
-    return Reached;
-  /* 未知壁を含む場合 */
   auto& nextDirectionCandidates = next_directions.next_direction_candidates;
-  calcNextDirectionsInAdvance(maze, goals, current_pose, next_directions);
+  auto& nextDirectionsKnown = next_directions.next_directions_known;
   /* ゴール判定 */
-  const auto next_p =
-      current_pose.p.next(nextDirectionCandidates[0] + Direction::Back);
-  const auto it = std::find(goals.cbegin(), goals.cend(), next_p);
+  const auto it = std::find(goals.cbegin(), goals.cend(), current_pose.p);
   if (it != goals.cend())
     return Reached;
+  /* 既知経路で行ける場合はそれで行く */
+  nextDirectionsKnown =
+      step_map.calcShortestDirections(maze, current_pose.p, goals, true, false);
+  if (!nextDirectionsKnown.empty()) {
+    nextDirectionCandidates = Directions{{
+        Direction(nextDirectionsKnown.back() + Direction::Front),
+        Direction(nextDirectionsKnown.back() + Direction::Left),
+        Direction(nextDirectionsKnown.back() + Direction::Right),
+        Direction(nextDirectionsKnown.back() + Direction::Back),
+    }};
+    return Processing;
+  }
+  /* 未知壁を含む場合 */
+  calcNextDirectionsInAdvance(maze, goals, current_pose, next_directions);
   return nextDirectionCandidates.empty() ? Error : Processing;
 }
 SearchAlgorithm::Result

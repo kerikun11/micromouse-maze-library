@@ -260,12 +260,15 @@ class StepMapSlalom {
  public:
   StepMapSlalom() {}
   /**
-   * @brief 迷路に Indexes を表示する関数
+   * @brief ステップマップを表示する関数
    */
   void print(const Maze& maze,
              const Indexes& indexes,
              std::ostream& os = std::cout) const;
-  void printFull(const Maze& maze,
+  /**
+   * @brief 迷路上に Indexes を表示する関数
+   */
+  void printPath(const Maze& maze,
                  const Indexes& indexes,
                  std::ostream& os = std::cout) const;
   /**
