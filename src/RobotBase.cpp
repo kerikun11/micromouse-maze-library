@@ -9,6 +9,118 @@
 
 namespace MazeLib {
 
+const char* RobotBase::getSearchActionName(enum SearchAction action) {
+  switch (action) {
+    case START_STEP:
+      return "START_STEP";
+    case START_INIT:
+      return "START_INIT";
+    case ST_FULL:
+      return "ST_FULL";
+    case ST_HALF:
+      return "ST_HARF";
+    case ST_HALF_STOP:
+      return "ST_HALF_STOP";
+    case TURN_L:
+      return "TURN_L";
+    case TURN_R:
+      return "TURN_R";
+    case ROTATE_180:
+      return "ROTATE_180";
+    default:
+      return "Unknown";
+  }
+}
+const char* RobotBase::getFastActionName(enum FastAction action) {
+  switch (action) {
+    case F_ST_FULL:
+      return "F_ST_FULL";
+    case F_ST_HALF:
+      return "F_ST_HALF";
+    case F_ST_DIAG:
+      return "F_ST_DIAG";
+    case F45_L:
+      return "F45_L";
+    case F45_LP:
+      return "F45_LP";
+    case F45_R:
+      return "F45_R";
+    case F45_RP:
+      return "F45_RP";
+    case F90_L:
+      return "F90_L";
+    case F90_R:
+      return "F90_R";
+    case FV90_L:
+      return "FV90_L";
+    case FV90_R:
+      return "FV90_R";
+    case FS90_L:
+      return "FS90_L";
+    case FS90_R:
+      return "FS90_R";
+    case F135_L:
+      return "F135_L";
+    case F135_LP:
+      return "F135_LP";
+    case F135_R:
+      return "F135_LP";
+    case F135_RP:
+      return "F135_RP";
+    case F180_L:
+      return "F180_L";
+    case F180_R:
+      return "F180_R";
+    default:
+      return "Unknown";
+  }
+}
+
+std::string RobotBase::pathConvertSearchToFast(std::string src,
+                                               const bool diag_enabled) {
+  /* 前後に半分の直線を追加 */
+  src = (char)F_ST_HALF + src + (char)F_ST_HALF;
+  return replaceStringSearchToFast(src, diag_enabled);
+}
+std::string RobotBase::pathConvertSearchToKnown(std::string src,
+                                                const bool diag_enabled) {
+  /* 直線を半区画に統一 */
+  replace(src, "S", "ss");
+  /* 初手ターンを防ぐため、直線を探す */
+  auto f = src.find_first_of(F_ST_HALF, 1); /*< 最初の直線を探す */
+  auto b = src.find_last_of(F_ST_HALF);     /*< 最後の直線を探す */
+  if (f >= b)
+    return src; /*< 直線なし */
+  /* 前後のターンを除いた、直線に挟まれた区間を抽出 */
+  auto fb = src.substr(f, b - f + 1);
+  fb = replaceStringSearchToFast(fb, diag_enabled); /*< 最短パターンに変換 */
+  /* 最初の直線前と最後の直線後を連結して完了 */
+  return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
+}
+std::string RobotBase::convertDirectionsToSearchPath(const Directions& dirs) {
+  if (dirs.empty())
+    return "";
+  std::string path;
+  path.reserve(dirs.size());
+  Direction prevDir = dirs[0];
+  for (int i = 1; i < (int)dirs.size(); ++i) {
+    const auto nextDir = dirs[i];
+    switch (Direction(nextDir - prevDir)) {
+      case Direction::Front:
+        path += RobotBase::SearchAction::ST_FULL;
+        break;
+      case Direction::Left:
+        path += RobotBase::SearchAction::TURN_L;
+        break;
+      case Direction::Right:
+        path += RobotBase::SearchAction::TURN_R;
+        break;
+    }
+    prevDir = nextDir;
+  }
+  return path;
+}
+
 void RobotBase::reset() {
   /* 迷路をリセット */
   Agent::reset();
@@ -69,8 +181,6 @@ bool RobotBase::endFastRunBackingToStartRun() {
   /* 走行開始 */
   return generalSearchRun();
 }
-
-/* protected: */
 
 void RobotBase::turnbackSave() {
   queueAction(ST_HALF_STOP);
@@ -167,6 +277,7 @@ bool RobotBase::generalSearchRun() {
   }
   return true;
 }
+
 std::string RobotBase::replaceStringSearchToFast(std::string src,
                                                  bool diag_enabled) {
   replace(src, "S", "ss");

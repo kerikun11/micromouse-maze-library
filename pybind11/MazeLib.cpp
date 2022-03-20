@@ -272,28 +272,12 @@ PYBIND11_MODULE(MazeLib, m) {
       .def(py::init<>())
       //
       ;
-  step_map_slalom
-      .def(py::init<>())
-      //  .def(
-      //      "calcShortestDirections",
-      //      [](StepMapSlalom &map, const Maze &maze, const bool known_only,
-      //         const bool diag_enabled) {
-      //        Directions shortest_dirs;
-      //        StepMapSlalom::EdgeCost edge_cost;
-      //        map.calcShortestDirections(maze, edge_cost, shortest_dirs,
-      //                                   known_only, diag_enabled);
-      //        return shortest_dirs;
-      //      },
-      //      py::arg("maze"), py::arg("known_only") = true,
-      //      py::arg("diag_enabled") = true)
+  step_map_slalom.def(py::init<>())
       .def(
           "calcShortestDirections",
           [](StepMapSlalom& map, const Maze& maze,
              const StepMapSlalom::EdgeCost& edge_cost, const bool known_only) {
-            Directions shortest_dirs;
-            map.calcShortestDirections(maze, edge_cost, shortest_dirs,
-                                       known_only);
-            return shortest_dirs;
+            return map.calcShortestDirections(maze, edge_cost, known_only);
           },
           py::arg("maze"), py::arg("edge_cost") = StepMapSlalom::EdgeCost(),
           py::arg("known_only") = true)

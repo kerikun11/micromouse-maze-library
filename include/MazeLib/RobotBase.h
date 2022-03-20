@@ -16,6 +16,9 @@ namespace MazeLib {
  */
 class RobotBase : public Agent {
  public:
+  /**
+   * @brief 探索の走行パターン一覧。これをキューに詰める。
+   */
   enum SearchAction : char {
     START_STEP = '1',
     START_INIT = '2',
@@ -26,6 +29,9 @@ class RobotBase : public Agent {
     TURN_R = 'R',
     ROTATE_180 = 'T',
   };
+  /**
+   * @brief 最短の走行パターン一覧。これをキューに詰める。
+   */
   enum FastAction : char {
     F_ST_FULL = 'S',
     F_ST_HALF = 's',
@@ -47,51 +53,14 @@ class RobotBase : public Agent {
     F180_L = 'u',
     F180_R = 'U',
   };
+  static const char* getSearchActionName(enum SearchAction action);
+  static const char* getFastActionName(enum FastAction action);
 
   static std::string pathConvertSearchToFast(std::string src,
-                                             const bool diag_enabled) {
-    /* 前後に半分の直線を追加 */
-    src = (char)F_ST_HALF + src + (char)F_ST_HALF;
-    return replaceStringSearchToFast(src, diag_enabled);
-  }
+                                             const bool diag_enabled);
   static std::string pathConvertSearchToKnown(std::string src,
-                                              const bool diag_enabled) {
-    /* 直線を半区画に統一 */
-    replace(src, "S", "ss");
-    /* 初手ターンを防ぐため、直線を探す */
-    auto f = src.find_first_of(F_ST_HALF, 1); /*< 最初の直線を探す */
-    auto b = src.find_last_of(F_ST_HALF);     /*< 最後の直線を探す */
-    if (f >= b)
-      return src; /*< 直線なし */
-    /* 前後のターンを除いた、直線に挟まれた区間を抽出 */
-    auto fb = src.substr(f, b - f + 1);
-    fb = replaceStringSearchToFast(fb, diag_enabled); /*< 最短パターンに変換 */
-    /* 最初の直線前と最後の直線後を連結して完了 */
-    return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
-  }
-  static std::string convertDirectionsToSearchPath(const Directions& dirs) {
-    if (dirs.empty())
-      return "";
-    std::string path;
-    path.reserve(dirs.size());
-    Direction prevDir = dirs[0];
-    for (int i = 1; i < (int)dirs.size(); ++i) {
-      const auto nextDir = dirs[i];
-      switch (Direction(nextDir - prevDir)) {
-        case Direction::Front:
-          path += RobotBase::SearchAction::ST_FULL;
-          break;
-        case Direction::Left:
-          path += RobotBase::SearchAction::TURN_L;
-          break;
-        case Direction::Right:
-          path += RobotBase::SearchAction::TURN_R;
-          break;
-      }
-      prevDir = nextDir;
-    }
-    return path;
-  }
+                                              const bool diag_enabled);
+  static std::string convertDirectionsToSearchPath(const Directions& dirs);
 
  public:
   RobotBase() { reset(); }
@@ -134,8 +103,8 @@ class RobotBase : public Agent {
   bool generalSearchRun();
 
   /**
-   * @brief 文字列置換の汎用関数，
-   * 置換対象文字列に含まれる置換前文字列をすべて置換後文字列に置換する
+   * @brief 文字列置換の汎用関数
+   * @details 置換対象文字列に含まれる置換前文字列をすべて置換後文字列に置換する
    *
    * @param src 置換対象文字列
    * @param from 置換前文字列

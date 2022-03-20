@@ -155,6 +155,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       case SearchAlgorithm::Processing:
         return result;
       case SearchAlgorithm::Reached:
+        isForceGoingToGoal = false;
         break; /*< go to next state */
       case SearchAlgorithm::Error:
         next_directions.state = State::IMPOSSIBLE;
@@ -214,9 +215,10 @@ bool SearchAlgorithm::calcShortestDirections(
     const StepMapSlalom::EdgeCost& edge_cost) {
   const bool known_only = true;
   if (diag_enabled) {
-    if (!step_map_slalom.calcShortestDirections(maze, edge_cost, shortest_dirs,
-                                                known_only))
-      return false; /* no path to goal */
+    shortest_dirs =
+        step_map_slalom.calcShortestDirections(maze, edge_cost, known_only);
+    if (shortest_dirs.empty())
+      return false; /*< failed */
     cost = step_map_slalom.getShortestCost();
   } else {
     shortest_dirs = step_map.calcShortestDirections(maze, known_only, false);
@@ -250,14 +252,15 @@ bool SearchAlgorithm::findShortestCandidates(Positions& candidates,
 #endif
 #if 0
   /* スラロームコスト考慮 */
-  candidates.clear();
-  for (const auto diag_enabled : {true, false}) {
-    Directions shortest_dirs;
+  {
+    candidates.clear();
+    const bool diag_enabled = true;
     const StepMapSlalom::EdgeCost edge_cost;
     const bool known_only = false;
-    if (!step_map_slalom.calcShortestDirections(maze, edge_cost, shortest_dirs,
-                                                known_only, diag_enabled))
-      return false; /* failed */
+    Directions shortest_dirs =
+        step_map_slalom.calcShortestDirections(maze, edge_cost, known_only);
+    if (shortest_dirs.empty())
+      return false; /*< failed */
     StepMap::appendStraightDirections(maze, shortest_dirs, known_only,
                                       diag_enabled);
     auto p = maze.getStart();
@@ -266,9 +269,10 @@ bool SearchAlgorithm::findShortestCandidates(Positions& candidates,
         candidates.push_back(p);
       p = p.next(d);
     }
+    return true;
   }
-  return true;
 #endif
+  /* 初期化 */
   candidates.clear();
   const auto known_only = false;
   /* no diag */
@@ -333,9 +337,6 @@ bool SearchAlgorithm::findShortestCandidates(Positions& candidates,
     /* 区画ベースに変換 */
     shortest_dirs = StepMapWall::convertWallIndexDirectionsToPositionDirections(
         shortest_dirs);
-    // step_map_wall.print(maze);
-    // step_map_wall.print(maze, shortest_dirs);
-    // getc(stdin);
     /* 最短経路中の未知壁区画を訪問候補に追加 */
     auto p = maze.getStart();
     for (const auto d : shortest_dirs) {

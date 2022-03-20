@@ -286,15 +286,11 @@ class StepMapSlalom {
    * @brief 最短経路を導出する
    * @param maze 迷路オブジェクト
    * @param edge_cost エッジコストオブジェクト
-   * @param shortest_dirs 最短経路を格納するための動的配列
    * @param known_only 既知壁のみを通行可能とする
-   * @return true 成功
-   * @return false 失敗．ゴールにたどり着けなかった
    */
-  bool calcShortestDirections(const Maze& maze,
-                              const EdgeCost& edge_cost,
-                              Directions& shortest_dirs,
-                              const bool known_only);
+  Directions calcShortestDirections(const Maze& maze,
+                                    const EdgeCost& edge_cost,
+                                    const bool known_only);
   /**
    * @brief コストマップを辿って経路を生成する
    * @param path 経路を格納する配列

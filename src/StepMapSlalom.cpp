@@ -92,17 +92,15 @@ std::ostream& operator<<(std::ostream& os, const StepMapSlalom::Index& i) {
 
 /* StepMapSlalom */
 
-bool StepMapSlalom::calcShortestDirections(const Maze& maze,
-                                           const EdgeCost& edge_cost,
-                                           Directions& shortest_dirs,
-                                           const bool known_only) {
+Directions StepMapSlalom::calcShortestDirections(const Maze& maze,
+                                                 const EdgeCost& edge_cost,
+                                                 const bool known_only) {
   const auto dest = convertDestinations(maze.getGoals());
   update(maze, edge_cost, dest, known_only);
   Indexes path;
   if (!genPathFromMap(path))
-    return false;
-  shortest_dirs = indexes2directions(path);
-  return true;
+    return {};
+  return indexes2directions(path); /*< 区画ベースの方向列 */
 }
 void StepMapSlalom::update(const Maze& maze,
                            const EdgeCost& edge_cost,
@@ -372,6 +370,7 @@ StepMapSlalom::Indexes StepMapSlalom::convertDestinations(
 }
 Directions StepMapSlalom::indexes2directions(const Indexes& path) {
   Directions dirs;
+  dirs.reserve(path.size());
   for (int i = 0; i < (int)path.size() - 1; ++i) {
     const auto nd = path[i].getNodeDirection();
     const auto rel_p = path[i + 1].getPosition() - path[i].getPosition();
