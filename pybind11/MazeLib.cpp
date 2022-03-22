@@ -86,7 +86,7 @@ PYBIND11_MODULE(MazeLib, m) {
                                                               py::const_),
            py::arg("d"), py::arg("center") = Position())
       .def("__str__",
-           [](const Position& obj) {
+           [](const Position obj) {
              std::stringstream ss;
              ss << obj;
              return ss.str();
@@ -97,7 +97,7 @@ PYBIND11_MODULE(MazeLib, m) {
 
   /* Pose */
   py::class_<Pose>(m, "Pose")
-      .def(py::init<Position&, Direction>(), py::arg("p") = Position(),
+      .def(py::init<Position, Direction>(), py::arg("p") = Position(),
            py::arg("d") = Direction())
       .def_readwrite("p", &Pose::p)
       .def_readwrite("d", &Pose::d)
@@ -118,7 +118,7 @@ PYBIND11_MODULE(MazeLib, m) {
       //  .def(py::init<int8_t, int8_t, int8_t>(), py::arg("x") = 0,
       //       py::arg("y") = 0, py::arg("z") = 0)
       .def(py::init<int8_t, int8_t, int8_t>())
-      .def(py::init<const Position&, const Direction>())
+      .def(py::init<const Position, const Direction>())
       //  .def(py::init<const uint16_t>())
       .def(py::init<const uint16_t>(), py::arg("index") = 0)
       .def(py::self == py::self)
@@ -144,7 +144,7 @@ PYBIND11_MODULE(MazeLib, m) {
       .def(py::init<>())
       .def(py::init<int8_t, int8_t, Direction, bool>(), py::arg("x") = 0,
            py::arg("y") = 0, py::arg("d") = 0, py::arg("b") = false)
-      .def(py::init<const Position&, const Direction, bool>())
+      .def(py::init<const Position, const Direction, bool>())
       .def("getPosition", &WallRecord::getPosition)
       .def("getDirection", &WallRecord::getDirection)
       //
@@ -154,7 +154,7 @@ PYBIND11_MODULE(MazeLib, m) {
   /* Maze */
   py::class_<Maze>(m, "Maze")
       .def(py::init<>())
-      .def(py::init<const Positions&, const Position&>(),  //
+      .def(py::init<const Positions&, const Position>(),  //
            py::arg("goals") = Positions(), py::arg("start") = Position(0, 0))
       .def("reset", &Maze::reset, py::arg("set_start_wall") = true,
            py::arg("set_range_full") = false)
@@ -216,7 +216,7 @@ PYBIND11_MODULE(MazeLib, m) {
              maze.print(std::cout, maze_size);
            })
       .def("print",
-           [](const Maze& maze, const Directions& dirs, const Position& start,
+           [](const Maze& maze, const Directions& dirs, const Position start,
               const int maze_size) {
              py::scoped_ostream_redirect stream(
                  std::cout, py::module::import("sys").attr("stdout"));

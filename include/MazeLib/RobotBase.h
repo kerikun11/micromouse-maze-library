@@ -55,12 +55,11 @@ class RobotBase : public Agent {
   };
   static const char* getSearchActionName(enum SearchAction action);
   static const char* getFastActionName(enum FastAction action);
-
-  static std::string pathConvertSearchToFast(std::string src,
-                                             const bool diag_enabled);
-  static std::string pathConvertSearchToKnown(std::string src,
-                                              const bool diag_enabled);
   static std::string convertDirectionsToSearchPath(const Directions& dirs);
+  static std::string convertSearchPathToFastPath(std::string src,
+                                                 const bool diag_enabled);
+  static std::string convertSearchPathToKnownPath(std::string src,
+                                                  const bool diag_enabled);
 
  public:
   RobotBase() { reset(); }
@@ -68,33 +67,33 @@ class RobotBase : public Agent {
   bool searchRun();
   bool positionIdentifyRun();
   bool endFastRunBackingToStartRun();
-  void setBreakFlag(const bool break_flag = true) {
-    this->break_flag = break_flag;
+  void setBreakFlag(const bool breakFlag = true) {
+    this->breakFlag = breakFlag;
   }
 
  protected:
-  bool break_flag = false; /*< 探索を中断させるフラグ */
-
   /**
    * @brief 仮想関数．継承して中身を埋める
    */
   virtual void calibration() {}
   virtual void queueAction(const SearchAction action __attribute__((unused))) {}
   virtual void startDequeue() {}
+  virtual void stopDequeue() {}
   virtual void waitForEndAction() {}
+  virtual void backupMazeToFlash() {}
+  virtual void discrepancyWithKnownWall() {}
   virtual void senseWalls(bool& left __attribute__((unused)),
                           bool& front __attribute__((unused)),
                           bool& right __attribute__((unused))) {}
-  virtual void stopDequeue() {}
   virtual void calcNextDirectionsPreCallback() {}
   virtual void calcNextDirectionsPostCallback(SearchAlgorithm::State oldState
                                               __attribute__((unused)),
                                               SearchAlgorithm::State newState
                                               __attribute__((unused))) {}
-  virtual void discrepancyWithKnownWall() {}
-  virtual void backupMazeToFlash() {}
 
  protected:
+  bool breakFlag = false; /*< @brief 探索を中断させるフラグ */
+
   /**
    * @brief 処理関数
    */
@@ -113,19 +112,7 @@ class RobotBase : public Agent {
    */
   static int replace(std::string& src,
                      const std::string& from,
-                     const std::string& to) {
-    if (from.empty())
-      return 0;
-    auto pos = src.find(from);
-    auto toLen = to.size();
-    int i = 0;
-    while ((pos = src.find(from, pos)) != std::string::npos) {
-      src.replace(pos, from.size(), to);
-      pos += toLen;
-      i++;
-    }
-    return i;
-  }
+                     const std::string& to);
   /**
    * @brief 探索パターンを最短パターンに変換する関数
    *

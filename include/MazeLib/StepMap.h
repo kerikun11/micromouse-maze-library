@@ -75,20 +75,20 @@ class StepMap {
    * @param p ハイライト区画
    */
   void print(const Maze& maze,
-             const Position& p = Position(-1, -1),
+             const Position p = Position(-1, -1),
              const Direction d = Direction::Max,
              std::ostream& os = std::cout) const;
   void print(const Maze& maze,
              const Directions& dirs,
-             const Position& start = Position(0, 0),
+             const Position start = Position(0, 0),
              std::ostream& os = std::cout) const;
   void printFull(const Maze& maze,
-                 const Position& p = Position(-1, -1),
+                 const Position p = Position(-1, -1),
                  const Direction d = Direction::Max,
                  std::ostream& os = std::cout) const;
   void printFull(const Maze& maze,
                  const Directions& dirs,
-                 const Position& start = Position(0, 0),
+                 const Position start = Position(0, 0),
                  std::ostream& os = std::cout) const;
   /**
    * @brief ステップマップの更新
@@ -110,7 +110,7 @@ class StepMap {
    *                    経路がない場合は空配列となる．
    */
   Directions calcShortestDirections(const Maze& maze,
-                                    const Position& start,
+                                    const Position start,
                                     const Positions& dest,
                                     const bool known_only,
                                     const bool simple);

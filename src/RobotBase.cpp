@@ -76,27 +76,6 @@ const char* RobotBase::getFastActionName(enum FastAction action) {
   }
 }
 
-std::string RobotBase::pathConvertSearchToFast(std::string src,
-                                               const bool diag_enabled) {
-  /* 前後に半分の直線を追加 */
-  src = (char)F_ST_HALF + src + (char)F_ST_HALF;
-  return replaceStringSearchToFast(src, diag_enabled);
-}
-std::string RobotBase::pathConvertSearchToKnown(std::string src,
-                                                const bool diag_enabled) {
-  /* 直線を半区画に統一 */
-  replace(src, "S", "ss");
-  /* 初手ターンを防ぐため、直線を探す */
-  auto f = src.find_first_of(F_ST_HALF, 1); /*< 最初の直線を探す */
-  auto b = src.find_last_of(F_ST_HALF);     /*< 最後の直線を探す */
-  if (f >= b)
-    return src; /*< 直線なし */
-  /* 前後のターンを除いた、直線に挟まれた区間を抽出 */
-  auto fb = src.substr(f, b - f + 1);
-  fb = replaceStringSearchToFast(fb, diag_enabled); /*< 最短パターンに変換 */
-  /* 最初の直線前と最後の直線後を連結して完了 */
-  return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
-}
 std::string RobotBase::convertDirectionsToSearchPath(const Directions& dirs) {
   if (dirs.empty())
     return "";
@@ -119,6 +98,27 @@ std::string RobotBase::convertDirectionsToSearchPath(const Directions& dirs) {
     prevDir = nextDir;
   }
   return path;
+}
+std::string RobotBase::convertSearchPathToFastPath(std::string src,
+                                                   const bool diag_enabled) {
+  /* 前後に半分の直線を追加 */
+  src = (char)F_ST_HALF + src + (char)F_ST_HALF;
+  return replaceStringSearchToFast(src, diag_enabled);
+}
+std::string RobotBase::convertSearchPathToKnownPath(std::string src,
+                                                    const bool diag_enabled) {
+  /* 直線を半区画に統一 */
+  replace(src, "S", "ss");
+  /* 初手ターンを防ぐため、直線を探す */
+  auto f = src.find_first_of(F_ST_HALF, 1); /*< 最初の直線を探す */
+  auto b = src.find_last_of(F_ST_HALF);     /*< 最後の直線を探す */
+  if (f >= b)
+    return src; /*< 直線なし */
+  /* 前後のターンを除いた、直線に挟まれた区間を抽出 */
+  auto fb = src.substr(f, b - f + 1);
+  fb = replaceStringSearchToFast(fb, diag_enabled); /*< 最短パターンに変換 */
+  /* 最初の直線前と最後の直線後を連結して完了 */
+  return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
 }
 
 void RobotBase::reset() {
@@ -186,7 +186,7 @@ void RobotBase::turnbackSave() {
   queueAction(ST_HALF_STOP);
   waitForEndAction();
   stopDequeue();
-  if (break_flag)
+  if (breakFlag)
     return;
   backupMazeToFlash();
   queueAction(ROTATE_180);
@@ -195,7 +195,7 @@ void RobotBase::turnbackSave() {
 }
 void RobotBase::queueNextDirections(const Directions& nextDirections) {
   for (const auto nextDirection : nextDirections) {
-    if (break_flag)
+    if (breakFlag)
       return;
     const auto relative_d = Direction(nextDirection - current_pose.d);
     switch (relative_d) {
@@ -243,7 +243,7 @@ bool RobotBase::generalSearchRun() {
     if (status == SearchAlgorithm::Reached)
       break;
     /* 探索中断を確認 */
-    if (break_flag) {
+    if (breakFlag) {
       maze_logw << "the break flag was set" << std::endl;
       stopDequeue();
       return false;
@@ -271,18 +271,33 @@ bool RobotBase::generalSearchRun() {
   stopDequeue();
   /* 迷路情報の保存 */
   backupMazeToFlash();
-  if (break_flag) {
+  if (breakFlag) {
     maze_logw << "the break flag was set" << std::endl;
     return false;
   }
   return true;
 }
 
+int RobotBase::replace(std::string& src,
+                       const std::string& from,
+                       const std::string& to) {
+  if (from.empty())
+    return 0;
+  auto pos = src.find(from);
+  auto toLen = to.size();
+  int i = 0;
+  while ((pos = src.find(from, pos)) != std::string::npos) {
+    src.replace(pos, from.size(), to);
+    pos += toLen;
+    i++;
+  }
+  return i;
+}
 std::string RobotBase::replaceStringSearchToFast(std::string src,
                                                  bool diag_enabled) {
-  replace(src, "S", "ss");
-  replace(src, "L", "ll");
-  replace(src, "R", "rr");
+  replace(src, "S", "ss"); /*< expand */
+  replace(src, "L", "ll"); /*< expand */
+  replace(src, "R", "rr"); /*< expand */
   if (diag_enabled) {
     replace(src, "rllllr", "rlplr"); /**< FV90 */
     replace(src, "lrrrrl", "lrPrl"); /**< FV90 */
@@ -300,9 +315,9 @@ std::string RobotBase::replaceStringSearchToFast(std::string src,
     replace(src, "lrrl", "lrwrl");   /*< ST_DIAG */
     replace(src, "slls", "q");       /*< F90 */
     replace(src, "srrs", "Q");       /*< F90 */
-    replace(src, "rl", "");
-    replace(src, "lr", "");
-    replace(src, "ss", "S");
+    replace(src, "rl", "");          /*< cleaning */
+    replace(src, "lr", "");          /*< cleaning */
+    replace(src, "ss", "S");         /*< ST_FULL */
   } else {
     replace(src, "slllls", "u"); /*< F180 */
     replace(src, "srrrrs", "U"); /*< F180 */

@@ -71,7 +71,7 @@ class Agent {
                   const bool right) {
     return searchAlgorithm.updateWall(getState(), pose, left, front, right);
   }
-  bool updateWall(const Position& p, const Direction d, const bool b) {
+  bool updateWall(const Position p, const Direction d, const bool b) {
     return searchAlgorithm.updateWall(getState(), p, d, b);
   }
   /**

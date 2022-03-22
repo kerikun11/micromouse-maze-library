@@ -306,7 +306,7 @@ class MazeSimulator : public MazeLib::RobotBase {
                   p1.y() + cell2posY(p.y) - wall_unit_px / 2);
   }
   QGraphicsItem* addWall(QGraphicsScene* scene,
-                         MazeLib::Pose pose,
+                         const MazeLib::Pose& pose,
                          const QPen& pen) {
     int x = pose.p.x;
     int y = pose.p.y;

@@ -287,7 +287,7 @@ void Maze::print(std::ostream& os, const int maze_size) const {
   }
 }
 void Maze::print(const Directions& dirs,
-                 const Position& start,
+                 const Position start,
                  std::ostream& os,
                  const size_t maze_size) const {
   /* preparation */
@@ -350,7 +350,7 @@ void Maze::print(const Positions& positions,
                  std::ostream& os,
                  const size_t maze_size) const {
   /* preparation */
-  const auto exists = [&](const Position& p) {
+  const auto exists = [&](const Position p) {
     return std::find(positions.cbegin(), positions.cend(), p) !=
            positions.cend();
   };

@@ -300,6 +300,14 @@ struct Position {
    * @brief stream での表示． (  x,  y) の形式
    */
   friend std::ostream& operator<<(std::ostream& os, const Position p);
+  /**
+   * @brief 表示用文字列に変換する
+   */
+  const char* toString() const {
+    static char str[32];
+    snprintf(str, sizeof(str), "(%02d, %02d)", x, y);
+    return str;
+  }
 };
 static_assert(sizeof(Position) == 2, "size error"); /**< @brief size check */
 
@@ -339,8 +347,18 @@ struct Pose {
   Pose next(const Direction next_direction) const {
     return Pose(p.next(next_direction), next_direction);
   }
-  /** @brief stream での表示 */
+  /**
+   * @brief ostream での表示
+   */
   friend std::ostream& operator<<(std::ostream& os, const Pose& pose);
+  /**
+   * @brief 表示用文字列に変換する
+   */
+  const char* toString() const {
+    static char str[32];
+    snprintf(str, sizeof(str), "(%02d, %02d, %c)", p.x, p.y, d.toChar());
+    return str;
+  }
 };
 static_assert(sizeof(Pose) == 4, "size error"); /**< @brief size check */
 
@@ -406,7 +424,7 @@ struct WallIndex {
    * @param p 区画位置
    * @param d 区画内方向．4方位
    */
-  WallIndex(const Position& p, const Direction d) : x(p.x), y(p.y) {
+  WallIndex(const Position p, const Direction d) : x(p.x), y(p.y) {
     uniquify(d);
   }
   /**
@@ -686,7 +704,7 @@ class Maze {
    * @param os output-stream
    */
   void print(const Directions& dirs,
-             const Position& start = Position(0, 0),
+             const Position start = Position(0, 0),
              std::ostream& os = std::cout,
              const size_t maze_size = MAZE_SIZE) const;
   /**
@@ -737,7 +755,7 @@ class Maze {
   /**
    * @brief スタート区画を更新
    */
-  void setStart(const Position& start) { this->start = start; }
+  void setStart(const Position start) { this->start = start; }
   /**
    * @brief ゴール区画の集合を取得
    */

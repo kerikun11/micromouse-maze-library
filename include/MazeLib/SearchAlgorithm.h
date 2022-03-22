@@ -79,7 +79,7 @@ class SearchAlgorithm {
                   const bool front,
                   const bool right);
   bool updateWall(const State state,
-                  const Position& p,
+                  const Position p,
                   const Direction d,
                   const bool b);
   /**
@@ -208,9 +208,8 @@ class SearchAlgorithm {
    * @param target_pose 検索対象の区画と方向
    * @return const Directions 注目する区画からの方向列
    */
-  const Directions findMatchDirectionCandidates(
-      const Position& current_position,
-      const Pose& target_pose) const;
+  const Directions findMatchDirectionCandidates(const Position current_position,
+                                                const Pose& target_pose) const;
 
   /**
    * @brief 各状態での進行方向列導出関数

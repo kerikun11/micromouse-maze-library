@@ -59,7 +59,7 @@ bool SearchAlgorithm::updateWall(const State state,
   return result;
 }
 bool SearchAlgorithm::updateWall(const State state,
-                                 const Position& p,
+                                 const Position p,
                                  const Direction d,
                                  const bool b) {
   auto& m = (state == IDENTIFYING_POSITION) ? idMaze : maze;
@@ -396,7 +396,7 @@ int SearchAlgorithm::countIdentityCandidates(const WallRecords& idWallRecords,
   return candidates_count;
 }
 const Directions SearchAlgorithm::findMatchDirectionCandidates(
-    const Position& current_position,
+    const Position current_position,
     const Pose& target) const {
   const int min_diff = 0; /*< 許容食い違い壁数 */
   /* パターンマッチング開始 */

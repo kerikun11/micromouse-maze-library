@@ -19,14 +19,14 @@ StepMap::StepMap() {
   reset();
 }
 void StepMap::print(const Maze& maze,
-                    const Position& p,
+                    const Position p,
                     const Direction d,
                     std::ostream& os) const {
   return print(maze, {d}, p.next(d + Direction::Back), os);
 }
 void StepMap::print(const Maze& maze,
                     const Directions& dirs,
-                    const Position& start,
+                    const Position start,
                     std::ostream& os) const {
   /* preparation */
   std::vector<Pose> path;
@@ -85,14 +85,14 @@ void StepMap::print(const Maze& maze,
   }
 }
 void StepMap::printFull(const Maze& maze,
-                        const Position& p,
+                        const Position p,
                         const Direction d,
                         std::ostream& os) const {
   return printFull(maze, {d}, p.next(d + Direction::Back), os);
 }
 void StepMap::printFull(const Maze& maze,
                         const Directions& dirs,
-                        const Position& start,
+                        const Position start,
                         std::ostream& os) const {
   /* preparation */
   std::vector<Pose> path;
@@ -199,7 +199,7 @@ void StepMap::update(const Maze& maze,
   }
 }
 Directions StepMap::calcShortestDirections(const Maze& maze,
-                                           const Position& start,
+                                           const Position start,
                                            const Positions& dest,
                                            const bool known_only,
                                            const bool simple) {
