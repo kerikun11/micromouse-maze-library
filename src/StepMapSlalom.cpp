@@ -93,19 +93,19 @@ std::ostream& operator<<(std::ostream& os, const StepMapSlalom::Index& i) {
 /* StepMapSlalom */
 
 Directions StepMapSlalom::calcShortestDirections(const Maze& maze,
-                                                 const EdgeCost& edge_cost,
-                                                 const bool known_only) {
+                                                 const EdgeCost& edgeCost,
+                                                 const bool knownOnly) {
   const auto dest = convertDestinations(maze.getGoals());
-  update(maze, edge_cost, dest, known_only);
+  update(maze, edgeCost, dest, knownOnly);
   Indexes path;
   if (!genPathFromMap(path))
     return {};
   return indexes2directions(path); /*< 区画ベースの方向列 */
 }
 void StepMapSlalom::update(const Maze& maze,
-                           const EdgeCost& edge_cost,
+                           const EdgeCost& edgeCost,
                            const Indexes& dest,
-                           const bool known_only) {
+                           const bool knownOnly) {
   /* 全ノードのコストを最大値に設定 */
   const auto cost = CostMax;
   cost_map.fill(cost);
@@ -126,9 +126,9 @@ void StepMapSlalom::update(const Maze& maze,
     cost_map[i.getIndex()] = 0;
     q.push(i);
   }
-  /* known_only を考慮した壁の判定式を用意 */
+  /* knownOnly を考慮した壁の判定式を用意 */
   const auto canGo = [&](const WallIndex& i) {
-    if (maze.isWall(i) || (known_only && !maze.isKnown(i)))
+    if (maze.isWall(i) || (knownOnly && !maze.isKnown(i)))
       return false;
     return true;
   };
@@ -146,8 +146,8 @@ void StepMapSlalom::update(const Maze& maze,
     const auto focus_cost = cost_map[focus.getIndex()];
     /* キューに追加する関数を用意 */
     const auto pushAndContinue = [&](const Index& next,
-                                     const cost_t edge_cost) {
-      const auto next_cost = focus_cost + edge_cost;
+                                     const cost_t edgeCost) {
+      const auto next_cost = focus_cost + edgeCost;
       const auto next_index = next.getIndex();
       if (cost_map[next_index] <= next_cost)
         return false;
@@ -165,7 +165,7 @@ void StepMapSlalom::update(const Maze& maze,
       int8_t n = 1;
       for (auto i = focus; canGo(i); ++n) {
         const auto next = i.next(nd);
-        if (!pushAndContinue(next, edge_cost.getEdgeCostAlong(n)))
+        if (!pushAndContinue(next, edgeCost.getEdgeCostAlong(n)))
           break;
         i = next;
       }
@@ -180,19 +180,19 @@ void StepMapSlalom::update(const Maze& maze,
         if (canGo(i45)) {
           /* 45 */
           if (canGo(i45.next(i45.getNodeDirection())))
-            pushAndContinue(i45, edge_cost.getEdgeCostSlalom(F45));
+            pushAndContinue(i45, edgeCost.getEdgeCostSlalom(F45));
           /* 90 */
           const auto v90 = focus.getPosition().next(nd).next(d90);
-          pushAndContinue(Index(v90, d90), edge_cost.getEdgeCostSlalom(F90));
+          pushAndContinue(Index(v90, d90), edgeCost.getEdgeCostSlalom(F90));
           /* 135 and 180 */
           const auto i135 = i45.next(d135);
           if (canGo(i135)) {
             /* 135 */
             if (canGo(i135.next(i135.getNodeDirection())))
-              pushAndContinue(i135, edge_cost.getEdgeCostSlalom(F135));
+              pushAndContinue(i135, edgeCost.getEdgeCostSlalom(F135));
             /* 180 */
             pushAndContinue(Index(v90.next(d180), d180),
-                            edge_cost.getEdgeCostSlalom(F180));
+                            edgeCost.getEdgeCostSlalom(F180));
           }
         }
       }
@@ -209,7 +209,7 @@ void StepMapSlalom::update(const Maze& maze,
         const auto next = i.next(nd);
         if (!canGo(next))
           break;
-        if (!pushAndContinue(i, edge_cost.getEdgeCostDiag(n)))
+        if (!pushAndContinue(i, edgeCost.getEdgeCostDiag(n)))
           break;
         i = next;
       }
@@ -219,15 +219,15 @@ void StepMapSlalom::update(const Maze& maze,
       auto d90 = nd + nd_r45 * 2;
       auto d135 = nd + nd_r45 * 3;
       /* 45R */
-      pushAndContinue(focus.next(d45), edge_cost.getEdgeCostSlalom(F45));
+      pushAndContinue(focus.next(d45), edgeCost.getEdgeCostSlalom(F45));
       /* V90, 135R */
       const auto i90 = i_f.next(d90);
       if (canGo(i90)) {
         /* V90 */
         if (canGo(i90.next(i90.getNodeDirection())))
-          pushAndContinue(i90, edge_cost.getEdgeCostSlalom(FV90));
+          pushAndContinue(i90, edgeCost.getEdgeCostSlalom(FV90));
         /* 135 R */
-        pushAndContinue(focus.next(d135), edge_cost.getEdgeCostSlalom(F135));
+        pushAndContinue(focus.next(d135), edgeCost.getEdgeCostSlalom(F135));
       }
     }
   }

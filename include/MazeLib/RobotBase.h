@@ -57,9 +57,9 @@ class RobotBase : public Agent {
   static const char* getFastActionName(enum FastAction action);
   static std::string convertDirectionsToSearchPath(const Directions& dirs);
   static std::string convertSearchPathToFastPath(std::string src,
-                                                 const bool diag_enabled);
+                                                 const bool diagEnabled);
   static std::string convertSearchPathToKnownPath(std::string src,
-                                                  const bool diag_enabled);
+                                                  const bool diagEnabled);
 
  public:
   RobotBase() { reset(); }
@@ -117,11 +117,11 @@ class RobotBase : public Agent {
    * @brief 探索パターンを最短パターンに変換する関数
    *
    * @param src { s, S, L, R} からなる探索パターン文字列
-   * @param diag_enabled 斜めありかどうか
+   * @param diagEnabled 斜めありかどうか
    * @return std::string 最短パターン文字列
    */
   static std::string replaceStringSearchToFast(std::string src,
-                                               const bool diag_enabled);
+                                               const bool diagEnabled);
 };
 
 }  // namespace MazeLib

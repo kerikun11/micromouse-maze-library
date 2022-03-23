@@ -66,8 +66,8 @@ void thread_maze(const std::string& name) {
   robot.printSearchResult();
 #if 1
   /* Fast Run */
-  for (const auto diag_enabled : {false, true})
-    robot.fastRun(diag_enabled);
+  for (const auto diagEnabled : {false, true})
+    robot.fastRun(diagEnabled);
   /* Position Identification Run */
   robot.positionIdentifyRun();
 #endif

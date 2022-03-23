@@ -100,13 +100,13 @@ std::string RobotBase::convertDirectionsToSearchPath(const Directions& dirs) {
   return path;
 }
 std::string RobotBase::convertSearchPathToFastPath(std::string src,
-                                                   const bool diag_enabled) {
+                                                   const bool diagEnabled) {
   /* 前後に半分の直線を追加 */
   src = (char)F_ST_HALF + src + (char)F_ST_HALF;
-  return replaceStringSearchToFast(src, diag_enabled);
+  return replaceStringSearchToFast(src, diagEnabled);
 }
 std::string RobotBase::convertSearchPathToKnownPath(std::string src,
-                                                    const bool diag_enabled) {
+                                                    const bool diagEnabled) {
   /* 直線を半区画に統一 */
   replace(src, "S", "ss");
   /* 初手ターンを防ぐため、直線を探す */
@@ -116,7 +116,7 @@ std::string RobotBase::convertSearchPathToKnownPath(std::string src,
     return src; /*< 直線なし */
   /* 前後のターンを除いた、直線に挟まれた区間を抽出 */
   auto fb = src.substr(f, b - f + 1);
-  fb = replaceStringSearchToFast(fb, diag_enabled); /*< 最短パターンに変換 */
+  fb = replaceStringSearchToFast(fb, diagEnabled); /*< 最短パターンに変換 */
   /* 最初の直線前と最後の直線後を連結して完了 */
   return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
 }
@@ -197,7 +197,7 @@ void RobotBase::queueNextDirections(const Directions& nextDirections) {
   for (const auto nextDirection : nextDirections) {
     if (breakFlag)
       return;
-    const auto relative_d = Direction(nextDirection - current_pose.d);
+    const auto relative_d = Direction(nextDirection - currentPose.d);
     switch (relative_d) {
       case Direction::Front:
         queueAction(ST_FULL);
@@ -214,7 +214,7 @@ void RobotBase::queueNextDirections(const Directions& nextDirections) {
       default:
         maze_loge << "invalid direction" << std::endl;
     }
-    updateCurrentPose(current_pose.next(nextDirection));
+    updateCurrentPose(currentPose.next(nextDirection));
   }
 }
 bool RobotBase::generalSearchRun() {
@@ -251,11 +251,11 @@ bool RobotBase::generalSearchRun() {
     /* 壁を確認 */
     bool left, front, right;
     senseWalls(left, front, right);
-    if (!updateWall(current_pose, left, front, right))
+    if (!updateWall(currentPose, left, front, right))
       discrepancyWithKnownWall();
     /* 壁のない方向へ1マス移動 */
     Direction nextDirection;
-    if (!determineNextDirection(current_pose, nextDirection)) {
+    if (!determineNextDirection(currentPose, nextDirection)) {
       maze_logw << "I can't go anywhere!" << std::endl;
       stopDequeue();
       return false;
@@ -294,11 +294,11 @@ int RobotBase::replace(std::string& src,
   return i;
 }
 std::string RobotBase::replaceStringSearchToFast(std::string src,
-                                                 bool diag_enabled) {
+                                                 bool diagEnabled) {
   replace(src, "S", "ss"); /*< expand */
   replace(src, "L", "ll"); /*< expand */
   replace(src, "R", "rr"); /*< expand */
-  if (diag_enabled) {
+  if (diagEnabled) {
     replace(src, "rllllr", "rlplr"); /**< FV90 */
     replace(src, "lrrrrl", "lrPrl"); /**< FV90 */
     replace(src, "sllr", "zlr");     /*< F45 */

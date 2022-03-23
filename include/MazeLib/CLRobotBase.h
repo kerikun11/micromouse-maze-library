@@ -24,18 +24,18 @@ class CLRobotBase : public RobotBase {
   CLRobotBase(Maze& maze_target) : maze_target(maze_target) {
     replaceGoals(maze_target.getGoals());
   }
-  void printInfo(const bool show_maze = true) {
-    RobotBase::printInfo(show_maze);
+  void printInfo(const bool showMaze = true) {
+    RobotBase::printInfo(showMaze);
     printSearchResult();
   }
-  void printInfoDoubleMaze(const bool show_maze = true) {
-    if (show_maze) {
+  void printInfoDoubleMaze(const bool showMaze = true) {
+    if (showMaze) {
       std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
       printDoubleMaze(
           {&maze_target, getState() == SearchAlgorithm::IDENTIFYING_POSITION
                              ? &getSearchAlgorithm().getIdMaze()
                              : &maze},
-          {&real, &current_pose},
+          {&real, &currentPose},
           {&getSearchAlgorithm().getStepMap(),
            &getSearchAlgorithm().getStepMap()},
           std::cout);
@@ -50,23 +50,23 @@ class CLRobotBase : public RobotBase {
         int(cost / 60) % 60, int(cost) % 60, step, f, l, r, b,
         int(maze.getWallRecords().size()));
   }
-  void printFastResult(const bool diag_enabled, const bool show_maze = false) {
+  void printFastResult(const bool diagEnabled, const bool showMaze = false) {
     /* 最短走行時間の表示 */
     const auto path_cost = getSearchAlgorithm().getShortestCost();
-    std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
+    std::cout << "PathCost " << (diagEnabled ? "diag" : "no_d") << ":\t"
               << path_cost << "\t[ms]" << std::endl;
-    if (show_maze) {
+    if (showMaze) {
       printPath();
     }
     /* 最短経路の比較 */
     const auto p_at = std::make_unique<Agent>(maze_target);
     Agent& at = *p_at;
-    at.calcShortestDirections(diag_enabled);
-    calcShortestDirections(diag_enabled);
+    at.calcShortestDirections(diagEnabled);
+    calcShortestDirections(diagEnabled);
     if (at.getSearchAlgorithm().getShortestCost() !=
         getSearchAlgorithm().getShortestCost()) {
       maze_logw << "searched path is not shortest! "
-                << (diag_enabled ? "(diag)" : "(no_diag)") << std::endl;
+                << (diagEnabled ? "(diag)" : "(no_diag)") << std::endl;
       maze_logw << "real: " << at.getSearchAlgorithm().getShortestCost()
                 << " searched: " << getSearchAlgorithm().getShortestCost()
                 << std::endl;
@@ -80,9 +80,9 @@ class CLRobotBase : public RobotBase {
     }
     return true;
   }
-  bool fastRun(const bool diag_enabled) {
+  bool fastRun(const bool diagEnabled) {
     /* 最短経路の導出 */
-    if (!calcShortestDirections(diag_enabled)) {
+    if (!calcShortestDirections(diagEnabled)) {
       maze_logw << "Failed to find shortest path!" << std::endl;
       return false;
     }
@@ -141,7 +141,7 @@ class CLRobotBase : public RobotBase {
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
-      updateWall(current_pose.p.next(current_pose.d), current_pose.d,
+      updateWall(currentPose.p.next(currentPose.d), currentPose.d,
                  !maze_target.canGo(real.p.next(real.d), real.d));
 #endif
   }
@@ -181,7 +181,7 @@ class CLRobotBase : public RobotBase {
     if (unknown_accel_prev && action_prev == SearchAction::ST_FULL &&
         action != SearchAction::ST_FULL &&
         getNextDirectionsKnown().size() == 0 &&
-        !maze.isWall(current_pose.p, current_pose.d)) {
+        !maze.isWall(currentPose.p, currentPose.d)) {
       printInfo();
       maze_logw << "not straight in unknown accel" << std::endl;
       getc(stdin);
@@ -191,7 +191,7 @@ class CLRobotBase : public RobotBase {
                          getUnknownAccelFlag();
 #endif
     const auto goals = maze.getGoals();
-    if (std::find(goals.cbegin(), goals.cend(), current_pose.p) != goals.cend())
+    if (std::find(goals.cbegin(), goals.cend(), currentPose.p) != goals.cend())
       real_visit_goal = true;
     cost += getTimeCost(action);
     switch (action) {
@@ -255,8 +255,8 @@ class CLRobotBase : public RobotBase {
   }
   virtual void crashed() {
     maze_loge << "The robot crashed into the wall! fake_offset:\t"
-              << fake_offset << "\tcur:\t" << current_pose << "\treal:\t"
-              << real << std::endl;
+              << fake_offset << "\tcur:\t" << currentPose << "\treal:\t" << real
+              << std::endl;
     setBreakFlag();
   }
   virtual float getTimeCost(const SearchAction action) {

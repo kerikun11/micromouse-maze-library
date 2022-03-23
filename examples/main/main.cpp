@@ -81,11 +81,11 @@ int main(int argc, char* argv[]) {
       "Left: %3d, Right: %3d, Back: %3d\n",
       ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step, robot.f,
       robot.l, robot.r, robot.b);
-  for (bool diag_enabled : {false, true}) {
-    robot.calcShortestDirections(diag_enabled);
+  for (bool diagEnabled : {false, true}) {
+    robot.calcShortestDirections(diagEnabled);
     robot.printPath();
     std::cout << "Estimated Shortest Time "
-              << (diag_enabled ? "(diag)" : "(no diag)") << ": "
+              << (diagEnabled ? "(diag)" : "(no diag)") << ": "
               << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
               << std::endl;
   }
@@ -94,18 +94,18 @@ int main(int argc, char* argv[]) {
 #if 0
   /* StepMap */
   for (const auto simple : {true, false}) {
-    const bool known_only = 0;
+    const bool knownOnly = 0;
     const Maze &maze = maze_target;
     const auto p = std::make_unique<StepMap>();
     StepMap &map = *p;
     std::chrono::microseconds sum{0};
     const int n = 100;
-    Directions shortest_dirs;
+    Directions shortestDirections;
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
-      shortest_dirs = map.calcShortestDirections(
-          maze, maze.getStart(), maze.getGoals(), known_only, simple);
-      if (shortest_dirs.empty())
+      shortestDirections = map.calcShortestDirections(
+          maze, maze.getStart(), maze.getGoals(), knownOnly, simple);
+      if (shortestDirections.empty())
         maze_loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
@@ -114,25 +114,25 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
               << sum.count() / n << "\t[us]" << std::endl;
-    // map.print(maze, shortest_dirs);
-    maze.print(shortest_dirs);
+    // map.print(maze, shortestDirections);
+    maze.print(shortestDirections);
   }
 #endif
 
 #if 0
   /* StepMapWall */
   for (const auto simple : {true, false}) {
-    const bool known_only = 0;
+    const bool knownOnly = 0;
     const Maze &maze = maze_target;
     const auto p = std::make_unique<StepMapWall>();
     StepMapWall &map = *p;
     std::chrono::microseconds sum{0};
     const int n = 100;
-    Directions shortest_dirs;
+    Directions shortestDirections;
     for (int i = 0; i < n; ++i) {
       const auto t_s = std::chrono::system_clock().now();
-      shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
-      if (shortest_dirs.empty())
+      shortestDirections = map.calcShortestDirections(maze, knownOnly, simple);
+      if (shortestDirections.empty())
         maze_loge << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
@@ -141,14 +141,14 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t"
               << sum.count() / n << "\t[us]" << std::endl;
-    map.print(maze, shortest_dirs);
+    map.print(maze, shortestDirections);
   }
 #endif
 
 #if 0
   /* StepMapSlalom */
-  for (const auto diag_enabled : {false, true}) {
-    const bool known_only = 0;
+  for (const auto diagEnabled : {false, true}) {
+    const bool knownOnly = 0;
     const Maze &maze = maze_target;
     const auto p = std::make_unique<StepMapSlalom>();
     StepMapSlalom &map = *p;
@@ -159,20 +159,20 @@ int main(int argc, char* argv[]) {
       const auto t_s = std::chrono::system_clock().now();
       map.update(maze, StepMapSlalom::EdgeCost(),
                  StepMapSlalom::convertDestinations(maze.getGoals()),
-                 known_only, diag_enabled);
+                 knownOnly, diagEnabled);
       map.genPathFromMap(path);
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
       sum += us;
     }
-    std::cout << "StepSla " << (diag_enabled ? "diag" : "no_d") << ":\t"
+    std::cout << "StepSla " << (diagEnabled ? "diag" : "no_d") << ":\t"
               << sum.count() / n << "\t[us]" << std::endl;
     map.print(maze, path);
-    // auto shortest_dirs = map.indexes2directions(path, diag_enabled);
-    // StepMap::appendStraightDirections(maze, shortest_dirs, known_only,
-    //                                   diag_enabled);
-    // maze.print(shortest_dirs);
+    // auto shortestDirections = map.indexes2directions(path, diagEnabled);
+    // StepMap::appendStraightDirections(maze, shortestDirections, knownOnly,
+    //                                   diagEnabled);
+    // maze.print(shortestDirections);
   }
 #endif
 

@@ -82,9 +82,9 @@ class MainWindow : public QMainWindow {
       //    rp.am_d *= factor;
       //    rp.vm_a *= factor * factor;
       //    rp.vm_d *= factor * factor;
-      //    StepMapSlalom::EdgeCost edge_cost(rp);
+      //    StepMapSlalom::EdgeCost edgeCost(rp);
       const auto& maze = maze_simulator.getMazeTarget();
-      if (!maze_simulator.drawShortest(maze, true, edge_cost)) {
+      if (!maze_simulator.drawShortest(maze, true, edgeCost)) {
         QMessageBox box(QMessageBox::Warning, "Path Error",
                         "Failed to Find any Shortest Path!");
         box.exec();
@@ -102,9 +102,9 @@ class MainWindow : public QMainWindow {
       //    rp.am_d *= factor;
       //    rp.vm_a *= factor * factor;
       //    rp.vm_d *= factor * factor;
-      //    StepMapSlalom::EdgeCost edge_cost(rp);
+      //    StepMapSlalom::EdgeCost edgeCost(rp);
       const auto& maze = maze_simulator.getMazeTarget();
-      if (!maze_simulator.drawShortest(maze, false, edge_cost)) {
+      if (!maze_simulator.drawShortest(maze, false, edgeCost)) {
         QMessageBox box(QMessageBox::Warning, "Path Error",
                         "Failed to Find any Shortest Path!");
         box.exec();
@@ -229,54 +229,54 @@ class MainWindow : public QMainWindow {
   }
 
   void on_straightCostVmAlong_valueChanged(int value) {
-    auto rp = edge_cost.getRunParameter();
+    auto rp = edgeCost.getRunParameter();
     StepMapSlalom::EdgeCost::RunParameter rp_default;
     if (value > 0)
       rp.vm_a = value * StepMapSlalom::EdgeCost::RunParameter::factor;
     else
       rp.vm_a = rp_default.vm_a;
-    edge_cost.setRunParameter(rp);
+    edgeCost.setRunParameter(rp);
     /* draw */
     on_drawButton_clicked();
     on_shortestDiagButton_clicked();
     on_shortestNoDiagButton_clicked();
   }
   void on_straightCostVmDiag_valueChanged(int value) {
-    auto rp = edge_cost.getRunParameter();
+    auto rp = edgeCost.getRunParameter();
     StepMapSlalom::EdgeCost::RunParameter rp_default;
     if (value > 0)
       rp.vm_d = value * StepMapSlalom::EdgeCost::RunParameter::factor;
     else
       rp.vm_d = rp_default.vm_d;
-    edge_cost.setRunParameter(rp);
+    edgeCost.setRunParameter(rp);
     /* draw */
     on_drawButton_clicked();
     on_shortestDiagButton_clicked();
     on_shortestNoDiagButton_clicked();
   }
   void on_straightCostAmAlong_valueChanged(int value) {
-    auto rp = edge_cost.getRunParameter();
+    auto rp = edgeCost.getRunParameter();
     StepMapSlalom::EdgeCost::RunParameter rp_default;
     if (value > 0)
       rp.am_a = value * StepMapSlalom::EdgeCost::RunParameter::factor *
                 StepMapSlalom::EdgeCost::RunParameter::factor;
     else
       rp.am_a = rp_default.am_a;
-    edge_cost.setRunParameter(rp);
+    edgeCost.setRunParameter(rp);
     /* draw */
     on_drawButton_clicked();
     on_shortestDiagButton_clicked();
     on_shortestNoDiagButton_clicked();
   }
   void on_straightCostAmDiag_valueChanged(int value) {
-    auto rp = edge_cost.getRunParameter();
+    auto rp = edgeCost.getRunParameter();
     StepMapSlalom::EdgeCost::RunParameter rp_default;
     if (value > 0)
       rp.am_d = value * StepMapSlalom::EdgeCost::RunParameter::factor *
                 StepMapSlalom::EdgeCost::RunParameter::factor;
     else
       rp.am_d = rp_default.am_d;
-    edge_cost.setRunParameter(rp);
+    edgeCost.setRunParameter(rp);
     /* draw */
     on_drawButton_clicked();
     on_shortestDiagButton_clicked();
@@ -287,17 +287,17 @@ class MainWindow : public QMainWindow {
   Ui::MainWindow* ui;
   QGraphicsScene* scene;
   MazeSimulator maze_simulator;
-  StepMapSlalom::EdgeCost edge_cost;
+  StepMapSlalom::EdgeCost edgeCost;
 
   void on_slalomCostBox_valueChanged(StepMapSlalom::Slalom slalom, int value) {
-    auto rp = edge_cost.getRunParameter();
+    auto rp = edgeCost.getRunParameter();
     StepMapSlalom::EdgeCost::RunParameter rp_default;
     if (value > 0)
       rp.slalom_cost_table[slalom] =
           value / StepMapSlalom::EdgeCost::RunParameter::factor;
     else
       rp.slalom_cost_table[slalom] = rp_default.slalom_cost_table[slalom];
-    edge_cost.setRunParameter(rp);
+    edgeCost.setRunParameter(rp);
     /* draw */
     on_drawButton_clicked();
     on_shortestDiagButton_clicked();

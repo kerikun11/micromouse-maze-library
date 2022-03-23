@@ -274,23 +274,23 @@ class StepMapSlalom {
   /**
    * @brief コストマップの更新
    * @param maze 迷路オブジェクト
-   * @param edge_cost エッジコストオブジェクト
+   * @param edgeCost エッジコストオブジェクト
    * @param dest 目的地の集合
-   * @param known_only 既知壁のみを通過可能とする
+   * @param knownOnly 既知壁のみを通過可能とする
    */
   void update(const Maze& maze,
-              const EdgeCost& edge_cost,
+              const EdgeCost& edgeCost,
               const Indexes& dest,
-              const bool known_only);
+              const bool knownOnly);
   /**
    * @brief 最短経路を導出する
    * @param maze 迷路オブジェクト
-   * @param edge_cost エッジコストオブジェクト
-   * @param known_only 既知壁のみを通行可能とする
+   * @param edgeCost エッジコストオブジェクト
+   * @param knownOnly 既知壁のみを通行可能とする
    */
   Directions calcShortestDirections(const Maze& maze,
-                                    const EdgeCost& edge_cost,
-                                    const bool known_only);
+                                    const EdgeCost& edgeCost,
+                                    const bool knownOnly);
   /**
    * @brief コストマップを辿って経路を生成する
    * @param path 経路を格納する配列

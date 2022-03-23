@@ -145,7 +145,7 @@ void StepMap::printFull(const Maze& maze,
 }
 void StepMap::update(const Maze& maze,
                      const Positions& dest,
-                     const bool known_only,
+                     const bool knownOnly,
                      const bool simple) {
   /* 計算を高速化するため，迷路の大きさを制限 */
   int8_t min_x = maze.getMinX();
@@ -187,7 +187,7 @@ void StepMap::update(const Maze& maze,
       for (int8_t i = 1;; ++i) {
         /* 壁あり or 既知壁のみで未知壁 ならば次へ */
         const auto next_wi = WallIndex(next, d);
-        if (maze.isWall(next_wi) || (known_only && !maze.isKnown(next_wi)))
+        if (maze.isWall(next_wi) || (knownOnly && !maze.isKnown(next_wi)))
           break;
         next = next.next(d); /*< 移動 */
         /* 直線加速を考慮したステップを算出 */
@@ -204,15 +204,15 @@ void StepMap::update(const Maze& maze,
 Directions StepMap::calcShortestDirections(const Maze& maze,
                                            const Position start,
                                            const Positions& dest,
-                                           const bool known_only,
+                                           const bool knownOnly,
                                            const bool simple) {
   /* ステップマップを更新 */
-  update(maze, dest, known_only, simple);
+  update(maze, dest, knownOnly, simple);
   Pose end;
-  const auto shortest_dirs = getStepDownDirections(
-      maze, {start, Direction::Max}, end, known_only, false);
+  const auto shortestDirections = getStepDownDirections(
+      maze, {start, Direction::Max}, end, knownOnly, false);
   /* ゴール判定 */
-  return step_map[end.p.getIndex()] == 0 ? shortest_dirs : Directions{};
+  return step_map[end.p.getIndex()] == 0 ? shortestDirections : Directions{};
 }
 Pose StepMap::calcNextDirections(const Maze& maze,
                                  const Pose& start,
@@ -226,10 +226,10 @@ Pose StepMap::calcNextDirections(const Maze& maze,
 Directions StepMap::getStepDownDirections(const Maze& maze,
                                           const Pose& start,
                                           Pose& end,
-                                          const bool known_only,
-                                          const bool break_unknown) const {
+                                          const bool knownOnly,
+                                          const bool breakUnknown) const {
   /* ステップマップから既知区間進行方向列を生成 */
-  Directions shortest_dirs;
+  Directions shortestDirections;
   /* start から順にステップマップを下る */
   end = start;
   /* 確認 */
@@ -243,7 +243,7 @@ Directions StepMap::getStepDownDirections(const Maze& maze,
       auto next = end.p; /*< 隣接 */
       for (int8_t i = 1; i < MAZE_SIZE; ++i) {
         /* 壁あり or 既知壁のみで未知壁 ならば次へ */
-        if (maze.isWall(next, d) || (known_only && !maze.isKnown(next, d)))
+        if (maze.isWall(next, d) || (knownOnly && !maze.isKnown(next, d)))
           break;
         next = next.next(d); /*< 隣接区画へ移動 */
         /* 現時点の min_step よりステップが小さければ更新 */
@@ -259,14 +259,14 @@ Directions StepMap::getStepDownDirections(const Maze& maze,
       break;
     /* 移動分を結果に追加 */
     while (end.p != min_pose.p) {
-      /* break_unknown のとき，未知壁を含むならば既知区間は終了 */
-      if (break_unknown && maze.unknownCount(end.p))
-        return shortest_dirs;
+      /* breakUnknown のとき，未知壁を含むならば既知区間は終了 */
+      if (breakUnknown && maze.unknownCount(end.p))
+        return shortestDirections;
       end = end.next(min_pose.d);
-      shortest_dirs.push_back(min_pose.d);
+      shortestDirections.push_back(min_pose.d);
     }
   }
-  return shortest_dirs;
+  return shortestDirections;
 }
 Directions StepMap::getNextDirectionCandidates(const Maze& maze,
                                                const Pose& focus) const {
@@ -299,17 +299,17 @@ Directions StepMap::getNextDirectionCandidates(const Maze& maze,
   return dirs;
 }
 void StepMap::appendStraightDirections(const Maze& maze,
-                                       Directions& shortest_dirs,
-                                       const bool known_only,
-                                       const bool diag_enabled) {
+                                       Directions& shortestDirections,
+                                       const bool knownOnly,
+                                       const bool diagEnabled) {
   /* ゴール区画までたどる */
   auto p = maze.getStart();
-  for (const auto d : shortest_dirs)
+  for (const auto d : shortestDirections)
     p = p.next(d);
-  if (shortest_dirs.size() < 2)
+  if (shortestDirections.size() < 2)
     return;
-  auto prev_dir = shortest_dirs[shortest_dirs.size() - 1 - 1];
-  auto dir = shortest_dirs[shortest_dirs.size() - 1];
+  auto prev_dir = shortestDirections[shortestDirections.size() - 1 - 1];
+  auto dir = shortestDirections[shortestDirections.size() - 1];
   /* ゴール区画内を行けるところまで直進(斜め考慮)する */
   bool loop = true;
   while (loop) {
@@ -317,16 +317,16 @@ void StepMap::appendStraightDirections(const Maze& maze,
     /* 斜めを考慮した進行方向を列挙する */
     Directions dirs;
     const auto rel_dir = Direction(dir - prev_dir);
-    if (diag_enabled && rel_dir == Direction::Left)
+    if (diagEnabled && rel_dir == Direction::Left)
       dirs = {Direction(dir + Direction::Right), dir};
-    else if (diag_enabled && rel_dir == Direction::Right)
+    else if (diagEnabled && rel_dir == Direction::Right)
       dirs = {Direction(dir + Direction::Left), dir};
     else
       dirs = {dir};
     /* 候補のうち行ける方向に行く */
     for (const auto d : dirs) {
-      if (!maze.isWall(p, d) && (!known_only || maze.isKnown(p, d))) {
-        shortest_dirs.push_back(d);
+      if (!maze.isWall(p, d) && (!knownOnly || maze.isKnown(p, d))) {
+        shortestDirections.push_back(d);
         p = p.next(d);
         prev_dir = dir;
         dir = d;

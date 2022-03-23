@@ -48,11 +48,11 @@ class SearchAlgorithm {
    * @brief 計算結果の構造体
    */
   struct NextDirections {
-    State state = State::START;       /**< @brief 探索状態 */
-    Directions next_directions_known; /**< @brief 既地区間移動候補列 */
-    Directions next_direction_candidates; /**< @brief 未知区間移動候補順位 */
-    bool unknown_accel_flag = false; /**< @brief 未知区間加速可能フラグ */
-    int match_count = 0; /**< @brief 自己位置同定の候補数 */
+    State state = State::START;     /**< @brief 探索状態 */
+    Directions nextDirectionsKnown; /**< @brief 既地区間移動候補列 */
+    Directions nextDirectionCandidates; /**< @brief 未知区間移動候補順位 */
+    bool unknownAccelFlag = false; /**< @brief 未知区間加速可能フラグ */
+    int poseMatchCount = 0;        /**< @brief 自己位置同定の候補数 */
   };
 
  public:
@@ -90,21 +90,21 @@ class SearchAlgorithm {
    * @brief 探索状態に応じた現在姿勢の更新
    */
   void updatePose(const State& state,
-                  Pose& current_pose,
+                  Pose& currentPose,
                   bool& isForceGoingToGoal);
 
   /**
    * @brief 次に進むべき方向を計算する関数
    *
-   * @param[out] next_directions 計算結果を格納する構造体
-   * @param[inout] current_pose 現在位置（自己位置同定の場合は変更されうる）
+   * @param[out] nextDirections 計算結果を格納する構造体
+   * @param[inout] currentPose 現在位置（自己位置同定の場合は変更されうる）
    * @param[inout] isPositionIdentifying 自己位置同定フラグ
    * @param[inout] isForceBackToStart 強制帰還フラグ
    * @param[inout] isForceGoingToGoal 強制ゴール訪問フラグ
    * @return Result 計算結果
    */
-  Result calcNextDirections(NextDirections& next_directions,
-                            Pose& current_pose,
+  Result calcNextDirections(NextDirections& nextDirections,
+                            Pose& currentPose,
                             bool& isPositionIdentifying,
                             bool& isForceBackToStart,
                             bool& isForceGoingToGoal);
@@ -139,23 +139,23 @@ class SearchAlgorithm {
   /**
    * @brief 最短経路の導出
    *
-   * @param[out] shortest_dirs 最短経路を格納する方向列
-   * @param[in] diag_enabled オプション
-   * @param[in] edge_cost 加速・スラロームの重み
+   * @param[out] shortestDirections 最短経路を格納する方向列
+   * @param[in] diagEnabled オプション
+   * @param[in] edgeCost 加速・スラロームの重み
    * @return true 成功
    * @return false 失敗
    */
   bool calcShortestDirections(
-      Directions& shortest_dirs,
-      const bool diag_enabled = true,
-      const StepMapSlalom::EdgeCost& edge_cost = StepMapSlalom::EdgeCost{});
+      Directions& shortestDirections,
+      const bool diagEnabled = true,
+      const StepMapSlalom::EdgeCost& edgeCost = StepMapSlalom::EdgeCost());
 
   /**
    * @brief 自己位置同定の初期化
    *
-   * @param[out] current_pose 初期姿勢
+   * @param[out] currentPose 初期姿勢
    */
-  void positionIdentifyingInit(Pose& current_pose);
+  void positionIdentifyingInit(Pose& currentPose);
 
   /**
    * @brief 表示
@@ -170,14 +170,14 @@ class SearchAlgorithm {
   const StepMapWall& getStepMapWall() const { return step_map_wall; }
   const StepMapSlalom& getStepMapSlalom() const { return step_map_slalom; }
   const Maze& getIdMaze() const { return idMaze; }
-  uint32_t getShortestCost() const { return cost; }
+  const uint32_t& getShortestCost() const { return cost; }
 
  protected:
   Maze& maze;                /**< @brief 使用する迷路の参照 */
   StepMap step_map;          /**< @brief 使用するステップマップ */
   StepMapWall step_map_wall; /**< @brief 使用するステップマップ */
   StepMapSlalom step_map_slalom; /**< @brief 使用するステップマップ */
-  uint32_t cost;
+  uint32_t cost;                 /*< 最短経路のコストを保持 */
 
  protected:
   Maze idMaze;       /**< @brief 自己位置同定に使用する迷路 */
@@ -187,7 +187,7 @@ class SearchAlgorithm {
    * @brief ステップマップにより最短経路上になりうる区画を洗い出す
    */
   bool findShortestCandidates(Positions& candidates,
-                              const Pose& current_pose = Pose());
+                              const Pose& currentPose = Pose());
   /**
    * @brief 自己位置同定のパターンにマッチする候補をカウントする
    *
@@ -204,27 +204,27 @@ class SearchAlgorithm {
    * @brief 特定の区画にマッチする方向の候補を探す
    * スタート区画への訪問を避けるために使用する関数
    *
-   * @param current_position 注目する区画
-   * @param target_pose 検索対象の区画と方向
+   * @param currentPosition 注目する区画
+   * @param targetPose 検索対象の区画と方向
    * @return const Directions 注目する区画からの方向列
    */
-  const Directions findMatchDirectionCandidates(const Position current_position,
-                                                const Pose& target_pose) const;
+  const Directions findMatchDirectionCandidates(const Position currentPosition,
+                                                const Pose& targetPose) const;
 
   /**
    * @brief 各状態での進行方向列導出関数
    */
-  Result calcNextDirectionsSearchForGoal(NextDirections& next_directions,
-                                         const Pose& current_pose);
-  Result calcNextDirectionsSearchAdditionally(NextDirections& next_directions,
-                                              const Pose& current_pose);
-  Result calcNextDirectionsBackingToStart(NextDirections& next_directions,
-                                          const Pose& current_pose);
-  Result calcNextDirectionsGoingToGoal(NextDirections& next_directions,
-                                       const Pose& current_pose);
+  Result calcNextDirectionsSearchForGoal(NextDirections& nextDirections,
+                                         const Pose& currentPose);
+  Result calcNextDirectionsSearchAdditionally(NextDirections& nextDirections,
+                                              const Pose& currentPose);
+  Result calcNextDirectionsBackingToStart(NextDirections& nextDirections,
+                                          const Pose& currentPose);
+  Result calcNextDirectionsGoingToGoal(NextDirections& nextDirections,
+                                       const Pose& currentPose);
   Result calcNextDirectionsPositionIdentification(
-      NextDirections& next_directions,
-      Pose& current_pose,
+      NextDirections& nextDirections,
+      Pose& currentPose,
       bool& isForceGoingToGoal);
   /**
    * @brief 迷路を編集してさらに優先順の精度を向上させる関数
@@ -232,8 +232,8 @@ class SearchAlgorithm {
    */
   const Position calcNextDirectionsInAdvance(Maze& maze,
                                              const Positions& dest,
-                                             const Pose& start_pose,
-                                             NextDirections& next_directions);
+                                             const Pose& startPose,
+                                             NextDirections& nextDirections);
 };
 
 }  // namespace MazeLib

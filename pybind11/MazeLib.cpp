@@ -243,12 +243,12 @@ PYBIND11_MODULE(MazeLib, m) {
       .def("calcShortestDirections",
            py::overload_cast<const Maze&, const bool, const bool>(
                &StepMap::calcShortestDirections),
-           py::arg("maze"), py::arg("known_only") = true,
+           py::arg("maze"), py::arg("knownOnly") = true,
            py::arg("simple") = false)
       .def_static("appendStraightDirections",
                   &StepMap::appendStraightDirections, py::arg("maze"),
-                  py::arg("directions"), py::arg("known_only"),
-                  py::arg("diag_enabled"))
+                  py::arg("directions"), py::arg("knownOnly"),
+                  py::arg("diagEnabled"))
       //
       ;
 
@@ -258,7 +258,7 @@ PYBIND11_MODULE(MazeLib, m) {
       .def("calcShortestDirections",
            py::overload_cast<const Maze&, const bool, const bool>(
                &StepMapWall::calcShortestDirections),
-           py::arg("maze"), py::arg("known_only") = true,
+           py::arg("maze"), py::arg("knownOnly") = true,
            py::arg("simple") = false)
       .def_static("convertWallIndexDirectionsToPositionDirections",
                   &StepMapWall::convertWallIndexDirectionsToPositionDirections,
@@ -276,11 +276,11 @@ PYBIND11_MODULE(MazeLib, m) {
       .def(
           "calcShortestDirections",
           [](StepMapSlalom& map, const Maze& maze,
-             const StepMapSlalom::EdgeCost& edge_cost, const bool known_only) {
-            return map.calcShortestDirections(maze, edge_cost, known_only);
+             const StepMapSlalom::EdgeCost& edgeCost, const bool knownOnly) {
+            return map.calcShortestDirections(maze, edgeCost, knownOnly);
           },
-          py::arg("maze"), py::arg("edge_cost") = StepMapSlalom::EdgeCost(),
-          py::arg("known_only") = true)
+          py::arg("maze"), py::arg("edgeCost") = StepMapSlalom::EdgeCost(),
+          py::arg("knownOnly") = true)
       //
       ;
 }

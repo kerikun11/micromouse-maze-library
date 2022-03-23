@@ -163,13 +163,13 @@ int main(void) {
   robot.display = 1;
   // robot.updateCurrentPose({Position(0, 1), Direction::South});
   // robot.printInfo();
-  for (bool diag_enabled : {true, false}) {
-    robot.calcShortestDirections(diag_enabled);
+  for (bool diagEnabled : {true, false}) {
+    robot.calcShortestDirections(diagEnabled);
     std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
     std::cout << "\x1b[J";  /*< カーソル以下を消去 */
     robot.printPath();
     std::cout << "Estimated Shortest Time "
-              << (diag_enabled ? "(diag)" : "(no diag)") << ": "
+              << (diagEnabled ? "(diag)" : "(no diag)") << ": "
               << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
               << std::endl;
     robot.wait();

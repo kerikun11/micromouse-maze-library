@@ -164,16 +164,16 @@ int main(void) {
   maze.print(of);
 
   /* StepMapSlalom */
-  const bool known_only = 0;
+  const bool knownOnly = 0;
   StepMapSlalom map;
   StepMapSlalom::Indexes path;
-  StepMapSlalom::EdgeCost edge_cost;
-  map.update(maze, edge_cost,
-             StepMapSlalom::convertDestinations(maze.getGoals()), known_only);
+  StepMapSlalom::EdgeCost edgeCost;
+  map.update(maze, edgeCost,
+             StepMapSlalom::convertDestinations(maze.getGoals()), knownOnly);
   map.genPathFromMap(path);
-  const auto shortest_dirs = map.indexes2directions(path);
+  const auto shortestDirections = map.indexes2directions(path);
   std::cout << std::endl;
-  maze.print(shortest_dirs);
+  maze.print(shortestDirections);
 
 #if 1
   /* Preparation */
@@ -189,10 +189,10 @@ int main(void) {
       "Left: %3d, Right: %3d, Back: %3d\n",
       ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step, robot.f,
       robot.l, robot.r, robot.b);
-  // for (bool diag_enabled : {false, true}) {
-  //   robot.calcShortestDirections(diag_enabled);
+  // for (bool diagEnabled : {false, true}) {
+  //   robot.calcShortestDirections(diagEnabled);
   //   std::cout << "Estimated Shortest Time "
-  //             << (diag_enabled ? "(diag)" : "(no diag)") << ": "
+  //             << (diagEnabled ? "(diag)" : "(no diag)") << ": "
   //             << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
   //             << std::endl;
   // }

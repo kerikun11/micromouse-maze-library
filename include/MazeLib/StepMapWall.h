@@ -42,12 +42,12 @@ class StepMapWall {
    */
   void print(const Maze& maze,
              const WallIndexes& indexes,
-             const bool show_full_step = false,
+             const bool showFullStep = false,
              std::ostream& os = std::cout) const;
   void print(const Maze& maze,
-             const Directions& shortest_dirs,
+             const Directions& shortestDirections,
              const WallIndex& start = START_WALL_INDEX,
-             const bool show_full_step = false,
+             const bool showFullStep = false,
              std::ostream& os = std::cout) const;
   /**
    * @brief 迷路上にパスを表示
@@ -56,30 +56,30 @@ class StepMapWall {
                  const WallIndexes& indexes,
                  std::ostream& os = std::cout) const;
   void printPath(const Maze& maze,
-                 const Directions& shortest_dirs,
+                 const Directions& shortestDirections,
                  const WallIndex& start = START_WALL_INDEX,
                  std::ostream& os = std::cout) const;
   void update(const Maze& maze,
               const WallIndexes& dest,
-              const bool known_only,
+              const bool knownOnly,
               const bool simple);
   Directions calcShortestDirections(const Maze& maze,
-                                    const bool known_only,
+                                    const bool knownOnly,
                                     const bool simple) {
     return calcShortestDirections(maze, START_WALL_INDEX,
                                   convertDestinations(maze, maze.getGoals()),
-                                  known_only, simple);
+                                  knownOnly, simple);
   }
   Directions calcShortestDirections(const Maze& maze,
                                     const WallIndex& start,
                                     const WallIndexes& dest,
-                                    const bool known_only,
+                                    const bool knownOnly,
                                     const bool simple);
   Directions getStepDownDirections(const Maze& maze,
                                    const WallIndex& start,
                                    WallIndex& end,
-                                   const bool known_only,
-                                   const bool break_unknown) const;
+                                   const bool knownOnly,
+                                   const bool breakUnknown) const;
   static WallIndexes convertDestinations(const Maze& maze,
                                          const Positions& positions);
   static Direction convertWallIndexDirection(const WallIndex& i,
@@ -88,7 +88,7 @@ class StepMapWall {
       const Directions& src);
   static void appendStraightDirections(
       const Maze& maze,
-      Directions& shortest_dirs,
+      Directions& shortestDirections,
       const WallIndex& start = START_WALL_INDEX);
 
 #if MAZE_DEBUG_PROFILING

@@ -125,29 +125,29 @@ class MazeSimulator : public MazeLib::RobotBase {
     scene->addPolygon(pol, QPen(Qt::yellow), QBrush(Qt::yellow));
   }
   bool drawShortest(const Maze& maze,
-                    const bool diag_enabled,
-                    const StepMapSlalom::EdgeCost& edge_cost = {}) {
+                    const bool diagEnabled,
+                    const StepMapSlalom::EdgeCost& edgeCost = {}) {
     Maze maze_tmp = maze;
     SearchAlgorithm sa(maze_tmp);
     Directions dirs;
-    if (!sa.calcShortestDirections(dirs, diag_enabled, edge_cost))
+    if (!sa.calcShortestDirections(dirs, diagEnabled, edgeCost))
       return false;
     auto p = maze.getStart();
     for (size_t i = 0; i < dirs.size(); ++i) {
-      if (diag_enabled && i == dirs.size() - 1)
+      if (diagEnabled && i == dirs.size() - 1)
         break;
       const auto d = dirs[i];
       const auto next_p = p.next(d);
-      const auto next_d = diag_enabled ? dirs[i + 1] : d;
+      const auto next_d = diagEnabled ? dirs[i + 1] : d;
       QPen pen(Qt::yellow);
       QPoint offset(line_px / 2, line_px / 2);
-      if (!diag_enabled) {
+      if (!diagEnabled) {
         pen.setColor(Qt::cyan);
         offset = -offset;
       }
-      QPoint p1 = getGraphicPointByPose(Pose(p, d), diag_enabled) + offset;
+      QPoint p1 = getGraphicPointByPose(Pose(p, d), diagEnabled) + offset;
       QPoint p2 =
-          getGraphicPointByPose(Pose(next_p, next_d), diag_enabled) + offset;
+          getGraphicPointByPose(Pose(next_p, next_d), diagEnabled) + offset;
       pen.setWidth(line_px);
       scene->addLine(p1.x(), p1.y(), p2.x(), p2.y(), pen);
       p = next_p;
@@ -156,24 +156,24 @@ class MazeSimulator : public MazeLib::RobotBase {
   }
   bool drawShortestStepMap(const Maze& maze, const bool simple) {
     Maze maze_tmp = maze;
-    const bool known_only = 0;
-    const bool diag_enabled = false;
+    const bool knownOnly = 0;
+    const bool diagEnabled = false;
     StepMap map;
-    Directions dirs = map.calcShortestDirections(maze, known_only, simple);
+    Directions dirs = map.calcShortestDirections(maze, knownOnly, simple);
     if (dirs.empty())
       return false;
-    StepMap::appendStraightDirections(maze, dirs, known_only, diag_enabled);
+    StepMap::appendStraightDirections(maze, dirs, knownOnly, diagEnabled);
     auto p = maze.getStart();
     for (size_t i = 0; i < dirs.size(); ++i) {
-      if (diag_enabled && i == dirs.size() - 1)
+      if (diagEnabled && i == dirs.size() - 1)
         break;
       const auto d = dirs[i];
       const auto next_p = p.next(d);
-      const auto next_d = diag_enabled ? dirs[i + 1] : d;
+      const auto next_d = diagEnabled ? dirs[i + 1] : d;
       QPoint offset(-line_px, -line_px);
-      QPoint p1 = getGraphicPointByPose(Pose(p, d), diag_enabled) + offset;
+      QPoint p1 = getGraphicPointByPose(Pose(p, d), diagEnabled) + offset;
       QPoint p2 =
-          getGraphicPointByPose(Pose(next_p, next_d), diag_enabled) + offset;
+          getGraphicPointByPose(Pose(next_p, next_d), diagEnabled) + offset;
       QPen pen(Qt::blue);
       pen.setWidth(line_px);
       scene->addLine(p1.x(), p1.y(), p2.x(), p2.y(), pen);
@@ -183,10 +183,10 @@ class MazeSimulator : public MazeLib::RobotBase {
   }
   bool drawShortestStepMapWall(const Maze& maze, const bool simple) {
     Maze maze_tmp = maze;
-    const bool known_only = 0;
-    const bool diag_enabled = true;
+    const bool knownOnly = 0;
+    const bool diagEnabled = true;
     StepMapWall map;
-    Directions dirs = map.calcShortestDirections(maze, known_only, simple);
+    Directions dirs = map.calcShortestDirections(maze, knownOnly, simple);
     if (dirs.empty())
       return false;
     map.appendStraightDirections(maze, dirs);
@@ -196,11 +196,11 @@ class MazeSimulator : public MazeLib::RobotBase {
       const auto next_p = p.next(d);
       QPoint offset(line_px, line_px);
       QPoint p1 = getGraphicPointByPose(Pose(p.getPosition(), p.getDirection()),
-                                        diag_enabled) +
+                                        diagEnabled) +
                   offset;
       QPoint p2 =
           getGraphicPointByPose(
-              Pose(next_p.getPosition(), next_p.getDirection()), diag_enabled) +
+              Pose(next_p.getPosition(), next_p.getDirection()), diagEnabled) +
           offset;
       QPen pen(Qt::magenta);
       pen.setWidth(line_px);
@@ -250,7 +250,7 @@ class MazeSimulator : public MazeLib::RobotBase {
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
-      updateWall(current_pose.p.next(current_pose.d), current_pose.d,
+      updateWall(currentPose.p.next(currentPose.d), currentPose.d,
                  !maze_target.canGo(pose.p.next(pose.d), pose.d));
 #endif
   }

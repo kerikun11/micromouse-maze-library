@@ -93,35 +93,35 @@ class StepMap {
   /**
    * @brief ステップマップの更新
    * @param dest ステップを0とする目的地の区画の集合(順不同)
-   * @param known_only true:未知壁は通過不可能，false:未知壁は通過可能とする
+   * @param knownOnly true:未知壁は通過不可能，false:未知壁は通過可能とする
    * @param simple 台形加速を考慮せず，隣接区画のコストをすべて1にする
    */
   void update(const Maze& maze,
               const Positions& dest,
-              const bool known_only,
+              const bool knownOnly,
               const bool simple);
   /**
    * @brief 与えられた区画間の最短経路を導出する関数
    * @param maze 迷路の参照
    * @param start 始点区画
    * @param dest 目的地区画の集合(順不同)
-   * @param known_only 既知壁のみモードかどうか
+   * @param knownOnly 既知壁のみモードかどうか
    * @return const Directions スタートからゴールへの最短経路の方向列．
    *                    経路がない場合は空配列となる．
    */
   Directions calcShortestDirections(const Maze& maze,
                                     const Position start,
                                     const Positions& dest,
-                                    const bool known_only,
+                                    const bool knownOnly,
                                     const bool simple);
   /**
    * @brief スタートからゴールまでの最短経路を導出する関数
    */
   Directions calcShortestDirections(const Maze& maze,
-                                    const bool known_only,
+                                    const bool knownOnly,
                                     const bool simple) {
     return calcShortestDirections(maze, maze.getStart(), maze.getGoals(),
-                                  known_only, simple);
+                                  knownOnly, simple);
   }
   /**
    * @brief ステップマップから次に行くべき方向を計算する関数
@@ -137,8 +137,8 @@ class StepMap {
   Directions getStepDownDirections(const Maze& maze,
                                    const Pose& start,
                                    Pose& end,
-                                   const bool known_only,
-                                   const bool break_unknown) const;
+                                   const bool knownOnly,
+                                   const bool breakUnknown) const;
   /**
    * @brief 引数区画の周囲の未知壁の確認優先順位を生成する関数
    * @return const Directions 行くべき方向の優先順位
@@ -148,13 +148,13 @@ class StepMap {
   /**
    * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
    * @param maze 迷路の参照
-   * @param shortest_dirs 追記元の方向列．これ自体に追記される．
-   * @param diag_enabled 斜めありなし
+   * @param shortestDirections 追記元の方向列．これ自体に追記される．
+   * @param diagEnabled 斜めありなし
    */
   static void appendStraightDirections(const Maze& maze,
-                                       Directions& shortest_dirs,
-                                       const bool known_only,
-                                       const bool diag_enabled);
+                                       Directions& shortestDirections,
+                                       const bool knownOnly,
+                                       const bool diagEnabled);
 
 #if MAZE_DEBUG_PROFILING
   std::size_t queue_size_max = 0;

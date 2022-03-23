@@ -152,28 +152,28 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
     // std::cout << "Total Search:\t" << t_search << "\t[us]" << std::endl;
     csv << "\t" << t_search;
     /* FastRun */
-    for (const auto diag_enabled : {false, true}) {
-      if (!robot.calcShortestDirections(diag_enabled)) {
+    for (const auto diagEnabled : {false, true}) {
+      if (!robot.calcShortestDirections(diagEnabled)) {
         maze_loge << "Failed to Find a Shortest Path! "
-                  << (diag_enabled ? "diag" : "no_diag") << std::endl;
+                  << (diagEnabled ? "diag" : "no_diag") << std::endl;
         continue;
       }
       const auto path_cost = robot.getSearchAlgorithm().getShortestCost();
-      std::cout << "PathCost " << (diag_enabled ? "diag" : "no_d") << ":\t"
+      std::cout << "PathCost " << (diagEnabled ? "diag" : "no_d") << ":\t"
                 << path_cost << "\t[ms]" << std::endl;
       csv << "\t" << path_cost;
-      robot.fastRun(diag_enabled);
+      robot.fastRun(diagEnabled);
 #if SHOW_MAZE
       robot.printPath();
 #endif
       /* Shortest Path Comparison */
       const auto p_at = std::make_unique<Agent>(maze_target);
       Agent& at = *p_at;
-      at.calcShortestDirections(diag_enabled);
-      robot.calcShortestDirections(diag_enabled);
+      at.calcShortestDirections(diagEnabled);
+      robot.calcShortestDirections(diagEnabled);
       if (at.getShortestDirections() != robot.getShortestDirections()) {
         maze_logw << "searched path is not shortest! "
-                  << (diag_enabled ? "(diag)" : "(no_diag)") << std::endl;
+                  << (diagEnabled ? "(diag)" : "(no_diag)") << std::endl;
         maze_logw << "real: " << at.getSearchAlgorithm().getShortestCost()
                   << " searched: "
                   << robot.getSearchAlgorithm().getShortestCost() << std::endl;
@@ -248,17 +248,18 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
 #if STEP_MAP_ENABLED
     /* StepMap */
     for (const auto simple : {true, false}) {
-      const bool known_only = 0;
+      const bool knownOnly = 0;
       const Maze& maze = maze_target;
       const auto p = std::make_unique<StepMap>();
       StepMap& map = *p;
       std::chrono::microseconds sum{0};
       const int n = 100;
-      Directions shortest_dirs;
+      Directions shortestDirections;
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
-        shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
-        if (shortest_dirs.empty())
+        shortestDirections =
+            map.calcShortestDirections(maze, knownOnly, simple);
+        if (shortestDirections.empty())
           maze_loge << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
         const auto us =
@@ -268,9 +269,9 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
       std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
 #if SHOW_MAZE
-      map.print(maze, shortest_dirs);
-      map.printFull(maze, shortest_dirs);
-      // maze.print(shortest_dirs);
+      map.print(maze, shortestDirections);
+      map.printFull(maze, shortestDirections);
+      // maze.print(shortestDirections);
 #endif
     }
 #endif
@@ -278,17 +279,18 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
 #if STEP_MAP_WALL_ENABLED
     /* StepMapWall */
     for (const auto simple : {true, false}) {
-      const bool known_only = 0;
+      const bool knownOnly = 0;
       const Maze& maze = maze_target;
       const auto p = std::make_unique<StepMapWall>();
       StepMapWall& map = *p;
       std::chrono::microseconds sum{0};
       const int n = 100;
-      Directions shortest_dirs;
+      Directions shortestDirections;
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
-        shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
-        if (shortest_dirs.empty())
+        shortestDirections =
+            map.calcShortestDirections(maze, knownOnly, simple);
+        if (shortestDirections.empty())
           maze_loge << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
         const auto us =
@@ -297,13 +299,13 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
       }
       std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
-      StepMapWall::appendStraightDirections(maze, shortest_dirs);
+      StepMapWall::appendStraightDirections(maze, shortestDirections);
 #if SHOW_MAZE
-      map.print(maze, shortest_dirs);
-      map.print(maze, shortest_dirs, StepMapWall::START_WALL_INDEX, true);
-      map.printPath(maze, shortest_dirs);
+      map.print(maze, shortestDirections);
+      map.print(maze, shortestDirections, StepMapWall::START_WALL_INDEX, true);
+      map.printPath(maze, shortestDirections);
       maze.print(StepMapWall::convertWallIndexDirectionsToPositionDirections(
-          shortest_dirs));
+          shortestDirections));
 #endif
     }
 #endif
@@ -311,27 +313,27 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
 #if STEP_MAP_SLALOM_ENABLED
     /* StepMapSlalom */
     {
-      const bool known_only = 0;
-      const bool diag_enabled = 1;
+      const bool knownOnly = 0;
+      const bool diagEnabled = 1;
       const Maze& maze = maze_target;
       const auto p = std::make_unique<StepMapSlalom>();
       StepMapSlalom& map = *p;
       std::chrono::microseconds sum{0};
       const int n = 100;
-      StepMapSlalom::EdgeCost edge_cost;
+      StepMapSlalom::EdgeCost edgeCost;
       StepMapSlalom::Indexes path;
-      Directions shortest_dirs;
+      Directions shortestDirections;
       for (int i = 0; i < n; ++i) {
         const auto t_s = std::chrono::system_clock().now();
-        map.update(maze, edge_cost,
+        map.update(maze, edgeCost,
                    StepMapSlalom::convertDestinations(maze.getGoals()),
-                   known_only);
+                   knownOnly);
         if (!map.genPathFromMap(path)) {
           maze_loge << "Failed!" << std::endl;
         }
-        shortest_dirs = map.indexes2directions(path);
-        StepMap::appendStraightDirections(maze, shortest_dirs, known_only,
-                                          diag_enabled);
+        shortestDirections = map.indexes2directions(path);
+        StepMap::appendStraightDirections(maze, shortestDirections, knownOnly,
+                                          diagEnabled);
         const auto t_e = std::chrono::system_clock().now();
         const auto us =
             std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
@@ -342,7 +344,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
 #if SHOW_MAZE
       map.printPath(maze, path);
       map.print(maze, path);
-      maze.print(shortest_dirs);
+      maze.print(shortestDirections);
 #endif
     }
 #endif

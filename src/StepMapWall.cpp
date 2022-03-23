@@ -18,7 +18,7 @@ const WallIndex StepMapWall::START_WALL_INDEX = WallIndex(0, 0, 1);
 
 void StepMapWall::print(const Maze& maze,
                         const WallIndexes& indexes,
-                        const bool show_full_step,
+                        const bool showFullStep,
                         std::ostream& os) const {
   const int maze_size = MAZE_SIZE;
   const auto find = [&](const WallIndex& i) {
@@ -42,18 +42,18 @@ void StepMapWall::print(const Maze& maze,
       const auto k = maze.isKnown(x, y, Direction::North);
       const auto i = WallIndex(Position(x, y), Direction::North);
       auto s = getStep(i);
-      s = std::min(simple ? s : s / scaler, show_full_step ? 99999 : 999);
+      s = std::min(simple ? s : s / scaler, showFullStep ? 99999 : 999);
       const auto f = find(i);
       if (w)
-        os << (show_full_step ? "-----" : "---");
+        os << (showFullStep ? "-----" : "---");
       else
         os << (f ? "\e[43m" C_BL : (s == 0 ? C_YE : (k ? C_BL : C_RE)))
-           << std::setw(show_full_step ? 5 : 3) << s << C_NO;
+           << std::setw(showFullStep ? 5 : 3) << s << C_NO;
     }
     os << '+' << std::endl;
     /* Vertical Wall Line */
     if (y != -1) {
-      os << (show_full_step ? "|  " : "| ");
+      os << (showFullStep ? "|  " : "| ");
       for (int8_t x = 0; x < maze_size; ++x) {
         /* Cell */
         os << ' ';
@@ -62,32 +62,32 @@ void StepMapWall::print(const Maze& maze,
         const auto k = maze.isKnown(x, y, Direction::East);
         const auto i = WallIndex(Position(x, y), Direction::East);
         auto s = getStep(i);
-        s = std::min(simple ? s : s / scaler, show_full_step ? 99999 : 999);
+        s = std::min(simple ? s : s / scaler, showFullStep ? 99999 : 999);
         const auto f = find(i);
         if (w)
-          os << (show_full_step ? "  |  " : " | ");
+          os << (showFullStep ? "  |  " : " | ");
         else
           os << (f ? "\e[43m" C_BL : (s == 0 ? C_YE : (k ? C_BL : C_RE)))
-             << std::setw(show_full_step ? 5 : 3) << s << C_NO;
+             << std::setw(showFullStep ? 5 : 3) << s << C_NO;
       }
       os << std::endl;
     }
   }
 }
 void StepMapWall::print(const Maze& maze,
-                        const Directions& shortest_dirs,
+                        const Directions& shortestDirections,
                         const WallIndex& start,
-                        const bool show_full_step,
+                        const bool showFullStep,
                         std::ostream& os) const {
   auto i = start;
-  WallIndexes shortest_indexes;
-  shortest_indexes.reserve(shortest_dirs.size() + 1);
-  shortest_indexes.push_back(i);
-  for (const auto d : shortest_dirs) {
+  WallIndexes shortestIndexes;
+  shortestIndexes.reserve(shortestDirections.size() + 1);
+  shortestIndexes.push_back(i);
+  for (const auto d : shortestDirections) {
     i = i.next(d);
-    shortest_indexes.push_back(i);
+    shortestIndexes.push_back(i);
   }
-  print(maze, shortest_indexes, show_full_step, os);
+  print(maze, shortestIndexes, showFullStep, os);
 }
 void StepMapWall::printPath(const Maze& maze,
                             const WallIndexes& indexes,
@@ -126,22 +126,22 @@ void StepMapWall::printPath(const Maze& maze,
   }
 }
 void StepMapWall::printPath(const Maze& maze,
-                            const Directions& shortest_dirs,
+                            const Directions& shortestDirections,
                             const WallIndex& start,
                             std::ostream& os) const {
   auto i = start;
-  WallIndexes shortest_indexes;
-  shortest_indexes.reserve(shortest_dirs.size() + 1);
-  shortest_indexes.push_back(i);
-  for (const auto d : shortest_dirs) {
+  WallIndexes shortestIndexes;
+  shortestIndexes.reserve(shortestDirections.size() + 1);
+  shortestIndexes.push_back(i);
+  for (const auto d : shortestDirections) {
     i = i.next(d);
-    shortest_indexes.push_back(i);
+    shortestIndexes.push_back(i);
   }
-  printPath(maze, shortest_indexes, os);
+  printPath(maze, shortestIndexes, os);
 }
 void StepMapWall::update(const Maze& maze,
                          const WallIndexes& dest,
-                         const bool known_only,
+                         const bool knownOnly,
                          const bool simple) {
   /* 計算を高速化するため，迷路の大きさを制限 */
   int8_t min_x = maze.getMinX();
@@ -186,7 +186,7 @@ void StepMapWall::update(const Maze& maze,
       for (int8_t i = 1;; ++i) {
         next = next.next(d); /*< 移動 */
         /* 壁あり or 既知壁のみで未知壁 ならば次へ */
-        if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
+        if (maze.isWall(next) || (knownOnly && !maze.isKnown(next)))
           break;
         /* 直線加速を考慮したステップを算出 */
         const auto next_step = focus_step + (simple ? i : step_table[i]);
@@ -202,24 +202,24 @@ void StepMapWall::update(const Maze& maze,
 Directions StepMapWall::calcShortestDirections(const Maze& maze,
                                                const WallIndex& start,
                                                const WallIndexes& dest,
-                                               const bool known_only,
+                                               const bool knownOnly,
                                                const bool simple) {
   /* ステップマップを更新 */
-  update(maze, dest, known_only, simple);
+  update(maze, dest, knownOnly, simple);
   WallIndex end;
-  const auto shortest_dirs =
-      getStepDownDirections(maze, start, end, known_only, false);
+  const auto shortestDirections =
+      getStepDownDirections(maze, start, end, knownOnly, false);
   /* ゴール判定 */
-  return step_map[end.getIndex()] == 0 ? shortest_dirs : Directions{};
+  return step_map[end.getIndex()] == 0 ? shortestDirections : Directions{};
 }
 Directions StepMapWall::getStepDownDirections(const Maze& maze,
                                               const WallIndex& start,
                                               WallIndex& end,
-                                              const bool known_only,
-                                              const bool break_unknown
+                                              const bool knownOnly,
+                                              const bool breakUnknown
                                               __attribute__((unused))) const {
   /* 最短経路となるスタートからの方向列 */
-  Directions shortest_dirs;
+  Directions shortestDirections;
   /* start から順にステップマップを下る */
   end = start;
   /* 確認 */
@@ -234,7 +234,7 @@ Directions StepMapWall::getStepDownDirections(const Maze& maze,
       auto next = end;     /*< 隣接 */
       next = next.next(d); /*< 移動 */
       /* 壁あり or 既知壁のみで未知壁 ならば次へ */
-      if (maze.isWall(next) || (known_only && !maze.isKnown(next)))
+      if (maze.isWall(next) || (knownOnly && !maze.isKnown(next)))
         continue;
       /* min_step よりステップが小さければ更新 (同じなら更新しない) */
       const auto next_step = step_map[next.getIndex()];
@@ -246,10 +246,10 @@ Directions StepMapWall::getStepDownDirections(const Maze& maze,
     /* 現在地のステップより大きかったらなんかおかしい */
     if (step_map[end.getIndex()] <= min_step)
       break;
-    end = end.next(min_d);           //< 位置を更新
-    shortest_dirs.push_back(min_d);  //< 既知区間移動
+    end = end.next(min_d);                //< 位置を更新
+    shortestDirections.push_back(min_d);  //< 既知区間移動
   }
-  return shortest_dirs;
+  return shortestDirections;
 }
 WallIndexes StepMapWall::convertDestinations(const Maze& maze,
                                              const Positions& positions) {
@@ -296,18 +296,18 @@ Directions StepMapWall::convertWallIndexDirectionsToPositionDirections(
   return dirs;
 }
 void StepMapWall::appendStraightDirections(const Maze& maze,
-                                           Directions& shortest_dirs,
+                                           Directions& shortestDirections,
                                            const WallIndex& start) {
   auto i = start;
-  for (const auto d : shortest_dirs)
+  for (const auto d : shortestDirections)
     i = i.next(d);
-  if (shortest_dirs.size()) {
-    const auto d = shortest_dirs.back();
+  if (shortestDirections.size()) {
+    const auto d = shortestDirections.back();
     while (1) {
       i = i.next(d);
       if (maze.isWall(i))
         break;
-      shortest_dirs.push_back(d);
+      shortestDirections.push_back(d);
     }
   }
 }

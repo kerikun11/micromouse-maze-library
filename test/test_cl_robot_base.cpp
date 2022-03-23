@@ -22,10 +22,10 @@ TEST(CLRobotBase, CLRobotBase) {
   EXPECT_TRUE(robot.searchRun());
   robot.printInfo();
   robot.printSearchResult();
-  for (const auto diag_enabled : {false, true}) {
-    EXPECT_TRUE(robot.calcShortestDirections(diag_enabled));
+  for (const auto diagEnabled : {false, true}) {
+    EXPECT_TRUE(robot.calcShortestDirections(diagEnabled));
     EXPECT_TRUE(robot.getSearchAlgorithm().getShortestCost());
-    EXPECT_TRUE(robot.fastRun(diag_enabled));
+    EXPECT_TRUE(robot.fastRun(diagEnabled));
     robot.printPath();
   }
 
@@ -35,47 +35,48 @@ TEST(CLRobotBase, CLRobotBase) {
 
   /* StepMap */
   for (const auto simple : {true, false}) {
-    const bool known_only = 0;
+    const bool knownOnly = 0;
     const Maze& maze = maze_target;
     StepMap map;
-    auto shortest_dirs = map.calcShortestDirections(
-        maze, maze.getStart(), maze.getGoals(), known_only, simple);
-    EXPECT_FALSE(shortest_dirs.empty());
-    map.appendStraightDirections(maze, shortest_dirs, known_only, false);
-    map.print(maze, shortest_dirs);
+    auto shortestDirections = map.calcShortestDirections(
+        maze, maze.getStart(), maze.getGoals(), knownOnly, simple);
+    EXPECT_FALSE(shortestDirections.empty());
+    map.appendStraightDirections(maze, shortestDirections, knownOnly, false);
+    map.print(maze, shortestDirections);
     map.print(maze);
-    map.printFull(maze, shortest_dirs);
+    map.printFull(maze, shortestDirections);
     map.printFull(maze);
-    maze.print(shortest_dirs);
+    maze.print(shortestDirections);
   }
 
   /* StepMapWall */
   for (const auto simple : {true, false}) {
-    const bool known_only = 0;
+    const bool knownOnly = 0;
     const Maze& maze = maze_target;
     StepMapWall map;
-    auto shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
-    EXPECT_FALSE(shortest_dirs.empty());
-    map.appendStraightDirections(maze, shortest_dirs);
-    map.print(maze, shortest_dirs);
-    map.printPath(maze, shortest_dirs);
+    auto shortestDirections =
+        map.calcShortestDirections(maze, knownOnly, simple);
+    EXPECT_FALSE(shortestDirections.empty());
+    map.appendStraightDirections(maze, shortestDirections);
+    map.print(maze, shortestDirections);
+    map.printPath(maze, shortestDirections);
     maze.print(StepMapWall::convertWallIndexDirectionsToPositionDirections(
-        shortest_dirs));
+        shortestDirections));
   }
 
   /* StepMapSlalom */
-  const bool known_only = 0;
+  const bool knownOnly = 0;
   const Maze& maze = maze_target;
   StepMapSlalom map;
-  StepMapSlalom::Indexes shortest_indexes;
+  StepMapSlalom::Indexes shortestIndexes;
   map.update(maze, StepMapSlalom::EdgeCost(),
-             StepMapSlalom::convertDestinations(maze.getGoals()), known_only);
-  EXPECT_TRUE(map.genPathFromMap(shortest_indexes));
-  map.print(maze, shortest_indexes);
-  auto shortest_dirs = map.indexes2directions(shortest_indexes);
-  EXPECT_FALSE(shortest_dirs.empty());
-  StepMap::appendStraightDirections(maze, shortest_dirs, known_only, true);
-  maze.print(shortest_dirs);
+             StepMapSlalom::convertDestinations(maze.getGoals()), knownOnly);
+  EXPECT_TRUE(map.genPathFromMap(shortestIndexes));
+  map.print(maze, shortestIndexes);
+  auto shortestDirections = map.indexes2directions(shortestIndexes);
+  EXPECT_FALSE(shortestDirections.empty());
+  StepMap::appendStraightDirections(maze, shortestDirections, knownOnly, true);
+  maze.print(shortestDirections);
 }
 
 TEST(CLRobotBase, fake) {
@@ -92,8 +93,8 @@ TEST(CLRobotBase, fake) {
   EXPECT_FALSE(robot.searchRun());
   robot.printInfo();
   robot.printSearchResult();
-  for (const auto diag_enabled : {false, true}) {
-    EXPECT_FALSE(robot.calcShortestDirections(diag_enabled));
+  for (const auto diagEnabled : {false, true}) {
+    EXPECT_FALSE(robot.calcShortestDirections(diagEnabled));
     EXPECT_FALSE(robot.endFastRunBackingToStartRun());
   }
 
@@ -105,46 +106,47 @@ TEST(CLRobotBase, fake) {
 
   /* StepMap */
   for (const auto simple : {true, false}) {
-    const bool known_only = 0;
+    const bool knownOnly = 0;
     const Maze& maze = maze_target;
     StepMap map;
-    auto shortest_dirs = map.calcShortestDirections(
-        maze, maze.getStart(), maze.getGoals(), known_only, simple);
-    EXPECT_TRUE(shortest_dirs.empty());
-    map.appendStraightDirections(maze, shortest_dirs, known_only, false);
-    map.print(maze, shortest_dirs);
+    auto shortestDirections = map.calcShortestDirections(
+        maze, maze.getStart(), maze.getGoals(), knownOnly, simple);
+    EXPECT_TRUE(shortestDirections.empty());
+    map.appendStraightDirections(maze, shortestDirections, knownOnly, false);
+    map.print(maze, shortestDirections);
     map.print(maze);
-    map.printFull(maze, shortest_dirs);
+    map.printFull(maze, shortestDirections);
     map.printFull(maze);
-    maze.print(shortest_dirs);
+    maze.print(shortestDirections);
   }
 
   /* StepMapWall */
   for (const auto simple : {true, false}) {
-    const bool known_only = 0;
+    const bool knownOnly = 0;
     const Maze& maze = maze_target;
     StepMapWall map;
-    auto shortest_dirs = map.calcShortestDirections(maze, known_only, simple);
-    EXPECT_TRUE(shortest_dirs.empty());
-    map.appendStraightDirections(maze, shortest_dirs);
-    map.print(maze, shortest_dirs);
-    map.printPath(maze, shortest_dirs);
+    auto shortestDirections =
+        map.calcShortestDirections(maze, knownOnly, simple);
+    EXPECT_TRUE(shortestDirections.empty());
+    map.appendStraightDirections(maze, shortestDirections);
+    map.print(maze, shortestDirections);
+    map.printPath(maze, shortestDirections);
     maze.print(StepMapWall::convertWallIndexDirectionsToPositionDirections(
-                   shortest_dirs),
+                   shortestDirections),
                maze.getStart());
   }
 
   /* StepMapSlalom */
-  const bool known_only = 0;
+  const bool knownOnly = 0;
   const Maze& maze = maze_target;
   StepMapSlalom map;
-  StepMapSlalom::Indexes shortest_indexes;
+  StepMapSlalom::Indexes shortestIndexes;
   map.update(maze, StepMapSlalom::EdgeCost(),
-             StepMapSlalom::convertDestinations(maze.getGoals()), known_only);
-  EXPECT_FALSE(map.genPathFromMap(shortest_indexes));
-  map.print(maze, shortest_indexes);
-  auto shortest_dirs = map.indexes2directions(shortest_indexes);
-  EXPECT_TRUE(shortest_dirs.empty());
-  StepMap::appendStraightDirections(maze, shortest_dirs, known_only, true);
-  maze.print(shortest_dirs);
+             StepMapSlalom::convertDestinations(maze.getGoals()), knownOnly);
+  EXPECT_FALSE(map.genPathFromMap(shortestIndexes));
+  map.print(maze, shortestIndexes);
+  auto shortestDirections = map.indexes2directions(shortestIndexes);
+  EXPECT_TRUE(shortestDirections.empty());
+  StepMap::appendStraightDirections(maze, shortestDirections, knownOnly, true);
+  maze.print(shortestDirections);
 }

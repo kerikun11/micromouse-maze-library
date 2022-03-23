@@ -28,8 +28,8 @@ class Agent {
    */
   void reset() {
     maze.reset();
-    next_directions.state = SearchAlgorithm::START;
-    current_pose = Pose(Position(0, 1), Direction::North);
+    nextDirections.state = SearchAlgorithm::START;
+    currentPose = Pose(Position(0, 1), Direction::North);
     isPositionIdentifying = false;
     isForceBackToStart = false;
     isForceGoingToGoal = false;
@@ -49,9 +49,9 @@ class Agent {
   /**
    * @brief 現在地を更新
    */
-  void updateCurrentPose(const Pose& new_pose) {
-    current_pose = new_pose;
-    searchAlgorithm.updatePose(getState(), current_pose, isForceGoingToGoal);
+  void updateCurrentPose(const Pose& newPose) {
+    currentPose = newPose;
+    searchAlgorithm.updatePose(getState(), currentPose, isForceGoingToGoal);
   }
   /**
    * @brief 次に行くべき方向を取得する
@@ -59,7 +59,7 @@ class Agent {
   bool determineNextDirection(const Pose& pose,
                               Direction& nextDirection) const {
     return searchAlgorithm.determineNextDirection(
-        getState(), pose, next_directions.next_direction_candidates,
+        getState(), pose, nextDirections.nextDirectionCandidates,
         nextDirection);
   }
   /**
@@ -87,19 +87,19 @@ class Agent {
    */
   SearchAlgorithm::Result calcNextDirections() {
     return searchAlgorithm.calcNextDirections(
-        next_directions, current_pose, isPositionIdentifying,
-        isForceBackToStart, isForceGoingToGoal);
+        nextDirections, currentPose, isPositionIdentifying, isForceBackToStart,
+        isForceGoingToGoal);
   }
   /**
    * @brief 最短経路を導出
-   * @param diag_enabled true: 斜めあり, false: 斜めなし
+   * @param diagEnabled true: 斜めあり, false: 斜めなし
    * @return true: 成功, false: 失敗
    */
   bool calcShortestDirections(
-      const bool diag_enabled,
-      const StepMapSlalom::EdgeCost& edge_cost = StepMapSlalom::EdgeCost{}) {
-    return searchAlgorithm.calcShortestDirections(shortest_dirs, diag_enabled,
-                                                  edge_cost);
+      const bool diagEnabled,
+      const StepMapSlalom::EdgeCost& edgeCost = StepMapSlalom::EdgeCost()) {
+    return searchAlgorithm.calcShortestDirections(shortestDirections,
+                                                  diagEnabled, edgeCost);
   }
   /**
    * @brief 探索を中止してスタート区画へ強制的に戻る
@@ -118,44 +118,42 @@ class Agent {
   void setPositionIdentifying(const bool yes = true) {
     isPositionIdentifying = yes;
     if (yes) {
-      searchAlgorithm.positionIdentifyingInit(current_pose);
-      next_directions.state = SearchAlgorithm::IDENTIFYING_POSITION;
+      searchAlgorithm.positionIdentifyingInit(currentPose);
+      nextDirections.state = SearchAlgorithm::IDENTIFYING_POSITION;
     } else {
-      next_directions.state = SearchAlgorithm::START;
+      nextDirections.state = SearchAlgorithm::START;
     }
   }
   /**
    * @brief 探索状態の取得
    */
   const SearchAlgorithm::State& getState() const {
-    return next_directions.state;
+    return nextDirections.state;
   }
   /**
    * @brief 既知区間移動方向列を取得
    */
   const Directions& getNextDirectionsKnown() const {
-    return next_directions.next_directions_known;
+    return nextDirections.nextDirectionsKnown;
   }
   /**
    * @brief 壁を確認後に進む方向優先順位を取得
    */
   const Directions& getNextDirectionCandidates() const {
-    return next_directions.next_direction_candidates;
+    return nextDirections.nextDirectionCandidates;
   }
   /**
    * @brief 未知区間加速可能かどうかを取得
    */
-  bool getUnknownAccelFlag() const {
-    return next_directions.unknown_accel_flag;
-  }
+  bool getUnknownAccelFlag() const { return nextDirections.unknownAccelFlag; }
   /**
    * @brief 現在姿勢を取得
    */
-  const Pose& getCurrentPose() const { return current_pose; }
+  const Pose& getCurrentPose() const { return currentPose; }
   /**
    * @brief 最短経路の方向配列の計算結果を取得
    */
-  const Directions& getShortestDirections() const { return shortest_dirs; }
+  const Directions& getShortestDirections() const { return shortestDirections; }
   /**
    * @brief 迷路を取得
    */
@@ -171,33 +169,33 @@ class Agent {
   /**
    * @brief 探索状態の表示
    *
-   * @param show_maze true:迷路も表示, false:迷路は非表示
+   * @param showMaze true:迷路も表示, false:迷路は非表示
    */
-  void printInfo(const bool show_maze = true) const {
-    printInfo(show_maze, current_pose, getState());
+  void printInfo(const bool showMaze = true) const {
+    printInfo(showMaze, currentPose, getState());
   }
   /**
    * @brief 探索状態の表示
    *
-   * @param show_maze true:迷路も表示, false:迷路は非表示
+   * @param showMaze true:迷路も表示, false:迷路は非表示
    * @param pose ハイライトする区画姿勢
    * @param state 探索状態
    */
-  void printInfo(const bool show_maze,
+  void printInfo(const bool showMaze,
                  const Pose& pose,
                  const SearchAlgorithm::State state) const;
   /**
    * @brief 最短経路の表示
    */
-  void printPath() const { maze.print(shortest_dirs, maze.getStart()); }
+  void printPath() const { maze.print(shortestDirections, maze.getStart()); }
   /**
    * @brief 自己位置同定の候補数を取得
    */
-  int getMatchCount() const { return next_directions.match_count; }
+  int getMatchCount() const { return nextDirections.poseMatchCount; }
 
  protected:
   Maze maze;                          /**< @brief 探索に使用する迷路 */
-  Pose current_pose;                  /**< @brief 現在の姿勢 */
+  Pose currentPose;                   /**< @brief 現在の姿勢 */
   bool isForceBackToStart = false;    /**< @brief 強制帰還モード */
   bool isForceGoingToGoal = false;    /**< @brief 強制終点訪問モード */
   bool isPositionIdentifying = false; /**< @brief 自己位置同定モード */
@@ -205,8 +203,8 @@ class Agent {
  private:
   SearchAlgorithm searchAlgorithm; /**< @brief 探索器 */
   SearchAlgorithm::NextDirections
-      next_directions;      /**< @brief 計算結果の移動方向配列 */
-  Directions shortest_dirs; /**< @brief 最短経路の方向配列 */
+      nextDirections; /**< @brief 計算結果の移動方向配列 */
+  Directions shortestDirections; /**< @brief 最短経路の方向配列 */
 };
 
 }  // namespace MazeLib
