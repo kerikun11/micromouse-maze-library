@@ -119,13 +119,11 @@ void Maze::reset(const bool set_start_wall, const bool set_range_full) {
 int8_t Maze::wallCount(const Position p) const {
   const auto& dirs = Direction::Along4;
   return std::count_if(dirs.cbegin(), dirs.cend(),
-                       //  [&](const auto d) { return isWall(p, d); });
                        [&](const Direction d) { return isWall(p, d); });
 }
 int8_t Maze::unknownCount(const Position p) const {
   const auto& dirs = Direction::Along4;
   return std::count_if(dirs.cbegin(), dirs.cend(),
-                       //  [&](const auto d) { return !isKnown(p, d); });
                        [&](const Direction d) { return !isKnown(p, d); });
 }
 bool Maze::updateWall(const Position p,
@@ -216,12 +214,12 @@ bool Maze::parse(std::istream& is) {
   return true;
 }
 bool Maze::parse(const std::vector<std::string>& data, const int maze_size) {
-  for (const auto xr : {true, false})
-    for (const auto yr : {false, true})
-      for (const auto xy : {false, true})
-        for (const auto b0 : Direction::Along4)
-          for (const auto b1 : Direction::Along4)
-            for (const auto b2 : Direction::Along4)
+  for (const auto xr : {true, false}) {
+    for (const auto yr : {false, true}) {
+      for (const auto xy : {false, true}) {
+        for (const auto b0 : Direction::Along4) {
+          for (const auto b1 : Direction::Along4) {
+            for (const auto b2 : Direction::Along4) {
               for (const auto b3 : Direction::Along4) {
                 const std::array<Direction, 4> bit_to_dir_map{{b0, b1, b2, b3}};
                 reset(false);
@@ -258,6 +256,12 @@ bool Maze::parse(const std::vector<std::string>& data, const int maze_size) {
                     !isWall(0, 0, Direction::North))
                   return true;
               }
+            }
+          }
+        }
+      }
+    }
+  }
   return false;
 }
 void Maze::print(std::ostream& os, const int maze_size) const {

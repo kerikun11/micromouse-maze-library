@@ -27,7 +27,7 @@ static constexpr int MAZE_SIZE = 32;
 /**
  * @brief 少数部分の切り上げ関数．
  */
-constexpr int ceil(const float f) {
+static constexpr int ceil(const float f) {
   return int(f) + (f > float(int(f)));
 }
 /**
@@ -91,6 +91,8 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 #define maze_logi std::ostream(0)
 #endif
 #endif
+
+#define MAZE_DEBUG_PROFILING 0
 
 /**
  * @brief 迷路上の方向を表す．

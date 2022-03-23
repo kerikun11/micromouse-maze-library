@@ -156,6 +156,10 @@ class StepMap {
                                        const bool known_only,
                                        const bool diag_enabled);
 
+#if MAZE_DEBUG_PROFILING
+  std::size_t queue_size_max = 0;
+#endif
+
  protected:
   /** @brief 迷路中のステップ数 */
   std::array<step_t, Position::SIZE> step_map;

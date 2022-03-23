@@ -321,6 +321,10 @@ class StepMapSlalom {
    */
   static Directions indexes2directions(const Indexes& path);
 
+#if MAZE_DEBUG_PROFILING
+  std::size_t queue_size_max = 0;
+#endif
+
  private:
   /** @brief スタートのノードの Index */
   const Index index_start = Index(Position(0, 0), Direction::North);

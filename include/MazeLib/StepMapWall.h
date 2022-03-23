@@ -91,6 +91,10 @@ class StepMapWall {
       Directions& shortest_dirs,
       const WallIndex& start = START_WALL_INDEX);
 
+#if MAZE_DEBUG_PROFILING
+  std::size_t queue_size_max = 0;
+#endif
+
  private:
   /** @brief 迷路中のステップ数 */
   std::array<step_t, WallIndex::SIZE> step_map;

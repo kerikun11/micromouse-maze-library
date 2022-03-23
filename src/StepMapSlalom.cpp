@@ -134,6 +134,9 @@ void StepMapSlalom::update(const Maze& maze,
   };
   /* 更新がなくなるまで更新 */
   while (!q.empty()) {
+#if MAZE_DEBUG_PROFILING
+    queue_size_max = std::max(queue_size_max, q.size());
+#endif
 #if STEP_MAP_USE_PRIORITY_QUEUE
     const auto focus = q.top();
 #else

@@ -66,14 +66,14 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
   std::vector<std::string> names;
 #if 0
   names.push_back("32MM2021HX");
-  // names.push_back("32MM2010HX");
   // names.push_back("32MM2015HX");  // max calc time is longest in 32x32
   // names.push_back("16MM2014CX");  // max calc time is longest in 16x16
-  // names.push_back("32_fake");
-  // names.push_back("32_unknown");
   // names.push_back("32_no_wall");
+  // names.push_back("32_farm");
   // names.push_back("32_test_01");
   // names.push_back("32_DFS_01");
+  // names.push_back("32_unknown");
+  // names.push_back("32_fake");
 #else
   for (int year = 2021; year >= 2021; --year)
     names.push_back("32MM" + std::to_string(year) + "HX");
@@ -182,6 +182,17 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
 #endif
       }
     }
+#if MAZE_DEBUG_PROFILING
+    std::cout << "StepMap MaxQueue: "
+              << robot.getSearchAlgorithm().getStepMap().queue_size_max
+              << std::endl;
+    std::cout << "StepMapWall     : "
+              << robot.getSearchAlgorithm().getStepMapWall().queue_size_max
+              << std::endl;
+    std::cout << "StepMapSlalom   : "
+              << robot.getSearchAlgorithm().getStepMapSlalom().queue_size_max
+              << std::endl;
+#endif
 #endif
 
 #if POSITION_IDENTIFICATION_RUN_ENABLED

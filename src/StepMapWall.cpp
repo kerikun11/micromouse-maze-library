@@ -166,6 +166,9 @@ void StepMapWall::update(const Maze& maze,
       step_map[i.getIndex()] = 0, q.push(i);
   /* ステップの更新がなくなるまで更新処理 */
   while (!q.empty()) {
+#if MAZE_DEBUG_PROFILING
+    queue_size_max = std::max(queue_size_max, q.size());
+#endif
     /* 注目する壁を取得 */
     const auto focus = q.front();
     q.pop();

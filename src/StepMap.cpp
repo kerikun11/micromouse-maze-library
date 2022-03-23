@@ -169,6 +169,9 @@ void StepMap::update(const Maze& maze,
       setStep(p, 0), q.push(p);
   /* ステップの更新がなくなるまで更新処理 */
   while (!q.empty()) {
+#if MAZE_DEBUG_PROFILING
+    queue_size_max = std::max(queue_size_max, q.size());
+#endif
     /* 注目する区画を取得 */
     const auto focus = q.front();
     q.pop();
