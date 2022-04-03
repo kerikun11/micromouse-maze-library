@@ -32,9 +32,9 @@ class CLRobotBase : public RobotBase {
     if (showMaze) {
       std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
       printDoubleMaze(
-          {&maze_target, getState() == SearchAlgorithm::IDENTIFYING_POSITION
-                             ? &getSearchAlgorithm().getIdMaze()
-                             : &maze},
+          {&getMaze(), getState() == SearchAlgorithm::IDENTIFYING_POSITION
+                           ? &getSearchAlgorithm().getIdMaze()
+                           : &maze},
           {&real, &currentPose},
           {&getSearchAlgorithm().getStepMap(),
            &getSearchAlgorithm().getStepMap()},

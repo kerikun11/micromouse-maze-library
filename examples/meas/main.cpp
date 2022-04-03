@@ -75,10 +75,9 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
   // names.push_back("32_unknown");
   // names.push_back("32_fake");
 #else
-  for (int year = 2021; year >= 2021; --year)
-    names.push_back("32MM" + std::to_string(year) + "HX");
-  for (int year = 2019; year >= 2010; --year)
-    names.push_back("32MM" + std::to_string(year) + "HX");
+  for (int year = 2021; year >= 2008; --year)
+    if (year != 2020)
+      names.push_back("32MM" + std::to_string(year) + "HX");
 #if 1
   for (int year = 2018; year >= 2014; --year)
     names.push_back("21MM" + std::to_string(year) + "HX_Taiwan");

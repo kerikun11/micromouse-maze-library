@@ -197,6 +197,8 @@ void StepMap::update(const Maze& maze,
           break;                          /*< 更新の必要がない */
         step_map[next_index] = next_step; /*< 更新 */
         q.push(next); /*< 再帰的に更新され得るのでキューにプッシュ */
+        // if (simple)
+        //   break;
       }
     }
   }
