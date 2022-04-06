@@ -16,6 +16,7 @@ target_include_directories(${MICROMOUSE_MAZE_LIBRARY}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 target_compile_options(${MICROMOUSE_MAZE_LIBRARY} PUBLIC
+  -fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}/= # for __FILE__
   -fconcepts # for use of 'auto' in parameter declaration
   -mno-ms-bitfields # for use of '__attribute__((__packed__))' on MSYS environment
   -fdiagnostics-color=always # colorized output for gcc
