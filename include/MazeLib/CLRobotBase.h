@@ -47,7 +47,7 @@ class CLRobotBase : public RobotBase {
     std::printf(
         "SearchTime: %2d:%02d, Step: %4d, "
         "F: %4d, L: %3d, R: %3d, B: %3d, Walls: %4d\n",
-        int(cost / 60) % 60, int(cost) % 60, step, f, l, r, b,
+        cost / 1000 / 60, cost / 1000 % 60, step, f, l, r, b,
         int(maze.getWallRecords().size()));
   }
   void printFastResult(const bool diagEnabled, const bool showMaze = false) {
@@ -71,6 +71,12 @@ class CLRobotBase : public RobotBase {
                 << " searched: " << getSearchAlgorithm().getShortestCost()
                 << std::endl;
       // at.printPath(), robot.printPath();
+    }
+  }
+  void printSearchLogs(std::ostream& os) {
+    for (const auto& data : calcNextDirectionsData) {
+      os << SearchAlgorithm::getStateString(data.state) << "\t";
+      os << data.tDur << "\n";
     }
   }
   bool searchRun() {
@@ -116,13 +122,17 @@ class CLRobotBase : public RobotBase {
 
  public:
   int step = 0, f = 0, l = 0, r = 0, b = 0; /*< 探索の評価のためのカウンタ */
-  float cost = 0;                           /*< 探索時間 [秒] */
+  uint32_t cost = 0;                        /*< 探索時間 [ms] */
   size_t walls_pi_max = 0;
   size_t walls_pi_min = MAZE_SIZE * MAZE_SIZE * 4;
-  int t_s;
-  int t_e;
-  int t_dur = 0;
-  int t_dur_max = 0;
+  int tCalcNextDirsPrev;
+  int tCalcMax = 0;
+  struct CalcNextDirectionsData {
+    SearchAlgorithm::State state;
+    Pose currentPose;
+    int tDur;
+  };
+  std::vector<CalcNextDirectionsData> calcNextDirectionsData;
 
  public:
   Maze& maze_target;
@@ -147,15 +157,18 @@ class CLRobotBase : public RobotBase {
   }
   virtual void calcNextDirectionsPreCallback() override {
     const auto now = std::chrono::steady_clock::now().time_since_epoch();
-    t_s = std::chrono::duration_cast<std::chrono::microseconds>(now).count();
+    tCalcNextDirsPrev =
+        std::chrono::duration_cast<std::chrono::microseconds>(now).count();
   }
   virtual void calcNextDirectionsPostCallback(
       SearchAlgorithm::State oldState,
       SearchAlgorithm::State newState) override {
     const auto now = std::chrono::steady_clock::now().time_since_epoch();
-    t_e = std::chrono::duration_cast<std::chrono::microseconds>(now).count();
-    t_dur = t_e - t_s;
-    t_dur_max = std::max(t_dur_max, t_dur);
+    const int tCalcNextDirsPost =
+        std::chrono::duration_cast<std::chrono::microseconds>(now).count();
+    const int tCalc = tCalcNextDirsPost - tCalcNextDirsPrev;
+    tCalcMax = std::max(tCalcMax, tCalc);
+    calcNextDirectionsData.push_back({newState, currentPose, tCalc});
     if (newState == oldState)
       return;
     /* State Change has occurred */
@@ -164,6 +177,7 @@ class CLRobotBase : public RobotBase {
           getSearchAlgorithm().getIdMaze().getWallRecords().size();
       walls_pi_min = std::min(walls_pi_min, walls);
       walls_pi_max = std::max(walls_pi_max, walls);
+      // maze_logi << tCalc << std::endl;
     }
   }
   virtual void discrepancyWithKnownWall() override {
@@ -176,6 +190,15 @@ class CLRobotBase : public RobotBase {
     // maze.backupWallRecordsToFile("maze.wallRecords"); //< (takes some time)
   }
   virtual void queueAction(const SearchAction action) override {
+#if 1
+    /* 自己位置同定走行中のスタート区画訪問の警告 */
+    if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
+        real.p == maze.getStart() && action != ST_HALF_STOP &&
+        !(fake_offset.p.x == 0 && fake_offset.d == Direction::South &&
+          maze_target.isWall(fake_offset.p, Direction::East)))
+      maze_logw << "Visited Start at P.I. fake_offset: " << fake_offset
+                << std::endl;
+#endif
 #if 1
     /* 未知区間加速のバグ探し */
     if (unknown_accel_prev && action_prev == SearchAction::ST_FULL &&
@@ -254,31 +277,33 @@ class CLRobotBase : public RobotBase {
     action_prev = action;
   }
   virtual void crashed() {
+    printInfo();
     maze_loge << "The robot crashed into the wall! fake_offset:\t"
               << fake_offset << "\tcur:\t" << currentPose << "\treal:\t" << real
               << std::endl;
+    getc(stdin);
     setBreakFlag();
   }
-  virtual float getTimeCost(const SearchAction action) {
+  virtual uint32_t getTimeCost(const SearchAction action) {
     const float velocity = 300.0f;
     const float segment = 90.0f;
     switch (action) {
       case RobotBase::START_STEP:
-        return 3.0f;
+        return 3000;
       case RobotBase::START_INIT:
-        return 3.0f;
+        return 3000;
       case RobotBase::ST_HALF_STOP:
-        return segment / 2 / velocity;
+        return segment / 2 / velocity * 1000;
       case RobotBase::TURN_L:
-        return 71 / velocity;
+        return 71 / velocity * 1000;
       case RobotBase::TURN_R:
-        return 71 / velocity;
+        return 71 / velocity * 1000;
       case RobotBase::ROTATE_180:
-        return 3.0f;
+        return 3000;
       case RobotBase::ST_FULL:
-        return segment / velocity;
+        return segment / velocity * 1000;
       case RobotBase::ST_HALF:
-        return segment / 2 / velocity;
+        return segment / 2 / velocity * 1000;
       default:
         maze_loge << "invalid action" << std::endl;
         return 0;

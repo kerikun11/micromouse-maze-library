@@ -7,7 +7,7 @@
  */
 #include "MazeLib/SearchAlgorithm.h"
 
-#include <algorithm>
+#include <algorithm> /*< for std::find */
 
 namespace MazeLib {
 
@@ -475,6 +475,9 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchForGoal(
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
     SearchAlgorithm::NextDirections& nextDirections,
     const Pose& currentPose) {
+#if MAZE_DEBUG_PROFILING
+  const auto t0 = microseconds();
+#endif
   /* 戻り値の用意 */
   Directions& nextDirectionsKnown = nextDirections.nextDirectionsKnown;
   Directions& nextDirectionCandidates = nextDirections.nextDirectionCandidates;
@@ -534,9 +537,19 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
   /* 表示用に仮壁を立てる前のステップを再計算 */
   findShortestCandidates(candidates, currentPose);
   step_map.update(maze, candidates, false, false);
+#warning "this is debug mode!"
 #endif
   /* 後処理 */
   nextDirectionCandidates = nextDirectionCandidatesAdvanced;
+#if MAZE_DEBUG_PROFILING
+  const auto t1 = microseconds();
+  const auto dur = t1 - t0;
+  static auto dur_max = dur;
+  if (dur > dur_max) {
+    dur_max = dur;
+    maze_logi << __func__ << "\t" << dur << " us" << std::endl;
+  }
+#endif
   return nextDirectionCandidates.empty() ? Error : Processing;
 }
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsBackingToStart(
@@ -600,6 +613,9 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     SearchAlgorithm::NextDirections& nextDirections,
     Pose& currentPose,
     bool& isForceGoingToGoal) {
+#if MAZE_DEBUG_PROFILING
+  const auto t0 = microseconds();
+#endif
   /* オフセットを調整する(処理はこのブロックで完結) */
   if (!idMaze.getWallRecords().empty()) {
     const int8_t min_x = idMaze.getMinX();
@@ -687,6 +703,8 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   /* エラー防止のため来た方向を追加 */
   nextDirections.nextDirectionCandidates.push_back(currentPose.d +
                                                    Direction::Back);
+  // step_map.print(idMaze, {currentPose.d}, currentPose.p);
+  // getc(stdin);
   /* 迷路をもとに戻す */
   std::reverse(wall_backup.begin(), wall_backup.end()); /* 重複対策 */
   for (const auto wr : wall_backup)
@@ -695,6 +713,15 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   if (step_map.getStep(currentPose.p) == StepMap::STEP_MAX)
     calcNextDirectionsInAdvance(idMaze, candidates, currentPose,
                                 nextDirections);
+#if MAZE_DEBUG_PROFILING
+  const auto t1 = microseconds();
+  const auto dur = t1 - t0;
+  static auto dur_max = dur;
+  if (dur > dur_max) {
+    dur_max = dur;
+    maze_logi << __func__ << "\t" << dur << " us" << std::endl;
+  }
+#endif
   return nextDirections.nextDirectionCandidates.empty() ? Error : Processing;
 }
 

@@ -6,41 +6,18 @@
 #define STEP_MAP_WALL_ENABLED 1
 #define STEP_MAP_SLALOM_ENABLED 1
 #define SHOW_MAZE 0
+#define SHOW_OBJECT_SIZE 0
 
 using namespace MazeLib;
 
-static std::string save_dir = "./";
-// static std::string save_dir = "/spiffs/";
-
 class CLRobot : public CLRobotBase {
  public:
-  CLRobot(Maze& maze_target, const std::string& name)
-      : CLRobotBase(maze_target), name(name) {
-    csv.open(save_dir + name + ".csv", std::ios::out);
-  }
-
- protected:
-  virtual void queueAction(const SearchAction action) override {
-#if 1
-    if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
-        real.p == maze.getStart() && action != ST_HALF_STOP)
-      maze_logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
-#endif
-    CLRobotBase::queueAction(action);
-  }
-  virtual void calcNextDirectionsPostCallback(
-      SearchAlgorithm::State oldState,
-      SearchAlgorithm::State newState) override {
-    CLRobotBase::calcNextDirectionsPostCallback(oldState, newState);
-    csv << getCurrentPose() << "\t" << t_dur << std::endl;
-  }
-
- private:
-  std::string name;
-  std::ofstream csv;
+  CLRobot(Maze& maze_target) : CLRobotBase(maze_target) {}
 };
 
-int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
+int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
+              const std::string& save_dir = "./") {
+#if SHOW_OBJECT_SIZE
   /* show size */
   maze_logi << "sizeof(Maze):\t" << sizeof(Maze) << std::endl;
   maze_logi << "sizeof(StepMap):\t" << sizeof(StepMap) << std::endl;
@@ -49,17 +26,16 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
   maze_logi << "sizeof(SearchAlgorithm):\t" << sizeof(SearchAlgorithm)
             << std::endl;
   maze_logi << "sizeof(RobotBase):\t" << sizeof(RobotBase) << std::endl;
+#endif
 
   /* save file */
   std::ofstream csv(save_dir + "measurement.csv");
-  // std::stringstream csv;
-  csv << "name\tsearch_time\tcost_s\tstep\tstep_f\tstep_l\tstep_r\tstep_"
-         "b\twalls\t"
-         "calc_dur_max\tdur_search\tshortest_time_ms_along\tshortest_time_ms_"
-         "diag"
+  /* print header */
+  csv << "name\tsearch_time\tsearch_time_ms\tstep\tstep_f\tstep_l\tstep_"
+         "r\tstep_b\twalls\tcalc_time_max\tshortest_ms_a\tshortest_ms_d"
 #if POSITION_IDENTIFICATION_RUN_ENABLED
-         "\tpi_calc_dur_max\tpi_cost_min\tpi_cost_max\tpi_walls_min\tpi_walls_"
-         "max"
+         "\tpi_calc_time_max\tpi_time_min\tpi_time_max\t"
+         "pi_walls_min\tpi_walls_max"
 #endif
       << std::endl;
   /* queue test files */
@@ -130,26 +106,21 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
 
 #if SEARCH_RUN_ENABLED
     /* Search Run */
-    const auto p_robot = std::make_unique<CLRobot>(maze_target, name);
+    const auto p_robot = std::make_unique<CLRobot>(maze_target);
     CLRobot& robot = *p_robot;
     robot.replaceGoals(maze_target.getGoals());
-    const auto t_s = std::chrono::system_clock().now();
     if (!robot.searchRun())
       maze_loge << "Failed to Find a Path to Goal!" << std::endl;
-    const auto t_e = std::chrono::system_clock().now();
-    const auto t_search =
-        std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s)
-            .count();
     robot.printSearchResult();
-    csv << "\t" << int(robot.cost / 60) << ":" << std::setw(2)
-        << std::setfill('0') << int(robot.cost) % 60;
+    csv << "\t" << robot.cost / 1000 / 60 << ":" << std::setw(2)
+        << std::setfill('0') << robot.cost / 1000 % 60;
     csv << "\t" << robot.cost << "\t" << robot.step << "\t" << robot.f << "\t"
         << robot.l << "\t" << robot.r << "\t" << robot.b;
     csv << "\t" << robot.getMaze().getWallRecords().size();
-    std::cout << "Max Calc Time:\t" << robot.t_dur_max << "\t[us]" << std::endl;
-    csv << "\t" << robot.t_dur_max;
-    // std::cout << "Total Search:\t" << t_search << "\t[us]" << std::endl;
-    csv << "\t" << t_search;
+    std::cout << "Max Calc Time:\t" << robot.tCalcMax << "\t[us]" << std::endl;
+    csv << "\t" << robot.tCalcMax;
+    std::ofstream res(save_dir + "search-logs-" + name + ".csv");
+    robot.printSearchLogs(res);
     /* FastRun */
     for (const auto diagEnabled : {false, true}) {
       if (!robot.calcShortestDirections(diagEnabled)) {
@@ -196,9 +167,9 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
 
 #if POSITION_IDENTIFICATION_RUN_ENABLED
     /* Position Identification Run */
-    robot.t_dur_max = 0;
-    float pi_cost_max = 0;    /*< 探索時間 [秒] */
-    float pi_cost_min = 1e6f; /*< 探索時間 [秒] */
+    robot.tCalcMax = 0;
+    uint32_t pi_time_max = 0;    /*< 探索時間 [秒] */
+    uint32_t pi_time_min = 1e6f; /*< 探索時間 [秒] */
     const auto p_step_map = std::make_unique<StepMap>();
     StepMap& step_map = *p_step_map;
     const auto p_maze_pi = std::make_unique<Maze>();
@@ -225,21 +196,21 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
             maze_loge << "Failed to Identify! fake_offset: "
                       << robot.fake_offset << std::endl;
           /* save result */
-          pi_cost_max = std::max(pi_cost_max, robot.cost);
-          pi_cost_min = std::min(pi_cost_min, robot.cost);
+          pi_time_max = std::max(pi_time_max, robot.cost);
+          pi_time_min = std::min(pi_time_min, robot.cost);
         }
     /* print result */
-    std::cout << "P.I. Max Calc:\t" << robot.t_dur_max << "\t[us]" << std::endl;
-    std::cout << "P.I. Time:\t" << (int(pi_cost_min) / 60) % 60 << ":"
-              << std::setw(2) << std::setfill('0') << int(pi_cost_min) % 60
-              << "\t" << (int(pi_cost_max) / 60) % 60 << ":" << std::setw(2)
-              << std::setfill('0') << int(pi_cost_max) % 60 << std::setfill(' ')
-              << std::endl;
-    std::cout << "P.I. wall:\t" << robot.walls_pi_min << "\t"
+    std::cout << "P.I. tCalcMax:\t" << robot.tCalcMax << "\t[us]" << std::endl;
+    std::cout << "P.I. tEst:\t" << (int(pi_time_min) / 60) % 60 << ":"
+              << std::setw(2) << std::setfill('0') << int(pi_time_min) % 60
+              << "\t" << pi_time_max / 1000 / 60 % 60 << ":" << std::setw(2)
+              << std::setfill('0') << pi_time_max / 1000 % 60
+              << std::setfill(' ') << std::endl;
+    std::cout << "P.I. walls:\t" << robot.walls_pi_min << "\t"
               << robot.walls_pi_max << std::endl;
-    csv << "\t" << robot.t_dur_max;
-    csv << "\t" << pi_cost_min;
-    csv << "\t" << pi_cost_max;
+    csv << "\t" << robot.tCalcMax;
+    csv << "\t" << pi_time_min;
+    csv << "\t" << pi_time_max;
     csv << "\t" << robot.walls_pi_min;
     csv << "\t" << robot.walls_pi_max;
 #endif
@@ -267,6 +238,9 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
       }
       std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
+#if MAZE_DEBUG_PROFILING
+      std::cout << "StepMap MaxQueue: " << map.queue_size_max << std::endl;
+#endif
 #if SHOW_MAZE
       map.print(maze, shortestDirections);
       map.printFull(maze, shortestDirections);
@@ -299,6 +273,9 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
       std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
       StepMapWall::appendStraightDirections(maze, shortestDirections);
+#if MAZE_DEBUG_PROFILING
+      std::cout << "StepMapWall MaxQueue: " << map.queue_size_max << std::endl;
+#endif
 #if SHOW_MAZE
       map.print(maze, shortestDirections);
       map.print(maze, shortestDirections, StepMapWall::START_WALL_INDEX, true);
@@ -340,6 +317,10 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
       }
       std::cout << "StepMapSlalom:\t" << sum.count() / n << "\t[us]"
                 << std::endl;
+#if MAZE_DEBUG_PROFILING
+      std::cout << "StepMapSlalom MaxQueue: " << map.queue_size_max
+                << std::endl;
+#endif
 #if SHOW_MAZE
       map.printPath(maze, path);
       map.print(maze, path);
@@ -360,8 +341,12 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/") {
   }
   std::cout << std::endl << "Measurement End" << std::endl;
 
-#if 0
-  std::cout << std::endl << csv.rdbuf() << std::endl;
+#if 1
+  std::ifstream f(save_dir + "measurement.csv");
+  std::string line;
+  while (std::getline(f, line)) {
+    std::cout << line << std::endl;
+  }
 #endif
 
   return 0;

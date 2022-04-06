@@ -18,7 +18,6 @@ class CLRobot : public CLRobotBase {
       SearchAlgorithm::State oldState,
       SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirectionsPostCallback(oldState, newState);
-    csv << t_dur << std::endl;
     if (newState == oldState)
       return;
     /* State Change has occurred */
@@ -64,6 +63,7 @@ int main(int argc, char* argv[]) {
   /* Search Run */
   robot.display = 1;
   robot.searchRun();
+  robot.printSearchLogs(csv);
 #endif
 
 #if 0

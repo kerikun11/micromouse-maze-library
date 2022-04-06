@@ -19,7 +19,7 @@ class Agent {
  public:
   /**
    * @brief 通常のコンストラクタ
-   * @param maze 更新に用いる迷路への参照(書き込み権限あり)
+   * @param maze 初期化用の迷路(読み取り専用・コピーして使用)
    */
   Agent() : searchAlgorithm(maze) {}
   Agent(const Maze& maze) : maze(maze), searchAlgorithm(this->maze) {}
@@ -194,17 +194,15 @@ class Agent {
   int getMatchCount() const { return nextDirections.poseMatchCount; }
 
  protected:
-  Maze maze;                          /**< @brief 探索に使用する迷路 */
+  Maze maze;                       /**< @brief 探索に使用する迷路 */
+  SearchAlgorithm searchAlgorithm; /**< @brief 探索器 */
+  SearchAlgorithm::NextDirections
+      nextDirections; /**< @brief 計算結果の移動方向配列 */
+  Directions shortestDirections;      /**< @brief 最短経路の方向配列 */
   Pose currentPose;                   /**< @brief 現在の姿勢 */
   bool isForceBackToStart = false;    /**< @brief 強制帰還モード */
   bool isForceGoingToGoal = false;    /**< @brief 強制終点訪問モード */
   bool isPositionIdentifying = false; /**< @brief 自己位置同定モード */
-
- private:
-  SearchAlgorithm searchAlgorithm; /**< @brief 探索器 */
-  SearchAlgorithm::NextDirections
-      nextDirections; /**< @brief 計算結果の移動方向配列 */
-  Directions shortestDirections; /**< @brief 最短経路の方向配列 */
 };
 
 }  // namespace MazeLib

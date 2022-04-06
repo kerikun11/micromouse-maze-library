@@ -8,8 +8,8 @@
 #include "MazeLib/StepMap.h"
 
 #include <algorithm> /*< for std::sort */
-#include <cmath>     /*< for std::sqrt, std::pow */
-#include <iomanip>   /*< for std::setw() */
+#include <cmath>     /*< for std::sqrt */
+#include <iomanip>   /*< for std::setw */
 #include <queue>
 
 namespace MazeLib {
@@ -147,6 +147,9 @@ void StepMap::update(const Maze& maze,
                      const Positions& dest,
                      const bool knownOnly,
                      const bool simple) {
+#if MAZE_DEBUG_PROFILING
+  const auto t0 = microseconds();
+#endif
   /* 計算を高速化するため，迷路の大きさを制限 */
   int8_t min_x = maze.getMinX();
   int8_t max_x = maze.getMaxX();
@@ -162,24 +165,50 @@ void StepMap::update(const Maze& maze,
   /* 全区画のステップを最大値に設定 */
   reset();
   /* ステップの更新予約のキュー */
+#define STEP_MAP_USE_PRIORITY_QUEUE 1
+#if STEP_MAP_USE_PRIORITY_QUEUE
+  struct Element {
+    Position p;
+    step_t s;
+    bool operator<(const Element& e) const { return s > e.s; }
+  };
+  std::priority_queue<Element> q;
+#else
   std::queue<Position> q;
+#endif
   /* destのステップを0とする */
   for (const auto p : dest)
     if (p.isInsideOfField())
+#if STEP_MAP_USE_PRIORITY_QUEUE
+      setStep(p, 0), q.push({p, 0});
+#else
       setStep(p, 0), q.push(p);
+#endif
   /* ステップの更新がなくなるまで更新処理 */
   while (!q.empty()) {
 #if MAZE_DEBUG_PROFILING
     queue_size_max = std::max(queue_size_max, q.size());
 #endif
     /* 注目する区画を取得 */
+#if STEP_MAP_USE_PRIORITY_QUEUE
+    const auto focus = q.top().p;
+    const auto focus_step_q = q.top().s;
+#else
     const auto focus = q.front();
+#endif
     q.pop();
     /* 計算を高速化するため展開範囲を制限 */
-    if (focus.x > max_x || focus.y > max_y || focus.x < min_x ||
-        focus.y < min_y)
+    // if (focus.x > max_x || focus.y > max_y || focus.x < min_x ||
+    //     focus.y < min_y)
+    if (!((uint8_t)focus.x - min_x <= (uint8_t)max_x - min_x ||
+          (uint8_t)focus.y - min_y <= (uint8_t)max_y - min_y))
       continue;
     const auto focus_step = step_map[focus.getIndex()];
+    /* 枝刈り */
+#if STEP_MAP_USE_PRIORITY_QUEUE
+    if (focus_step < focus_step_q)
+      continue;
+#endif
     /* 周辺を走査 */
     for (const auto d : Direction::Along4) {
       /* 直線で行けるところまで更新する */
@@ -191,17 +220,30 @@ void StepMap::update(const Maze& maze,
           break;
         next = next.next(d); /*< 移動 */
         /* 直線加速を考慮したステップを算出 */
-        const auto next_step = focus_step + (simple ? i : step_table[i]);
+        const step_t next_step = focus_step + (simple ? i : step_table[i]);
         const auto next_index = next.getIndex();
         if (step_map[next_index] <= next_step)
           break;                          /*< 更新の必要がない */
         step_map[next_index] = next_step; /*< 更新 */
-        q.push(next); /*< 再帰的に更新され得るのでキューにプッシュ */
-        // if (simple)
-        //   break;
+        /* 再帰的に更新するためにキューにプッシュ */
+#if STEP_MAP_USE_PRIORITY_QUEUE
+        q.push({next, next_step});
+#else
+        q.push(next);
+#endif
       }
     }
   }
+#if MAZE_DEBUG_PROFILING
+  const auto t1 = microseconds();
+  const auto dur = t1 - t0;
+  static auto dur_max = dur;
+  if (dur > dur_max) {
+    dur_max = dur;
+    maze_logi << __func__ << "\t" << dur << " us" << std::endl;
+    // print(maze);
+  }
+#endif
 }
 Directions StepMap::calcShortestDirections(const Maze& maze,
                                            const Position start,

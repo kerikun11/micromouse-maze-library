@@ -177,7 +177,7 @@ class SearchAlgorithm {
   StepMap step_map;          /**< @brief 使用するステップマップ */
   StepMapWall step_map_wall; /**< @brief 使用するステップマップ */
   StepMapSlalom step_map_slalom; /**< @brief 使用するステップマップ */
-  uint32_t cost;                 /*< 最短経路のコストを保持 */
+  uint32_t cost;                 /*< @brief 最短経路のコスト [ms] */
 
  protected:
   Maze idMaze;       /**< @brief 自己位置同定に使用する迷路 */
@@ -202,7 +202,7 @@ class SearchAlgorithm {
                               Pose& ans) const;
   /**
    * @brief 特定の区画にマッチする方向の候補を探す
-   * スタート区画への訪問を避けるために使用する関数
+   * @details スタート区画への訪問を避けるために使用する関数
    *
    * @param currentPosition 注目する区画
    * @param targetPose 検索対象の区画と方向

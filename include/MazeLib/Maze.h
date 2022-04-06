@@ -9,11 +9,22 @@
 
 #include <array>
 #include <bitset>
-#include <cmath> /*< for std::log2 */
-#include <cstdint>
-#include <fstream>
-#include <iostream>
+#include <cmath>    /*< for std::log2 */
+#include <cstdint>  /*< for uint8_t */
+#include <fstream>  /*< for std::ifstream */
+#include <iostream> /*< for std::cout */
 #include <vector>
+
+#define MAZE_DEBUG_PROFILING 0
+#if MAZE_DEBUG_PROFILING
+#warning "this is debug mode!"
+#include <chrono>
+static int microseconds() {
+  return std::chrono::duration_cast<std::chrono::microseconds>(
+             std::chrono::steady_clock::now().time_since_epoch())
+      .count();
+}
+#endif
 
 /**
  * @brief 迷路探索ライブラリはすべてこの名前空間に格納されている．
@@ -91,8 +102,6 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
 #define maze_logi std::ostream(0)
 #endif
 #endif
-
-#define MAZE_DEBUG_PROFILING 0
 
 /**
  * @brief 迷路上の方向を表す．

@@ -50,7 +50,7 @@ class CLRobot : public CLRobotBase {
 int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/data/";
-  const std::string filename = "32MM2019HX.maze";
+  const std::string filename = "32MM2021HX.maze";
   Maze maze_target;
   if (!maze_target.parse((mazedata_dir + filename).c_str()))
     return -1;
@@ -68,7 +68,7 @@ int test_position_identify() {
 #if 1
   /* Position Identification Run */
   robot.display = 1;
-  robot.fake_offset = robot.real = Pose(Position(4, 1), Direction::East);
+  robot.fake_offset = robot.real = Pose(Position(0, 5), Direction::North);
   robot.updateMaze(maze_pi); /*< 探索直後の迷路に置き換える */
   // robot.resetLastWalls(robot.getMaze().getWallRecords().size() / 2);
   robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
@@ -92,12 +92,12 @@ int test_position_identify() {
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
       for (const auto d : Direction::Along4) {
         const auto p = Position(x, y);
+        if (p == Position(0, 0))
+          continue; /*< スタートは除外 */
         if (step_map.getStep(p) == StepMap::STEP_MAX)
           continue; /*< そもそも迷路的に行き得ない区画は除外 */
         if (maze_target.isWall(p, d + Direction::Back))
           continue; /*< 壁上からは除外 */
-        if (p == Position(0, 0))
-          continue; /*< スタートは除外 */
         /* set fake offset */
         robot.fake_offset = robot.real = Pose(Position(x, y), d);
         robot.updateMaze(maze_pi); /*< 探索直後の迷路に置き換える */

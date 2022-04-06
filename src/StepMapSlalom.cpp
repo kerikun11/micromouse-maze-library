@@ -8,9 +8,8 @@
 
 #include "MazeLib/StepMapSlalom.h"
 
-#include <algorithm> /*< for std::find_if, etc. */
-#include <functional>
-#include <iomanip> /*< for std::setw() */
+#include <algorithm> /*< for std::find_if */
+#include <iomanip>   /*< for std::setw */
 #include <queue>
 
 namespace MazeLib {
@@ -111,21 +110,24 @@ void StepMapSlalom::update(const Maze& maze,
   cost_map.fill(cost);
   from_map.fill(index_start);
   /* 更新予約のキュー */
-#define STEP_MAP_USE_PRIORITY_QUEUE 0
-#if STEP_MAP_USE_PRIORITY_QUEUE == 1
-  std::function<bool(const Index, const Index)> greater = [&](const Index i1,
-                                                              const Index i2) {
-    return cost_map[i1.getIndex()] > cost_map[i2.getIndex()];
+#define STEP_MAP_USE_PRIORITY_QUEUE 1
+#if STEP_MAP_USE_PRIORITY_QUEUE
+  struct Element {
+    Index v;
+    cost_t c;
+    bool operator<(const Element& e) const { return c > e.c; }
   };
-  std::priority_queue<Index, std::vector<Index>, decltype(greater)> q(greater);
+  std::priority_queue<Element> q;
 #else
   std::queue<Index> q;
 #endif
   /* dest のコストを0とする */
-  for (const auto i : dest) {
-    cost_map[i.getIndex()] = 0;
-    q.push(i);
-  }
+  for (const auto i : dest)
+#if STEP_MAP_USE_PRIORITY_QUEUE
+    cost_map[i.getIndex()] = 0, q.push({i, 0});
+#else
+    cost_map[i.getIndex()] = 0, q.push(i);
+#endif
   /* knownOnly を考慮した壁の判定式を用意 */
   const auto canGo = [&](const WallIndex& i) {
     if (maze.isWall(i) || (knownOnly && !maze.isKnown(i)))
@@ -138,22 +140,31 @@ void StepMapSlalom::update(const Maze& maze,
     queue_size_max = std::max(queue_size_max, q.size());
 #endif
 #if STEP_MAP_USE_PRIORITY_QUEUE
-    const auto focus = q.top();
+    const auto focus = q.top().v;
+    const auto focus_cost_q = q.top().c;
 #else
     const auto focus = q.front();
 #endif
     q.pop();
     const auto focus_cost = cost_map[focus.getIndex()];
+    /* 枝刈り */
+#if STEP_MAP_USE_PRIORITY_QUEUE
+    if (focus_cost < focus_cost_q)
+      continue;
+#endif
     /* キューに追加する関数を用意 */
-    const auto pushAndContinue = [&](const Index& next,
-                                     const cost_t edgeCost) {
-      const auto next_cost = focus_cost + edgeCost;
+    const auto pushAndContinue = [&](const Index& next, const cost_t edgeCost) {
+      const cost_t next_cost = focus_cost + edgeCost;
       const auto next_index = next.getIndex();
       if (cost_map[next_index] <= next_cost)
         return false;
       cost_map[next_index] = next_cost;
       from_map[next_index] = focus;
+#if STEP_MAP_USE_PRIORITY_QUEUE
+      q.push({next, next_cost});
+#else
       q.push(next);
+#endif
       return true;
     };
     const auto nd = focus.getNodeDirection();

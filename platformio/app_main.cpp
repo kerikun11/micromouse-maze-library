@@ -10,16 +10,16 @@
 #include <iostream>
 
 /* defined in examples/meas/main.cpp */
-int test_meas(const std::string& mazedata_dir);
+int test_meas(const std::string& mazedata_dir, const std::string& save_dir);
 
 void setup() {
   SPIFFS.begin(true);
-  vTaskDelay(pdMS_TO_TICKS(2000));
+  vTaskDelay(pdMS_TO_TICKS(3000));
   maze_logi << "Hello, this is ESP32 :)" << std::endl;
 }
 
 void loop() {
-  test_meas("/spiffs/");
+  test_meas("/spiffs/", "/spiffs/");
   maze_logi << "End" << std::endl;
   vTaskDelay(portMAX_DELAY);
 }
