@@ -28,10 +28,10 @@ class SearchAlgorithm {
     Error,      /**< @brief エラーが発生 */
   };
   /**
-   * @brief 探索状態を列挙
+   * @brief 探索状態
    */
   enum State : uint8_t {
-    START,                  /**< @brief 初期位置，初期姿勢 */
+    START,                  /**< @brief 初期位置、初期姿勢 */
     SEARCHING_FOR_GOAL,     /**< @brief ゴール区画を探索中 */
     SEARCHING_ADDITIONALLY, /**< @brief 追加探索中 */
     BACKING_TO_START,       /**< @brief スタートに戻っている */
@@ -45,14 +45,24 @@ class SearchAlgorithm {
    */
   static const char* getStateString(const State s);
   /**
-   * @brief 計算結果の構造体
+   * @brief 移動方向の計算結果の構造体
    */
-  struct NextDirections {
+  struct CalcResultData {
     State state = State::START;     /**< @brief 探索状態 */
     Directions nextDirectionsKnown; /**< @brief 既地区間移動候補列 */
     Directions nextDirectionCandidates; /**< @brief 未知区間移動候補順位 */
     bool unknownAccelFlag = false; /**< @brief 未知区間加速可能フラグ */
-    int poseMatchCount = 0;        /**< @brief 自己位置同定の候補数 */
+    int positionIdMatchedCount = 0; /**< @brief 自己位置同定の候補数 */
+  };
+  /**
+   * @brief 移動方向の計算の入出力構造体
+   */
+  struct CalcData {
+    Pose currentPose;                      /**< @brief 現在の姿勢 */
+    bool isPositionIdentification = false; /**< @brief 自己位置同定モード */
+    bool isForceBackToStart = false;       /**< @brief 強制帰還モード */
+    bool isForceGoingToGoal = false; /**< @brief 強制終点訪問モード */
+    CalcResultData result; /**< @brief 移動方向列の計算結果 */
   };
 
  public:
@@ -72,6 +82,7 @@ class SearchAlgorithm {
 
   /**
    * @brief 壁の更新
+   * @details 現在の探索状態を考慮して迷路情報を更新する
    */
   bool updateWall(const State state,
                   const Pose& pose,
@@ -89,95 +100,73 @@ class SearchAlgorithm {
   /**
    * @brief 探索状態に応じた現在姿勢の更新
    */
-  void updatePose(const State& state,
-                  Pose& currentPose,
-                  bool& isForceGoingToGoal);
+  void updatePose(CalcData& calcData, const Pose& newPose);
 
   /**
    * @brief 次に進むべき方向を計算する関数
-   *
-   * @param[out] nextDirections 計算結果を格納する構造体
-   * @param[inout] currentPose 現在位置（自己位置同定の場合は変更されうる）
-   * @param[inout] isPositionIdentifying 自己位置同定フラグ
-   * @param[inout] isForceBackToStart 強制帰還フラグ
-   * @param[inout] isForceGoingToGoal 強制ゴール訪問フラグ
+   * @param[inout] calcData 計算条件と計算結果の構造体
    * @return Result 計算結果
    */
-  Result calcNextDirections(NextDirections& nextDirections,
-                            Pose& currentPose,
-                            bool& isPositionIdentifying,
-                            bool& isForceBackToStart,
-                            bool& isForceGoingToGoal);
+  Result calcNextDirections(CalcData& calcData);
   /**
    * @brief 次に進むべき候補列から次に進むべき方向を決定する関数
-   *
-   * @param[in] pose 現在姿勢
-   * @param[in] nextDirectionCandidates
+   * @param[in] calcData 事前計算の結果
    * @param[out] nextDirection 次に進むべき方向
-   * @return true 成功
-   * @return false 失敗
+   * @retval true 成功
+   * @retval false 失敗
+   */
+  bool determineNextDirection(const CalcData& calcData,
+                              Direction& nextDirection) const;
+  /**
+   * @brief 次に進むべき候補列から次に進むべき方向を決定する関数
+   * @param[in] maze 使用する迷路
+   * @param[in] pose 現在姿勢
+   * @param[in] nextDirectionCandidates 事前計算の候補列
+   * @param[out] nextDirection 次に進むべき方向
+   * @retval true 成功
+   * @retval false 失敗
    */
   bool determineNextDirection(const Maze& maze,
                               const Pose& pose,
                               const Directions& nextDirectionCandidates,
                               Direction& nextDirection) const;
   /**
-   * @brief 次に進むべき候補列から次に進むべき方向を決定する関数
-   *
-   * @param[in] state 現在状態
-   * @param[in] pose 現在姿勢
-   * @param[in] nextDirectionCandidates
-   * @param[out] nextDirection 次に進むべき方向
-   * @return true 成功
-   * @return false 失敗
-   */
-  bool determineNextDirection(const State state,
-                              const Pose& pose,
-                              const Directions& nextDirectionCandidates,
-                              Direction& nextDirection) const;
-
-  /**
    * @brief 最短経路の導出
-   *
    * @param[out] shortestDirections 最短経路を格納する方向列
-   * @param[in] diagEnabled オプション
+   * @param[in] diagEnabled 斜め走行を有効化する
    * @param[in] edgeCost 加速・スラロームの重み
-   * @return true 成功
-   * @return false 失敗
+   * @retval true 成功
+   * @retval false 失敗
    */
   bool calcShortestDirections(
       Directions& shortestDirections,
       const bool diagEnabled = true,
       const StepMapSlalom::EdgeCost& edgeCost = StepMapSlalom::EdgeCost());
-
   /**
    * @brief 自己位置同定の初期化
    *
    * @param[out] currentPose 初期姿勢
    */
   void positionIdentifyingInit(Pose& currentPose);
-
   /**
    * @brief 表示
    */
-  void printMap(const State state, const Pose& pose) const;
+  void printStepMap(const State state, const Pose& pose) const;
 
-  /**
-   * @brief Getters
-   */
+  /* Getters */
   const Maze& getMaze() const { return maze; }
-  const StepMap& getStepMap() const { return step_map; }
-  const StepMapWall& getStepMapWall() const { return step_map_wall; }
-  const StepMapSlalom& getStepMapSlalom() const { return step_map_slalom; }
+  const StepMap& getStepMap() const { return stepMap; }
+  const StepMapWall& getStepMapWall() const { return stepMapWall; }
+  const StepMapSlalom& getStepMapSlalom() const { return stepMapSlalom; }
   const Maze& getIdMaze() const { return idMaze; }
-  const uint32_t& getShortestCost() const { return cost; }
+  const uint32_t& getShortestCost() const { return shortestCost; }
 
  protected:
-  Maze& maze;                /**< @brief 使用する迷路の参照 */
-  StepMap step_map;          /**< @brief 使用するステップマップ */
-  StepMapWall step_map_wall; /**< @brief 使用するステップマップ */
-  StepMapSlalom step_map_slalom; /**< @brief 使用するステップマップ */
-  uint32_t cost;                 /*< @brief 最短経路のコスト [ms] */
+  Maze& maze;                  /**< @brief 使用する迷路の参照 */
+  StepMap stepMap;             /**< @brief 使用するステップマップ */
+  StepMapWall stepMapWall;     /**< @brief 使用するステップマップ */
+  StepMapSlalom stepMapSlalom; /**< @brief 使用するステップマップ */
+  uint32_t shortestCost;       /**< @brief 最短経路のコスト [ms] */
 
  protected:
   Maze idMaze;       /**< @brief 自己位置同定に使用する迷路 */
@@ -191,15 +180,15 @@ class SearchAlgorithm {
   /**
    * @brief 自己位置同定のパターンにマッチする候補をカウントする
    *
-   * @param idWallRecords[in] 自己位置同定走行の壁ログ
-   * @param ans[out] マッチした解のひとつ
+   * @param[in] idWallRecords 自己位置同定走行の壁ログ
+   * @param[out] matchedPose マッチした姿勢(のひとつ)
    * @return int マッチ数, 0: 失敗, 1: 特定, 2-: 複数マッチ (同定中)
    * @retval 0 失敗
    * @retval 1 特定
    * @retval 2- 複数マッチ (同定中)
    */
   int countIdentityCandidates(const WallRecords& idWallRecords,
-                              Pose& ans) const;
+                              Pose& matchedPose) const;
   /**
    * @brief 特定の区画にマッチする方向の候補を探す
    * @details スタート区画への訪問を避けるために使用する関数
@@ -214,26 +203,18 @@ class SearchAlgorithm {
   /**
    * @brief 各状態での進行方向列導出関数
    */
-  Result calcNextDirectionsSearchForGoal(NextDirections& nextDirections,
-                                         const Pose& currentPose);
-  Result calcNextDirectionsSearchAdditionally(NextDirections& nextDirections,
-                                              const Pose& currentPose);
-  Result calcNextDirectionsBackingToStart(NextDirections& nextDirections,
-                                          const Pose& currentPose);
-  Result calcNextDirectionsGoingToGoal(NextDirections& nextDirections,
-                                       const Pose& currentPose);
-  Result calcNextDirectionsPositionIdentification(
-      NextDirections& nextDirections,
-      Pose& currentPose,
-      bool& isForceGoingToGoal);
+  Result calcNextDirectionsSearchForGoal(CalcData& calcData);
+  Result calcNextDirectionsSearchAdditionally(CalcData& calcData);
+  Result calcNextDirectionsBackingToStart(CalcData& calcData);
+  Result calcNextDirectionsGoingToGoal(CalcData& calcData);
+  Result calcNextDirectionsPositionIdentification(CalcData& calcData);
   /**
    * @brief 迷路を編集してさらに優先順の精度を向上させる関数
    * @return 既知区間の最終区画
    */
   const Position calcNextDirectionsInAdvance(Maze& maze,
                                              const Positions& dest,
-                                             const Pose& startPose,
-                                             NextDirections& nextDirections);
+                                             CalcData& calcData);
 };
 
 }  // namespace MazeLib

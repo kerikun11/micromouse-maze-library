@@ -10,7 +10,7 @@ std::ofstream csv("main.csv");
 
 class CLRobot : public CLRobotBase {
  public:
-  CLRobot(Maze& maze_target) : CLRobotBase(maze_target) {}
+  CLRobot(Maze& mazeTarget) : CLRobotBase(mazeTarget) {}
   bool display = 0;
 
  protected:
@@ -36,7 +36,7 @@ class CLRobot : public CLRobotBase {
 #if 0
     /* 袋小路以外の転回検出 */
     if (action == SearchAction::ROTATE_180 &&
-        maze_target.wallCount(real.p) != 3)
+        mazeTarget.wallCount(real.p) != 3)
       MAZE_LOGI << "it's not dead end!" << std::endl, getc(stdin);
 #endif
     CLRobotBase::queueAction(action);
@@ -51,12 +51,12 @@ int main(int argc, char* argv[]) {
   const std::string filepath_default = "../mazedata/data/32MM2021HX.maze";
   const std::string filepath =
       argc > 1 ? std::string(argv[1]) : filepath_default;
-  Maze maze_target;
-  if (!maze_target.parse(filepath))
+  Maze mazeTarget;
+  if (!mazeTarget.parse(filepath))
     return -1;
-  const auto p_robot = std::make_unique<CLRobot>(maze_target);
+  const auto p_robot = std::make_unique<CLRobot>(mazeTarget);
   CLRobot& robot = *p_robot;
-  robot.replaceGoals(maze_target.getGoals());
+  robot.replaceGoals(mazeTarget.getGoals());
 #endif
 
 #if 1
@@ -79,8 +79,8 @@ int main(int argc, char* argv[]) {
   std::printf(
       "Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
       "Left: %3d, Right: %3d, Back: %3d\n",
-      ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step, robot.f,
-      robot.l, robot.r, robot.b);
+      robot.est_time / 1000 / 60 % 60, robot.est_time / 1000 % 60, robot.step,
+      robot.f, robot.l, robot.r, robot.b);
   for (bool diagEnabled : {false, true}) {
     robot.calcShortestDirections(diagEnabled);
     robot.printPath();
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
   /* StepMap */
   for (const auto simple : {true, false}) {
     const bool knownOnly = 0;
-    const Maze &maze = maze_target;
+    const Maze &maze = mazeTarget;
     const auto p = std::make_unique<StepMap>();
     StepMap &map = *p;
     std::chrono::microseconds sum{0};
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool knownOnly = 0;
-    const Maze &maze = maze_target;
+    const Maze &maze = mazeTarget;
     const auto p = std::make_unique<StepMapWall>();
     StepMapWall &map = *p;
     std::chrono::microseconds sum{0};
@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
   /* StepMapSlalom */
   for (const auto diagEnabled : {false, true}) {
     const bool knownOnly = 0;
-    const Maze &maze = maze_target;
+    const Maze &maze = mazeTarget;
     const auto p = std::make_unique<StepMapSlalom>();
     StepMapSlalom &map = *p;
     std::chrono::microseconds sum{0};

@@ -12,7 +12,7 @@ using namespace MazeLib;
 
 class CLRobot : public CLRobotBase {
  public:
-  CLRobot(Maze& maze_target) : CLRobotBase(maze_target) {}
+  CLRobot(Maze& mazeTarget) : CLRobotBase(mazeTarget) {}
 };
 
 int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
@@ -34,7 +34,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
   csv << "name\tsearch_time\tsearch_time_ms\tstep\tstep_f\tstep_l\tstep_"
          "r\tstep_b\twalls\tcalc_time_max\tshortest_ms_a\tshortest_ms_d"
 #if POSITION_IDENTIFICATION_RUN_ENABLED
-         "\tpi_calc_time_max\tpi_time_min\tpi_time_max\t"
+         "\tpi_calc_time_max\tpi_est_time_min\tpi_est_time_max\t"
          "pi_walls_min\tpi_walls_max"
 #endif
       << std::endl;
@@ -97,25 +97,25 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     csv << name;
 
     /* Maze Target */
-    const auto p_maze_target = std::make_unique<Maze>();
-    Maze& maze_target = *p_maze_target;
-    if (!maze_target.parse(mazedata_dir + name + ".maze")) {
+    const auto pMazeTarget = std::make_unique<Maze>();
+    Maze& mazeTarget = *pMazeTarget;
+    if (!mazeTarget.parse(mazedata_dir + name + ".maze")) {
       MAZE_LOGE << "File Parse Error!" << std::endl;
       continue;
     }
 
 #if SEARCH_RUN_ENABLED
     /* Search Run */
-    const auto p_robot = std::make_unique<CLRobot>(maze_target);
+    const auto p_robot = std::make_unique<CLRobot>(mazeTarget);
     CLRobot& robot = *p_robot;
-    robot.replaceGoals(maze_target.getGoals());
+    robot.replaceGoals(mazeTarget.getGoals());
     if (!robot.searchRun())
       MAZE_LOGE << "Failed to Find a Path to Goal!" << std::endl;
     robot.printSearchResult();
-    csv << "\t" << robot.cost / 1000 / 60 << ":" << std::setw(2)
-        << std::setfill('0') << robot.cost / 1000 % 60;
-    csv << "\t" << robot.cost << "\t" << robot.step << "\t" << robot.f << "\t"
-        << robot.l << "\t" << robot.r << "\t" << robot.b;
+    csv << "\t" << robot.est_time / 1000 / 60 << ":" << std::setw(2)
+        << std::setfill('0') << robot.est_time / 1000 % 60;
+    csv << "\t" << robot.est_time << "\t" << robot.step << "\t" << robot.f
+        << "\t" << robot.l << "\t" << robot.r << "\t" << robot.b;
     csv << "\t" << robot.getMaze().getWallRecords().size();
     std::cout << "Max Calc Time:\t" << robot.tCalcMax << "\t[us]" << std::endl;
     csv << "\t" << robot.tCalcMax;
@@ -137,8 +137,9 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
       robot.printPath();
 #endif
       /* Shortest Path Comparison */
-      const auto p_at = std::make_unique<Agent>(maze_target);
-      Agent& at = *p_at;
+      const auto pAgent = std::make_unique<Agent>();
+      Agent& at = *pAgent;
+      at.updateMaze(mazeTarget);
       at.calcShortestDirections(diagEnabled);
       robot.calcShortestDirections(diagEnabled);
       if (at.getSearchAlgorithm().getShortestCost() !=
@@ -153,13 +154,13 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     }
 #if MAZE_DEBUG_PROFILING
     std::cout << "StepMap MaxQueue: "
-              << robot.getSearchAlgorithm().getStepMap().queue_size_max
+              << robot.getSearchAlgorithm().getStepMap().queueSizeMax
               << std::endl;
     std::cout << "StepMapWall     : "
-              << robot.getSearchAlgorithm().getStepMapWall().queue_size_max
+              << robot.getSearchAlgorithm().getStepMapWall().queueSizeMax
               << std::endl;
     std::cout << "StepMapSlalom   : "
-              << robot.getSearchAlgorithm().getStepMapSlalom().queue_size_max
+              << robot.getSearchAlgorithm().getStepMapSlalom().queueSizeMax
               << std::endl;
 #endif
 #endif
@@ -167,49 +168,45 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
 #if POSITION_IDENTIFICATION_RUN_ENABLED
     /* Position Identification Run */
     robot.tCalcMax = 0;
-    uint32_t pi_time_max = 0;    /*< 探索時間 [秒] */
-    uint32_t pi_time_min = 1e6f; /*< 探索時間 [秒] */
-    const auto p_step_map = std::make_unique<StepMap>();
-    StepMap& step_map = *p_step_map;
-    const auto p_maze_pi = std::make_unique<Maze>();
-    Maze& maze_pi = *p_maze_pi;
-    maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
+    const auto pStepMap = std::make_unique<StepMap>();
+    StepMap& stepMap = *pStepMap;
+    const auto pMazePi = std::make_unique<Maze>();
+    Maze& mazePi = *pMazePi;
+    mazePi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
     /* 迷路的に行き得る区画を洗い出す */
-    step_map.update(maze_target, {maze_target.getStart()}, true, true);
+    stepMap.update(mazeTarget, {mazeTarget.getStart()}, true, true);
     for (int8_t x = 0; x < MAZE_SIZE; ++x)
       for (int8_t y = 0; y < MAZE_SIZE; ++y)
         for (const auto d : Direction::Along4) {
           const auto p = Position(x, y);
           if (p == Position(0, 0))
             continue; /*< スタートは除外 */
-          if (step_map.getStep(p) == StepMap::STEP_MAX)
+          if (stepMap.getStep(p) == StepMap::STEP_MAX)
             continue; /*< そもそも迷路的に行き得ない区画は除外 */
-          if (maze_target.isWall(p, d + Direction::Back))
+          if (mazeTarget.isWall(p, d + Direction::Back))
             continue; /*< 壁上からは除外 */
           robot.fake_offset = robot.real = Pose(p, d);
-          robot.updateMaze(maze_pi); /*< 探索直後の迷路に置き換える */
-          // robot.resetLastWalls(maze_pi.getWallRecords().size() / 5);
+          robot.updateMaze(mazePi); /*< 探索直後の迷路に置き換える */
+          // robot.resetLastWalls(mazePi.getWallRecords().size() / 5);
           robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
           const bool res = robot.positionIdentifyRun();
           if (!res)
             MAZE_LOGE << "Failed to Identify! fake_offset: "
                       << robot.fake_offset << std::endl;
-          /* save result */
-          pi_time_max = std::max(pi_time_max, robot.cost);
-          pi_time_min = std::min(pi_time_min, robot.cost);
         }
     /* print result */
     std::cout << "P.I. tCalcMax:\t" << robot.tCalcMax << "\t[us]" << std::endl;
-    std::cout << "P.I. tEst:\t" << (int(pi_time_min) / 60) % 60 << ":"
-              << std::setw(2) << std::setfill('0') << int(pi_time_min) % 60
-              << "\t" << pi_time_max / 1000 / 60 % 60 << ":" << std::setw(2)
-              << std::setfill('0') << pi_time_max / 1000 % 60
+    std::cout << "P.I. tEst:\t" << robot.pi_est_time_min / 1000 / 60 % 60 << ":"
+              << std::setw(2) << std::setfill('0')
+              << robot.pi_est_time_min / 1000 % 60 << "\t"
+              << robot.pi_est_time_max / 1000 / 60 % 60 << ":" << std::setw(2)
+              << std::setfill('0') << robot.pi_est_time_max / 1000 % 60
               << std::setfill(' ') << std::endl;
     std::cout << "P.I. walls:\t" << robot.walls_pi_min << "\t"
               << robot.walls_pi_max << std::endl;
     csv << "\t" << robot.tCalcMax;
-    csv << "\t" << pi_time_min;
-    csv << "\t" << pi_time_max;
+    csv << "\t" << robot.pi_est_time_min;
+    csv << "\t" << robot.pi_est_time_max;
     csv << "\t" << robot.walls_pi_min;
     csv << "\t" << robot.walls_pi_max;
 #endif
@@ -218,7 +215,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     /* StepMap */
     for (const auto simple : {true, false}) {
       const bool knownOnly = 0;
-      const Maze& maze = maze_target;
+      const Maze& maze = mazeTarget;
       const auto p = std::make_unique<StepMap>();
       StepMap& map = *p;
       std::chrono::microseconds sum{0};
@@ -238,7 +235,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
       std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
                 << sum.count() / n << "\t[us]" << std::endl;
 #if MAZE_DEBUG_PROFILING
-      std::cout << "StepMap MaxQueue: " << map.queue_size_max << std::endl;
+      std::cout << "StepMap MaxQueue: " << map.queueSizeMax << std::endl;
 #endif
 #if SHOW_MAZE
       map.print(maze, shortestDirections);
@@ -252,7 +249,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     /* StepMapWall */
     for (const auto simple : {true, false}) {
       const bool knownOnly = 0;
-      const Maze& maze = maze_target;
+      const Maze& maze = mazeTarget;
       const auto p = std::make_unique<StepMapWall>();
       StepMapWall& map = *p;
       std::chrono::microseconds sum{0};
@@ -273,7 +270,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
                 << sum.count() / n << "\t[us]" << std::endl;
       StepMapWall::appendStraightDirections(maze, shortestDirections);
 #if MAZE_DEBUG_PROFILING
-      std::cout << "StepMapWall MaxQueue: " << map.queue_size_max << std::endl;
+      std::cout << "StepMapWall MaxQueue: " << map.queueSizeMax << std::endl;
 #endif
 #if SHOW_MAZE
       map.print(maze, shortestDirections);
@@ -290,7 +287,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     {
       const bool knownOnly = 0;
       const bool diagEnabled = 1;
-      const Maze& maze = maze_target;
+      const Maze& maze = mazeTarget;
       const auto p = std::make_unique<StepMapSlalom>();
       StepMapSlalom& map = *p;
       std::chrono::microseconds sum{0};
@@ -317,8 +314,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
       std::cout << "StepMapSlalom:\t" << sum.count() / n << "\t[us]"
                 << std::endl;
 #if MAZE_DEBUG_PROFILING
-      std::cout << "StepMapSlalom MaxQueue: " << map.queue_size_max
-                << std::endl;
+      std::cout << "StepMapSlalom MaxQueue: " << map.queueSizeMax << std::endl;
 #endif
 #if SHOW_MAZE
       map.printPath(maze, path);

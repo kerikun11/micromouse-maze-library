@@ -8,8 +8,8 @@ using namespace MazeLib;
 TEST(Maze, parse_from_file) {
   /* ファイルから迷路情報を取得 */
   Maze maze;
-  const std::string file_path = "../mazedata/data/32MM2019HX.maze";
-  EXPECT_TRUE(maze.parse(file_path.c_str()));
+  const std::string filepath = "../mazedata/data/32MM2019HX.maze";
+  EXPECT_TRUE(maze.parse(filepath.c_str()));
   EXPECT_TRUE(maze.canGo(Position(0, 0), Direction::North));
   for (const auto clear : {true, false})
     EXPECT_TRUE(maze.backupWallRecordsToFile("data.bin", clear));
@@ -67,7 +67,7 @@ TEST(Maze, parse_from_string_array) {
   };
   /* parameter */
   const auto maze_data = mazeData;
-  const int maze_size = mazeData.size();
+  const int mazeSize = mazeData.size();
   const std::string output_filename = "output.maze";
   const Positions goals = {
       Position(7, 7),
@@ -78,8 +78,8 @@ TEST(Maze, parse_from_string_array) {
   /* process */
   Maze sample;
   std::ofstream of(output_filename);
-  sample.parse(maze_data, maze_size);
+  sample.parse(maze_data, mazeSize);
   sample.setGoals(goals);
-  sample.print(of, maze_size);
-  sample.print(std::cout, maze_size);
+  sample.print(of, mazeSize);
+  sample.print(std::cout, mazeSize);
 }

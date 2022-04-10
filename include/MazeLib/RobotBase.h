@@ -1,6 +1,6 @@
 /**
  * @file RobotBase.h
- * @brief ロボットのベース
+ * @brief ロボットの基本動作を定義
  * @author Ryotaro Onuki <kerikun11+github@gmail.com>
  * @date 2018-05-20
  * @copyright Copyright 2018 Ryotaro Onuki <kerikun11+github@gmail.com>
@@ -12,7 +12,7 @@
 namespace MazeLib {
 
 /**
- * @brief 迷路を探索ロボットの基底クラス．継承して仮想関数内を埋めて使用する．
+ * @brief 迷路を探索ロボットの基底クラス。継承して仮想関数内を埋めて使用する。
  */
 class RobotBase : public Agent {
  public:
@@ -73,7 +73,7 @@ class RobotBase : public Agent {
 
  protected:
   /**
-   * @brief 仮想関数．継承して中身を埋める
+   * @brief 仮想関数。継承して中身を埋める
    */
   virtual void calibration() {}
   virtual void queueAction(const SearchAction action __attribute__((unused))) {}

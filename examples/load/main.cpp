@@ -16,7 +16,7 @@ int main(void) {
 #if 1
   /* parameter */
   const auto maze_data = mazeData;
-  const int maze_size = mazeData.size();
+  const int mazeSize = mazeData.size();
   const std::string output_filename = "output.maze";
   const Positions goals = {
       Position(7, 7), Position(8, 7), Position(7, 8), Position(8, 8),
@@ -26,10 +26,10 @@ int main(void) {
   /* process */
   Maze sample;
   std::ofstream of(output_filename);
-  sample.parse(maze_data, maze_size);
+  sample.parse(maze_data, mazeSize);
   sample.setGoals(goals);
-  sample.print(of, maze_size);
-  sample.print(std::cout, maze_size);
+  sample.print(of, mazeSize);
+  sample.print(std::cout, mazeSize);
 #endif
 
 #if 0

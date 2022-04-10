@@ -1,6 +1,6 @@
 /**
  * @file RobotBase.cpp
- * @brief ロボットのベース
+ * @brief ロボットの基本動作を定義
  * @author Ryotaro Onuki <kerikun11+github@gmail.com>
  * @date 2018-05-20
  * @copyright Copyright 2018 Ryotaro Onuki <kerikun11+github@gmail.com>
@@ -135,7 +135,7 @@ void RobotBase::reset() {
 }
 bool RobotBase::searchRun() {
   /* 既に探索済みなら正常終了 */
-  if (!isForceGoingToGoal && isCompleted())
+  if (!calcData.isForceGoingToGoal && isCompleted())
     return true;
   /* 探索中断をクリア */
   setBreakFlag(false);
@@ -168,7 +168,7 @@ bool RobotBase::endFastRunBackingToStartRun() {
   for (const auto d : getShortestDirections())
     p = p.next(d);
   updateCurrentPose({p, getShortestDirections().back()});
-  /* 最短後は区画の中央にいるので，区画の切り替わり位置に移動 */
+  /* 最短後は区画の中央にいるので、区画の切り替わり位置に移動 */
   const auto next_d = getCurrentPose().d + Direction::Back;
   const auto next_p = getCurrentPose().p.next(next_d);
   updateCurrentPose(Pose(next_p, next_d));
@@ -197,7 +197,7 @@ void RobotBase::queueNextDirections(const Directions& nextDirections) {
   for (const auto nextDirection : nextDirections) {
     if (breakFlag)
       return;
-    const auto relative_d = Direction(nextDirection - currentPose.d);
+    const auto relative_d = Direction(nextDirection - getCurrentPose().d);
     switch (relative_d) {
       case Direction::Front:
         queueAction(ST_FULL);
@@ -214,7 +214,7 @@ void RobotBase::queueNextDirections(const Directions& nextDirections) {
       default:
         MAZE_LOGE << "invalid direction" << std::endl;
     }
-    updateCurrentPose(currentPose.next(nextDirection));
+    updateCurrentPose(getCurrentPose().next(nextDirection));
   }
 }
 bool RobotBase::generalSearchRun() {
@@ -231,7 +231,7 @@ bool RobotBase::generalSearchRun() {
     calcNextDirectionsPostCallback(oldState, newState);
     /* 最短経路導出結果を確認 */
     if (status == SearchAlgorithm::Error) {
-      MAZE_LOGW << "calcNextDirections Error" << std::endl;
+      MAZE_LOGW << "calcCalcData Error" << std::endl;
       stopDequeue();
       return false;
     }
@@ -251,11 +251,11 @@ bool RobotBase::generalSearchRun() {
     /* 壁を確認 */
     bool left, front, right;
     senseWalls(left, front, right);
-    if (!updateWall(currentPose, left, front, right))
+    if (!updateWall(left, front, right))
       discrepancyWithKnownWall();
     /* 壁のない方向へ1マス移動 */
     Direction nextDirection;
-    if (!determineNextDirection(currentPose, nextDirection)) {
+    if (!determineNextDirection(nextDirection)) {
       MAZE_LOGW << "I can't go anywhere!" << std::endl;
       stopDequeue();
       return false;

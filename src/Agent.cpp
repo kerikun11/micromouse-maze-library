@@ -1,6 +1,6 @@
 /**
  * @file Agent.cpp
- * @brief 現在位置，探索状態を管理するクラスを定義するファイル
+ * @brief 現在位置、探索状態を管理するクラスを定義するファイル
  * @author Ryotaro Onuki <kerikun11+github@gmail.com>
  * @date 2018-05-20
  * @copyright Copyright 2018 Ryotaro Onuki <kerikun11+github@gmail.com>
@@ -9,22 +9,20 @@
 
 namespace MazeLib {
 
-void Agent::printInfo(const bool showMaze,
-                      const Pose& pose,
-                      const SearchAlgorithm::State state) const {
+void Agent::printInfo(const bool showMaze) const {
   /* 迷路を表示 */
   if (showMaze) {
     std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-    searchAlgorithm.printMap(state, pose);
+    searchAlgorithm.printStepMap(getState(), getCurrentPose());
   }
   /* 詳細を表示 */
   std::cout << "\x1b[J"; /*< カーソル以下を消去 */
-  std::cout << "Pose: " << pose << ", "
-            << "State: " << SearchAlgorithm::getStateString(state) << ", "
-            << "Force Start: " << (isForceBackToStart ? "true " : "false")
-            << ", "
-            << "Force Goal: " << (isForceGoingToGoal ? "true " : "false")
-            << ", "
+  std::cout << "Pose: " << getCurrentPose() << ", "
+            << "State: " << SearchAlgorithm::getStateString(getState()) << ", "
+            << "Force Start: "
+            << (calcData.isForceBackToStart ? "true " : "false") << ", "
+            << "Force Goal: "
+            << (calcData.isForceGoingToGoal ? "true " : "false") << ", "
             << "Unknown Accel: " << (getUnknownAccelFlag() ? "true " : "false")
             << std::endl;
   std::cout << "Known: ";
@@ -35,7 +33,7 @@ void Agent::printInfo(const bool showMaze,
   for (const auto d : getNextDirectionCandidates())
     std::cout << d.toChar();
   std::cout << std::endl;
-  if (state == SearchAlgorithm::IDENTIFYING_POSITION)
+  if (getState() == SearchAlgorithm::IDENTIFYING_POSITION)
     std::cout << "Match Count: \t" << getMatchCount() << std::endl;
 }
 

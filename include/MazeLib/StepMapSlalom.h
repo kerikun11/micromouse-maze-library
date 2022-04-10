@@ -44,7 +44,7 @@ class StepMapSlalom {
       float am_d = 3600.0f * factor * factor; /*< 最大加速度(斜め) [mm/s/s] */
       float vm_a = 1500.0f * factor;          /*< 飽和速度 [mm/s] */
       float vm_d = 1200.0f * factor;          /*< 飽和速度(斜め) [mm/s] */
-      std::array<cost_t, Slalom::FMAX> slalom_cost_table = {{
+      std::array<cost_t, Slalom::FMAX> slalomCostTable = {{
           cost_t(257 / factor), /*< F45  [ms] @ 412 [mm/s] */
           cost_t(375 / factor), /*< F90  [ms] @ 422 [mm/s] */
           cost_t(465 / factor), /*< F135 [ms] @ 354 [mm/s] */
@@ -56,29 +56,29 @@ class StepMapSlalom {
 
    public:
     EdgeCost(const RunParameter& rp = RunParameter()) : rp(rp) {
-      genCostTable();
+      calcStraightCostTable();
     }
     cost_t getEdgeCostAlong(const int n) const {
-      return cost_table_along[n]; /*< [ms] */
+      return costTableAlong[n]; /*< [ms] */
     }
     cost_t getEdgeCostDiag(const int n) const {
-      return cost_table_diag[n]; /*< [ms] */
+      return costTableDiag[n]; /*< [ms] */
     }
     cost_t getEdgeCostSlalom(const Slalom p) const {
-      return rp.slalom_cost_table[p]; /*< [ms] */
+      return rp.slalomCostTable[p]; /*< [ms] */
     }
     const RunParameter& getRunParameter() const { return rp; }
     void setRunParameter(const RunParameter& rp) {
       this->rp = rp;
-      genCostTable();
+      calcStraightCostTable();
     }
 
    private:
     RunParameter rp; /**< @brief 走行パラメータ */
     /** @brief 台形加速を考慮したコストテーブル (壁沿い) */
-    std::array<cost_t, MAZE_SIZE * 2> cost_table_along;
+    std::array<cost_t, MAZE_SIZE * 2> costTableAlong;
     /** @brief 台形加速を考慮したコストテーブル (斜め) */
-    std::array<cost_t, MAZE_SIZE * 2> cost_table_diag;
+    std::array<cost_t, MAZE_SIZE * 2> costTableDiag;
 
     /**
      * @brief 台形加速を考慮したコストを生成する関数
@@ -89,11 +89,11 @@ class StepMapSlalom {
      * @param seg 1マスの長さ
      * @return StepMap::step_t コスト
      */
-    static cost_t gen_cost_impl(const int i,
-                                const float am,
-                                const float vs,
-                                const float vm,
-                                const float seg) {
+    static cost_t calcStraightCost(const int i,
+                                   const float am,
+                                   const float vs,
+                                   const float vm,
+                                   const float seg) {
       const auto d = seg * i; /*< i 区画分の走行距離 */
       /* グラフの面積から時間を求める */
       const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
@@ -108,20 +108,20 @@ class StepMapSlalom {
      * @brief コストテーブルを生成する関数
      * @details 各マス数ごとのコストは不変なので高速化のために予め計算しておく
      */
-    void genCostTable() {
+    void calcStraightCostTable() {
       const float seg_a = 90.0f;
       const float seg_d = 45.0f * std::sqrt(2.0f);
       for (int i = 0; i < MAZE_SIZE * 2; ++i) {
-        cost_table_along[i] = gen_cost_impl(i, rp.am_a, rp.vs, rp.vm_a, seg_a);
-        cost_table_diag[i] = gen_cost_impl(i, rp.am_d, rp.vs, rp.vm_d, seg_d);
+        costTableAlong[i] = calcStraightCost(i, rp.am_a, rp.vs, rp.vm_a, seg_a);
+        costTableDiag[i] = calcStraightCost(i, rp.am_d, rp.vs, rp.vm_d, seg_d);
       }
     }
   };
 
   /**
-   * @brief スラローム走行のノードの Index．
+   * @brief スラローム走行のノードの Index。
    * @details 「各区画中央の4方位」または「
-   * 各壁上の4方位」，の位置姿勢を一意に識別する．
+   * 各壁上の4方位」、の位置姿勢を一意に識別する。
    */
   class Index {
    private:
@@ -138,7 +138,7 @@ class StepMapSlalom {
 
    public:
     /**
-     * @brief 迷路中の Index の総数．for文などに使える．
+     * @brief 迷路中の Index の総数。for文などに使える。
      * @details x * y * (z と nd の表現数)
      */
     static constexpr int SIZE = MAZE_SIZE_MAX * MAZE_SIZE_MAX * 12;
@@ -190,7 +190,7 @@ class StepMapSlalom {
              y; /*< M * M * 12 */
     }
     /**
-     * @brief 座標の冗長を一意にする．
+     * @brief 座標の冗長を一意にする。
      * @details d を East or North のどちらかにそろえる
      */
     void uniquify(const Direction d) {
@@ -253,7 +253,7 @@ class StepMapSlalom {
   static_assert(sizeof(Index) == 2, "size error"); /**< @brief size check */
 
   /**
-   * @brief Index の動的配列，集合
+   * @brief Index の動的配列、集合
    */
   using Indexes = std::vector<Index>;
 
@@ -294,7 +294,7 @@ class StepMapSlalom {
   /**
    * @brief コストマップを辿って経路を生成する
    * @param path 経路を格納する配列
-   * @return true 成功
+   * @retval true 成功
    * @return false ゴールにたどりつけなかった
    */
   bool genPathFromMap(Indexes& path) const;
@@ -303,35 +303,35 @@ class StepMapSlalom {
    * @return cost_t 最短経路のコスト
    */
   cost_t getShortestCost() const {
-    return cost_map[index_start.opposite().getIndex()] *
+    return costMap[indexStart.opposite().getIndex()] *
            EdgeCost::RunParameter::factor;
   }
 
   /**
    * @brief 目的地の区画集合を Indexes に変換する関数
-   * @details 目的区画のうち壁のない入射 Index を抽出．すべて区画の中央の Index
-   * @param src
+   * @details 目的区画のうち壁のない入射 Index を抽出。すべて区画の中央の Index
+   * @param src 区画ベースの目的地配列
    * @return const Indexes
    */
   static Indexes convertDestinations(const Positions& src);
   /**
    * @brief ノード列を方向列に変換する関数
-   * @param path
+   * @param path 変換元の Index 列
    * @return const Directions
    */
   static Directions indexes2directions(const Indexes& path);
 
 #if MAZE_DEBUG_PROFILING
-  std::size_t queue_size_max = 0;
+  std::size_t queueSizeMax = 0;
 #endif
 
  private:
   /** @brief スタートのノードの Index */
-  const Index index_start = Index(Position(0, 0), Direction::North);
+  const Index indexStart = Index(Position(0, 0), Direction::North);
   /** @brief 迷路上のノードのコストマップ */
-  std::array<cost_t, Index::SIZE> cost_map;
+  std::array<cost_t, Index::SIZE> costMap;
   /** @brief 迷路上の最短経路候補の移動元ノードを格納するマップ */
-  std::array<Index, Index::SIZE> from_map;
+  std::array<Index, Index::SIZE> fromMap;
 };
 
 }  // namespace MazeLib

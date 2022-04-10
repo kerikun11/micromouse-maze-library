@@ -107,8 +107,8 @@ void StepMapSlalom::update(const Maze& maze,
                            const bool knownOnly) {
   /* 全ノードのコストを最大値に設定 */
   const auto cost = CostMax;
-  cost_map.fill(cost);
-  from_map.fill(index_start);
+  costMap.fill(cost);
+  fromMap.fill(indexStart);
   /* 更新予約のキュー */
 #define STEP_MAP_USE_PRIORITY_QUEUE 1
 #if STEP_MAP_USE_PRIORITY_QUEUE
@@ -124,9 +124,9 @@ void StepMapSlalom::update(const Maze& maze,
   /* dest のコストを0とする */
   for (const auto i : dest)
 #if STEP_MAP_USE_PRIORITY_QUEUE
-    cost_map[i.getIndex()] = 0, q.push({i, 0});
+    costMap[i.getIndex()] = 0, q.push({i, 0});
 #else
-    cost_map[i.getIndex()] = 0, q.push(i);
+    costMap[i.getIndex()] = 0, q.push(i);
 #endif
   /* knownOnly を考慮した壁の判定式を用意 */
   const auto canGo = [&](const WallIndex& i) {
@@ -137,7 +137,7 @@ void StepMapSlalom::update(const Maze& maze,
   /* 更新がなくなるまで更新 */
   while (!q.empty()) {
 #if MAZE_DEBUG_PROFILING
-    queue_size_max = std::max(queue_size_max, q.size());
+    queueSizeMax = std::max(queueSizeMax, q.size());
 #endif
 #if STEP_MAP_USE_PRIORITY_QUEUE
     const auto focus = q.top().v;
@@ -146,7 +146,7 @@ void StepMapSlalom::update(const Maze& maze,
     const auto focus = q.front();
 #endif
     q.pop();
-    const auto focus_cost = cost_map[focus.getIndex()];
+    const auto focus_cost = costMap[focus.getIndex()];
     /* 枝刈り */
 #if STEP_MAP_USE_PRIORITY_QUEUE
     if (focus_cost < focus_cost_q)
@@ -156,10 +156,10 @@ void StepMapSlalom::update(const Maze& maze,
     const auto pushAndContinue = [&](const Index& next, const cost_t edgeCost) {
       const cost_t next_cost = focus_cost + edgeCost;
       const auto next_index = next.getIndex();
-      if (cost_map[next_index] <= next_cost)
+      if (costMap[next_index] <= next_cost)
         return false;
-      cost_map[next_index] = next_cost;
-      from_map[next_index] = focus;
+      costMap[next_index] = next_cost;
+      fromMap[next_index] = focus;
 #if STEP_MAP_USE_PRIORITY_QUEUE
       q.push({next, next_cost});
 #else
@@ -245,20 +245,20 @@ void StepMapSlalom::update(const Maze& maze,
 }
 bool StepMapSlalom::genPathFromMap(Indexes& path) const {
   path.clear();
-  auto i = index_start.opposite();
+  auto i = indexStart.opposite();
   while (1) {
     path.push_back(i.opposite());
     /* ゴールなら終了 */
-    if (cost_map[i.getIndex()] == 0)
+    if (costMap[i.getIndex()] == 0)
       break;
     /* 移動元を確認 */
-    const auto i_from = from_map[i.getIndex()];
+    const auto i_from = fromMap[i.getIndex()];
     if (!i_from.getWallIndex().isInsideOfField())
       return false;
     /* コストが減っていなかったらおかしい */
-    if (cost_map[i.getIndex()] <= cost_map[i_from.getIndex()])
+    if (costMap[i.getIndex()] <= costMap[i_from.getIndex()])
       return false;
-    i = from_map[i.getIndex()];
+    i = fromMap[i.getIndex()];
   }
   /* ゴールにたどり着いた */
   return true;
@@ -278,18 +278,18 @@ void StepMapSlalom::print(const Maze& maze,
   };
   const auto get_min_cost_p = [&](int8_t x, int8_t y) {
     return std::min({
-        cost_map[Index(x, y, 0, Direction::East).getIndex()],
-        cost_map[Index(x, y, 0, Direction::North).getIndex()],
-        cost_map[Index(x, y, 0, Direction::West).getIndex()],
-        cost_map[Index(x, y, 0, Direction::South).getIndex()],
+        costMap[Index(x, y, 0, Direction::East).getIndex()],
+        costMap[Index(x, y, 0, Direction::North).getIndex()],
+        costMap[Index(x, y, 0, Direction::West).getIndex()],
+        costMap[Index(x, y, 0, Direction::South).getIndex()],
     });
   };
   const auto get_min_cost_w = [&](const WallIndex i) {
     return std::min({
-        cost_map[Index(i.x, i.y, i.z, Direction::NorthEast).getIndex()],
-        cost_map[Index(i.x, i.y, i.z, Direction::NorthWest).getIndex()],
-        cost_map[Index(i.x, i.y, i.z, Direction::SouthWest).getIndex()],
-        cost_map[Index(i.x, i.y, i.z, Direction::SouthEast).getIndex()],
+        costMap[Index(i.x, i.y, i.z, Direction::NorthEast).getIndex()],
+        costMap[Index(i.x, i.y, i.z, Direction::NorthWest).getIndex()],
+        costMap[Index(i.x, i.y, i.z, Direction::SouthWest).getIndex()],
+        costMap[Index(i.x, i.y, i.z, Direction::SouthEast).getIndex()],
     });
   };
   /* start to draw maze */

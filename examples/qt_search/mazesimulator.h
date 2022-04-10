@@ -210,8 +210,8 @@ class MazeSimulator : public MazeLib::RobotBase {
     return true;
   }
 
-  const Maze& getMazeTarget() { return maze_target; }
-  void setMazeTarget(const Maze& maze) { maze_target = maze; }
+  const Maze& getMazeTarget() { return mazeTarget; }
+  void setMazeTarget(const Maze& maze) { mazeTarget = maze; }
   void drawStatus() {
     std::stringstream ss;
     ss << "State: " << SearchAlgorithm::getStateString(getState());
@@ -240,18 +240,18 @@ class MazeSimulator : public MazeLib::RobotBase {
   }
 
  protected:
-  Maze maze_target;
+  Maze mazeTarget;
 
   virtual void senseWalls(bool& left, bool& front, bool& right) override {
     const auto& pose = getCurrentPose();
-    left = !maze_target.canGo(pose.p, pose.d + Direction::Left);
-    front = !maze_target.canGo(pose.p, pose.d + Direction::Front);
-    right = !maze_target.canGo(pose.p, pose.d + Direction::Right);
+    left = !mazeTarget.canGo(pose.p, pose.d + Direction::Left);
+    front = !mazeTarget.canGo(pose.p, pose.d + Direction::Front);
+    right = !mazeTarget.canGo(pose.p, pose.d + Direction::Right);
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
       updateWall(currentPose.p.next(currentPose.d), currentPose.d,
-                 !maze_target.canGo(pose.p.next(pose.d), pose.d));
+                 !mazeTarget.canGo(pose.p.next(pose.d), pose.d));
 #endif
   }
   virtual void calcNextDirectionsPreCallback() override {}

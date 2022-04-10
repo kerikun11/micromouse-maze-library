@@ -21,8 +21,8 @@ namespace MazeLib {
  */
 class CLRobotBase : public RobotBase {
  public:
-  CLRobotBase(Maze& maze_target) : maze_target(maze_target) {
-    replaceGoals(maze_target.getGoals());
+  CLRobotBase(Maze& mazeTarget) : mazeTarget(mazeTarget) {
+    replaceGoals(mazeTarget.getGoals());
   }
   void printInfo(const bool showMaze = true) {
     RobotBase::printInfo(showMaze);
@@ -35,7 +35,7 @@ class CLRobotBase : public RobotBase {
           {&getMaze(), getState() == SearchAlgorithm::IDENTIFYING_POSITION
                            ? &getSearchAlgorithm().getIdMaze()
                            : &maze},
-          {&real, &currentPose},
+          {&real, &getCurrentPose()},
           {&getSearchAlgorithm().getStepMap(),
            &getSearchAlgorithm().getStepMap()},
           std::cout);
@@ -47,7 +47,7 @@ class CLRobotBase : public RobotBase {
     std::printf(
         "SearchTime: %2d:%02d, Step: %4d, "
         "F: %4d, L: %3d, R: %3d, B: %3d, Walls: %4d\n",
-        cost / 1000 / 60, cost / 1000 % 60, step, f, l, r, b,
+        est_time / 1000 / 60, est_time / 1000 % 60, step, f, l, r, b,
         int(maze.getWallRecords().size()));
   }
   void printFastResult(const bool diagEnabled, const bool showMaze = false) {
@@ -59,8 +59,9 @@ class CLRobotBase : public RobotBase {
       printPath();
     }
     /* 最短経路の比較 */
-    const auto p_at = std::make_unique<Agent>(maze_target);
-    Agent& at = *p_at;
+    const auto pAgent = std::make_unique<Agent>();
+    Agent& at = *pAgent;
+    at.updateMaze(mazeTarget);
     at.calcShortestDirections(diagEnabled);
     calcShortestDirections(diagEnabled);
     if (at.getSearchAlgorithm().getShortestCost() !=
@@ -112,7 +113,7 @@ class CLRobotBase : public RobotBase {
   }
   bool positionIdentifyRun(const bool reset_cost = true) {
     if (reset_cost) {
-      step = f = l = r = b = cost = 0;
+      step = f = l = r = b = est_time = 0;
       calcNextDirectionsData.clear();
     }
     if (!RobotBase::positionIdentifyRun()) {
@@ -124,9 +125,15 @@ class CLRobotBase : public RobotBase {
 
  public:
   int step = 0, f = 0, l = 0, r = 0, b = 0; /*< 探索の評価のためのカウンタ */
-  uint32_t cost = 0;                        /*< 探索時間 [ms] */
+  uint32_t est_time = 0;                    /*< 探索時間 [ms] */
+
+ public:
   size_t walls_pi_max = 0;
   size_t walls_pi_min = MAZE_SIZE * MAZE_SIZE * 4;
+  uint32_t pi_est_time_max = 0;
+  uint32_t pi_est_time_min = std::numeric_limits<uint32_t>::max();
+
+ public:
   int tCalcNextDirsPrev;
   int tCalcMax = 0;
   struct CalcNextDirectionsData {
@@ -137,7 +144,7 @@ class CLRobotBase : public RobotBase {
   std::vector<CalcNextDirectionsData> calcNextDirectionsData;
 
  public:
-  Maze& maze_target;
+  Maze& mazeTarget;
   Pose fake_offset;
   Pose real;
   bool real_visit_goal = false;
@@ -147,14 +154,14 @@ class CLRobotBase : public RobotBase {
   bool unknown_accel_prev = false;
 
   virtual void senseWalls(bool& left, bool& front, bool& right) override {
-    left = !maze_target.canGo(real.p, real.d + Direction::Left);
-    front = !maze_target.canGo(real.p, real.d + Direction::Front);
-    right = !maze_target.canGo(real.p, real.d + Direction::Right);
+    left = !mazeTarget.canGo(real.p, real.d + Direction::Left);
+    front = !mazeTarget.canGo(real.p, real.d + Direction::Front);
+    right = !mazeTarget.canGo(real.p, real.d + Direction::Right);
 #if 0
     /* 前1区画先の壁を読める場合 */
     if (!front)
       updateWall(currentPose.p.next(currentPose.d), currentPose.d,
-                 !maze_target.canGo(real.p.next(real.d), real.d));
+                 !mazeTarget.canGo(real.p.next(real.d), real.d));
 #endif
   }
   virtual void calcNextDirectionsPreCallback() override {
@@ -170,7 +177,7 @@ class CLRobotBase : public RobotBase {
         std::chrono::duration_cast<std::chrono::microseconds>(now).count();
     const int tCalc = tCalcNextDirsPost - tCalcNextDirsPrev;
     tCalcMax = std::max(tCalcMax, tCalc);
-    calcNextDirectionsData.push_back({newState, currentPose, tCalc});
+    calcNextDirectionsData.push_back({getState(), getCurrentPose(), tCalc});
     if (newState == oldState)
       return;
     /* State Change has occurred */
@@ -179,6 +186,8 @@ class CLRobotBase : public RobotBase {
           getSearchAlgorithm().getIdMaze().getWallRecords().size();
       walls_pi_min = std::min(walls_pi_min, walls);
       walls_pi_max = std::max(walls_pi_max, walls);
+      pi_est_time_max = std::max(pi_est_time_max, est_time);
+      pi_est_time_min = std::min(pi_est_time_min, est_time);
     }
   }
   virtual void discrepancyWithKnownWall() override {
@@ -196,7 +205,7 @@ class CLRobotBase : public RobotBase {
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.p == maze.getStart() && action != ST_HALF_STOP &&
         !(fake_offset.p.x == 0 && fake_offset.d == Direction::South &&
-          maze_target.isWall(fake_offset.p, Direction::East)))
+          mazeTarget.isWall(fake_offset.p, Direction::East)))
       MAZE_LOGW << "Visited Start at P.I. fake_offset: " << fake_offset
                 << std::endl;
 #endif
@@ -205,7 +214,7 @@ class CLRobotBase : public RobotBase {
     if (unknown_accel_prev && action_prev == SearchAction::ST_FULL &&
         action != SearchAction::ST_FULL &&
         getNextDirectionsKnown().size() == 0 &&
-        !maze.isWall(currentPose.p, currentPose.d)) {
+        !maze.isWall(getCurrentPose().p, getCurrentPose().d)) {
       printInfo();
       MAZE_LOGW << "not straight in unknown accel" << std::endl;
       getc(stdin);
@@ -215,9 +224,10 @@ class CLRobotBase : public RobotBase {
                          getUnknownAccelFlag();
 #endif
     const auto goals = maze.getGoals();
-    if (std::find(goals.cbegin(), goals.cend(), currentPose.p) != goals.cend())
+    if (std::find(goals.cbegin(), goals.cend(), getCurrentPose().p) !=
+        goals.cend())
       real_visit_goal = true;
-    cost += getTimeCost(action);
+    est_time += getTimeCost(action);
     switch (action) {
       case RobotBase::START_STEP:
         real.p = Position(0, 1);
@@ -234,7 +244,7 @@ class CLRobotBase : public RobotBase {
         break;
       case RobotBase::TURN_L:
         real.d = real.d + Direction::Left;
-        if (!maze_target.canGo(real.p, real.d))
+        if (!mazeTarget.canGo(real.p, real.d))
           crashed();
         real.p = real.p.next(real.d);
         l++;
@@ -242,7 +252,7 @@ class CLRobotBase : public RobotBase {
         break;
       case RobotBase::TURN_R:
         real.d = real.d + Direction::Right;
-        if (!maze_target.canGo(real.p, real.d))
+        if (!mazeTarget.canGo(real.p, real.d))
           crashed();
         real.p = real.p.next(real.d);
         r++;
@@ -250,22 +260,22 @@ class CLRobotBase : public RobotBase {
         break;
       case RobotBase::ROTATE_180:
         real.d = real.d + Direction::Back;
-        if (!maze_target.canGo(real.p, real.d))
+        if (!mazeTarget.canGo(real.p, real.d))
           crashed();
         real.p = real.p.next(real.d);
         b++;
         step++;
         break;
       case RobotBase::ST_FULL:
-        if (!maze_target.canGo(real.p, real.d))
+        if (!mazeTarget.canGo(real.p, real.d))
           crashed();
         real.p = real.p.next(real.d);
         /* 未知区間加速 */
         if (getUnknownAccelFlag() && action_prev == action)
-          cost -= getTimeCost(action) / 3;
+          est_time -= getTimeCost(action) / 3;
         /* 既知区間加速 */
         if (getNextDirectionsKnown().size() > 1 && action_prev == action)
-          cost -= getTimeCost(action) / 2;
+          est_time -= getTimeCost(action) / 2;
         f++;
         step++;
         break;
@@ -280,8 +290,8 @@ class CLRobotBase : public RobotBase {
   virtual void crashed() {
     printInfo();
     MAZE_LOGE << "The robot crashed into the wall! fake_offset:\t"
-              << fake_offset << "\tcur:\t" << currentPose << "\treal:\t" << real
-              << std::endl;
+              << fake_offset << "\tcur:\t" << getCurrentPose() << "\treal:\t"
+              << real << std::endl;
     getc(stdin);
     setBreakFlag();
   }
@@ -314,23 +324,23 @@ class CLRobotBase : public RobotBase {
  protected:
   void printDoubleMaze(std::array<const Maze*, 2> maze,
                        std::array<const Pose*, 2> pose,
-                       std::array<const StepMap*, 2> step_map,
+                       std::array<const StepMap*, 2> stepMap,
                        std::ostream& os) const {
     /* preparation */
-    const int maze_size = MAZE_SIZE;
+    const int mazeSize = MAZE_SIZE;
     bool simple[2];
     for (int i = 0; i < 2; ++i) {
-      StepMap::step_t max_step = 0;
-      for (const auto step : step_map[i]->getMapArray())
+      StepMap::step_t maxStep = 0;
+      for (const auto step : stepMap[i]->getMapArray())
         if (step != StepMap::STEP_MAX)
-          max_step = std::max(max_step, step);
-      simple[i] = (max_step < 999);
+          maxStep = std::max(maxStep, step);
+      simple[i] = (maxStep < 999);
     }
     /* start to draw maze */
-    for (int8_t y = maze_size; y >= 0; --y) {
-      if (y != maze_size) {
+    for (int8_t y = mazeSize; y >= 0; --y) {
+      if (y != mazeSize) {
         for (int i = 0; i < 2; ++i) {
-          for (uint8_t x = 0; x <= maze_size; ++x) {
+          for (uint8_t x = 0; x <= mazeSize; ++x) {
             /* Vertical Wall */
             const auto w = maze[i]->isWall(x, y, Direction::West);
             const auto k = maze[i]->isKnown(x, y, Direction::West);
@@ -342,7 +352,7 @@ class CLRobotBase : public RobotBase {
             else
               os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
             /* Cell */
-            if (x != maze_size) {
+            if (x != mazeSize) {
               if (i == 0) {
                 if (Position(x, y) == maze[i]->getStart())
                   os << C_BL << " S " << C_NO;
@@ -353,16 +363,14 @@ class CLRobotBase : public RobotBase {
                   os << C_BL << " G " << C_NO;
                 else
                   os << "   ";
-              } else if (step_map[i]->getStep(x, y) == StepMap::STEP_MAX)
+              } else if (stepMap[i]->getStep(x, y) == StepMap::STEP_MAX)
                 os << C_CY << "999" << C_NO;
-              else if (step_map[i]->getStep(x, y) == 0)
-                os << C_YE << std::setw(3) << step_map[i]->getStep(x, y)
-                   << C_NO;
+              else if (stepMap[i]->getStep(x, y) == 0)
+                os << C_YE << std::setw(3) << stepMap[i]->getStep(x, y) << C_NO;
               else if (simple[i])
-                os << C_CY << std::setw(3) << step_map[i]->getStep(x, y)
-                   << C_NO;
+                os << C_CY << std::setw(3) << stepMap[i]->getStep(x, y) << C_NO;
               else
-                os << C_CY << std::setw(3) << step_map[i]->getStep(x, y) / 100
+                os << C_CY << std::setw(3) << stepMap[i]->getStep(x, y) / 100
                    << C_NO;
             }
           }
@@ -371,7 +379,7 @@ class CLRobotBase : public RobotBase {
         os << std::endl;
       }
       for (int i = 0; i < 2; ++i) {
-        for (uint8_t x = 0; x < maze_size; ++x) {
+        for (uint8_t x = 0; x < mazeSize; ++x) {
           /* Pillar */
           os << "+";
           /* Horizontal Wall */

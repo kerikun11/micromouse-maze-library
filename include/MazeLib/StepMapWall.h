@@ -29,13 +29,13 @@ class StepMapWall {
   static const WallIndex START_WALL_INDEX;
 
  public:
-  StepMapWall() { calcStraightStepTable(); }
+  StepMapWall() { calcStraightCostTable(); }
   step_t getStep(const WallIndex i) const {
-    return i.isInsideOfField() ? step_map[i.getIndex()] : STEP_MAX;
+    return i.isInsideOfField() ? stepMap[i.getIndex()] : STEP_MAX;
   }
   void setStep(const WallIndex i, const step_t step) {
     if (i.isInsideOfField())
-      step_map[i.getIndex()] = step;
+      stepMap[i.getIndex()] = step;
   }
   /**
    * @brief ステップマップの表示
@@ -50,7 +50,7 @@ class StepMapWall {
              const bool showFullStep = false,
              std::ostream& os = std::cout) const;
   /**
-   * @brief 迷路上にパスを表示
+   * @brief 迷路上に WallIndex パスを表示
    */
   void printPath(const Maze& maze,
                  const WallIndexes& indexes,
@@ -59,6 +59,14 @@ class StepMapWall {
                  const Directions& shortestDirections,
                  const WallIndex& start = START_WALL_INDEX,
                  std::ostream& os = std::cout) const;
+  /**
+   * @brief ステップマップの更新
+   *
+   * @param maze 使用する迷路情報
+   * @param dest 目的地の集合
+   * @param knownOnly 既知壁のみで更新(未知壁は壁ありとみなす)
+   * @param simple 台形加速を考慮しないシンプルな更新
+   */
   void update(const Maze& maze,
               const WallIndexes& dest,
               const bool knownOnly,
@@ -93,21 +101,21 @@ class StepMapWall {
       const WallIndex& start = START_WALL_INDEX);
 
 #if MAZE_DEBUG_PROFILING
-  std::size_t queue_size_max = 0;
+  std::size_t queueSizeMax = 0;
 #endif
 
  private:
   /** @brief 迷路中のステップ数 */
-  std::array<step_t, WallIndex::SIZE> step_map;
+  std::array<step_t, WallIndex::SIZE> stepMap;
   /** @brief 台形加速を考慮した移動コストテーブル (壁沿い方向) */
-  std::array<step_t, MAZE_SIZE * 2> step_table_along;
+  std::array<step_t, MAZE_SIZE * 2> stepTableAlong;
   /** @brief 台形加速を考慮した移動コストテーブル (斜め方向) */
-  std::array<step_t, MAZE_SIZE * 2> step_table_diag;
+  std::array<step_t, MAZE_SIZE * 2> stepTableDiag;
 
   /**
    * @brief 計算の高速化のために予め直進のコストテーブルを生成する関数
    */
-  void calcStraightStepTable();
+  void calcStraightCostTable();
 };
 
 }  // namespace MazeLib

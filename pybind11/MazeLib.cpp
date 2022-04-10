@@ -210,17 +210,17 @@ PYBIND11_MODULE(MazeLib, m) {
              maze.print();
            })
       .def("print",
-           [](const Maze& maze, const int maze_size) {
+           [](const Maze& maze, const int mazeSize) {
              py::scoped_ostream_redirect stream(
                  std::cout, py::module::import("sys").attr("stdout"));
-             maze.print(std::cout, maze_size);
+             maze.print(std::cout, mazeSize);
            })
       .def("print",
            [](const Maze& maze, const Directions& dirs, const Position start,
-              const int maze_size) {
+              const int mazeSize) {
              py::scoped_ostream_redirect stream(
                  std::cout, py::module::import("sys").attr("stdout"));
-             maze.print(dirs, start, std::cout, maze_size);
+             maze.print(dirs, start, std::cout, mazeSize);
            })
       /* parse */
       .def("parse", py::overload_cast<const std::string&>(&Maze::parse))
@@ -267,12 +267,12 @@ PYBIND11_MODULE(MazeLib, m) {
       ;
 
   /* StepMapSlalom */
-  py::class_<StepMapSlalom> step_map_slalom(m, "StepMapSlalom");
-  py::class_<StepMapSlalom::EdgeCost>(step_map_slalom, "EdgeCost")
+  py::class_<StepMapSlalom> stepMapSlalom(m, "StepMapSlalom");
+  py::class_<StepMapSlalom::EdgeCost>(stepMapSlalom, "EdgeCost")
       .def(py::init<>())
       //
       ;
-  step_map_slalom.def(py::init<>())
+  stepMapSlalom.def(py::init<>())
       .def(
           "calcShortestDirections",
           [](StepMapSlalom& map, const Maze& maze,

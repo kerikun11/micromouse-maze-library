@@ -131,36 +131,36 @@ class MazeDrawer:
             while path:
                 path.pop(0).remove()
         maze = self.maze
-        # step_map simple
-        step_map = MazeLib.StepMap()
-        sd = step_map.calcShortestDirections(maze, simple=True)
+        # stepMap simple
+        stepMap = MazeLib.StepMap()
+        sd = stepMap.calcShortestDirections(maze, simple=True)
         if not sd:
             print("Failed to Find any Path! (StepMap simple)")
         MazeLib.StepMap.appendStraightDirections(
             maze, sd, knownOnly=True, diagEnabled=False)
         self.draw_path(maze.getStart(), sd, color='b', offset=[0.05, 0.05])
-        # step_map_wall simple
-        step_map_wall = MazeLib.StepMapWall()
-        sd = step_map_wall.calcShortestDirections(maze, simple=True)
+        # stepMapWall simple
+        stepMapWall = MazeLib.StepMapWall()
+        sd = stepMapWall.calcShortestDirections(maze, simple=True)
         if not sd:
             print("Failed to Find any Path! (StepMapWall simple)")
-        sd = step_map_wall.convertWallIndexDirectionsToPositionDirections(sd)
+        sd = stepMapWall.convertWallIndexDirectionsToPositionDirections(sd)
         MazeLib.StepMap.appendStraightDirections(
             maze, sd, knownOnly=True, diagEnabled=True)
         self.draw_path_wall(maze.getStart(), sd, color='g',
                             offset=[-0.05, -0.05])
-        # step_map no_diag
-        step_map = MazeLib.StepMap()
-        sd = step_map.calcShortestDirections(maze, simple=False)
+        # stepMap no_diag
+        stepMap = MazeLib.StepMap()
+        sd = stepMap.calcShortestDirections(maze, simple=False)
         if not sd:
             print("Failed to Find any Path! (StepMap Normal)")
         MazeLib.StepMap.appendStraightDirections(
             maze, sd, knownOnly=True, diagEnabled=False)
         self.draw_path(maze.getStart(), sd, diagEnabled=False,
                        color='c', offset=[0.02, -0.02])
-        # step_map_slalom diag
-        step_map_slalom = MazeLib.StepMapSlalom()
-        sd = step_map_slalom.calcShortestDirections(maze)
+        # stepMapSlalom diag
+        stepMapSlalom = MazeLib.StepMapSlalom()
+        sd = stepMapSlalom.calcShortestDirections(maze)
         if not sd:
             print("Failed to Find any Path! (StepMapSlalom)")
         MazeLib.StepMap.appendStraightDirections(

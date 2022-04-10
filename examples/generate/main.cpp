@@ -127,15 +127,15 @@ void dig(Maze& maze) {
 void setGoalLongest(Maze& maze) {
   StepMap map;
   map.update(maze, {maze.getStart()}, false, false);
-  StepMap::step_t max_step = 0;
+  StepMap::step_t maxStep = 0;
   Position max_position;
   for (int x = 0; x < MAZE_SIZE; ++x)
     for (int y = 0; y < MAZE_SIZE; ++y) {
       const auto p = Position(x, y);
       const auto s = map.getStep(p);
-      if (s == StepMap::STEP_MAX || s <= max_step)
+      if (s == StepMap::STEP_MAX || s <= maxStep)
         continue;
-      max_step = s;
+      maxStep = s;
       max_position = p;
     }
   maze.setGoals({max_position});
@@ -187,8 +187,8 @@ int main(void) {
   std::printf(
       "Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
       "Left: %3d, Right: %3d, Back: %3d\n",
-      ((int)robot.cost / 60) % 60, ((int)robot.cost) % 60, robot.step, robot.f,
-      robot.l, robot.r, robot.b);
+      robot.est_time / 1000 / 60 % 60, robot.est_time / 1000 % 60, robot.step,
+      robot.f, robot.l, robot.r, robot.b);
   // for (bool diagEnabled : {false, true}) {
   //   robot.calcShortestDirections(diagEnabled);
   //   std::cout << "Estimated Shortest Time "

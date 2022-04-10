@@ -6,7 +6,7 @@ using namespace MazeLib;
 
 class CLRobot : public CLRobotBase {
  public:
-  CLRobot(Maze& maze_target) : CLRobotBase(maze_target) {}
+  CLRobot(Maze& mazeTarget) : CLRobotBase(mazeTarget) {}
   bool display = 0;
   void printInfo() {
     CLRobotBase::printInfoDoubleMaze();
@@ -51,25 +51,25 @@ int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/data/";
   const std::string filename = "32MM2021HX.maze";
-  Maze maze_target;
-  if (!maze_target.parse((mazedata_dir + filename).c_str()))
+  Maze mazeTarget;
+  if (!mazeTarget.parse((mazedata_dir + filename).c_str()))
     return -1;
-  const auto p_robot = std::make_unique<CLRobot>(maze_target);
+  const auto p_robot = std::make_unique<CLRobot>(mazeTarget);
   CLRobot& robot = *p_robot;
-  robot.replaceGoals(maze_target.getGoals());
+  robot.replaceGoals(mazeTarget.getGoals());
   robot.searchRun();
   // robot.printInfo();
 
   /* 探索終了時の迷路を保存 */
-  const auto p_maze_pi = std::make_unique<Maze>();
-  Maze& maze_pi = *p_maze_pi;
-  maze_pi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
+  const auto pMazePi = std::make_unique<Maze>();
+  Maze& mazePi = *pMazePi;
+  mazePi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
 
 #if 1
   /* Position Identification Run */
   robot.display = 1;
   robot.fake_offset = robot.real = Pose(Position(0, 5), Direction::North);
-  robot.updateMaze(maze_pi); /*< 探索直後の迷路に置き換える */
+  robot.updateMaze(mazePi); /*< 探索直後の迷路に置き換える */
   // robot.resetLastWalls(robot.getMaze().getWallRecords().size() / 2);
   robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
   bool res = robot.positionIdentifyRun();
@@ -84,23 +84,23 @@ int test_position_identify() {
 
 #if 1
   /* Position Identification Run */
-  const auto p_step_map = std::make_unique<StepMap>();
-  StepMap& step_map = *p_step_map;
+  const auto pStepMap = std::make_unique<StepMap>();
+  StepMap& stepMap = *pStepMap;
   /* 迷路的に行き得る区画を洗い出す */
-  step_map.update(maze_target, {maze_target.getStart()}, true, true);
+  stepMap.update(mazeTarget, {mazeTarget.getStart()}, true, true);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
       for (const auto d : Direction::Along4) {
         const auto p = Position(x, y);
         if (p == Position(0, 0))
           continue; /*< スタートは除外 */
-        if (step_map.getStep(p) == StepMap::STEP_MAX)
+        if (stepMap.getStep(p) == StepMap::STEP_MAX)
           continue; /*< そもそも迷路的に行き得ない区画は除外 */
-        if (maze_target.isWall(p, d + Direction::Back))
+        if (mazeTarget.isWall(p, d + Direction::Back))
           continue; /*< 壁上からは除外 */
         /* set fake offset */
         robot.fake_offset = robot.real = Pose(Position(x, y), d);
-        robot.updateMaze(maze_pi); /*< 探索直後の迷路に置き換える */
+        robot.updateMaze(mazePi); /*< 探索直後の迷路に置き換える */
         // robot.resetLastWalls(robot.getMaze().getWallRecords().size() / 2);
         robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
         robot.display = 1;

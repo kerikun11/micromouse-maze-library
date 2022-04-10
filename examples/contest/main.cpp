@@ -6,7 +6,7 @@ using namespace MazeLib;
 
 class CLRobot : public CLRobotBase {
  public:
-  CLRobot(Maze& maze_target) : CLRobotBase(maze_target) {}
+  CLRobot(Maze& mazeTarget) : CLRobotBase(mazeTarget) {}
   bool display = false;
 
   void wait() {
@@ -48,9 +48,9 @@ class CLRobot : public CLRobotBase {
 #if 1
     /* fix mistook wall */
     if (step == 354) {
-      maze_target.setWall(0, 28, Direction::East, false);
-      maze_target.setWall(0, 29, Direction::East, false);
-      maze_target.setWall(0, 30, Direction::East, false);
+      mazeTarget.setWall(0, 28, Direction::East, false);
+      mazeTarget.setWall(0, 29, Direction::East, false);
+      mazeTarget.setWall(0, 30, Direction::East, false);
     }
     /* 1st crashed here */
     if (step == 1071) {
@@ -79,18 +79,18 @@ int main(void) {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/data/";
   const std::string filename = "32MM2019HX.maze";
-  Maze maze_target;
-  if (!maze_target.parse((mazedata_dir + filename).c_str()))
+  Maze mazeTarget;
+  if (!mazeTarget.parse((mazedata_dir + filename).c_str()))
     return -1;
-  const auto p_robot = std::make_unique<CLRobot>(maze_target);
+  const auto p_robot = std::make_unique<CLRobot>(mazeTarget);
   CLRobot& robot = *p_robot;
-  robot.replaceGoals(maze_target.getGoals());
+  robot.replaceGoals(mazeTarget.getGoals());
 
 #if 1
   /* Set Mistook Wall */
-  maze_target.setWall(0, 28, Direction::East, true);
-  maze_target.setWall(0, 29, Direction::East, true);
-  maze_target.setWall(0, 30, Direction::East, true);
+  mazeTarget.setWall(0, 28, Direction::East, true);
+  mazeTarget.setWall(0, 29, Direction::East, true);
+  mazeTarget.setWall(0, 30, Direction::East, true);
 
   /* 1. Search Run */
   robot.display = 0;
@@ -119,7 +119,7 @@ int main(void) {
   robot.fastRun(true);
   /* 2nd Recovery */
   /* Set Mistook Wall */
-  maze_target.setWall(27, 1, Direction::North, true);
+  mazeTarget.setWall(27, 1, Direction::North, true);
   robot.fake_offset = robot.real = Pose(Position(2, 1), Direction::East);
   robot.setForceGoingToGoal();
   robot.setForceBackToStart();

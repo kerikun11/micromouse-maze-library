@@ -32,7 +32,7 @@ class StepMap {
    * @brief ステップマップを初期化する関数
    * @param step この値で初期化する
    */
-  void reset(const step_t step = STEP_MAX) { step_map.fill(step); }
+  void reset(const step_t step = STEP_MAX) { stepMap.fill(step); }
   /**
    * @brief ステップの取得
    * @details 盤面外なら `STEP_MAX` を返す
@@ -45,7 +45,7 @@ class StepMap {
    * @details 盤面外なら `STEP_MAX` を返す
    */
   step_t getStep(const Position p) const {
-    return p.isInsideOfField() ? step_map[p.getIndex()] : STEP_MAX;
+    return p.isInsideOfField() ? stepMap[p.getIndex()] : STEP_MAX;
   }
   /**
    * @brief ステップの更新
@@ -60,16 +60,16 @@ class StepMap {
    */
   void setStep(const Position p, const step_t step) {
     if (p.isInsideOfField())
-      step_map[p.getIndex()] = step;
+      stepMap[p.getIndex()] = step;
   }
   /**
    * @brief ステップマップの生配列への参照を取得 (読み取り専用)
    */
-  const auto& getMapArray() const { return step_map; }
+  const auto& getMapArray() const { return stepMap; }
   /**
    * @brief ステップのスケーリング係数を取得
    */
-  const auto getScalingFactor() const { return scaling_factor; }
+  const auto getScalingFactor() const { return scalingFactor; }
   /**
    * @brief ステップの表示
    * @param p ハイライト区画
@@ -93,8 +93,8 @@ class StepMap {
   /**
    * @brief ステップマップの更新
    * @param dest ステップを0とする目的地の区画の集合(順不同)
-   * @param knownOnly true:未知壁は通過不可能，false:未知壁は通過可能とする
-   * @param simple 台形加速を考慮せず，隣接区画のコストをすべて1にする
+   * @param knownOnly true:未知壁は通過不可能、false:未知壁は通過可能とする
+   * @param simple 台形加速を考慮せず、隣接区画のコストをすべて1にする
    */
   void update(const Maze& maze,
               const Positions& dest,
@@ -106,8 +106,8 @@ class StepMap {
    * @param start 始点区画
    * @param dest 目的地区画の集合(順不同)
    * @param knownOnly 既知壁のみモードかどうか
-   * @return const Directions スタートからゴールへの最短経路の方向列．
-   *                    経路がない場合は空配列となる．
+   * @return const Directions スタートからゴールへの最短経路の方向列。
+   *                    経路がない場合は空配列となる。
    */
   Directions calcShortestDirections(const Maze& maze,
                                     const Position start,
@@ -149,7 +149,7 @@ class StepMap {
   /**
    * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
    * @param maze 迷路の参照
-   * @param shortestDirections 追記元の方向列．これ自体に追記される．
+   * @param shortestDirections 追記元の方向列。これ自体に追記される。
    * @param diagEnabled 斜めありなし
    */
   static void appendStraightDirections(const Maze& maze,
@@ -158,24 +158,24 @@ class StepMap {
                                        const bool diagEnabled);
 
 #if MAZE_DEBUG_PROFILING
-  std::size_t queue_size_max = 0;
+  std::size_t queueSizeMax = 0;
 #endif
 
  protected:
   /** @brief 迷路中のステップ数 */
-  std::array<step_t, Position::SIZE> step_map;
+  std::array<step_t, Position::SIZE> stepMap;
   /** @brief 台形加速を考慮した移動コストテーブル (壁沿い方向) */
-  std::array<step_t, MAZE_SIZE> step_table;
+  std::array<step_t, MAZE_SIZE> stepTable;
   /**
    * @brief コストの合計が 65,535 [ms] を超えないようにスケーリングする係数
    */
-  static constexpr float scaling_factor = 2;
+  static constexpr float scalingFactor = 2;
 
   /**
    * @brief 最短経路導出用の加速を考慮したステップリストを算出する関数
-   * 高速化のため，あらかじめ計算を終えておく．
+   * 高速化のため、あらかじめ計算を終えておく。
    */
-  void calcStraightStepTable();
+  void calcStraightCostTable();
 };
 
 }  // namespace MazeLib

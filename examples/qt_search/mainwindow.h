@@ -23,7 +23,7 @@ class MainWindow : public QMainWindow {
       : QMainWindow(parent),
         ui(new Ui::MainWindow),
         scene(new QGraphicsScene),
-        maze_simulator(ui, scene) {
+        mazeSimulator(ui, scene) {
     ui->setupUi(this);
     ui->fileSeectEdit->setText("../mazedata/data/32MM2016HX.maze");
     ui->statusBar->showMessage("Hello World!");
@@ -56,11 +56,11 @@ class MainWindow : public QMainWindow {
       return;
     }
     /* Print Maze */
-    maze_simulator.clear();
-    maze_simulator.drawMaze(maze);
+    mazeSimulator.clear();
+    mazeSimulator.drawMaze(maze);
     /* Set the Maze */
-    maze_simulator.setMazeTarget(maze);
-    maze_simulator.replaceGoals(maze.getGoals());
+    mazeSimulator.setMazeTarget(maze);
+    mazeSimulator.replaceGoals(maze.getGoals());
   }
 
   void on_drawAllButton_clicked() {
@@ -83,8 +83,8 @@ class MainWindow : public QMainWindow {
       //    rp.vm_a *= factor * factor;
       //    rp.vm_d *= factor * factor;
       //    StepMapSlalom::EdgeCost edgeCost(rp);
-      const auto& maze = maze_simulator.getMazeTarget();
-      if (!maze_simulator.drawShortest(maze, true, edgeCost)) {
+      const auto& maze = mazeSimulator.getMazeTarget();
+      if (!mazeSimulator.drawShortest(maze, true, edgeCost)) {
         QMessageBox box(QMessageBox::Warning, "Path Error",
                         "Failed to Find any Shortest Path!");
         box.exec();
@@ -103,8 +103,8 @@ class MainWindow : public QMainWindow {
       //    rp.vm_a *= factor * factor;
       //    rp.vm_d *= factor * factor;
       //    StepMapSlalom::EdgeCost edgeCost(rp);
-      const auto& maze = maze_simulator.getMazeTarget();
-      if (!maze_simulator.drawShortest(maze, false, edgeCost)) {
+      const auto& maze = mazeSimulator.getMazeTarget();
+      if (!mazeSimulator.drawShortest(maze, false, edgeCost)) {
         QMessageBox box(QMessageBox::Warning, "Path Error",
                         "Failed to Find any Shortest Path!");
         box.exec();
@@ -114,8 +114,8 @@ class MainWindow : public QMainWindow {
   }
 
   void on_stepmapSimpleButton_clicked() {
-    const auto& maze = maze_simulator.getMazeTarget();
-    if (!maze_simulator.drawShortestStepMap(maze, true)) {
+    const auto& maze = mazeSimulator.getMazeTarget();
+    if (!mazeSimulator.drawShortestStepMap(maze, true)) {
       QMessageBox box(QMessageBox::Warning, "Path Error",
                       "Failed to Find any Shortest Path!");
       box.exec();
@@ -124,8 +124,8 @@ class MainWindow : public QMainWindow {
   }
 
   void on_stepmapTrapezoidButton_clicked() {
-    const auto& maze = maze_simulator.getMazeTarget();
-    if (!maze_simulator.drawShortestStepMap(maze, false)) {
+    const auto& maze = mazeSimulator.getMazeTarget();
+    if (!mazeSimulator.drawShortestStepMap(maze, false)) {
       QMessageBox box(QMessageBox::Warning, "Path Error",
                       "Failed to Find any Shortest Path!");
       box.exec();
@@ -134,8 +134,8 @@ class MainWindow : public QMainWindow {
   }
 
   void on_stepmapWallSimpleButton_clicked() {
-    const auto& maze = maze_simulator.getMazeTarget();
-    if (!maze_simulator.drawShortestStepMapWall(maze, true)) {
+    const auto& maze = mazeSimulator.getMazeTarget();
+    if (!mazeSimulator.drawShortestStepMapWall(maze, true)) {
       QMessageBox box(QMessageBox::Warning, "Path Error",
                       "Failed to Find any Shortest Path!");
       box.exec();
@@ -144,8 +144,8 @@ class MainWindow : public QMainWindow {
   }
 
   void on_stepmapWallTrapezoidButton_clicked() {
-    const auto& maze = maze_simulator.getMazeTarget();
-    if (!maze_simulator.drawShortestStepMapWall(maze, false)) {
+    const auto& maze = mazeSimulator.getMazeTarget();
+    if (!mazeSimulator.drawShortestStepMapWall(maze, false)) {
       QMessageBox box(QMessageBox::Warning, "Path Error",
                       "Failed to Find any Shortest Path!");
       box.exec();
@@ -171,24 +171,24 @@ class MainWindow : public QMainWindow {
 
   void on_actionDraw_triggered() { on_drawButton_clicked(); }
 
-  void on_resetButton_clicked() { maze_simulator.reset(); }
+  void on_resetButton_clicked() { mazeSimulator.reset(); }
 
   void on_stepToggleButton_clicked() {
-    //  maze_simulator.toggle(ui->stepTimeBox->text().toInt());
-    maze_simulator.toggle(1);
+    //  mazeSimulator.toggle(ui->stepTimeBox->text().toInt());
+    mazeSimulator.toggle(1);
   }
 
   void on_stepButton_clicked() {
-    //  maze_simulator.next(ui->stepCountBox->text().toInt());
-    maze_simulator.next(1);
+    //  mazeSimulator.next(ui->stepCountBox->text().toInt());
+    mazeSimulator.next(1);
   }
 
   void on_searchButton_clicked() {
     /* Print Maze */
-    maze_simulator.clear();
-    maze_simulator.searchRun();
-    maze_simulator.clear();
-    maze_simulator.drawMaze(maze_simulator.getMaze());
+    mazeSimulator.clear();
+    mazeSimulator.searchRun();
+    mazeSimulator.clear();
+    mazeSimulator.drawMaze(mazeSimulator.getMaze());
     /* Draw Shortest Path */
     on_shortestDiagButton_clicked();
     on_shortestNoDiagButton_clicked();
@@ -286,17 +286,17 @@ class MainWindow : public QMainWindow {
  private:
   Ui::MainWindow* ui;
   QGraphicsScene* scene;
-  MazeSimulator maze_simulator;
+  MazeSimulator mazeSimulator;
   StepMapSlalom::EdgeCost edgeCost;
 
   void on_slalomCostBox_valueChanged(StepMapSlalom::Slalom slalom, int value) {
     auto rp = edgeCost.getRunParameter();
     StepMapSlalom::EdgeCost::RunParameter rp_default;
     if (value > 0)
-      rp.slalom_cost_table[slalom] =
+      rp.slalomCostTable[slalom] =
           value / StepMapSlalom::EdgeCost::RunParameter::factor;
     else
-      rp.slalom_cost_table[slalom] = rp_default.slalom_cost_table[slalom];
+      rp.slalomCostTable[slalom] = rp_default.slalomCostTable[slalom];
     edgeCost.setRunParameter(rp);
     /* draw */
     on_drawButton_clicked();

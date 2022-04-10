@@ -10,10 +10,10 @@ TEST(CLRobotBase, CLRobotBase) {
   // const std::string filename = "32MM2019HX.maze";
   const std::string filename = "16MM2020CX.maze";
   // const std::string filename = "09MM2019C_Cheese_cand.maze";
-  Maze maze_target;
-  EXPECT_TRUE(maze_target.parse((mazedata_dir + filename).c_str()));
-  CLRobotBase robot(maze_target);
-  robot.replaceGoals(maze_target.getGoals());
+  Maze mazeTarget;
+  EXPECT_TRUE(mazeTarget.parse((mazedata_dir + filename).c_str()));
+  CLRobotBase robot(mazeTarget);
+  robot.replaceGoals(mazeTarget.getGoals());
 
   /* Search Run */
   robot.resetLastWalls();
@@ -36,7 +36,7 @@ TEST(CLRobotBase, CLRobotBase) {
   /* StepMap */
   for (const auto simple : {true, false}) {
     const bool knownOnly = 0;
-    const Maze& maze = maze_target;
+    const Maze& maze = mazeTarget;
     StepMap map;
     auto shortestDirections = map.calcShortestDirections(
         maze, maze.getStart(), maze.getGoals(), knownOnly, simple);
@@ -52,7 +52,7 @@ TEST(CLRobotBase, CLRobotBase) {
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool knownOnly = 0;
-    const Maze& maze = maze_target;
+    const Maze& maze = mazeTarget;
     StepMapWall map;
     auto shortestDirections =
         map.calcShortestDirections(maze, knownOnly, simple);
@@ -66,7 +66,7 @@ TEST(CLRobotBase, CLRobotBase) {
 
   /* StepMapSlalom */
   const bool knownOnly = 0;
-  const Maze& maze = maze_target;
+  const Maze& maze = mazeTarget;
   StepMapSlalom map;
   StepMapSlalom::Indexes shortestIndexes;
   map.update(maze, StepMapSlalom::EdgeCost(),
@@ -83,10 +83,10 @@ TEST(CLRobotBase, fake) {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/data/";
   const std::string filename = "32_fake.maze";
-  Maze maze_target;
-  EXPECT_TRUE(maze_target.parse((mazedata_dir + filename).c_str()));
-  CLRobotBase robot(maze_target);
-  robot.replaceGoals(maze_target.getGoals());
+  Maze mazeTarget;
+  EXPECT_TRUE(mazeTarget.parse((mazedata_dir + filename).c_str()));
+  CLRobotBase robot(mazeTarget);
+  robot.replaceGoals(mazeTarget.getGoals());
 
   /* Search Run */
   robot.resetLastWalls();
@@ -107,7 +107,7 @@ TEST(CLRobotBase, fake) {
   /* StepMap */
   for (const auto simple : {true, false}) {
     const bool knownOnly = 0;
-    const Maze& maze = maze_target;
+    const Maze& maze = mazeTarget;
     StepMap map;
     auto shortestDirections = map.calcShortestDirections(
         maze, maze.getStart(), maze.getGoals(), knownOnly, simple);
@@ -123,7 +123,7 @@ TEST(CLRobotBase, fake) {
   /* StepMapWall */
   for (const auto simple : {true, false}) {
     const bool knownOnly = 0;
-    const Maze& maze = maze_target;
+    const Maze& maze = mazeTarget;
     StepMapWall map;
     auto shortestDirections =
         map.calcShortestDirections(maze, knownOnly, simple);
@@ -138,7 +138,7 @@ TEST(CLRobotBase, fake) {
 
   /* StepMapSlalom */
   const bool knownOnly = 0;
-  const Maze& maze = maze_target;
+  const Maze& maze = mazeTarget;
   StepMapSlalom map;
   StepMapSlalom::Indexes shortestIndexes;
   map.update(maze, StepMapSlalom::EdgeCost(),
