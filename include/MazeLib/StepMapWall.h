@@ -79,6 +79,7 @@ class StepMapWall {
                                    const WallIndex& start,
                                    WallIndex& end,
                                    const bool knownOnly,
+                                   const bool simple,
                                    const bool breakUnknown) const;
   static WallIndexes convertDestinations(const Maze& maze,
                                          const Positions& positions);

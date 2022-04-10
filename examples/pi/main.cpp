@@ -41,7 +41,7 @@ class CLRobot : public CLRobotBase {
 #if 1
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
         real.p == maze.getStart() && action != ST_HALF_STOP)
-      maze_logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
+      MAZE_LOGW << "Visited Start! fake_offset: " << fake_offset << std::endl;
 #endif
     CLRobotBase::queueAction(action);
   }

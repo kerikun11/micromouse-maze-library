@@ -37,7 +37,7 @@ void MoveRobot(const Direction relative_dir) {
     case Direction::Back:
       return /* <引き返しの処理> */;
     default:
-      maze_loge << "invalid direction: " << relative_dir << std::endl;
+      MAZE_LOGE << "invalid direction: " << relative_dir << std::endl;
       return;
   }
 }
@@ -99,7 +99,7 @@ int SearchRun(Maze& maze, const Maze& maze_target) {
         maze, current_pos, maze.getGoals(), false, true);
     /* エラー処理 */
     if (move_dirs.empty()) {
-      maze_loge << "Failed to Find a path to goal!" << std::endl;
+      MAZE_LOGE << "Failed to Find a path to goal!" << std::endl;
       return -1;
     }
     /* 未知壁のある区画に当たるまで進む */
@@ -148,7 +148,7 @@ int SearchRun(Maze& maze, const Maze& maze_target) {
         maze, current_pos, shortest_candidates, false, true);
     /* エラー処理 */
     if (move_dirs.empty()) {
-      maze_loge << "Failed to Find a path to goal!" << std::endl;
+      MAZE_LOGE << "Failed to Find a path to goal!" << std::endl;
       return -1;
     }
     /* 未知壁のある区画に当たるまで進む */
@@ -176,7 +176,7 @@ int SearchRun(Maze& maze, const Maze& maze_target) {
         maze, current_pos, {maze.getStart()}, true, true);
     /* エラー処理 */
     if (move_dirs.empty()) {
-      maze_loge << "Failed to Find a path to goal!" << std::endl;
+      MAZE_LOGE << "Failed to Find a path to goal!" << std::endl;
       return -1;
     }
     /* 経路上を進む */
@@ -204,7 +204,7 @@ int ShortestRun(const Maze& maze) {
   const auto shortest_dirs = step_map.calcShortestDirections(
       maze, maze.getStart(), maze.getGoals(), true, false);
   if (shortest_dirs.empty()) {
-    maze_loge << "Failed to Find a path to goal!" << std::endl;
+    MAZE_LOGE << "Failed to Find a path to goal!" << std::endl;
     return -1;
   }
   /* 最短走行 */

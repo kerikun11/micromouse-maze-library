@@ -15,6 +15,7 @@
 #include <iostream> /*< for std::cout */
 #include <vector>
 
+/* debug profiling option */
 #define MAZE_DEBUG_PROFILING 0
 #if MAZE_DEBUG_PROFILING
 #warning "this is debug mode!"
@@ -24,6 +25,72 @@ static int microseconds() {
              std::chrono::steady_clock::now().time_since_epoch())
       .count();
 }
+#define MAZE_DEBUG_PROFILING_START(id) const auto t0_##id = microseconds();
+#define MAZE_DEBUG_PROFILING_END(id)                                 \
+  {                                                                  \
+    const auto t1_##id = microseconds();                             \
+    const auto dur = t1_##id - t0_##id;                              \
+    static auto dur_max = 0;                                         \
+    if (dur > dur_max) {                                             \
+      dur_max = dur;                                                 \
+      MAZE_LOGD << __func__ << "(" << #id << ")\t" << dur << " [us]" \
+                << std::endl;                                        \
+    }                                                                \
+  }
+#else
+#define MAZE_DEBUG_PROFILING_START(id)
+#define MAZE_DEBUG_PROFILING_END(id)
+#endif
+
+/*
+ * 迷路のカラー表示切替
+ */
+#ifdef MAZE_COLOR_DISABLED
+#define C_RE ""
+#define C_GR ""
+#define C_YE ""
+#define C_BL ""
+#define C_MA ""
+#define C_CY ""
+#define C_NO ""
+#else
+#define C_RE "\x1b[31m" /**< @brief ANSI Escape Sequence RED */
+#define C_GR "\x1b[32m" /**< @brief ANSI Escape Sequence GREEN */
+#define C_YE "\x1b[33m" /**< @brief ANSI Escape Sequence YELLOW */
+#define C_BL "\x1b[34m" /**< @brief ANSI Escape Sequence BLUE */
+#define C_MA "\x1b[35m" /**< @brief ANSI Escape Sequence MAGENTA */
+#define C_CY "\x1b[36m" /**< @brief ANSI Escape Sequence CYAN */
+#define C_NO "\x1b[0m"  /**< @brief ANSI Escape Sequence RESET */
+#endif
+
+/**
+ * @brief ログ出力の選択
+ * @details 0: None, 1: Error, 2: Warn, 3: Info, 4: Debug
+ */
+#ifndef MAZE_LOG_LEVEL
+#define MAZE_LOG_LEVEL 4
+#endif
+#define MAZE_LOG_STREAM_BASE(s, l, c) \
+  (s << c "[" l "][" __FILE__ ":" << __LINE__ << "]" C_NO "\t")
+#if MAZE_LOG_LEVEL >= 1
+#define MAZE_LOGE MAZE_LOG_STREAM_BASE(std::cout, "E", C_RE)
+#else
+#define MAZE_LOGE std::ostream(0)
+#endif
+#if MAZE_LOG_LEVEL >= 2
+#define MAZE_LOGW MAZE_LOG_STREAM_BASE(std::cout, "W", C_YE)
+#else
+#define MAZE_LOGW std::ostream(0)
+#endif
+#if MAZE_LOG_LEVEL >= 3
+#define MAZE_LOGI MAZE_LOG_STREAM_BASE(std::cout, "I", C_GR)
+#else
+#define MAZE_LOGI std::ostream(0)
+#endif
+#if MAZE_LOG_LEVEL >= 4
+#define MAZE_LOGD MAZE_LOG_STREAM_BASE(std::cout, "D", C_BL)
+#else
+#define MAZE_LOGD std::ostream(0)
 #endif
 
 /**
@@ -49,59 +116,6 @@ static constexpr int MAZE_SIZE_BIT = ceil(std::log2(MAZE_SIZE));
  * @brief 迷路の1辺の区画数の最大値．2のbit数乗の値．
  */
 static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
-
-/*
- * 迷路のカラー表示切替
- */
-#ifdef MAZE_COLOR_DISABLED
-#define C_RE ""
-#define C_GR ""
-#define C_YE ""
-#define C_BL ""
-#define C_MA ""
-#define C_CY ""
-#define C_NO ""
-#else
-#define C_RE "\x1b[31m" /**< @brief ANSI Escape Sequence RED */
-#define C_GR "\x1b[32m" /**< @brief ANSI Escape Sequence GREEN */
-#define C_YE "\x1b[33m" /**< @brief ANSI Escape Sequence YELLOW */
-#define C_BL "\x1b[34m" /**< @brief ANSI Escape Sequence BLUE */
-#define C_MA "\x1b[35m" /**< @brief ANSI Escape Sequence MAGENTA */
-#define C_CY "\x1b[36m" /**< @brief ANSI Escape Sequence CYAN */
-#define C_NO "\x1b[0m"  /**< @brief ANSI Escape Sequence RESET */
-#endif
-
-/** @brief 引数を文字列リテラルに変換するマクロ */
-#define MAZE_TO_STRING_SUPPORT(n) #n
-/** @brief 引数を文字列リテラルに変換するマクロの補助 */
-#define MAZE_TO_STRING(n) MAZE_TO_STRING_SUPPORT(n)
-/** @brief 行番号の文字列リテラルを返すマクロ */
-#define MAZE_LINENO MAZE_TO_STRING(__LINE__)
-
-/** @brief Log Stream (Error) */
-#ifndef maze_loge
-#if 1
-#define maze_loge (std::cout << C_RE "[E][" __FILE__ ":" MAZE_LINENO "]\t" C_NO)
-#else
-#define maze_loge std::ostream(0)
-#endif
-#endif
-/** @brief Log Stream (Warning) */
-#ifndef maze_logw
-#if 1
-#define maze_logw (std::cout << C_YE "[W][" __FILE__ ":" MAZE_LINENO "]\t" C_NO)
-#else
-#define maze_logw std::ostream(0)
-#endif
-#endif
-/** @brief Log Stream (Info) */
-#ifndef maze_logi
-#if 1
-#define maze_logi (std::cout << C_GR "[I][" __FILE__ ":" MAZE_LINENO "]\t" C_NO)
-#else
-#define maze_logi std::ostream(0)
-#endif
-#endif
 
 /**
  * @brief 迷路上の方向を表す．

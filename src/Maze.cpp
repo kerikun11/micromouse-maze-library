@@ -37,7 +37,7 @@ Position Position::next(const Direction d) const {
     case Direction::SouthEast:
       return Position(x + 1, y - 1);
     default:
-      maze_loge << d << std::endl;
+      MAZE_LOGE << d << std::endl;
       return *this;
   }
 }
@@ -52,7 +52,7 @@ Position Position::rotate(const Direction d) const {
     case Direction::South:
       return Position(y, -x);
     default:
-      maze_loge << d << std::endl;
+      MAZE_LOGE << d << std::endl;
       return *this;
   }
 }
@@ -87,7 +87,7 @@ WallIndex WallIndex::next(const Direction d) const {
     case Direction::SouthEast:
       return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
     default:
-      maze_loge << d << std::endl;
+      MAZE_LOGE << d << std::endl;
       return WallIndex(x, y, z);
   }
 }
@@ -412,7 +412,7 @@ bool Maze::backupWallRecordsToFile(const std::string& filepath,
   /* WallRecords を追記 */
   std::ofstream ofs(filepath, std::ios::binary | std::ios::app);
   if (ofs.fail()) {
-    maze_logw << "failed to open file! " << filepath << std::endl;
+    MAZE_LOGW << "failed to open file! " << filepath << std::endl;
     return false;
   }
   while (backup_counter < wallRecords.size()) {
@@ -425,7 +425,7 @@ bool Maze::backupWallRecordsToFile(const std::string& filepath,
 bool Maze::restoreWallRecordsFromFile(const std::string& filepath) {
   std::ifstream f(filepath, std::ios::binary);
   if (f.fail()) {
-    maze_logw << "failed to open file! " << filepath << std::endl;
+    MAZE_LOGW << "failed to open file! " << filepath << std::endl;
     return false;
   }
   reset();

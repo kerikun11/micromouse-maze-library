@@ -28,23 +28,13 @@ class CLRobot : public CLRobotBase {
           setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
           const bool res = CLRobotBase::positionIdentifyRun();
           if (!res)
-            maze_loge << "Failed to Identify! fake_offset: " << fake_offset
+            MAZE_LOGE << "Failed to Identify! fake_offset: " << fake_offset
                       << std::endl;
         }
       }
     }
     updateMaze(maze_searched); /*< 探索終了時の迷路に置き換える */
     return true;
-  }
-
- protected:
-  virtual void queueAction(const SearchAction action) override {
-#if 0
-    if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
-        real.p == maze.getStart() && action != ST_HALF_STOP)
-      maze_logw << "Visited Start! fake_offset: " << fake_offset << std::endl;
-#endif
-    CLRobotBase::queueAction(action);
   }
 };
 
@@ -54,7 +44,7 @@ void thread_maze(const std::string& name) {
   const auto filepath = mazedata_dir + name + ".maze";
   Maze maze_target;
   if (!maze_target.parse(filepath)) {
-    maze_loge << "File Parse Error!" << std::endl;
+    MAZE_LOGE << "File Parse Error!" << std::endl;
     return;
   }
 

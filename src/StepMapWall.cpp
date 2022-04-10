@@ -28,7 +28,7 @@ void StepMapWall::print(const Maze& maze,
   for (const auto step : step_map)
     if (step != STEP_MAX)
       max_step = std::max(max_step, step);
-  const bool simple = (max_step < 999);
+  const bool simple = showFullStep || (max_step < 999);
   const step_t scaler =
       step_table_diag[MAZE_SIZE * 2 - 1] - step_table_diag[MAZE_SIZE * 2 - 2];
   /* start to draw maze */
@@ -143,21 +143,7 @@ void StepMapWall::update(const Maze& maze,
                          const WallIndexes& dest,
                          const bool knownOnly,
                          const bool simple) {
-#if MAZE_DEBUG_PROFILING
-  const auto t0 = microseconds();
-#endif
-  /* 計算を高速化するため，迷路の大きさを制限 */
-  int8_t min_x = maze.getMinX();
-  int8_t max_x = maze.getMaxX();
-  int8_t min_y = maze.getMinY();
-  int8_t max_y = maze.getMaxY();
-  for (const auto p : dest) { /*< ゴールを含めないと導出不可能になる */
-    min_x = std::min(p.x, min_x);
-    max_x = std::max(p.x, max_x);
-    min_y = std::min(p.y, min_y);
-    max_y = std::max(p.y, max_y);
-  }
-  min_x -= 1, min_y -= 1, max_x += 2, max_y += 2; /*< 外周を許す */
+  MAZE_DEBUG_PROFILING_START(0)
   /* 全区画のステップを最大値に設定 */
   const auto step = STEP_MAX;
   step_map.fill(step);
@@ -175,7 +161,7 @@ void StepMapWall::update(const Maze& maze,
 #endif
   /* destのステップを0とする */
   for (const auto i : dest)
-    if (i.isInsideOfField())
+    if (i.isInsideOfField() && !maze.isWall(i))
 #if STEP_MAP_USE_PRIORITY_QUEUE
       step_map[i.getIndex()] = 0, q.push({i, 0});
 #else
@@ -194,15 +180,9 @@ void StepMapWall::update(const Maze& maze,
     const auto focus = q.front();
 #endif
     q.pop();
-    /* 計算を高速化するため展開範囲を制限 */
-    // if (focus.x > max_x || focus.y > max_y || focus.x < min_x ||
-    //     focus.y < min_y)
-    if (!((uint8_t)focus.x - min_x <= (uint8_t)max_x - min_x ||
-          (uint8_t)focus.y - min_y <= (uint8_t)max_y - min_y))
-      continue;
     const auto focus_step = step_map[focus.getIndex()];
-    /* 枝刈り */
 #if STEP_MAP_USE_PRIORITY_QUEUE
+    /* 枝刈り */
     if (focus_step < focus_step_q)
       continue;
 #endif
@@ -232,15 +212,7 @@ void StepMapWall::update(const Maze& maze,
       }
     }
   }
-#if MAZE_DEBUG_PROFILING
-  const auto t1 = microseconds();
-  const auto dur = t1 - t0;
-  static auto dur_max = dur;
-  if (dur > dur_max) {
-    dur_max = dur;
-    maze_logi << __func__ << "\t" << dur << " us" << std::endl;
-  }
-#endif
+  MAZE_DEBUG_PROFILING_END(0)
 }
 Directions StepMapWall::calcShortestDirections(const Maze& maze,
                                                const WallIndex& start,
@@ -251,7 +223,7 @@ Directions StepMapWall::calcShortestDirections(const Maze& maze,
   update(maze, dest, knownOnly, simple);
   WallIndex end;
   const auto shortestDirections =
-      getStepDownDirections(maze, start, end, knownOnly, false);
+      getStepDownDirections(maze, start, end, knownOnly, simple, false);
   /* ゴール判定 */
   return step_map[end.getIndex()] == 0 ? shortestDirections : Directions{};
 }
@@ -259,8 +231,67 @@ Directions StepMapWall::getStepDownDirections(const Maze& maze,
                                               const WallIndex& start,
                                               WallIndex& end,
                                               const bool knownOnly,
-                                              const bool breakUnknown
-                                              __attribute__((unused))) const {
+                                              const bool simple,
+                                              const bool breakUnknown) const {
+#if 0
+  /* 最短経路となるスタートからの方向列 */
+  Directions shortestDirections;
+  auto& focus = end;
+  /* start から順にステップマップを下る */
+  focus = start;
+  /* 確認 */
+  if (!start.isInsideOfField())
+    return {};
+  /* 周辺の走査; 未知壁の有無と最小ステップの方向を求める */
+  while (1) {
+    const auto focus_step = step_map[focus.getIndex()];
+    // MAZE_LOGI << focus << "\t" << focus_step << std::endl;
+    /* 終了条件 */
+    if (focus_step == 0)
+      break;
+    /* 周辺を走査 */
+    auto min_p = focus;
+    auto min_d = Direction::Max;
+    for (const auto d : focus.getNextDirection6()) {
+      const auto& step_table =
+          (d.isAlong() ? step_table_along : step_table_diag);
+      /* 直線で行けるところまで探す */
+      auto next = focus;
+      for (int8_t i = 1;; ++i) {
+        next = next.next(d); /*< 移動 */
+        /* 壁あり or 既知壁のみで未知壁 ならば次へ */
+        if (maze.isWall(next) || (knownOnly && !maze.isKnown(next)))
+          break;
+        /* 直線加速を考慮したステップを算出 */
+        const step_t next_step = focus_step - (simple ? i : step_table[i]);
+        /* エッジコストと一致する確認 */
+        if (step_map[next.getIndex()] == next_step) {
+          min_p = next, min_d = d;
+          goto loop_exit;
+        }
+      }
+    }
+  loop_exit:
+    /* 現在地よりステップが大きかったらなんかおかしい */
+    if (focus_step <= step_map[min_p.getIndex()]) {
+      MAZE_LOGE << "error" << std::endl;
+      break;
+    }
+    /* 移動分を結果に追加 */
+    while (focus != min_p) {
+      /* breakUnknown のとき，未知壁を含むならば既知区間は終了 */
+      if (breakUnknown && maze.isKnown(focus))
+        return shortestDirections;
+      focus = focus.next(min_d);
+      shortestDirections.push_back(min_d);
+    }
+  }
+  return shortestDirections;
+#else
+  MAZE_DEBUG_PROFILING_START(0)
+  /* 壁ベースはたどり方に注意。135度ターンが鋭角にならないように1マスずつ。 */
+  (void)simple;
+  (void)breakUnknown;
   /* 最短経路となるスタートからの方向列 */
   Directions shortestDirections;
   /* start から順にステップマップを下る */
@@ -281,7 +312,7 @@ Directions StepMapWall::getStepDownDirections(const Maze& maze,
         continue;
       /* min_step よりステップが小さければ更新 (同じなら更新しない) */
       const auto next_step = step_map[next.getIndex()];
-      if (min_step <= next_step)
+      if (min_step < next_step)
         continue;
       min_step = next_step;
       min_d = d;
@@ -292,7 +323,9 @@ Directions StepMapWall::getStepDownDirections(const Maze& maze,
     end = end.next(min_d);                //< 位置を更新
     shortestDirections.push_back(min_d);  //< 既知区間移動
   }
+  MAZE_DEBUG_PROFILING_END(0)
   return shortestDirections;
+#endif
 }
 WallIndexes StepMapWall::convertDestinations(const Maze& maze,
                                              const Positions& positions) {
@@ -320,7 +353,7 @@ Direction StepMapWall::convertWallIndexDirection(const WallIndex& i,
     case Direction::SouthEast:
       return i.z == 0 ? Direction::South : Direction::East;
     default:
-      maze_loge << "invalid direction" << std::endl;
+      MAZE_LOGE << "invalid direction" << std::endl;
       return Direction::Max;
   }
 }
@@ -398,6 +431,12 @@ void StepMapWall::calcStraightStepTable() {
   for (int i = 0; i < MAZE_SIZE * 2; ++i) {
     step_table_along[i] /= scaling_factor;
     step_table_diag[i] /= scaling_factor;
+#if 0
+    MAZE_LOGI << "step_table_along[" << i << "]:\t" << step_table_along[i]
+              << "\t"
+              << "step_table_diag[" << i << "]:\t" << step_table_diag[i]
+              << std::endl;
+#endif
   }
 }
 

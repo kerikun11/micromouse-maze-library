@@ -233,7 +233,7 @@ class StepMapSlalom {
         case Direction::SouthEast:
           return z == 1 ? Direction::Left45 : Direction::Right45;
         default:
-          maze_loge << "Invalid Direction: " << nd << std::endl;
+          MAZE_LOGE << "Invalid Direction: " << nd << std::endl;
           return Direction::Max;
       }
     }

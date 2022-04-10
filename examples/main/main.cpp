@@ -37,7 +37,7 @@ class CLRobot : public CLRobotBase {
     /* 袋小路以外の転回検出 */
     if (action == SearchAction::ROTATE_180 &&
         maze_target.wallCount(real.p) != 3)
-      maze_logi << "it's not dead end!" << std::endl, getc(stdin);
+      MAZE_LOGI << "it's not dead end!" << std::endl, getc(stdin);
 #endif
     CLRobotBase::queueAction(action);
   }
@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
       shortestDirections = map.calcShortestDirections(
           maze, maze.getStart(), maze.getGoals(), knownOnly, simple);
       if (shortestDirections.empty())
-        maze_loge << "Failed!" << std::endl;
+        MAZE_LOGE << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
       const auto t_s = std::chrono::system_clock().now();
       shortestDirections = map.calcShortestDirections(maze, knownOnly, simple);
       if (shortestDirections.empty())
-        maze_loge << "Failed!" << std::endl;
+        MAZE_LOGE << "Failed!" << std::endl;
       const auto t_e = std::chrono::system_clock().now();
       const auto us =
           std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);

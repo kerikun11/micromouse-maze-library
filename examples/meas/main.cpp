@@ -19,13 +19,13 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
               const std::string& save_dir = "./") {
 #if SHOW_OBJECT_SIZE
   /* show size */
-  maze_logi << "sizeof(Maze):\t" << sizeof(Maze) << std::endl;
-  maze_logi << "sizeof(StepMap):\t" << sizeof(StepMap) << std::endl;
-  maze_logi << "sizeof(StepMapWall):\t" << sizeof(StepMapWall) << std::endl;
-  maze_logi << "sizeof(StepMapSlalom):\t" << sizeof(StepMapSlalom) << std::endl;
-  maze_logi << "sizeof(SearchAlgorithm):\t" << sizeof(SearchAlgorithm)
+  MAZE_LOGI << "sizeof(Maze):\t" << sizeof(Maze) << std::endl;
+  MAZE_LOGI << "sizeof(StepMap):\t" << sizeof(StepMap) << std::endl;
+  MAZE_LOGI << "sizeof(StepMapWall):\t" << sizeof(StepMapWall) << std::endl;
+  MAZE_LOGI << "sizeof(StepMapSlalom):\t" << sizeof(StepMapSlalom) << std::endl;
+  MAZE_LOGI << "sizeof(SearchAlgorithm):\t" << sizeof(SearchAlgorithm)
             << std::endl;
-  maze_logi << "sizeof(RobotBase):\t" << sizeof(RobotBase) << std::endl;
+  MAZE_LOGI << "sizeof(RobotBase):\t" << sizeof(RobotBase) << std::endl;
 #endif
 
   /* save file */
@@ -100,7 +100,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     const auto p_maze_target = std::make_unique<Maze>();
     Maze& maze_target = *p_maze_target;
     if (!maze_target.parse(mazedata_dir + name + ".maze")) {
-      maze_loge << "File Parse Error!" << std::endl;
+      MAZE_LOGE << "File Parse Error!" << std::endl;
       continue;
     }
 
@@ -110,7 +110,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     CLRobot& robot = *p_robot;
     robot.replaceGoals(maze_target.getGoals());
     if (!robot.searchRun())
-      maze_loge << "Failed to Find a Path to Goal!" << std::endl;
+      MAZE_LOGE << "Failed to Find a Path to Goal!" << std::endl;
     robot.printSearchResult();
     csv << "\t" << robot.cost / 1000 / 60 << ":" << std::setw(2)
         << std::setfill('0') << robot.cost / 1000 % 60;
@@ -119,12 +119,12 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     csv << "\t" << robot.getMaze().getWallRecords().size();
     std::cout << "Max Calc Time:\t" << robot.tCalcMax << "\t[us]" << std::endl;
     csv << "\t" << robot.tCalcMax;
-    std::ofstream res(save_dir + "search-logs-" + name + ".csv");
+    std::ofstream res(save_dir + name + ".csv");
     robot.printSearchLogs(res);
     /* FastRun */
     for (const auto diagEnabled : {false, true}) {
       if (!robot.calcShortestDirections(diagEnabled)) {
-        maze_loge << "Failed to Find a Shortest Path! "
+        MAZE_LOGE << "Failed to Find a Shortest Path! "
                   << (diagEnabled ? "diag" : "no_diag") << std::endl;
         continue;
       }
@@ -141,15 +141,14 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
       Agent& at = *p_at;
       at.calcShortestDirections(diagEnabled);
       robot.calcShortestDirections(diagEnabled);
-      if (at.getShortestDirections() != robot.getShortestDirections()) {
-        maze_logw << "searched path is not shortest! "
+      if (at.getSearchAlgorithm().getShortestCost() !=
+          robot.getSearchAlgorithm().getShortestCost()) {
+        MAZE_LOGW << "searched path is not shortest! "
                   << (diagEnabled ? "(diag)" : "(no_diag)") << std::endl;
-        maze_logw << "real: " << at.getSearchAlgorithm().getShortestCost()
+        MAZE_LOGW << "real: " << at.getSearchAlgorithm().getShortestCost()
                   << " searched: "
                   << robot.getSearchAlgorithm().getShortestCost() << std::endl;
-#if SHOW_MAZE
-        at.printPath(), robot.printPath();
-#endif
+        // at.printPath(), robot.printPath();
       }
     }
 #if MAZE_DEBUG_PROFILING
@@ -193,7 +192,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
           robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
           const bool res = robot.positionIdentifyRun();
           if (!res)
-            maze_loge << "Failed to Identify! fake_offset: "
+            MAZE_LOGE << "Failed to Identify! fake_offset: "
                       << robot.fake_offset << std::endl;
           /* save result */
           pi_time_max = std::max(pi_time_max, robot.cost);
@@ -230,7 +229,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
         shortestDirections =
             map.calcShortestDirections(maze, knownOnly, simple);
         if (shortestDirections.empty())
-          maze_loge << "Failed!" << std::endl;
+          MAZE_LOGE << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
         const auto us =
             std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
@@ -264,7 +263,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
         shortestDirections =
             map.calcShortestDirections(maze, knownOnly, simple);
         if (shortestDirections.empty())
-          maze_loge << "Failed!" << std::endl;
+          MAZE_LOGE << "Failed!" << std::endl;
         const auto t_e = std::chrono::system_clock().now();
         const auto us =
             std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
@@ -305,7 +304,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
                    StepMapSlalom::convertDestinations(maze.getGoals()),
                    knownOnly);
         if (!map.genPathFromMap(path)) {
-          maze_loge << "Failed!" << std::endl;
+          MAZE_LOGE << "Failed!" << std::endl;
         }
         shortestDirections = map.indexes2directions(path);
         StepMap::appendStraightDirections(maze, shortestDirections, knownOnly,
@@ -330,11 +329,11 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
 #endif
 
 #if 0
+    /* print csv file */
     std::ifstream f(save_dir + name + ".csv");
     std::string line;
-    while (std::getline(f, line)) {
+    while (std::getline(f, line))
       std::cout << line << std::endl;
-    }
 #endif
 
     csv << std::endl;

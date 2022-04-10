@@ -65,9 +65,9 @@ class CLRobotBase : public RobotBase {
     calcShortestDirections(diagEnabled);
     if (at.getSearchAlgorithm().getShortestCost() !=
         getSearchAlgorithm().getShortestCost()) {
-      maze_logw << "searched path is not shortest! "
+      MAZE_LOGW << "searched path is not shortest! "
                 << (diagEnabled ? "(diag)" : "(no_diag)") << std::endl;
-      maze_logw << "real: " << at.getSearchAlgorithm().getShortestCost()
+      MAZE_LOGW << "real: " << at.getSearchAlgorithm().getShortestCost()
                 << " searched: " << getSearchAlgorithm().getShortestCost()
                 << std::endl;
       // at.printPath(), robot.printPath();
@@ -81,7 +81,7 @@ class CLRobotBase : public RobotBase {
   }
   bool searchRun() {
     if (!RobotBase::searchRun()) {
-      maze_loge << "searchRun failed." << std::endl;
+      MAZE_LOGE << "searchRun failed." << std::endl;
       return false;
     }
     return true;
@@ -89,7 +89,7 @@ class CLRobotBase : public RobotBase {
   bool fastRun(const bool diagEnabled) {
     /* 最短経路の導出 */
     if (!calcShortestDirections(diagEnabled)) {
-      maze_logw << "Failed to find shortest path!" << std::endl;
+      MAZE_LOGW << "Failed to find shortest path!" << std::endl;
       return false;
     }
     /* 現在位置をスタート区画に設定 */
@@ -105,16 +105,18 @@ class CLRobotBase : public RobotBase {
     real = Pose(p, getShortestDirections().back());
     /* スタート区画に帰る */
     if (!endFastRunBackingToStartRun()) {
-      maze_loge << "endFastRunBackingToStartRun failed." << std::endl;
+      MAZE_LOGE << "endFastRunBackingToStartRun failed." << std::endl;
       return false;
     }
     return true;
   }
   bool positionIdentifyRun(const bool reset_cost = true) {
-    if (reset_cost)
+    if (reset_cost) {
       step = f = l = r = b = cost = 0;
+      calcNextDirectionsData.clear();
+    }
     if (!RobotBase::positionIdentifyRun()) {
-      maze_loge << "positionIdentifyRun failed." << std::endl;
+      MAZE_LOGE << "positionIdentifyRun failed." << std::endl;
       return false;
     }
     return true;
@@ -177,12 +179,11 @@ class CLRobotBase : public RobotBase {
           getSearchAlgorithm().getIdMaze().getWallRecords().size();
       walls_pi_min = std::min(walls_pi_min, walls);
       walls_pi_max = std::max(walls_pi_max, walls);
-      // maze_logi << tCalc << std::endl;
     }
   }
   virtual void discrepancyWithKnownWall() override {
     if (getState() != SearchAlgorithm::IDENTIFYING_POSITION) {
-      maze_logw << "There was a discrepancy with known information! "
+      MAZE_LOGW << "There was a discrepancy with known information! "
                 << getCurrentPose() << std::endl;
     }
   }
@@ -196,7 +197,7 @@ class CLRobotBase : public RobotBase {
         real.p == maze.getStart() && action != ST_HALF_STOP &&
         !(fake_offset.p.x == 0 && fake_offset.d == Direction::South &&
           maze_target.isWall(fake_offset.p, Direction::East)))
-      maze_logw << "Visited Start at P.I. fake_offset: " << fake_offset
+      MAZE_LOGW << "Visited Start at P.I. fake_offset: " << fake_offset
                 << std::endl;
 #endif
 #if 1
@@ -206,7 +207,7 @@ class CLRobotBase : public RobotBase {
         getNextDirectionsKnown().size() == 0 &&
         !maze.isWall(currentPose.p, currentPose.d)) {
       printInfo();
-      maze_logw << "not straight in unknown accel" << std::endl;
+      MAZE_LOGW << "not straight in unknown accel" << std::endl;
       getc(stdin);
     }
     unknown_accel_prev = getState() != SearchAlgorithm::GOING_TO_GOAL &&
@@ -227,7 +228,7 @@ class CLRobotBase : public RobotBase {
         break;
       case RobotBase::START_INIT:
         if (real_visit_goal == false)
-          maze_logw << "Reached Start without Going to Goal!" << std::endl;
+          MAZE_LOGW << "Reached Start without Going to Goal!" << std::endl;
         break;
       case RobotBase::ST_HALF_STOP:
         break;
@@ -271,14 +272,14 @@ class CLRobotBase : public RobotBase {
       case RobotBase::ST_HALF:
         break;
       default:
-        maze_loge << "invalid action" << std::endl;
+        MAZE_LOGE << "invalid action" << std::endl;
         break;
     }
     action_prev = action;
   }
   virtual void crashed() {
     printInfo();
-    maze_loge << "The robot crashed into the wall! fake_offset:\t"
+    MAZE_LOGE << "The robot crashed into the wall! fake_offset:\t"
               << fake_offset << "\tcur:\t" << currentPose << "\treal:\t" << real
               << std::endl;
     getc(stdin);
@@ -305,7 +306,7 @@ class CLRobotBase : public RobotBase {
       case RobotBase::ST_HALF:
         return segment / 2 / velocity * 1000;
       default:
-        maze_loge << "invalid action" << std::endl;
+        MAZE_LOGE << "invalid action" << std::endl;
         return 0;
     }
   }

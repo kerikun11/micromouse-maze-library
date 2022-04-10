@@ -76,7 +76,7 @@ StepMapSlalom::Index StepMapSlalom::Index::next(const Direction nd) const {
           return Index(WallIndex(x, y, z).next(nd), nd);
       }
     default:
-      maze_loge << "Invalid Direction: " << nd << std::endl;
+      MAZE_LOGE << "Invalid Direction: " << nd << std::endl;
       return Index(x, y, z, nd);
   }
 }
@@ -211,7 +211,7 @@ void StepMapSlalom::update(const Maze& maze,
       /* 直前の壁 */
       const auto i_f = focus.next(nd);
       if (!canGo(i_f)) {
-        maze_loge << "FWE: " << focus << std::endl;
+        MAZE_LOGE << "Front Wall Exists: " << focus << std::endl;
         continue;
       }
       /* 直進で行けるところまで行く */
@@ -433,7 +433,7 @@ Directions StepMapSlalom::indexes2directions(const Indexes& path) {
           }
           break;
         default:
-          maze_loge << "invalid Direction" << std::endl;
+          MAZE_LOGE << "invalid Direction" << std::endl;
           break;
       }
     } else {
@@ -468,7 +468,7 @@ Directions StepMapSlalom::indexes2directions(const Indexes& path) {
           dirs.push_back(nd + Direction::Right135);
           break;
         default:
-          maze_loge << "invalid Direction" << std::endl;
+          MAZE_LOGE << "invalid Direction" << std::endl;
           break;
       }
     }

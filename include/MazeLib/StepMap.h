@@ -138,6 +138,7 @@ class StepMap {
                                    const Pose& start,
                                    Pose& end,
                                    const bool knownOnly,
+                                   const bool simple,
                                    const bool breakUnknown) const;
   /**
    * @brief 引数区画の周囲の未知壁の確認優先順位を生成する関数

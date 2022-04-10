@@ -147,9 +147,7 @@ void StepMap::update(const Maze& maze,
                      const Positions& dest,
                      const bool knownOnly,
                      const bool simple) {
-#if MAZE_DEBUG_PROFILING
-  const auto t0 = microseconds();
-#endif
+  MAZE_DEBUG_PROFILING_START(0)
   /* 計算を高速化するため，迷路の大きさを制限 */
   int8_t min_x = maze.getMinX();
   int8_t max_x = maze.getMaxX();
@@ -198,14 +196,12 @@ void StepMap::update(const Maze& maze,
 #endif
     q.pop();
     /* 計算を高速化するため展開範囲を制限 */
-    // if (focus.x > max_x || focus.y > max_y || focus.x < min_x ||
-    //     focus.y < min_y)
-    if (!((uint8_t)focus.x - min_x <= (uint8_t)max_x - min_x ||
-          (uint8_t)focus.y - min_y <= (uint8_t)max_y - min_y))
+    if (focus.x > max_x || focus.y > max_y || focus.x < min_x ||
+        focus.y < min_y)
       continue;
     const auto focus_step = step_map[focus.getIndex()];
-    /* 枝刈り */
 #if STEP_MAP_USE_PRIORITY_QUEUE
+    /* 枝刈り */
     if (focus_step < focus_step_q)
       continue;
 #endif
@@ -234,16 +230,7 @@ void StepMap::update(const Maze& maze,
       }
     }
   }
-#if MAZE_DEBUG_PROFILING
-  const auto t1 = microseconds();
-  const auto dur = t1 - t0;
-  static auto dur_max = dur;
-  if (dur > dur_max) {
-    dur_max = dur;
-    maze_logi << __func__ << "\t" << dur << " us" << std::endl;
-    // print(maze);
-  }
-#endif
+  MAZE_DEBUG_PROFILING_END(0)
 }
 Directions StepMap::calcShortestDirections(const Maze& maze,
                                            const Position start,
@@ -254,7 +241,7 @@ Directions StepMap::calcShortestDirections(const Maze& maze,
   update(maze, dest, knownOnly, simple);
   Pose end;
   const auto shortestDirections = getStepDownDirections(
-      maze, {start, Direction::Max}, end, knownOnly, false);
+      maze, {start, Direction::Max}, end, knownOnly, simple, false);
   /* ゴール判定 */
   return step_map[end.p.getIndex()] == 0 ? shortestDirections : Directions{};
 }
@@ -263,7 +250,8 @@ Pose StepMap::calcNextDirections(const Maze& maze,
                                  Directions& nextDirectionsKnown,
                                  Directions& nextDirectionCandidates) const {
   Pose end;
-  nextDirectionsKnown = getStepDownDirections(maze, start, end, false, true);
+  nextDirectionsKnown =
+      getStepDownDirections(maze, start, end, false, false, true);
   nextDirectionCandidates = getNextDirectionCandidates(maze, end);
   return end;
 }
@@ -271,7 +259,58 @@ Directions StepMap::getStepDownDirections(const Maze& maze,
                                           const Pose& start,
                                           Pose& end,
                                           const bool knownOnly,
+                                          const bool simple,
                                           const bool breakUnknown) const {
+#if 1
+  /* 最短経路となるスタートからの方向列 */
+  Directions shortestDirections;
+  auto& focus = end;
+  /* start から順にステップマップを下る */
+  focus = start;
+  /* 確認 */
+  if (!start.p.isInsideOfField())
+    return {};
+  /* 周辺の走査; 未知壁の有無と最小ステップの方向を求める */
+  while (1) {
+    const auto focus_step = step_map[focus.p.getIndex()];
+    /* 終了条件 */
+    if (focus_step == 0)
+      break;
+    /* 周辺を走査 */
+    auto min_p = focus.p;
+    auto min_d = Direction::Max;
+    for (const auto d : Direction::Along4) {
+      /* 直線で行けるところまで探す */
+      auto next = focus.p; /*< 隣接 */
+      for (int8_t i = 1;; ++i) {
+        /* 壁あり or 既知壁のみで未知壁 ならば次へ */
+        if (maze.isWall(next, d) || (knownOnly && !maze.isKnown(next, d)))
+          break;
+        next = next.next(d); /*< 移動 */
+        /* 直線加速を考慮したステップを算出 */
+        const step_t next_step = focus_step - (simple ? i : step_table[i]);
+        /* エッジコストと一致するか確認 */
+        if (step_map[next.getIndex()] == next_step) {
+          min_p = next, min_d = d;
+          goto loop_exit;
+        }
+      }
+    }
+  loop_exit:
+    /* 現在地よりステップが大きかったらなんかおかしい */
+    if (focus_step <= step_map[min_p.getIndex()])
+      break;
+    /* 移動分を結果に追加 */
+    while (focus.p != min_p) {
+      /* breakUnknown のとき，未知壁を含むならば既知区間は終了 */
+      if (breakUnknown && maze.unknownCount(focus.p))
+        return shortestDirections;
+      focus = focus.next(min_d);
+      shortestDirections.push_back(min_d);
+    }
+  }
+  return shortestDirections;
+#else
   /* ステップマップから既知区間進行方向列を生成 */
   Directions shortestDirections;
   /* start から順にステップマップを下る */
@@ -311,6 +350,7 @@ Directions StepMap::getStepDownDirections(const Maze& maze,
     }
   }
   return shortestDirections;
+#endif
 }
 Directions StepMap::getNextDirectionCandidates(const Maze& maze,
                                                const Pose& focus) const {
@@ -415,8 +455,12 @@ void StepMap::calcStraightStepTable() {
     step_table[i] = t_slalom + gen_cost_impl(i - 1, am_a, vs, vm_a, seg_a);
   }
   /* コストの合計が 65,535 [ms] を超えないようにスケーリング */
-  for (int i = 0; i < MAZE_SIZE; ++i)
+  for (int i = 0; i < MAZE_SIZE; ++i) {
     step_table[i] /= scaling_factor;
+#if 0
+    MAZE_LOGI << "step_table[" << i << "]:\t" << step_table[i] << std::endl;
+#endif
+  }
 }
 
 }  // namespace MazeLib
