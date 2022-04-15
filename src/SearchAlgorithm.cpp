@@ -378,12 +378,12 @@ int SearchAlgorithm::countIdentityCandidates(const WallRecords& idWallRecords,
           if (static_cast<uint8_t>(maze_p.x) >= max_x ||
               static_cast<uint8_t>(maze_p.y) >= max_y) {
             /* (x < 0 || x >= max_x || y < 0 || y >= max_y) の高速化 */
-            diffs = 9999;
+            diffs = min_diff + 1;
             break;
           }
           /* 既知かつ食い違い壁をカウント */
-          if (maze.isKnown(maze_p, maze_d) &&
-              maze.isWall(maze_p, maze_d) != wr.b)
+          const auto maze_wi = WallIndex(maze_p, maze_d);
+          if (maze.isKnown(maze_wi) && maze.isWall(maze_wi) != wr.b)
             ++diffs;
           /* 打ち切り */
           if (diffs > min_diff)
