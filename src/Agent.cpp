@@ -12,11 +12,11 @@ namespace MazeLib {
 void Agent::printInfo(const bool showMaze) const {
   /* 迷路を表示 */
   if (showMaze) {
-    std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+    std::cout << "\e[0;0H"; /*< アニメーションのためにカーソルを左上に移動 */
     searchAlgorithm.printStepMap(getState(), getCurrentPose());
   }
   /* 詳細を表示 */
-  std::cout << "\x1b[J"; /*< カーソル以下を消去 */
+  std::cout << "\e[J"; /*< カーソル以下を消去 */
   std::cout << "Pose: " << getCurrentPose() << ", "
             << "State: " << SearchAlgorithm::getStateString(getState()) << ", "
             << "Force Start: "
@@ -25,14 +25,8 @@ void Agent::printInfo(const bool showMaze) const {
             << (calcData.isForceGoingToGoal ? "true " : "false") << ", "
             << "Unknown Accel: " << (getUnknownAccelFlag() ? "true " : "false")
             << std::endl;
-  std::cout << "Known: ";
-  for (const auto d : getNextDirectionsKnown())
-    std::cout << d.toChar();
-  std::cout << std::endl;
-  std::cout << "Candidates: ";
-  for (const auto d : getNextDirectionCandidates())
-    std::cout << d.toChar();
-  std::cout << std::endl;
+  std::cout << "Known: " << getNextDirectionsKnown() << std::endl;
+  std::cout << "Candidates: " << getNextDirectionCandidates() << std::endl;
   if (getState() == SearchAlgorithm::IDENTIFYING_POSITION)
     std::cout << "Match Count: \t" << getMatchCount() << std::endl;
 }

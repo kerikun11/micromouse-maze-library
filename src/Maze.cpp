@@ -16,6 +16,11 @@ namespace MazeLib {
 const std::array<Direction, 4> Direction::Along4 = {East, North, West, South};
 const std::array<Direction, 4> Direction::Diag4 = {NorthEast, NorthWest,
                                                    SouthWest, SouthEast};
+std::ostream& operator<<(std::ostream& os, const Directions& obj) {
+  for (const auto d : obj)
+    os << d;
+  return os;
+}
 
 /* Position */
 Position Position::next(const Direction d) const {

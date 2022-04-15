@@ -50,7 +50,8 @@ class CLRobot : public CLRobotBase {
 int test_position_identify() {
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/data/";
-  const std::string filename = "32MM2021HX.maze";
+  // const std::string filename = "32MM2021HX.maze";
+  const std::string filename = "16MM2014CX.maze";  //< straight at start
   Maze mazeTarget;
   if (!mazeTarget.parse((mazedata_dir + filename).c_str()))
     return -1;

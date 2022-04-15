@@ -30,9 +30,17 @@ class StepMapWall {
 
  public:
   StepMapWall() { calcStraightCostTable(); }
+  /**
+   * @brief ステップを取得する
+   * @details 盤面外なら `STEP_MAX` を返す
+   */
   step_t getStep(const WallIndex i) const {
     return i.isInsideOfField() ? stepMap[i.getIndex()] : STEP_MAX;
   }
+  /**
+   * @brief ステップを更新する
+   * @details 盤面外なら何もしない
+   */
   void setStep(const WallIndex i, const step_t step) {
     if (i.isInsideOfField())
       stepMap[i.getIndex()] = step;
@@ -107,13 +115,17 @@ class StepMapWall {
  private:
   /** @brief 迷路中のステップ数 */
   std::array<step_t, WallIndex::SIZE> stepMap;
+  /** @brief コストテーブルのサイズ */
+  static constexpr int stepTableSize = MAZE_SIZE * 2;
+  /** @brief コストが最大値を超えないようにスケーリングする係数 */
+  static constexpr float scalingFactor = 2;
   /** @brief 台形加速を考慮した移動コストテーブル (壁沿い方向) */
-  std::array<step_t, MAZE_SIZE * 2> stepTableAlong;
+  std::array<step_t, stepTableSize> stepTableAlong;
   /** @brief 台形加速を考慮した移動コストテーブル (斜め方向) */
-  std::array<step_t, MAZE_SIZE * 2> stepTableDiag;
+  std::array<step_t, stepTableSize> stepTableDiag;
 
   /**
-   * @brief 計算の高速化のために予め直進のコストテーブルを生成する関数
+   * @brief 計算の高速化のために予め直進のコストテーブルを計算する関数
    */
   void calcStraightCostTable();
 };

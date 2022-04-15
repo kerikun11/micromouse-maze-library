@@ -74,7 +74,7 @@ class CLRobot : public CLRobotBase {
 
 int main(void) {
   std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-  std::cout << "\x1b[J";  /*< カーソル以下を消去 */
+  std::cout << "\e[J";  /*< カーソル以下を消去 */
 
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/data/";
@@ -166,7 +166,7 @@ int main(void) {
   for (bool diagEnabled : {true, false}) {
     robot.calcShortestDirections(diagEnabled);
     std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-    std::cout << "\x1b[J";  /*< カーソル以下を消去 */
+    std::cout << "\e[J";  /*< カーソル以下を消去 */
     robot.printPath();
     std::cout << "Estimated Shortest Time "
               << (diagEnabled ? "(diag)" : "(no diag)") << ": "

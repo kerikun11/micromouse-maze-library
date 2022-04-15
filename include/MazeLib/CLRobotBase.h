@@ -176,6 +176,10 @@ class CLRobotBase : public RobotBase {
     const int tCalcNextDirsPost =
         std::chrono::duration_cast<std::chrono::microseconds>(now).count();
     const int tCalc = tCalcNextDirsPost - tCalcNextDirsPrev;
+#if MAZE_DEBUG_PROFILING
+    if (tCalc > tCalcMax)
+      MAZE_LOGD << "tCalcMax: " << tCalc << "[us]" << std::endl;
+#endif
     tCalcMax = std::max(tCalcMax, tCalc);
     calcNextDirectionsData.push_back({getState(), getCurrentPose(), tCalc});
     if (newState == oldState)
@@ -203,8 +207,8 @@ class CLRobotBase : public RobotBase {
 #if 1
     /* 自己位置同定走行中のスタート区画訪問の警告 */
     if (getState() == SearchAlgorithm::IDENTIFYING_POSITION &&
-        real.p == maze.getStart() && action != ST_HALF_STOP &&
-        !(fake_offset.p.x == 0 && fake_offset.d == Direction::South &&
+        real.p == maze.getStart() && action == ROTATE_180 &&
+        !(fake_offset.p.x == 0 && fake_offset.d == Direction::North &&
           mazeTarget.isWall(fake_offset.p, Direction::East)))
       MAZE_LOGW << "Visited Start at P.I. fake_offset: " << fake_offset
                 << std::endl;

@@ -16,8 +16,6 @@ namespace MazeLib {
  */
 #define SEARCHING_ADDITIONALLY_AT_START 1
 
-#define STEP_MAP_RECOVERY_DEBUG_MODE 0
-
 const char* SearchAlgorithm::getStateString(const State s) {
   static const char* const str[] = {
       "Start                 ", "Searching for Goal    ",
@@ -184,21 +182,33 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
 }
 bool SearchAlgorithm::determineNextDirection(const CalcData& calcData,
                                              Direction& nextDirection) const {
-  const auto& m =
-      (calcData.result.state == State::IDENTIFYING_POSITION) ? idMaze : maze;
-  return determineNextDirection(m, calcData.currentPose,
-                                calcData.result.nextDirectionCandidates,
-                                nextDirection);
-}
-bool SearchAlgorithm::determineNextDirection(
-    const Maze& maze,
-    const Pose& pose,
-    const Directions& nextDirectionCandidates,
-    Direction& nextDirection) const {
+  MAZE_DEBUG_PROFILING_START(0);
+  const auto& maze = (calcData.result.state == State::IDENTIFYING_POSITION)
+                         ? idMaze
+                         : this->maze;
+  auto nextDirectionCandidates = calcData.result.nextDirectionCandidates;
+  const auto& pose = calcData.currentPose;
+#if 1
+  if (calcData.result.state == State::IDENTIFYING_POSITION) {
+    /* スタート区画に行き得る方向を洗い出し */
+    const auto forbidden = findMatchDirectionCandidates(
+        pose.p, {Position(0, 1), Direction::South}, 0);
+    /* スタート区画に行き得る方向を後ろに持っていく */
+    std::sort(
+        nextDirectionCandidates.begin(), nextDirectionCandidates.end(),
+        [&](const Direction d1 __attribute__((unused)), const Direction d2) {
+          return std::find(forbidden.cbegin(), forbidden.cend(), d2) !=
+                 forbidden.cend();
+        });
+    /* 最後に後方を追加 (スタート区画を避けられない場合ふさがれてしまうので) */
+    nextDirectionCandidates.push_back(pose.d + Direction::Back);
+  }
+#endif
   /* find a direction it can go in nextDirectionCandidates */
   const auto it = std::find_if(
       nextDirectionCandidates.cbegin(), nextDirectionCandidates.cend(),
       [&](const Direction next_d) { return maze.canGo(pose.p, next_d); });
+  MAZE_DEBUG_PROFILING_END(0);
   if (it == nextDirectionCandidates.cend())
     return false; /*< no answer */
   nextDirection = *it;
@@ -398,9 +408,10 @@ int SearchAlgorithm::countIdentityCandidates(const WallRecords& idWallRecords,
 }
 const Directions SearchAlgorithm::findMatchDirectionCandidates(
     const Position currentPosition,
-    const Pose& target) const {
+    const Pose& target,
+    const int ignoreWalls) const {
   MAZE_DEBUG_PROFILING_START(0)
-  const int min_diff = 0; /*< 許容食い違い壁数 */
+  const int min_diff = ignoreWalls; /*< 許容食い違い壁数 */
   /* パターンマッチング開始 */
   Directions result_dirs;  //< target と一致する方向の候補を格納する
   for (const auto offset_d : Direction::Along4) {
@@ -426,7 +437,7 @@ const Directions SearchAlgorithm::findMatchDirectionCandidates(
   MAZE_DEBUG_PROFILING_END(0)
   return result_dirs;
 }
-const Position SearchAlgorithm::calcNextDirectionsInAdvance(
+const Pose SearchAlgorithm::calcNextDirectionsInAdvance(
     Maze& maze,
     const Positions& dest,
     SearchAlgorithm::CalcData& calcData) {
@@ -459,7 +470,7 @@ const Position SearchAlgorithm::calcNextDirectionsInAdvance(
     maze.setWall(i, false), maze.setKnown(i, false);
   /* 後処理 */
   calcData.result.nextDirectionCandidates = nextDirectionCandidatesAdvanced;
-  return end.p;
+  return end;
 }
 SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchForGoal(
     SearchAlgorithm::CalcData& calcData) {
@@ -533,7 +544,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
   /* 仮壁を復元 */
   for (const auto i : wall_backup)
     maze.setWall(i, false);
-#if STEP_MAP_RECOVERY_DEBUG_MODE
+#if 0
   /* 表示用に仮壁を立てる前のステップを再計算 */
   findShortestCandidates(candidates, currentPose);
   stepMap.update(maze, candidates, false, false);
@@ -571,7 +582,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsBackingToStart(
     return Reached;
   /* 行程に未知壁がある */
   const auto end_p =
-      calcNextDirectionsInAdvance(maze, {maze.getStart()}, calcData);
+      calcNextDirectionsInAdvance(maze, {maze.getStart()}, calcData).p;
   if (end_p == maze.getStart())
     return Reached;
   return calcData.result.nextDirectionCandidates.empty() ? Error : Processing;
@@ -672,8 +683,8 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     for (int8_t y = min_y; y < max_y; ++y) {
       const auto p = Position(x, y);
       /* スタート区画を避ける */
-      const auto forbidden =
-          findMatchDirectionCandidates(p, {Position(0, 1), Direction::South});
+      const auto forbidden = findMatchDirectionCandidates(
+          p, {Position(0, 1), Direction::South}, 0);
       for (const auto d : forbidden) {
         wall_backup.push_back(WallRecord(p, d, idMaze.isWall(p, d)));
         idMaze.setWall(p, d, true);
@@ -690,20 +701,34 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
         if (idMaze.unknownCount(p))
           candidates.push_back(p);
       }
-  /* スタート区画を避けて導出 */
-  calcNextDirectionsInAdvance(idMaze, candidates, calcData);
-  /* エラー防止のため来た方向を追加 */
-  calcData.result.nextDirectionCandidates.push_back(currentPose.d +
-                                                    Direction::Back);
-  // stepMap.print(idMaze, {currentPose.d}, currentPose.p);
-  // getc(stdin);
+  /* スタート区画を避けたことで閉じ込められたか確認 */
+  stepMap.update(idMaze, candidates, false, false);
+  const auto current_step =
+      stepMap.getStep(currentPose.p.next(currentPose.d + Direction::Back));
+  if (current_step != StepMap::STEP_MAX) {
+    /* スタート区画を避けて導出 */
+    calcNextDirectionsInAdvance(idMaze, candidates, calcData);
+    // stepMap.print(idMaze, {currentPose.d}, currentPose.p);
+    // MAZE_LOGI << std::endl;
+    // getc(stdin);
+  }
   /* 迷路をもとに戻す */
   std::reverse(wall_backup.begin(), wall_backup.end()); /* 重複対策 */
   for (const auto wr : wall_backup)
     idMaze.setWall(wr.getPosition(), wr.d, wr.b);
-  /* 既知情報からではスタート区画を避けられない場合 */
-  if (stepMap.getStep(currentPose.p) == StepMap::STEP_MAX)
-    calcNextDirectionsInAdvance(idMaze, candidates, calcData);
+  /* 既知情報からではスタート区画を避けられない場合は壁を戻してから計算 */
+  if (current_step == StepMap::STEP_MAX) {
+    // calcNextDirectionsInAdvance(idMaze, candidates, calcData);
+    calcData.result.nextDirectionsKnown.clear();
+    calcData.result.nextDirectionCandidates = {
+        Direction(currentPose.d + Direction::Front),
+        Direction(currentPose.d + Direction::Left),
+        Direction(currentPose.d + Direction::Right),
+    };
+    // stepMap.print(idMaze, {currentPose.d}, currentPose.p);
+    // MAZE_LOGI << std::endl;
+    // getc(stdin);
+  }
   MAZE_DEBUG_PROFILING_END(0)
   return calcData.result.nextDirectionCandidates.empty() ? Error : Processing;
 }

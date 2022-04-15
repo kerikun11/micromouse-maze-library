@@ -56,9 +56,9 @@ class Agent {
   }
   /**
    * @brief 壁情報を更新する
-   * @param left 現在姿勢から見た右方向の壁の有無
-   * @param front 現在姿勢から見た前方向の壁の有無
-   * @param right 現在姿勢から見た左方向の壁の有無
+   * @param[in] left 現在姿勢から見た右方向の壁の有無
+   * @param[in] front 現在姿勢から見た前方向の壁の有無
+   * @param[in] right 現在姿勢から見た左方向の壁の有無
    * @retval true 正常に壁情報を更新できた
    * @retval false 壁情報に食い違いがあった
    */
@@ -85,8 +85,8 @@ class Agent {
   }
   /**
    * @brief 最短経路を導出
-   * @param diagEnabled true: 斜めあり, false: 斜めなし
-   * @param edgeCost StepMapSlalom の走行パラメータ
+   * @param[in] diagEnabled true: 斜めあり, false: 斜めなし
+   * @param[in] edgeCost StepMapSlalom の走行パラメータ
    * @return true: 成功, false: 失敗
    */
   bool calcShortestDirections(
@@ -166,7 +166,7 @@ class Agent {
   const SearchAlgorithm& getSearchAlgorithm() const { return searchAlgorithm; }
   /**
    * @brief 探索状態の表示
-   * @param showMaze true:迷路も表示 false:迷路は非表示
+   * @param[in] showMaze true:迷路も表示 false:迷路は非表示
    */
   void printInfo(const bool showMaze = false) const;
   /**

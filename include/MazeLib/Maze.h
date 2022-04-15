@@ -54,13 +54,13 @@ static int microseconds() {
 #define C_CY ""
 #define C_NO ""
 #else
-#define C_RE "\x1b[31m" /**< @brief ANSI Escape Sequence RED */
-#define C_GR "\x1b[32m" /**< @brief ANSI Escape Sequence GREEN */
-#define C_YE "\x1b[33m" /**< @brief ANSI Escape Sequence YELLOW */
-#define C_BL "\x1b[34m" /**< @brief ANSI Escape Sequence BLUE */
-#define C_MA "\x1b[35m" /**< @brief ANSI Escape Sequence MAGENTA */
-#define C_CY "\x1b[36m" /**< @brief ANSI Escape Sequence CYAN */
-#define C_NO "\x1b[0m"  /**< @brief ANSI Escape Sequence RESET */
+#define C_RE "\e[31m" /**< @brief ANSI Escape Sequence RED */
+#define C_GR "\e[32m" /**< @brief ANSI Escape Sequence GREEN */
+#define C_YE "\e[33m" /**< @brief ANSI Escape Sequence YELLOW */
+#define C_BL "\e[34m" /**< @brief ANSI Escape Sequence BLUE */
+#define C_MA "\e[35m" /**< @brief ANSI Escape Sequence MAGENTA */
+#define C_CY "\e[36m" /**< @brief ANSI Escape Sequence CYAN */
+#define C_NO "\e[0m"  /**< @brief ANSI Escape Sequence RESET */
 #endif
 
 /**
@@ -201,7 +201,7 @@ class Direction {
   bool isDiag() const { return (d & 1) == 1; }
   /** @brief 表示用char型へのキャスト */
   char toChar() const { return ">'^`<,v.X"[d]; }
-  /** @brief stream での表示 */
+  /** @brief stream 表示 */
   friend std::ostream& operator<<(std::ostream& os, const Direction d) {
     return os << d.toChar();
   }
@@ -219,6 +219,11 @@ static_assert(sizeof(Direction) == 1, "size error"); /**< @brief size check */
  *  @brief Direction 構造体の動的配列、集合
  */
 using Directions = std::vector<Direction>;
+/**
+ * @brief Directions の stream 表示
+ * @details >^<v の形式
+ */
+std::ostream& operator<<(std::ostream& os, const Directions& obj);
 
 /**
  * @brief 迷路の区画の位置(座標)を定義。

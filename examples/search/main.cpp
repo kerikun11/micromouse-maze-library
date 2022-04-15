@@ -232,7 +232,7 @@ int ShortestRun(const Maze& maze) {
 int main(void) {
   /* 画面のクリア */
   std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-  std::cout << "\x1b[J";  /*< カーソル以下を消去 */
+  std::cout << "\e[J";  /*< カーソル以下を消去 */
 
   /* シミュレーションに用いる迷路の選択 */
   const std::string filepath = "../mazedata/data/16MM2018CX.maze";

@@ -21,7 +21,7 @@ void setup() {
   const esp_partition_t* running = esp_ota_get_running_partition();
   ESP_ERROR_CHECK(esp_ota_get_partition_description(running, &app_desc));
   MAZE_LOGI << "version: " << app_desc.version << std::endl;
-  MAZE_LOGI << "date: " << __DATE__ << std::endl;
+  MAZE_LOGI << "build time: " << __DATE__ << " " << __TIME__ << std::endl;
 }
 
 void loop() {

@@ -40,7 +40,8 @@ void StepMap::print(const Maze& maze,
     if (step != STEP_MAX)
       maxStep = std::max(maxStep, step);
   const bool simple = (maxStep < 999);
-  const step_t scaler = stepTable[MAZE_SIZE - 1] - stepTable[MAZE_SIZE - 2];
+  const step_t scaler =
+      stepTable[stepTableSize - 1] - stepTable[stepTableSize - 2];
   const auto find = [&](const WallIndex& i) {
     return std::find_if(path.cbegin(), path.cend(), [&](const Pose& pose) {
       return WallIndex(pose.p, pose.d) == i;
@@ -450,12 +451,12 @@ void StepMap::calcStraightCostTable() {
   const float seg_a = 90.0f;   /*< 区画の長さ [mm] */
   const float t_turn = 287.0f; /*< 小回り90度ターンの時間 [ms] */
   stepTable[0] = 0;            /*< [0] は使用しない */
-  for (int i = 1; i < MAZE_SIZE; ++i) {
+  for (int i = 1; i < stepTableSize; ++i) {
     /* 1歩目は90度ターンとみなす */
     stepTable[i] = t_turn + calcStraightCost(i - 1, am_a, vs, vm_a, seg_a);
   }
   /* コストの合計が 65,535 [ms] を超えないようにスケーリング */
-  for (int i = 0; i < MAZE_SIZE; ++i) {
+  for (int i = 0; i < stepTableSize; ++i) {
     stepTable[i] /= scalingFactor;
 #if 0
     MAZE_LOGI << "stepTable[" << i << "]:\t" << stepTable[i] << std::endl;

@@ -30,7 +30,7 @@ void StepMapWall::print(const Maze& maze,
       maxStep = std::max(maxStep, step);
   const bool simple = showFullStep || (maxStep < 999);
   const step_t scaler =
-      stepTableDiag[MAZE_SIZE * 2 - 1] - stepTableDiag[MAZE_SIZE * 2 - 2];
+      stepTableDiag[stepTableSize - 1] - stepTableDiag[stepTableSize - 2];
   /* start to draw maze */
   for (int8_t y = mazeSize - 1; y >= -1; --y) {
     /* Horizontal Wall Line */
@@ -420,14 +420,13 @@ void StepMapWall::calcStraightCostTable() {
   const float seg_d = 45.0f * std::sqrt(2.0f); /*< 1区画の長さ(斜め) [mm] */
   const float t_turn = 388.0f;              /*< FV90ターンの時間 [ms] */
   stepTableAlong[0] = stepTableDiag[0] = 0; /*< [0] は使用しない */
-  for (int i = 1; i < MAZE_SIZE * 2; ++i) {
+  for (int i = 1; i < stepTableSize; ++i) {
     /* V90があるので斜め側でターンのコストを考慮 */
     stepTableAlong[i] = calcStraightCost(i, am_a, vs, vm_a, seg_a);
     stepTableDiag[i] = t_turn + calcStraightCost(i - 1, am_d, vs, vm_d, seg_d);
   }
   /* コストの合計が 65,535 [ms] を超えないようにスケーリング */
-  const float scalingFactor = 2;
-  for (int i = 0; i < MAZE_SIZE * 2; ++i) {
+  for (int i = 0; i < stepTableSize; ++i) {
     stepTableAlong[i] /= scalingFactor;
     stepTableDiag[i] /= scalingFactor;
 #if 0

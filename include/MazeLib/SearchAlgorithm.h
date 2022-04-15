@@ -68,15 +68,17 @@ class SearchAlgorithm {
  public:
   /**
    * @brief デフォルトコンストラクタ
-   * @param maze 使用する迷路への参照
+   * @param maze 使用する迷路への参照。コピーせずに参照として引き継ぐ。
    */
   SearchAlgorithm(Maze& maze) : maze(maze) {}
   /**
    * @brief 探索が完全に終了しているかどうかを返す関数
+   * @attention 計算に時間がかかる可能性あり
    */
   bool isCompleted();
   /**
    * @brief 探索によって可解かどうかを返す関数
+   * @attention 計算に時間がかかる可能性あり
    */
   bool isSolvable();
 
@@ -99,6 +101,9 @@ class SearchAlgorithm {
   void resetLastWalls(const State state, const int num = 1);
   /**
    * @brief 探索状態に応じた現在姿勢の更新
+   * @details calcData のゴール区画の訪問フラグなども更新する
+   * @param[inout] calcData 更新先のデータ
+   * @param[in] newPose 更新元の姿勢
    */
   void updatePose(CalcData& calcData, const Pose& newPose);
 
@@ -118,19 +123,6 @@ class SearchAlgorithm {
   bool determineNextDirection(const CalcData& calcData,
                               Direction& nextDirection) const;
   /**
-   * @brief 次に進むべき候補列から次に進むべき方向を決定する関数
-   * @param[in] maze 使用する迷路
-   * @param[in] pose 現在姿勢
-   * @param[in] nextDirectionCandidates 事前計算の候補列
-   * @param[out] nextDirection 次に進むべき方向
-   * @retval true 成功
-   * @retval false 失敗
-   */
-  bool determineNextDirection(const Maze& maze,
-                              const Pose& pose,
-                              const Directions& nextDirectionCandidates,
-                              Direction& nextDirection) const;
-  /**
    * @brief 最短経路の導出
    * @param[out] shortestDirections 最短経路を格納する方向列
    * @param[in] diagEnabled 斜め走行を有効化する
@@ -144,12 +136,11 @@ class SearchAlgorithm {
       const StepMapSlalom::EdgeCost& edgeCost = StepMapSlalom::EdgeCost());
   /**
    * @brief 自己位置同定の初期化
-   *
    * @param[out] currentPose 初期姿勢
    */
   void positionIdentifyingInit(Pose& currentPose);
   /**
-   * @brief 表示
+   * @brief ステップマップの表示
    */
   void printStepMap(const State state, const Pose& pose) const;
 
@@ -174,15 +165,16 @@ class SearchAlgorithm {
 
   /**
    * @brief ステップマップにより最短経路上になりうる区画を洗い出す
+   * @details[out] candidates 最短経路になりうる未探索区画
+   * @details[in] currentPose 現在姿勢
    */
   bool findShortestCandidates(Positions& candidates,
                               const Pose& currentPose = Pose());
   /**
    * @brief 自己位置同定のパターンにマッチする候補をカウントする
-   *
    * @param[in] idWallRecords 自己位置同定走行の壁ログ
    * @param[out] matchedPose マッチした姿勢(のひとつ)
-   * @return int マッチ数, 0: 失敗, 1: 特定, 2-: 複数マッチ (同定中)
+   * @return int 自己位置のマッチ数, 0: 失敗, 1: 特定, 2-: 複数マッチ (同定中)
    * @retval 0 失敗
    * @retval 1 特定
    * @retval 2- 複数マッチ (同定中)
@@ -192,16 +184,19 @@ class SearchAlgorithm {
   /**
    * @brief 特定の区画にマッチする方向の候補を探す
    * @details スタート区画への訪問を避けるために使用する関数
-   *
-   * @param currentPosition 注目する区画
-   * @param targetPose 検索対象の区画と方向
+   * @param[in] currentPosition 注目する区画 (自己位置同定用迷路上の座標)
+   * @param[in] targetPose 検索対象の区画と方向 (探索用迷路上の座標)
+   * @param[in] ignoreWalls 食い違いを許容する壁の数
    * @return const Directions 注目する区画からの方向列
    */
   const Directions findMatchDirectionCandidates(const Position currentPosition,
-                                                const Pose& targetPose) const;
+                                                const Pose& targetPose,
+                                                const int ignoreWalls) const;
 
   /**
    * @brief 各状態での進行方向列導出関数
+   * @param[inout] calcData 計算条件と結果の構造体
+   * @return 計算結果
    */
   Result calcNextDirectionsSearchForGoal(CalcData& calcData);
   Result calcNextDirectionsSearchAdditionally(CalcData& calcData);
@@ -210,11 +205,14 @@ class SearchAlgorithm {
   Result calcNextDirectionsPositionIdentification(CalcData& calcData);
   /**
    * @brief 迷路を編集してさらに優先順の精度を向上させる関数
-   * @return 既知区間の最終区画
+   * @param[in] maze 使用する迷路
+   * @param[in] dest ゴール区画の集合
+   * @param[inout] calcData 事前計算の結果
+   * @return Pose 既知区間の最終姿勢
    */
-  const Position calcNextDirectionsInAdvance(Maze& maze,
-                                             const Positions& dest,
-                                             CalcData& calcData);
+  const Pose calcNextDirectionsInAdvance(Maze& maze,
+                                         const Positions& dest,
+                                         CalcData& calcData);
 };
 
 }  // namespace MazeLib
