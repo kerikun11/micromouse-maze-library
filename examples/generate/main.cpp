@@ -177,25 +177,20 @@ int main(void) {
 
 #if 1
   /* Preparation */
-  const auto p_robot = std::make_unique<CLRobotBase>(maze);
-  CLRobotBase& robot = *p_robot;
+  const auto pRobot = std::make_unique<CLRobotBase>(maze);
+  CLRobotBase& robot = *pRobot;
   robot.replaceGoals(maze.getGoals());
   /* Search Run */
   robot.searchRun();
   /* Show Result */
-  // robot.printInfo();
-  std::printf(
-      "Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
-      "Left: %3d, Right: %3d, Back: %3d\n",
-      robot.est_time / 1000 / 60 % 60, robot.est_time / 1000 % 60, robot.step,
-      robot.f, robot.l, robot.r, robot.b);
-  // for (bool diagEnabled : {false, true}) {
-  //   robot.calcShortestDirections(diagEnabled);
-  //   std::cout << "Estimated Shortest Time "
-  //             << (diagEnabled ? "(diag)" : "(no diag)") << ": "
-  //             << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
-  //             << std::endl;
-  // }
+  robot.printInfo(false);
+  for (bool diagEnabled : {false, true}) {
+    robot.calcShortestDirections(diagEnabled);
+    std::cout << "Estimated Shortest Time "
+              << (diagEnabled ? "(diag)" : "(no diag)") << ": "
+              << robot.getSearchAlgorithm().getShortestCost() << "\t[ms]"
+              << std::endl;
+  }
 #endif
 
   return 0;

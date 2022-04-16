@@ -43,9 +43,9 @@ class CLRobotBase : public RobotBase {
   }
   void printSearchResult() const {
     std::printf(
-        "SearchTime: %2u:%02u, Step: %4d, "
+        "SearchTime: %2d:%02d, Step: %4d, "
         "F: %4d, L: %3d, R: %3d, B: %3d, Walls: %4d\n",
-        est_time / 1000 / 60, est_time / 1000 % 60, step, f, l, r, b,
+        est_time_ms / 1000 / 60, est_time_ms / 1000 % 60, step, f, l, r, b,
         int(maze.getWallRecords().size()));
   }
   void printFastResult(const bool diagEnabled, const bool showMaze = false) {
@@ -112,7 +112,7 @@ class CLRobotBase : public RobotBase {
   bool positionIdentifyRun(const Pose& fake_offset = {{0, 1}, Direction::North},
                            const bool reset_cost = true) {
     if (reset_cost) {
-      step = f = l = r = b = est_time = 0;
+      step = f = l = r = b = est_time_ms = 0;
       calcNextDirectionsData.clear();
     }
     this->fake_offset = this->real = fake_offset;
@@ -167,18 +167,18 @@ class CLRobotBase : public RobotBase {
 
  public:
   int step = 0, f = 0, l = 0, r = 0, b = 0; /*< 探索の評価のためのカウンタ */
-  uint32_t est_time = 0;                    /*< 見積もり探索時間 [ms] */
+  int est_time_ms = 0;                      /*< 見積もり探索時間 [ms] */
 
  public:
   Pose fake_offset;
   size_t pi_walls_max = 0;
   size_t pi_walls_min = MAZE_SIZE * MAZE_SIZE * 4;
-  uint32_t pi_est_time_max = 0;
-  uint32_t pi_est_time_min = std::numeric_limits<uint32_t>::max();
+  int pi_est_time_ms_max = 0;
+  int pi_est_time_ms_min = std::numeric_limits<int>::max();
 
  public:
   int tCalcNextDirsPrev;
-  int tCalcMax = 0;
+  int calc_time_max = 0;
   struct CalcNextDirectionsData {
     SearchAlgorithm::State state;
     Pose currentPose;
@@ -211,10 +211,10 @@ class CLRobotBase : public RobotBase {
     const int tCalcNextDirsPost = microseconds();
     const int tCalc = tCalcNextDirsPost - tCalcNextDirsPrev;
 #if MAZE_DEBUG_PROFILING
-    if (tCalc > tCalcMax)
-      MAZE_LOGD << "tCalcMax: " << tCalc << "[us]" << std::endl;
+    if (tCalc > calc_time_max)
+      MAZE_LOGD << "calc_time_max: " << tCalc << "[us]" << std::endl;
 #endif
-    tCalcMax = std::max(tCalcMax, tCalc);
+    calc_time_max = std::max(calc_time_max, tCalc);
     calcNextDirectionsData.push_back({getState(), getCurrentPose(), tCalc});
     if (newState == oldState)
       return;
@@ -224,8 +224,8 @@ class CLRobotBase : public RobotBase {
           getSearchAlgorithm().getIdMaze().getWallRecords().size();
       pi_walls_min = std::min(pi_walls_min, walls);
       pi_walls_max = std::max(pi_walls_max, walls);
-      pi_est_time_max = std::max(pi_est_time_max, est_time);
-      pi_est_time_min = std::min(pi_est_time_min, est_time);
+      pi_est_time_ms_max = std::max(pi_est_time_ms_max, est_time_ms);
+      pi_est_time_ms_min = std::min(pi_est_time_ms_min, est_time_ms);
     }
   }
   virtual void discrepancyWithKnownWall() override {
@@ -265,7 +265,7 @@ class CLRobotBase : public RobotBase {
     if (std::find(goals.cbegin(), goals.cend(), getCurrentPose().p) !=
         goals.cend())
       real_visit_goal = true;
-    est_time += getTimeCost(action);
+    est_time_ms += getTimeCost(action);
     switch (action) {
       case RobotBase::START_STEP:
         real.p = Position(0, 1);
@@ -310,10 +310,10 @@ class CLRobotBase : public RobotBase {
         real.p = real.p.next(real.d);
         /* 未知区間加速 */
         if (getUnknownAccelFlag() && action_prev == action)
-          est_time -= getTimeCost(action) / 3;
+          est_time_ms -= getTimeCost(action) / 3;
         /* 既知区間加速 */
         if (getNextDirectionsKnown().size() > 1 && action_prev == action)
-          est_time -= getTimeCost(action) / 2;
+          est_time_ms -= getTimeCost(action) / 2;
         f++;
         step++;
         break;
@@ -333,7 +333,7 @@ class CLRobotBase : public RobotBase {
     getc(stdin);
     setBreakFlag();
   }
-  virtual uint32_t getTimeCost(const SearchAction action) {
+  virtual int getTimeCost(const SearchAction action) {
     const float velocity = 300.0f;
     const float segment = 90.0f;
     switch (action) {

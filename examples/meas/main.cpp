@@ -112,13 +112,14 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     if (!robot.searchRun())
       MAZE_LOGE << "Failed to Find a Path to Goal!" << std::endl;
     robot.printSearchResult();
-    csv << "\t" << robot.est_time / 1000 / 60 << ":" << std::setw(2)
-        << std::setfill('0') << robot.est_time / 1000 % 60;
-    csv << "\t" << robot.est_time << "\t" << robot.step << "\t" << robot.f
+    csv << "\t" << robot.est_time_ms / 1000 / 60 << ":" << std::setw(2)
+        << std::setfill('0') << robot.est_time_ms / 1000 % 60;
+    csv << "\t" << robot.est_time_ms << "\t" << robot.step << "\t" << robot.f
         << "\t" << robot.l << "\t" << robot.r << "\t" << robot.b;
     csv << "\t" << robot.getMaze().getWallRecords().size();
-    std::cout << "Max Calc Time:\t" << robot.tCalcMax << "\t[us]" << std::endl;
-    csv << "\t" << robot.tCalcMax;
+    std::cout << "Max Calc Time:\t" << robot.calc_time_max << "\t[us]"
+              << std::endl;
+    csv << "\t" << robot.calc_time_max;
     std::ofstream res(save_dir + name + ".csv");
     robot.printSearchLogs(res);
     /* FastRun */
@@ -167,21 +168,23 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
 
 #if POSITION_IDENTIFICATION_RUN_ENABLED
     /* Position Identification Run */
-    robot.tCalcMax = 0;
+    robot.calc_time_max = 0;
     robot.positionIdentifyRunForAllOffset();
     /* print result */
-    std::cout << "P.I. Max Calc:\t" << robot.tCalcMax << "\t[us]" << std::endl;
-    std::cout << "P.I. Est Time:\t" << robot.pi_est_time_min / 1000 / 60 % 60
+    std::cout << "P.I. Max Calc:\t" << robot.calc_time_max << "\t[us]"
+              << std::endl;
+    std::cout << "P.I. Est Time:\t" << robot.pi_est_time_ms_min / 1000 / 60 % 60
               << ":" << std::setw(2) << std::setfill('0')
-              << robot.pi_est_time_min / 1000 % 60 << "\t"
-              << robot.pi_est_time_max / 1000 / 60 % 60 << ":" << std::setw(2)
-              << std::setfill('0') << robot.pi_est_time_max / 1000 % 60
-              << std::setfill(' ') << std::endl;
+              << robot.pi_est_time_ms_min / 1000 % 60 << "\t"
+              << robot.pi_est_time_ms_max / 1000 / 60 % 60 << ":"
+              << std::setw(2) << std::setfill('0')
+              << robot.pi_est_time_ms_max / 1000 % 60 << std::setfill(' ')
+              << std::endl;
     std::cout << "P.I. walls:\t" << robot.pi_walls_min << "\t"
               << robot.pi_walls_max << std::endl;
-    csv << "\t" << robot.tCalcMax;
-    csv << "\t" << robot.pi_est_time_min;
-    csv << "\t" << robot.pi_est_time_max;
+    csv << "\t" << robot.calc_time_max;
+    csv << "\t" << robot.pi_est_time_ms_min;
+    csv << "\t" << robot.pi_est_time_ms_max;
     csv << "\t" << robot.pi_walls_min;
     csv << "\t" << robot.pi_walls_max;
 #endif

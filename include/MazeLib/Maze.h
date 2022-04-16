@@ -25,6 +25,7 @@ static int microseconds() {
              std::chrono::steady_clock::now().time_since_epoch())
       .count();
 }
+static int microseconds() __attribute__((unused));
 #define MAZE_DEBUG_PROFILING_START(id) const auto t0_##id = microseconds();
 #define MAZE_DEBUG_PROFILING_END(id)                                 \
   {                                                                  \
@@ -624,7 +625,7 @@ class Maze {
   /**
    * @brief 迷路の初期化。壁を削除し、スタート区画を既知に
    * @param set_start_wall スタート区画の East と North の壁を設定するかどうか
-   * @param set_range_full 高速化用の min_x, max_x を予め最大に設定するかどうか
+   * @param set_range_full 高速化用の min_x などを予め最大に設定するかどうか
    */
   void reset(const bool set_start_wall = true,
              const bool set_range_full = false);
