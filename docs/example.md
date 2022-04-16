@@ -1,6 +1,21 @@
 ## コンピュータでの使用例
 
-コマンドラインでの使用例を示す．
+コマンドラインでの使用例を示す。
+
+--------------------------------------------------------------------------------
+
+### Docker による環境構築
+
+```sh
+# build dev env
+./docker/build.sh
+# configure
+./docker/run.sh cmake ..
+# build
+./docker/run.sh make -j
+# run
+./docker/run.sh make search
+```
 
 --------------------------------------------------------------------------------
 
@@ -75,9 +90,9 @@ pacman -S --needed git make \
 
 ### リポジトリの取得
 
-このリポジトリは [CMake](https://cmake.org/) プロジェクトになっている．
+このリポジトリは [CMake](https://cmake.org/) プロジェクトになっている。
 
-はじめに以下のコマンドで初期化する．
+はじめに以下のコマンドで初期化する。
 
 ```sh
 ## 迷路データ (サブモジュール) を含めて clone
@@ -93,7 +108,7 @@ cmake .. ${MSYSTEM:+-G"MSYS Makefiles"}
 make
 ```
 
-以降，コマンド `make` は，この `build` ディレクトリで実行すること．
+以降、コマンド `make` は上記 `build` ディレクトリで実行すること。
 
 --------------------------------------------------------------------------------
 
@@ -111,7 +126,7 @@ make search
 
 ### リファレンスの生成
 
-コード中のコメントは [Doxygen](http://www.doxygen.jp/) に準拠しているので，API リファレンスを自動生成することができる．
+コード中のコメントは [Doxygen](http://www.doxygen.jp/) に準拠しているので、API リファレンスを自動生成することができる。
 
 ```sh
 # ドキュメントの自動生成
@@ -120,7 +135,7 @@ make docs
 open docs/html/index.html
 ```
 
-上記コマンドにより `build/docs/html/index.html` にリファレンスが生成される．
+上記コマンドにより `build/docs/html/index.html` にリファレンスが生成される。
 
 --------------------------------------------------------------------------------
 
@@ -134,9 +149,9 @@ make lcov_init
 # テストを実行
 make test_run
 # カバレッジ結果の収集
-make lcov
+make lcov_capture
 # ブラウザでカバレッジ結果をみる (open コマンドは環境依存)
 open test/html/index.html
 ```
 
-上記コマンドにより `build/test/html/index.html` にカバレッジ結果が生成される．
+上記コマンドにより `build/test/html/index.html` にカバレッジ結果が生成される。
