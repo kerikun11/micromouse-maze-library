@@ -17,14 +17,14 @@ file(GLOB SRC_FILES
 pybind11_add_module(${MODULE_NAME} ${SRC_FILES})
 target_include_directories(${MODULE_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
-# find python interpreter
+## find python interpreter
 find_package(Python3)
 if(NOT Python3_FOUND)
   message(WARNING "Python3 not found in your environment! skipping...")
   RETURN()
 endif()
 
-# make a custom target to plot
+## make a custom target to plot
 set(CUSTOM_TARGET_NAME "pybind11_plot")
 add_custom_target(${CUSTOM_TARGET_NAME}
   COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}

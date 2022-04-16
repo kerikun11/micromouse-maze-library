@@ -7,7 +7,7 @@ plt.rcParams["font.family"] = "IPAGothic"
 
 # ============================================================================ #
 # load measurement.csv
-raw = np.loadtxt('./build/measurement.csv', delimiter=',',
+raw = np.loadtxt('./build/measurement.csv', delimiter='\t',
                  dtype='unicode', encoding='utf-8', skiprows=1)
 raw = np.flipud(raw)
 
@@ -19,7 +19,7 @@ year = [l[4:8] for l in raw[:, 0]]
 # show step
 # fig, ax = plt.subplots(figsize=(6, 6))
 fig, ax = plt.subplots()
-step = raw[:, [3, 4, 5, 6, 7]].astype(np.int)
+step = raw[:, [3, 4, 5, 6, 7]].astype(int)
 bottom = 0 * step[:, 1]
 p_s_f = plt.bar(year, step[:, 1], bottom=bottom, label='Forward')
 bottom += step[:, 1]
@@ -29,7 +29,6 @@ p_s_r = plt.bar(year, step[:, 3], bottom=bottom, label='Right')
 bottom += step[:, 3]
 p_s_b = plt.bar(year, step[:, 4], bottom=bottom, label='Back')
 plt.title("最短経路探索に要する総歩数の比較")
-# plt.title("全探索に要する総歩数の比較")
 plt.xlabel("全日本マイクロマウス大会 32x32迷路 [年]")
 plt.ylabel("歩数 [歩]")
 
@@ -52,14 +51,13 @@ for ext in ['.png', '.pdf', '.svg']:
 # ============================================================================ #
 # show estimated time
 fig, ax = plt.subplots()
-time_s = raw[:, 2].astype(np.float).astype(np.int)
+time_s = raw[:, 2].astype(float).astype(int)
 time_str = raw[:, 1]
 p_t = plt.bar(year, time_s)
 labels = time_s
 for i, v in enumerate(labels):
     ax.text(i, labels[i], time_str[i], ha='center', va='bottom')
 plt.title("最短経路探索に要する時間の比較")
-# plt.title("全探索に要する時間の比較")
 plt.xlabel("全日本マイクロマウス大会 32x32迷路 [年]")
 plt.ylabel("見積探索時間 [秒]")
 
@@ -72,7 +70,7 @@ for ext in ['.png', '.pdf', '.svg']:
 # ============================================================================ #
 # show estimated time
 fig, ax = plt.subplots()
-time = raw[:, [11, 12]].astype(np.float)/1000
+time = raw[:, [10, 11]].astype(float)/1000
 # 反転
 time = np.flipud(time)
 year = np.flipud(year)

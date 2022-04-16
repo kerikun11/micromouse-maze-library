@@ -1,11 +1,12 @@
 #!/bin/sh
 
-SRC_DIR=$(dirname $(dirname $(readlink -f $0)))
-mkdir -p $SRC_DIR/build
+SRC_DIR=$(readlink -f $(dirname $0)/..)
+BUILD_DIR=$SRC_DIR/build-docker
+mkdir -p $BUILD_DIR
 
 docker run --rm --interactive --tty \
     --volume $SRC_DIR:/src \
-    --workdir /src/build \
+    --workdir /src/$(basename $BUILD_DIR) \
     --volume /etc/group:/etc/group:ro \
     --volume /etc/passwd:/etc/passwd:ro \
     --volume /etc/shadow:/etc/shadow:ro \

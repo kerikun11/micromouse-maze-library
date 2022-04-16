@@ -150,7 +150,7 @@ make lcov_init
 # テストを実行
 make test_run
 # カバレッジ結果の収集
-make lcov
+make lcov_capture
 # ブラウザでカバレッジ結果をみる (open コマンドは環境依存)
 open test/html/index.html
 ```
