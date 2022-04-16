@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['y_0',['y',['../d0/ddc/structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec',1,'MazeLib::Position::y()'],['../d6/d8d/structMazeLib_1_1WallIndex.html#a2f1799666bb81b082c857a3ca874980a',1,'MazeLib::WallIndex::y()'],['../dc/dd5/structMazeLib_1_1WallRecord.html#a611126b38f6ef8b89487e9bf99eff193',1,'MazeLib::WallRecord::y()'],['../d1/de8/Maze_8h.html#a0a2f84ed7838f07779ae24c5a9086d33',1,'y():&#160;Maze.h']]]
+  ['unknowncount_0',['unknownCount',['../d8/d25/classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831',1,'MazeLib::Maze']]],
+  ['update_1',['update',['../d9/da9/classMazeLib_1_1StepMap.html#aa693f3d5b63146dce4b2e60ed5aa9746',1,'MazeLib::StepMap']]],
+  ['updatewall_2',['updateWall',['../d8/d25/classMazeLib_1_1Maze.html#a6a43815bde60f520ecd1f7471d3951ba',1,'MazeLib::Maze']]]
 ];

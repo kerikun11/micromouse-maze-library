@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['relativedirection_0',['RelativeDirection',['../d3/d5c/classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60',1,'MazeLib::Direction']]],
-  ['reset_1',['reset',['../d8/d25/classMazeLib_1_1Maze.html#ae550859cb46898c9cf4a74c254488e46',1,'MazeLib::Maze::reset()'],['../d9/da9/classMazeLib_1_1StepMap.html#abe105dfa5e71b6a5d98bd6185d48b63c',1,'MazeLib::StepMap::reset()']]],
-  ['resetlastwalls_2',['resetLastWalls',['../d8/d25/classMazeLib_1_1Maze.html#adaa479806ff5509cb9374bc062681db4',1,'MazeLib::Maze']]],
-  ['restorewallrecordsfromfile_3',['restoreWallRecordsFromFile',['../d8/d25/classMazeLib_1_1Maze.html#afabe3d1808634f5ae23c26331184c80d',1,'MazeLib::Maze']]],
-  ['rotate_4',['rotate',['../d0/ddc/structMazeLib_1_1Position.html#a4aac1630ca560a2139a781b90202dbb0',1,'MazeLib::Position::rotate(const Direction d) const'],['../d0/ddc/structMazeLib_1_1Position.html#ae9660ebc8676cf177c8a96bb129abf3c',1,'MazeLib::Position::rotate(const Direction d, const Position center) const']]]
+  ['next_0',['next',['../d0/ddc/structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261',1,'MazeLib::Position::next()'],['../df/ddb/structMazeLib_1_1Pose.html#ae858274f0f1f5e3be99cf41563ed0798',1,'MazeLib::Pose::next()'],['../d6/d8d/structMazeLib_1_1WallIndex.html#a4177234bba4e64cc4f6c59410b9a6908',1,'MazeLib::WallIndex::next()']]],
+  ['north_1',['North',['../d3/d5c/classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4',1,'MazeLib::Direction']]],
+  ['northeast_2',['NorthEast',['../d3/d5c/classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4',1,'MazeLib::Direction']]],
+  ['northwest_3',['NorthWest',['../d3/d5c/classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890',1,'MazeLib::Direction']]]
 ];

@@ -9,12 +9,17 @@ digraph "MazeLib::Maze::setKnown"
   Node2 [label="MazeLib::Maze::updateWall",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#a6a43815bde60f520ecd1f7471d3951ba",tooltip="既知の壁情報と照らしあわせながら、壁を更新する関数"];
   Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node3 [label="MazeLib::Maze::parse",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#aeaf471afcf3c3562c815707aa1b04952",tooltip="特定の迷路の文字列(*.maze ファイル)から壁をパースする"];
-  Node2 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node4 [label="MazeLib::Maze::reset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#ae550859cb46898c9cf4a74c254488e46",tooltip="迷路の初期化。壁を削除し、スタート区画を既知に"];
-  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node5 [label="MazeLib::Maze::Maze",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#a8e313813114d6c26174fb04ca29007fe",tooltip="デフォルトコンストラクタ"];
-  Node4 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node4 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node6 [label="MazeLib::Maze::resetLast\lWalls",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#adaa479806ff5509cb9374bc062681db4",tooltip="直前に更新した壁を見探索状態にリセットする"];
-  Node2 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="MazeLib::Maze::parse",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#acd6e8455d36f472a978e350ad0eeeb87",tooltip=" "];
+  Node2 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="MazeLib::Maze::reset",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#ae550859cb46898c9cf4a74c254488e46",tooltip="迷路の初期化。壁を削除し、スタート区画を既知に"];
+  Node5 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="MazeLib::Maze::Maze",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#a8e313813114d6c26174fb04ca29007fe",tooltip="デフォルトコンストラクタ"];
+  Node5 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="MazeLib::Maze::resetLast\lWalls",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#adaa479806ff5509cb9374bc062681db4",tooltip="直前に更新した壁を見探索状態にリセットする"];
+  Node5 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="MazeLib::Maze::restoreWall\lRecordsFromFile",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/d25/classMazeLib_1_1Maze.html#afabe3d1808634f5ae23c26331184c80d",tooltip="壁ログファイルから壁情報を復元する関数"];
+  Node2 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
 }

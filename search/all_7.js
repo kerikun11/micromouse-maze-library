@@ -1,17 +1,9 @@
 var searchData=
 [
-  ['max_0',['Max',['../d3/d5c/classMazeLib_1_1Direction.html#a45d12960450cee7631c77462a977b211',1,'MazeLib::Direction']]],
-  ['max_5fx_1',['max_x',['../d8/d25/classMazeLib_1_1Maze.html#a2d3a9b9a6d128a977475ea6d99099d50',1,'MazeLib::Maze']]],
-  ['max_5fy_2',['max_y',['../d8/d25/classMazeLib_1_1Maze.html#a4438acf57678e0d31f8418b6eda76689',1,'MazeLib::Maze']]],
-  ['maze_3',['Maze',['../d8/d25/classMazeLib_1_1Maze.html#a8e313813114d6c26174fb04ca29007fe',1,'MazeLib::Maze::Maze()'],['../d8/d25/classMazeLib_1_1Maze.html',1,'MazeLib::Maze']]],
-  ['maze_2ecpp_4',['Maze.cpp',['../dd/d66/Maze_8cpp.html',1,'']]],
-  ['maze_2eh_5',['Maze.h',['../d1/de8/Maze_8h.html',1,'']]],
-  ['maze_5flog_5flevel_6',['MAZE_LOG_LEVEL',['../d1/de8/Maze_8h.html#a7bc2dd5ff9bf44db101f03c7f7f412d4',1,'Maze.h']]],
-  ['maze_5fsize_7',['MAZE_SIZE',['../dc/d56/namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa',1,'MazeLib']]],
-  ['maze_5fsize_5fbit_8',['MAZE_SIZE_BIT',['../dc/d56/namespaceMazeLib.html#a88e6e653888925d5477ac5d2a7cd14b5',1,'MazeLib']]],
-  ['maze_5fsize_5fmax_9',['MAZE_SIZE_MAX',['../dc/d56/namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8',1,'MazeLib']]],
-  ['mazelib_10',['MazeLib',['../dc/d56/namespaceMazeLib.html',1,'']]],
-  ['micromouse_20maze_20library_11',['MicroMouse Maze Library',['../index.html',1,'']]],
-  ['min_5fx_12',['min_x',['../d8/d25/classMazeLib_1_1Maze.html#a8facecfc158bb39c39b5d0fd57035b37',1,'MazeLib::Maze']]],
-  ['min_5fy_13',['min_y',['../d8/d25/classMazeLib_1_1Maze.html#a249eb52831483e99094b72b800ee71e9',1,'MazeLib::Maze']]]
+  ['isalong_0',['isAlong',['../d3/d5c/classMazeLib_1_1Direction.html#a71ebf7d415031f843328f925a14fc774',1,'MazeLib::Direction']]],
+  ['isdiag_1',['isDiag',['../d3/d5c/classMazeLib_1_1Direction.html#ab4d2e7c798db8222193a63a5d6f05207',1,'MazeLib::Direction']]],
+  ['isinsideoffield_2',['isInsideOfField',['../d0/ddc/structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71',1,'MazeLib::Position::isInsideOfField()'],['../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce',1,'MazeLib::WallIndex::isInsideOfField()']]],
+  ['isknown_3',['isKnown',['../d8/d25/classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208',1,'MazeLib::Maze::isKnown(const WallIndex i) const'],['../d8/d25/classMazeLib_1_1Maze.html#a8b3a4bf236e57125af7d268b61928fc2',1,'MazeLib::Maze::isKnown(const Position p, const Direction d) const'],['../d8/d25/classMazeLib_1_1Maze.html#a8b3bfd3869c46f64684b533d81104af6',1,'MazeLib::Maze::isKnown(const int8_t x, const int8_t y, const Direction d) const']]],
+  ['iswall_4',['isWall',['../d8/d25/classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0',1,'MazeLib::Maze::isWall(const WallIndex i) const'],['../d8/d25/classMazeLib_1_1Maze.html#a0f38445f51be87108d7e4793f305f012',1,'MazeLib::Maze::isWall(const Position p, const Direction d) const'],['../d8/d25/classMazeLib_1_1Maze.html#a7a626e83bdc72373ee85948ffacfa776',1,'MazeLib::Maze::isWall(const int8_t x, const int8_t y, const Direction d) const']]],
+  ['iswallbase_5',['isWallBase',['../d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560',1,'MazeLib::Maze']]]
 ];

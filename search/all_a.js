@@ -1,9 +1,25 @@
 var searchData=
 [
-  ['p_0',['p',['../df/ddb/structMazeLib_1_1Pose.html#a1792c8b1b5634a5ad3292282b085b6ae',1,'MazeLib::Pose']]],
-  ['parse_1',['parse',['../d8/d25/classMazeLib_1_1Maze.html#aeaf471afcf3c3562c815707aa1b04952',1,'MazeLib::Maze::parse(std::istream &amp;is)'],['../d8/d25/classMazeLib_1_1Maze.html#afcbb0b30f3bcec5868b7630ff7aabb8b',1,'MazeLib::Maze::parse(const std::vector&lt; std::string &gt; &amp;data, const int mazeSize)']]],
-  ['pose_2',['Pose',['../df/ddb/structMazeLib_1_1Pose.html',1,'MazeLib']]],
-  ['position_3',['Position',['../d0/ddc/structMazeLib_1_1Position.html',1,'MazeLib::Position'],['../d0/ddc/structMazeLib_1_1Position.html#a273bddbcc328c127be9453db54707ef6',1,'MazeLib::Position::Position()'],['../d0/ddc/structMazeLib_1_1Position.html#aeb482522ab6fbcfd2224719296f05d1f',1,'MazeLib::Position::Position(const int8_t x, const int8_t y)']]],
-  ['positions_4',['Positions',['../dc/d56/namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853',1,'MazeLib']]],
-  ['print_5',['print',['../d8/d25/classMazeLib_1_1Maze.html#abe3a8ddb09cef4adf591bbe4cc8f9b76',1,'MazeLib::Maze::print(std::ostream &amp;os=std::cout, const int mazeSize=MAZE_SIZE) const'],['../d8/d25/classMazeLib_1_1Maze.html#a542984879d879110311dd9dfa524c09a',1,'MazeLib::Maze::print(const Directions &amp;dirs, const Position start=Position(0, 0), std::ostream &amp;os=std::cout, const size_t mazeSize=MAZE_SIZE) const'],['../d8/d25/classMazeLib_1_1Maze.html#a9964e0a1193ccc6aa9187a06ce88e970',1,'MazeLib::Maze::print(const Positions &amp;positions, std::ostream &amp;os=std::cout, const size_t mazeSize=MAZE_SIZE) const'],['../d9/da9/classMazeLib_1_1StepMap.html#a1170bcf45c4a2e259f0fbe8628b18df8',1,'MazeLib::StepMap::print()']]]
+  ['max_0',['Max',['../d3/d5c/classMazeLib_1_1Direction.html#a45d12960450cee7631c77462a977b211',1,'MazeLib::Direction']]],
+  ['max_5fx_1',['max_x',['../d8/d25/classMazeLib_1_1Maze.html#a2d3a9b9a6d128a977475ea6d99099d50',1,'MazeLib::Maze']]],
+  ['max_5fy_2',['max_y',['../d8/d25/classMazeLib_1_1Maze.html#a4438acf57678e0d31f8418b6eda76689',1,'MazeLib::Maze']]],
+  ['maze_3',['Maze',['../d8/d25/classMazeLib_1_1Maze.html#a8e313813114d6c26174fb04ca29007fe',1,'MazeLib::Maze::Maze()'],['../d8/d25/classMazeLib_1_1Maze.html',1,'MazeLib::Maze']]],
+  ['maze_2ecpp_4',['Maze.cpp',['../dd/d66/Maze_8cpp.html',1,'']]],
+  ['maze_2eh_5',['Maze.h',['../d1/de8/Maze_8h.html',1,'']]],
+  ['maze_5fdebug_5fprofiling_6',['MAZE_DEBUG_PROFILING',['../d1/de8/Maze_8h.html#ae366f28d860f7b88faa742e82ca79b31',1,'Maze.h']]],
+  ['maze_5fdebug_5fprofiling_5fend_7',['MAZE_DEBUG_PROFILING_END',['../d1/de8/Maze_8h.html#abda50dee42271ae85421b54315c81bac',1,'Maze.h']]],
+  ['maze_5fdebug_5fprofiling_5fstart_8',['MAZE_DEBUG_PROFILING_START',['../d1/de8/Maze_8h.html#a0d65f3f445d44979c5eb45254c31f17b',1,'Maze.h']]],
+  ['maze_5flog_5flevel_9',['MAZE_LOG_LEVEL',['../d1/de8/Maze_8h.html#a7bc2dd5ff9bf44db101f03c7f7f412d4',1,'Maze.h']]],
+  ['maze_5flog_5fstream_5fbase_10',['MAZE_LOG_STREAM_BASE',['../d1/de8/Maze_8h.html#a3c6275e238c5402c0a91ae51099aeda9',1,'Maze.h']]],
+  ['maze_5flogd_11',['MAZE_LOGD',['../d1/de8/Maze_8h.html#a21003738917b3be5edb6b59c81803bf1',1,'Maze.h']]],
+  ['maze_5floge_12',['MAZE_LOGE',['../d1/de8/Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441',1,'Maze.h']]],
+  ['maze_5flogi_13',['MAZE_LOGI',['../d1/de8/Maze_8h.html#add5d63a398ee01e9e3a8664207f7ac1b',1,'Maze.h']]],
+  ['maze_5flogw_14',['MAZE_LOGW',['../d1/de8/Maze_8h.html#a7a69a1657ef6038530d86d9b48a41847',1,'Maze.h']]],
+  ['maze_5fsize_15',['MAZE_SIZE',['../dc/d56/namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa',1,'MazeLib']]],
+  ['maze_5fsize_5fbit_16',['MAZE_SIZE_BIT',['../dc/d56/namespaceMazeLib.html#a88e6e653888925d5477ac5d2a7cd14b5',1,'MazeLib']]],
+  ['maze_5fsize_5fmax_17',['MAZE_SIZE_MAX',['../dc/d56/namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8',1,'MazeLib']]],
+  ['mazelib_18',['MazeLib',['../dc/d56/namespaceMazeLib.html',1,'']]],
+  ['micromouse_20maze_20library_19',['MicroMouse Maze Library',['../index.html',1,'']]],
+  ['min_5fx_20',['min_x',['../d8/d25/classMazeLib_1_1Maze.html#a8facecfc158bb39c39b5d0fd57035b37',1,'MazeLib::Maze']]],
+  ['min_5fy_21',['min_y',['../d8/d25/classMazeLib_1_1Maze.html#a249eb52831483e99094b72b800ee71e9',1,'MazeLib::Maze']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['next_0',['next',['../d0/ddc/structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261',1,'MazeLib::Position::next()'],['../df/ddb/structMazeLib_1_1Pose.html#ae858274f0f1f5e3be99cf41563ed0798',1,'MazeLib::Pose::next()'],['../d6/d8d/structMazeLib_1_1WallIndex.html#a4177234bba4e64cc4f6c59410b9a6908',1,'MazeLib::WallIndex::next()']]]
+  ['known_0',['known',['../d8/d25/classMazeLib_1_1Maze.html#a8c73fb9c579a994917a46204dcb09986',1,'MazeLib::Maze']]]
 ];
