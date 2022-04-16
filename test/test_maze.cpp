@@ -41,7 +41,9 @@ TEST(Maze, parse_from_istream) {
 )";
   Maze maze;
   maze_stream >> maze;
+  ::testing::internal::CaptureStdout();
   maze.print({Position(1, 1)});
+  ::testing::internal::GetCapturedStdout();
 
   EXPECT_EQ(maze.getStart(), Position(1, 0));
 
@@ -80,6 +82,8 @@ TEST(Maze, parse_from_string_array) {
   std::ofstream of(output_filename);
   sample.parse(maze_data, mazeSize);
   sample.setGoals(goals);
+  ::testing::internal::CaptureStdout();
   sample.print(of, mazeSize);
   sample.print(std::cout, mazeSize);
+  ::testing::internal::GetCapturedStdout();
 }
