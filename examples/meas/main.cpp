@@ -15,29 +15,7 @@ class CLRobot : public CLRobotBase {
   CLRobot(Maze& mazeTarget) : CLRobotBase(mazeTarget) {}
 };
 
-int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
-              const std::string& save_dir = "./") {
-#if SHOW_OBJECT_SIZE
-  /* show size */
-  MAZE_LOGI << "sizeof(Maze):\t" << sizeof(Maze) << std::endl;
-  MAZE_LOGI << "sizeof(StepMap):\t" << sizeof(StepMap) << std::endl;
-  MAZE_LOGI << "sizeof(StepMapWall):\t" << sizeof(StepMapWall) << std::endl;
-  MAZE_LOGI << "sizeof(StepMapSlalom):\t" << sizeof(StepMapSlalom) << std::endl;
-  MAZE_LOGI << "sizeof(SearchAlgorithm):\t" << sizeof(SearchAlgorithm)
-            << std::endl;
-  MAZE_LOGI << "sizeof(RobotBase):\t" << sizeof(RobotBase) << std::endl;
-#endif
-
-  /* save file */
-  std::ofstream csv(save_dir + "measurement.csv");
-  /* print header */
-  csv << "name\tsearch_time\tsearch_time_ms\tstep\tstep_f\tstep_l\tstep_"
-         "r\tstep_b\twalls\tcalc_time_max\tshortest_ms_a\tshortest_ms_d"
-#if POSITION_IDENTIFICATION_RUN_ENABLED
-         "\tpi_calc_time_max\tpi_est_time_min\tpi_est_time_max\t"
-         "pi_walls_min\tpi_walls_max"
-#endif
-      << std::endl;
+std::vector<std::string> getTargetMazeNames() {
   /* queue test files */
   std::vector<std::string> names;
 #if 0
@@ -89,8 +67,39 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
   names.push_back("08MM2016CF_pre");
 #endif
 #endif
+  return names;
+}
+
+void show_obj_size() {
+  MAZE_LOGI << "sizeof(Maze):\t" << sizeof(Maze) << std::endl;
+  MAZE_LOGI << "sizeof(StepMap):\t" << sizeof(StepMap) << std::endl;
+  MAZE_LOGI << "sizeof(StepMapWall):\t" << sizeof(StepMapWall) << std::endl;
+  MAZE_LOGI << "sizeof(StepMapSlalom):\t" << sizeof(StepMapSlalom) << std::endl;
+  MAZE_LOGI << "sizeof(SearchAlgorithm):\t" << sizeof(SearchAlgorithm)
+            << std::endl;
+  MAZE_LOGI << "sizeof(RobotBase):\t" << sizeof(RobotBase) << std::endl;
+}
+
+int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
+              const std::string& save_dir = "./") {
+#if SHOW_OBJECT_SIZE
+  /* show size */
+  show_obj_size();
+#endif
+
+  /* prepare output csv file */
+  std::ofstream csv(save_dir + "measurement.csv");
+  /* print csv header */
+  csv << "name\tsearch_time\tsearch_time_ms\tstep\tstep_f\tstep_l\tstep_"
+         "r\tstep_b\twalls\tcalc_time_max\tshortest_ms_a\tshortest_ms_d"
+#if POSITION_IDENTIFICATION_RUN_ENABLED
+         "\tpi_calc_time_max\tpi_est_time_min\tpi_est_time_max\t"
+         "pi_walls_min\tpi_walls_max"
+#endif
+      << std::endl;
 
   /* test for each maze */
+  const auto names = getTargetMazeNames();
   for (const auto& name : names) {
     std::cout << std::endl;
     std::cout << "Maze: \t" << name << std::endl;
@@ -99,15 +108,16 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
     /* Maze Target */
     const auto pMazeTarget = std::make_unique<Maze>();
     Maze& mazeTarget = *pMazeTarget;
-    if (!mazeTarget.parse(mazedata_dir + name + ".maze")) {
-      MAZE_LOGE << "File Parse Error!" << std::endl;
+    const auto filename = mazedata_dir + name + ".maze";
+    if (!mazeTarget.parse(filename)) {
+      MAZE_LOGE << "File Parse Error! " << filename << std::endl;
       continue;
     }
 
 #if SEARCH_RUN_ENABLED
     /* Search Run */
-    const auto p_robot = std::make_unique<CLRobot>(mazeTarget);
-    CLRobot& robot = *p_robot;
+    const auto pRobot = std::make_unique<CLRobot>(mazeTarget);
+    CLRobot& robot = *pRobot;
     robot.replaceGoals(mazeTarget.getGoals());
     if (!robot.searchRun())
       MAZE_LOGE << "Failed to Find a Path to Goal!" << std::endl;
@@ -196,22 +206,20 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
       const Maze& maze = mazeTarget;
       const auto p = std::make_unique<StepMap>();
       StepMap& map = *p;
-      std::chrono::microseconds sum{0};
+      int sum = 0;
       const int n = 100;
       Directions shortestDirections;
       for (int i = 0; i < n; ++i) {
-        const auto t_s = std::chrono::system_clock().now();
+        const auto t_s = robot.microseconds();
         shortestDirections =
             map.calcShortestDirections(maze, knownOnly, simple);
+        const auto t_e = robot.microseconds();
         if (shortestDirections.empty())
           MAZE_LOGE << "Failed!" << std::endl;
-        const auto t_e = std::chrono::system_clock().now();
-        const auto us =
-            std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
-        sum += us;
+        sum += t_e - t_s;
       }
       std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
-                << sum.count() / n << "\t[us]" << std::endl;
+                << sum / n << "\t[us]" << std::endl;
 #if MAZE_DEBUG_PROFILING
       std::cout << "StepMap MaxQueue: " << map.queueSizeMax << std::endl;
 #endif
@@ -230,22 +238,20 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
       const Maze& maze = mazeTarget;
       const auto p = std::make_unique<StepMapWall>();
       StepMapWall& map = *p;
-      std::chrono::microseconds sum{0};
+      int sum = 0;
       const int n = 100;
       Directions shortestDirections;
       for (int i = 0; i < n; ++i) {
-        const auto t_s = std::chrono::system_clock().now();
+        const auto t_s = robot.microseconds();
         shortestDirections =
             map.calcShortestDirections(maze, knownOnly, simple);
+        const auto t_e = robot.microseconds();
         if (shortestDirections.empty())
           MAZE_LOGE << "Failed!" << std::endl;
-        const auto t_e = std::chrono::system_clock().now();
-        const auto us =
-            std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
-        sum += us;
+        sum += t_e - t_s;
       }
-      std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t"
-                << sum.count() / n << "\t[us]" << std::endl;
+      std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t" << sum / n
+                << "\t[us]" << std::endl;
       StepMapWall::appendStraightDirections(maze, shortestDirections);
 #if MAZE_DEBUG_PROFILING
       std::cout << "StepMapWall MaxQueue: " << map.queueSizeMax << std::endl;
@@ -268,13 +274,13 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
       const Maze& maze = mazeTarget;
       const auto p = std::make_unique<StepMapSlalom>();
       StepMapSlalom& map = *p;
-      std::chrono::microseconds sum{0};
+      int sum = 0;
       const int n = 100;
       StepMapSlalom::EdgeCost edgeCost;
       StepMapSlalom::Indexes path;
       Directions shortestDirections;
       for (int i = 0; i < n; ++i) {
-        const auto t_s = std::chrono::system_clock().now();
+        const auto t_s = robot.microseconds();
         map.update(maze, edgeCost,
                    StepMapSlalom::convertDestinations(maze.getGoals()),
                    knownOnly);
@@ -284,13 +290,10 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
         shortestDirections = map.indexes2directions(path);
         StepMap::appendStraightDirections(maze, shortestDirections, knownOnly,
                                           diagEnabled);
-        const auto t_e = std::chrono::system_clock().now();
-        const auto us =
-            std::chrono::duration_cast<std::chrono::microseconds>(t_e - t_s);
-        sum += us;
+        const auto t_e = robot.microseconds();
+        sum += t_e - t_s;
       }
-      std::cout << "StepMapSlalom:\t" << sum.count() / n << "\t[us]"
-                << std::endl;
+      std::cout << "StepMapSlalom:\t" << sum / n << "\t[us]" << std::endl;
 #if MAZE_DEBUG_PROFILING
       std::cout << "StepMapSlalom MaxQueue: " << map.queueSizeMax << std::endl;
 #endif
