@@ -74,7 +74,7 @@ class CLRobot : public CLRobotBase {
 
 int main(void) {
   std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-  std::cout << "\e[J";  /*< カーソル以下を消去 */
+  std::cout << "\e[J";    /*< カーソル以下を消去 */
 
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/data/";
@@ -104,8 +104,8 @@ int main(void) {
 
   robot.display = 1;
   /* 1st Recovery */
-  robot.fake_offset = robot.real = Pose(Position(23, 11), Direction::South);
-  robot.positionIdentifyRun(false);
+  auto fake_offset = Pose(Position(23, 11), Direction::South);
+  robot.positionIdentifyRun(fake_offset, false);
 
   /* Reset Last Wall */
   {
@@ -120,10 +120,10 @@ int main(void) {
   /* 2nd Recovery */
   /* Set Mistook Wall */
   mazeTarget.setWall(27, 1, Direction::North, true);
-  robot.fake_offset = robot.real = Pose(Position(2, 1), Direction::East);
+  fake_offset = Pose(Position(2, 1), Direction::East);
   robot.setForceGoingToGoal();
   robot.setForceBackToStart();
-  robot.positionIdentifyRun(false);
+  robot.positionIdentifyRun(fake_offset, false);
 
   /* 3. 2nd Fast Run */
   robot.wait();
@@ -166,7 +166,7 @@ int main(void) {
   for (bool diagEnabled : {true, false}) {
     robot.calcShortestDirections(diagEnabled);
     std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-    std::cout << "\e[J";  /*< カーソル以下を消去 */
+    std::cout << "\e[J";    /*< カーソル以下を消去 */
     robot.printPath();
     std::cout << "Estimated Shortest Time "
               << (diagEnabled ? "(diag)" : "(no diag)") << ": "

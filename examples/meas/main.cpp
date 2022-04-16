@@ -168,47 +168,22 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
 #if POSITION_IDENTIFICATION_RUN_ENABLED
     /* Position Identification Run */
     robot.tCalcMax = 0;
-    const auto pStepMap = std::make_unique<StepMap>();
-    StepMap& stepMap = *pStepMap;
-    const auto pMazePi = std::make_unique<Maze>();
-    Maze& mazePi = *pMazePi;
-    mazePi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
-    /* 迷路的に行き得る区画を洗い出す */
-    stepMap.update(mazeTarget, {mazeTarget.getStart()}, true, true);
-    for (int8_t x = 0; x < MAZE_SIZE; ++x)
-      for (int8_t y = 0; y < MAZE_SIZE; ++y)
-        for (const auto d : Direction::Along4) {
-          const auto p = Position(x, y);
-          if (p == Position(0, 0))
-            continue; /*< スタートは除外 */
-          if (stepMap.getStep(p) == StepMap::STEP_MAX)
-            continue; /*< そもそも迷路的に行き得ない区画は除外 */
-          if (mazeTarget.isWall(p, d + Direction::Back))
-            continue; /*< 壁上からは除外 */
-          robot.fake_offset = robot.real = Pose(p, d);
-          robot.updateMaze(mazePi); /*< 探索直後の迷路に置き換える */
-          // robot.resetLastWalls(mazePi.getWallRecords().size() / 5);
-          robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
-          const bool res = robot.positionIdentifyRun();
-          if (!res)
-            MAZE_LOGE << "Failed to Identify! fake_offset: "
-                      << robot.fake_offset << std::endl;
-        }
+    robot.positionIdentifyRunForAllOffset();
     /* print result */
-    std::cout << "P.I. tCalcMax:\t" << robot.tCalcMax << "\t[us]" << std::endl;
-    std::cout << "P.I. tEst:\t" << robot.pi_est_time_min / 1000 / 60 % 60 << ":"
-              << std::setw(2) << std::setfill('0')
+    std::cout << "P.I. Max Calc:\t" << robot.tCalcMax << "\t[us]" << std::endl;
+    std::cout << "P.I. Est Time:\t" << robot.pi_est_time_min / 1000 / 60 % 60
+              << ":" << std::setw(2) << std::setfill('0')
               << robot.pi_est_time_min / 1000 % 60 << "\t"
               << robot.pi_est_time_max / 1000 / 60 % 60 << ":" << std::setw(2)
               << std::setfill('0') << robot.pi_est_time_max / 1000 % 60
               << std::setfill(' ') << std::endl;
-    std::cout << "P.I. walls:\t" << robot.walls_pi_min << "\t"
-              << robot.walls_pi_max << std::endl;
+    std::cout << "P.I. walls:\t" << robot.pi_walls_min << "\t"
+              << robot.pi_walls_max << std::endl;
     csv << "\t" << robot.tCalcMax;
     csv << "\t" << robot.pi_est_time_min;
     csv << "\t" << robot.pi_est_time_max;
-    csv << "\t" << robot.walls_pi_min;
-    csv << "\t" << robot.walls_pi_max;
+    csv << "\t" << robot.pi_walls_min;
+    csv << "\t" << robot.pi_walls_max;
 #endif
 
 #if STEP_MAP_ENABLED

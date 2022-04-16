@@ -31,21 +31,19 @@ class CLRobotBase : public RobotBase {
   void printInfoDoubleMaze(const bool showMaze = true) {
     if (showMaze) {
       std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-      printDoubleMaze(
-          {&getMaze(), getState() == SearchAlgorithm::IDENTIFYING_POSITION
-                           ? &getSearchAlgorithm().getIdMaze()
-                           : &maze},
-          {&real, &getCurrentPose()},
-          {&getSearchAlgorithm().getStepMap(),
-           &getSearchAlgorithm().getStepMap()},
-          std::cout);
+      const auto& maze = getState() == SearchAlgorithm::IDENTIFYING_POSITION
+                             ? getSearchAlgorithm().getIdMaze()
+                             : getMaze();
+      const auto& map = getSearchAlgorithm().getStepMap();
+      printDoubleMaze({&getMaze(), &maze}, {&real, &getCurrentPose()},
+                      {&map, &map}, std::cout);
     }
     RobotBase::printInfo(false);
     std::cout << "Real Pose:\t" << real << std::endl;
   }
   void printSearchResult() const {
     std::printf(
-        "SearchTime: %2d:%02d, Step: %4d, "
+        "SearchTime: %2u:%02u, Step: %4d, "
         "F: %4d, L: %3d, R: %3d, B: %3d, Walls: %4d\n",
         est_time / 1000 / 60, est_time / 1000 % 60, step, f, l, r, b,
         int(maze.getWallRecords().size()));
@@ -111,25 +109,70 @@ class CLRobotBase : public RobotBase {
     }
     return true;
   }
-  bool positionIdentifyRun(const bool reset_cost = true) {
+  bool positionIdentifyRun(const Pose& fake_offset = {{0, 1}, Direction::North},
+                           const bool reset_cost = true) {
     if (reset_cost) {
       step = f = l = r = b = est_time = 0;
       calcNextDirectionsData.clear();
     }
+    this->fake_offset = this->real = fake_offset;
     if (!RobotBase::positionIdentifyRun()) {
       MAZE_LOGE << "positionIdentifyRun failed." << std::endl;
       return false;
     }
     return true;
   }
+  bool positionIdentifyRunForAllOffset() {
+    /* StepMap */
+    const auto pStepMap = std::make_unique<StepMap>();
+    StepMap& stepMap = *pStepMap;
+    /* Maze */
+    const auto pMazeEndSearch = std::make_unique<Maze>();
+    Maze& mazeEndSearch = *pMazeEndSearch;
+    mazeEndSearch = getMaze(); /*< 探索終了時の迷路を取得 */
+    /* 迷路的に行き得る区画を洗い出す */
+    stepMap.update(mazeTarget, {mazeTarget.getStart()}, true, true);
+    for (int8_t x = 0; x < MAZE_SIZE; ++x) {
+      for (int8_t y = 0; y < MAZE_SIZE; ++y) {
+        for (const auto d : Direction::Along4) {
+          const auto p = Position(x, y);
+          if (p == Position(0, 0))
+            continue; /*< スタート区画は除外 */
+          if (stepMap.getStep(p) == StepMap::STEP_MAX)
+            continue; /*< そもそも迷路的に行き得ない区画は除外 */
+          if (mazeTarget.isWall(p, d + Direction::Back))
+            continue; /*< 壁上からの場合は除外 */
+          fake_offset = real = Pose(p, d);
+          updateMaze(mazeEndSearch); /*< 探索終了時の迷路に置き換える */
+          // robot.resetLastWalls(mazePi.getWallRecords().size() / 5);
+          setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
+          const bool res = positionIdentifyRun(fake_offset);
+          if (!res)
+            MAZE_LOGE << "Failed to Identify! fake_offset: " << fake_offset
+                      << std::endl;
+        }
+      }
+    }
+    /* 迷路をもとに戻す */
+    updateMaze(mazeEndSearch);
+    return true;
+  }
+
+ protected:
+  Maze& mazeTarget;
+  Pose real;
+  bool real_visit_goal = false;
+  SearchAction action_prev = SearchAction::START_STEP;
+  bool unknown_accel_prev = false;
 
  public:
   int step = 0, f = 0, l = 0, r = 0, b = 0; /*< 探索の評価のためのカウンタ */
-  uint32_t est_time = 0;                    /*< 探索時間 [ms] */
+  uint32_t est_time = 0;                    /*< 見積もり探索時間 [ms] */
 
  public:
-  size_t walls_pi_max = 0;
-  size_t walls_pi_min = MAZE_SIZE * MAZE_SIZE * 4;
+  Pose fake_offset;
+  size_t pi_walls_max = 0;
+  size_t pi_walls_min = MAZE_SIZE * MAZE_SIZE * 4;
   uint32_t pi_est_time_max = 0;
   uint32_t pi_est_time_min = std::numeric_limits<uint32_t>::max();
 
@@ -142,17 +185,12 @@ class CLRobotBase : public RobotBase {
     int tDur;
   };
   std::vector<CalcNextDirectionsData> calcNextDirectionsData;
-
- public:
-  Maze& mazeTarget;
-  Pose fake_offset;
-  Pose real;
-  bool real_visit_goal = false;
+  virtual int microseconds() {
+    const auto now = std::chrono::steady_clock::now().time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::microseconds>(now).count();
+  }
 
  protected:
-  SearchAction action_prev = SearchAction::START_STEP;
-  bool unknown_accel_prev = false;
-
   virtual void senseWalls(bool& left, bool& front, bool& right) override {
     left = !mazeTarget.canGo(real.p, real.d + Direction::Left);
     front = !mazeTarget.canGo(real.p, real.d + Direction::Front);
@@ -165,16 +203,12 @@ class CLRobotBase : public RobotBase {
 #endif
   }
   virtual void calcNextDirectionsPreCallback() override {
-    const auto now = std::chrono::steady_clock::now().time_since_epoch();
-    tCalcNextDirsPrev =
-        std::chrono::duration_cast<std::chrono::microseconds>(now).count();
+    tCalcNextDirsPrev = microseconds();
   }
   virtual void calcNextDirectionsPostCallback(
       SearchAlgorithm::State oldState,
       SearchAlgorithm::State newState) override {
-    const auto now = std::chrono::steady_clock::now().time_since_epoch();
-    const int tCalcNextDirsPost =
-        std::chrono::duration_cast<std::chrono::microseconds>(now).count();
+    const int tCalcNextDirsPost = microseconds();
     const int tCalc = tCalcNextDirsPost - tCalcNextDirsPrev;
 #if MAZE_DEBUG_PROFILING
     if (tCalc > tCalcMax)
@@ -188,8 +222,8 @@ class CLRobotBase : public RobotBase {
     if (oldState == SearchAlgorithm::IDENTIFYING_POSITION) {
       const auto walls =
           getSearchAlgorithm().getIdMaze().getWallRecords().size();
-      walls_pi_min = std::min(walls_pi_min, walls);
-      walls_pi_max = std::max(walls_pi_max, walls);
+      pi_walls_min = std::min(pi_walls_min, walls);
+      pi_walls_max = std::max(pi_walls_max, walls);
       pi_est_time_max = std::max(pi_est_time_max, est_time);
       pi_est_time_min = std::min(pi_est_time_min, est_time);
     }

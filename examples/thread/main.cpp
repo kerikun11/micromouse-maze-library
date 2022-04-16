@@ -7,40 +7,11 @@ using namespace MazeLib;
 class CLRobot : public CLRobotBase {
  public:
   CLRobot(Maze& mazeTarget) : CLRobotBase(mazeTarget) {}
-  bool positionIdentifyRun() {
-    /* Position Identification Run */
-    StepMap stepMap;
-    Maze maze_searched = getMaze(); /*< 探索終了時の迷路を取得 */
-    /* 迷路的に行き得る区画を洗い出す */
-    stepMap.update(mazeTarget, {mazeTarget.getStart()}, true, true);
-    for (int8_t x = 0; x < MAZE_SIZE; ++x) {
-      for (int8_t y = 0; y < MAZE_SIZE; ++y) {
-        for (const auto d : Direction::Along4) {
-          const auto p = Position(x, y);
-          if (p == Position(0, 0))
-            continue; /*< スタート区画は除外 */
-          if (stepMap.getStep(p) == StepMap::STEP_MAX)
-            continue; /*< そもそも迷路的に行き得ない区画は除外 */
-          if (mazeTarget.isWall(p, d + Direction::Back))
-            continue; /*< 壁上は除外 */
-          fake_offset = real = Pose(p, d);
-          updateMaze(maze_searched); /*< 探索終了時の迷路に置き換える */
-          setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
-          const bool res = CLRobotBase::positionIdentifyRun();
-          if (!res)
-            MAZE_LOGE << "Failed to Identify! fake_offset: " << fake_offset
-                      << std::endl;
-        }
-      }
-    }
-    updateMaze(maze_searched); /*< 探索終了時の迷路に置き換える */
-    return true;
-  }
 };
 
 void thread_maze(const std::string& name) {
   /* Maze Target */
-  const std::string& mazedata_dir = "../mazedata/data/";
+  const auto mazedata_dir = "../mazedata/data/";
   const auto filepath = mazedata_dir + name + ".maze";
   Maze mazeTarget;
   if (!mazeTarget.parse(filepath)) {
@@ -51,15 +22,15 @@ void thread_maze(const std::string& name) {
   /* Search Run */
   CLRobot robot(mazeTarget);
   robot.searchRun();
-  /* Show Result */
+  /* Search Result */
   std::printf("%-20s", name.c_str());
   robot.printSearchResult();
-#if 1
+#if 0
   /* Fast Run */
   for (const auto diagEnabled : {false, true})
     robot.fastRun(diagEnabled);
   /* Position Identification Run */
-  robot.positionIdentifyRun();
+  robot.positionIdentifyRunForAllOffset();
 #endif
 }
 
