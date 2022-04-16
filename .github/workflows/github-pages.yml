@@ -20,11 +20,11 @@ jobs:
 
       - name: Install Specific Verison of Doxygen
         env:
-          DOXYGEN_VERSION: 1.9.1
+          DOXYGEN_VERSION: 1.9.3
         run: |
           sudo apt install -y curl make libclang-9-dev libclang-cpp9
           cd /tmp
-          curl -L https://doxygen.nl/files/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz | tar xz
+          curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz/download | tar xz
           cd doxygen-$DOXYGEN_VERSION
           sudo make -j$(nproc) install
 
