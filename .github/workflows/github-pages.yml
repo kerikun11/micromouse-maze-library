@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0 # for use of git describe
 
       - name: Install Packages
-        run: sudo apt install -y gcc g++ make cmake graphviz dot
+        run: sudo apt install -y gcc g++ make cmake graphviz
 
       - name: Install Specific Verison of Doxygen
         env:
