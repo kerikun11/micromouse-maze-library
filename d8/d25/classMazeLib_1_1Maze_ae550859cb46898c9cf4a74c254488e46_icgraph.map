@@ -1,7 +1,0 @@
-<map id="MazeLib::Maze::reset" name="MazeLib::Maze::reset">
-<area shape="rect" id="node1" title="迷路の初期化．壁を削除し，スタート区画を既知に" alt="" coords="255,85,415,112"/>
-<area shape="rect" id="node2" href="$d8/d25/classMazeLib_1_1Maze.html#a8e313813114d6c26174fb04ca29007fe" title="デフォルトコンストラクタ" alt="" coords="25,5,187,32"/>
-<area shape="rect" id="node3" href="$d8/d25/classMazeLib_1_1Maze.html#aeaf471afcf3c3562c815707aa1b04952" title="特定の迷路の文字列(*.maze ファイル)から壁をパースする" alt="" coords="25,56,187,83"/>
-<area shape="rect" id="node4" href="$d8/d25/classMazeLib_1_1Maze.html#a02951c0204c5f8fc3553b0208f7bf7f6" title="直前に更新した壁を見探索状態にリセットする" alt="" coords="13,107,199,149"/>
-<area shape="rect" id="node5" href="$d8/d25/classMazeLib_1_1Maze.html#afabe3d1808634f5ae23c26331184c80d" title="壁ログファイルから壁情報を復元する関数" alt="" coords="5,173,207,214"/>
-</map>

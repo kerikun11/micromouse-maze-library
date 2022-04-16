@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.9.1"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.3"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>MicroMouse Maze Library: MazeLib::StepMap クラス</title>
 <link href="../../tabs.css" rel="stylesheet" type="text/css"/>
@@ -19,8 +19,8 @@
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr style="height: 56px;">
-  <td id="projectalign" style="padding-left: 0.5em;">
+ <tr id="projectrow">
+  <td id="projectalign">
    <div id="projectname">MicroMouse Maze Library
    </div>
   </td>
@@ -29,21 +29,22 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 構築: Doxygen 1.9.1 -->
+<!-- 構築: Doxygen 1.9.3 -->
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
-var searchBox = new SearchBox("searchBox", "../../search",false,'検索','.html');
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "../../search",'検索','.html');
 /* @license-end */
 </script>
 <script type="text/javascript" src="../../menudata.js"></script>
 <script type="text/javascript" src="../../menu.js"></script>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
 $(function() {
   initMenu('../../',true,false,'search.php','検索');
   $(document).ready(function() { init_search(); });
 });
-/* @license-end */</script>
+/* @license-end */
+</script>
 <div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -72,9 +73,9 @@ $(function() {
 <a href="#pub-static-attribs">静的公開変数類</a> &#124;
 <a href="#pro-methods">限定公開メンバ関数</a> &#124;
 <a href="#pro-attribs">限定公開変数類</a> &#124;
+<a href="#pro-static-attribs">静的限定公開変数類</a> &#124;
 <a href="../../d0/de5/classMazeLib_1_1StepMap-members.html">全メンバ一覧</a>  </div>
-  <div class="headertitle">
-<div class="title">MazeLib::StepMap クラス</div>  </div>
+  <div class="headertitle"><div class="title">MazeLib::StepMap クラス</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -83,14 +84,14 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="../../da/d12/StepMap_8h_source.html">StepMap.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 公開型</h2></td></tr>
-<tr class="memitem:a3a3603aafce4cd7a543a90580bdfdd0a"><td class="memItemLeft" align="right" valign="top"><a id="a3a3603aafce4cd7a543a90580bdfdd0a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a">step_t</a> = uint16_t</td></tr>
+<tr class="memitem:a3a3603aafce4cd7a543a90580bdfdd0a"><td class="memItemLeft" align="right" valign="top"><a id="a3a3603aafce4cd7a543a90580bdfdd0a" name="a3a3603aafce4cd7a543a90580bdfdd0a"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>step_t</b> = uint16_t</td></tr>
 <tr class="memdesc:a3a3603aafce4cd7a543a90580bdfdd0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップの型 <br /></td></tr>
 <tr class="separator:a3a3603aafce4cd7a543a90580bdfdd0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 公開メンバ関数</h2></td></tr>
 <tr class="memitem:a04255283577fb7422d4b49e33cfde064"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a04255283577fb7422d4b49e33cfde064">StepMap</a> ()</td></tr>
 <tr class="memdesc:a04255283577fb7422d4b49e33cfde064"><td class="mdescLeft">&#160;</td><td class="mdescRight">デフォルトコンストラクタ  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a04255283577fb7422d4b49e33cfde064">[詳解]</a><br /></td></tr>
@@ -110,77 +111,89 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../
 <tr class="memitem:a3b0fff1fbe5cd71cbcb26619f4bf9d9b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3b0fff1fbe5cd71cbcb26619f4bf9d9b">setStep</a> (const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> p, const <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a">step_t</a> step)</td></tr>
 <tr class="memdesc:a3b0fff1fbe5cd71cbcb26619f4bf9d9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップの更新  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a3b0fff1fbe5cd71cbcb26619f4bf9d9b">[詳解]</a><br /></td></tr>
 <tr class="separator:a3b0fff1fbe5cd71cbcb26619f4bf9d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb6b02693ab2345aac19e91f6284a05f"><td class="memItemLeft" align="right" valign="top"><a id="abb6b02693ab2345aac19e91f6284a05f"></a>
-const auto &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#abb6b02693ab2345aac19e91f6284a05f">getMapArray</a> () const</td></tr>
-<tr class="memdesc:abb6b02693ab2345aac19e91f6284a05f"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップマップの生配列への参照を取得 (読み取り専用) <br /></td></tr>
-<tr class="separator:abb6b02693ab2345aac19e91f6284a05f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8820317c6b0257db1789bbdc355fe7cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a8820317c6b0257db1789bbdc355fe7cb">print</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> &amp;p=<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(-1, -1), const <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html">Direction</a> <a class="el" href="../../d1/de8/Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>=<a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html#a45d12960450cee7631c77462a977b211">Direction::Max</a>, std::ostream &amp;os=std::cout) const</td></tr>
-<tr class="memdesc:a8820317c6b0257db1789bbdc355fe7cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップの表示  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a8820317c6b0257db1789bbdc355fe7cb">[詳解]</a><br /></td></tr>
-<tr class="separator:a8820317c6b0257db1789bbdc355fe7cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97633de613218a96377e5b4c4b29b3fd"><td class="memItemLeft" align="right" valign="top"><a id="a97633de613218a96377e5b4c4b29b3fd"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;dirs, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> &amp;start=<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(0, 0), std::ostream &amp;os=std::cout) const</td></tr>
-<tr class="separator:a97633de613218a96377e5b4c4b29b3fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c3367ba9f81a444040f84321f6998d7"><td class="memItemLeft" align="right" valign="top"><a id="a7c3367ba9f81a444040f84321f6998d7"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>printFull</b> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> &amp;p=<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(-1, -1), const <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html">Direction</a> <a class="el" href="../../d1/de8/Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>=<a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html#a45d12960450cee7631c77462a977b211">Direction::Max</a>, std::ostream &amp;os=std::cout) const</td></tr>
-<tr class="separator:a7c3367ba9f81a444040f84321f6998d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa852a0a0b5438780faddacc7ddc75a55"><td class="memItemLeft" align="right" valign="top"><a id="aa852a0a0b5438780faddacc7ddc75a55"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>printFull</b> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;dirs, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> &amp;start=<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(0, 0), std::ostream &amp;os=std::cout) const</td></tr>
-<tr class="separator:aa852a0a0b5438780faddacc7ddc75a55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acaf2520846ba0691bd42441dd609053c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#acaf2520846ba0691bd42441dd609053c">update</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../dc/d56/namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">Positions</a> &amp;dest, const bool known_only, const bool simple)</td></tr>
-<tr class="memdesc:acaf2520846ba0691bd42441dd609053c"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップマップの更新  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#acaf2520846ba0691bd42441dd609053c">[詳解]</a><br /></td></tr>
-<tr class="separator:acaf2520846ba0691bd42441dd609053c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5622bf74eedec602d042d49958582c27"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a5622bf74eedec602d042d49958582c27">calcShortestDirections</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> &amp;start, const <a class="el" href="../../dc/d56/namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">Positions</a> &amp;dest, const bool known_only, const bool simple)</td></tr>
-<tr class="memdesc:a5622bf74eedec602d042d49958582c27"><td class="mdescLeft">&#160;</td><td class="mdescRight">与えられた区画間の最短経路を導出する関数  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a5622bf74eedec602d042d49958582c27">[詳解]</a><br /></td></tr>
-<tr class="separator:a5622bf74eedec602d042d49958582c27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9403d4e0deb77c81a2737b370148f775"><td class="memItemLeft" align="right" valign="top"><a id="a9403d4e0deb77c81a2737b370148f775"></a>
-<a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a9403d4e0deb77c81a2737b370148f775">calcShortestDirections</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const bool known_only, const bool simple)</td></tr>
-<tr class="memdesc:a9403d4e0deb77c81a2737b370148f775"><td class="mdescLeft">&#160;</td><td class="mdescRight">スタートからゴールまでの最短経路を導出する関数 <br /></td></tr>
-<tr class="separator:a9403d4e0deb77c81a2737b370148f775"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a813c57c1d7a797d13d52fed3eb01449e"><td class="memItemLeft" align="right" valign="top"><a id="a813c57c1d7a797d13d52fed3eb01449e" name="a813c57c1d7a797d13d52fed3eb01449e"></a>
+const auto &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getMapArray</b> () const</td></tr>
+<tr class="memdesc:a813c57c1d7a797d13d52fed3eb01449e"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップマップの生配列への参照を取得 (読み取り専用) <br /></td></tr>
+<tr class="separator:a813c57c1d7a797d13d52fed3eb01449e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacec08625376c1864dffe926859e881e"><td class="memItemLeft" align="right" valign="top">const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#aacec08625376c1864dffe926859e881e">getScalingFactor</a> () const</td></tr>
+<tr class="memdesc:aacec08625376c1864dffe926859e881e"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップのスケーリング係数を取得  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#aacec08625376c1864dffe926859e881e">[詳解]</a><br /></td></tr>
+<tr class="separator:aacec08625376c1864dffe926859e881e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1170bcf45c4a2e259f0fbe8628b18df8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a1170bcf45c4a2e259f0fbe8628b18df8">print</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> p=<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(-1, -1), const <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html">Direction</a> <a class="el" href="../../d1/de8/Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>=<a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html#a45d12960450cee7631c77462a977b211">Direction::Max</a>, std::ostream &amp;os=std::cout) const</td></tr>
+<tr class="memdesc:a1170bcf45c4a2e259f0fbe8628b18df8"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップの表示  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a1170bcf45c4a2e259f0fbe8628b18df8">[詳解]</a><br /></td></tr>
+<tr class="separator:a1170bcf45c4a2e259f0fbe8628b18df8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada4dc887d52b3b59bace8aa6b68447ed"><td class="memItemLeft" align="right" valign="top"><a id="ada4dc887d52b3b59bace8aa6b68447ed" name="ada4dc887d52b3b59bace8aa6b68447ed"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;dirs, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> start=<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(0, 0), std::ostream &amp;os=std::cout) const</td></tr>
+<tr class="separator:ada4dc887d52b3b59bace8aa6b68447ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3884e1891252cbdee8e7295dd53f3a3c"><td class="memItemLeft" align="right" valign="top"><a id="a3884e1891252cbdee8e7295dd53f3a3c" name="a3884e1891252cbdee8e7295dd53f3a3c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>printFull</b> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> p=<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(-1, -1), const <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html">Direction</a> <a class="el" href="../../d1/de8/Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>=<a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html#a45d12960450cee7631c77462a977b211">Direction::Max</a>, std::ostream &amp;os=std::cout) const</td></tr>
+<tr class="separator:a3884e1891252cbdee8e7295dd53f3a3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad32a5acacd31cd9a73bfd577518cfee7"><td class="memItemLeft" align="right" valign="top"><a id="ad32a5acacd31cd9a73bfd577518cfee7" name="ad32a5acacd31cd9a73bfd577518cfee7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>printFull</b> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;dirs, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> start=<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(0, 0), std::ostream &amp;os=std::cout) const</td></tr>
+<tr class="separator:ad32a5acacd31cd9a73bfd577518cfee7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa693f3d5b63146dce4b2e60ed5aa9746"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#aa693f3d5b63146dce4b2e60ed5aa9746">update</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../dc/d56/namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">Positions</a> &amp;dest, const bool knownOnly, const bool simple)</td></tr>
+<tr class="memdesc:aa693f3d5b63146dce4b2e60ed5aa9746"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップマップの更新  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#aa693f3d5b63146dce4b2e60ed5aa9746">[詳解]</a><br /></td></tr>
+<tr class="separator:aa693f3d5b63146dce4b2e60ed5aa9746"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97a7b2d52b74a8fe1f2253fcc1398614"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614">calcShortestDirections</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> start, const <a class="el" href="../../dc/d56/namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">Positions</a> &amp;dest, const bool knownOnly, const bool simple)</td></tr>
+<tr class="memdesc:a97a7b2d52b74a8fe1f2253fcc1398614"><td class="mdescLeft">&#160;</td><td class="mdescRight">与えられた区画間の最短経路を導出する関数  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614">[詳解]</a><br /></td></tr>
+<tr class="separator:a97a7b2d52b74a8fe1f2253fcc1398614"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a8c7e032f24e587b4736cfc6122cb03"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a2a8c7e032f24e587b4736cfc6122cb03">calcShortestDirections</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const bool knownOnly, const bool simple)</td></tr>
+<tr class="memdesc:a2a8c7e032f24e587b4736cfc6122cb03"><td class="mdescLeft">&#160;</td><td class="mdescRight">スタートからゴールまでの最短経路を導出する関数  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a2a8c7e032f24e587b4736cfc6122cb03">[詳解]</a><br /></td></tr>
+<tr class="separator:a2a8c7e032f24e587b4736cfc6122cb03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adacb549c46e7464ddc9a69add9e16443"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html">Pose</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#adacb549c46e7464ddc9a69add9e16443">calcNextDirections</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html">Pose</a> &amp;start, <a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;nextDirectionsKnown, <a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;nextDirectionCandidates) const</td></tr>
 <tr class="memdesc:adacb549c46e7464ddc9a69add9e16443"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップマップから次に行くべき方向を計算する関数  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#adacb549c46e7464ddc9a69add9e16443">[詳解]</a><br /></td></tr>
 <tr class="separator:adacb549c46e7464ddc9a69add9e16443"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82474af635f286d73d58c57a713bb330"><td class="memItemLeft" align="right" valign="top"><a id="a82474af635f286d73d58c57a713bb330"></a>
-<a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a82474af635f286d73d58c57a713bb330">getStepDownDirections</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html">Pose</a> &amp;start, <a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html">Pose</a> &amp;end, const bool known_only, const bool break_unknown) const</td></tr>
-<tr class="memdesc:a82474af635f286d73d58c57a713bb330"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップマップにより次に行くべき方向列を生成する <br /></td></tr>
-<tr class="separator:a82474af635f286d73d58c57a713bb330"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af11d7b324e1cd98760f6a5fc3efa7a2a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#af11d7b324e1cd98760f6a5fc3efa7a2a">getStepDownDirections</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html">Pose</a> &amp;start, <a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html">Pose</a> &amp;end, const bool knownOnly, const bool simple, const bool breakUnknown) const</td></tr>
+<tr class="memdesc:af11d7b324e1cd98760f6a5fc3efa7a2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">ステップマップにより次に行くべき方向列を生成する  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#af11d7b324e1cd98760f6a5fc3efa7a2a">[詳解]</a><br /></td></tr>
+<tr class="separator:af11d7b324e1cd98760f6a5fc3efa7a2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac277a78faec8d3d924dabcaa7a7b69ed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#ac277a78faec8d3d924dabcaa7a7b69ed">getNextDirectionCandidates</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html">Pose</a> &amp;focus) const</td></tr>
 <tr class="memdesc:ac277a78faec8d3d924dabcaa7a7b69ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">引数区画の周囲の未知壁の確認優先順位を生成する関数  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#ac277a78faec8d3d924dabcaa7a7b69ed">[詳解]</a><br /></td></tr>
 <tr class="separator:ac277a78faec8d3d924dabcaa7a7b69ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 静的公開メンバ関数</h2></td></tr>
-<tr class="memitem:a5e4659c576d284dc3eaeb961a2f63bb0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a5e4659c576d284dc3eaeb961a2f63bb0">appendStraightDirections</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, <a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;shortest_dirs, const bool known_only, const bool diag_enabled)</td></tr>
-<tr class="memdesc:a5e4659c576d284dc3eaeb961a2f63bb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">ゴール区画内を行けるところまで直進させる方向列を追加する関数  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a5e4659c576d284dc3eaeb961a2f63bb0">[詳解]</a><br /></td></tr>
-<tr class="separator:a5e4659c576d284dc3eaeb961a2f63bb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f31c46ec39b2b24b765541f159670cf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a8f31c46ec39b2b24b765541f159670cf">appendStraightDirections</a> (const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;maze, <a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;shortestDirections, const bool knownOnly, const bool diagEnabled)</td></tr>
+<tr class="memdesc:a8f31c46ec39b2b24b765541f159670cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">ゴール区画内を行けるところまで直進させる方向列を追加する関数  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a8f31c46ec39b2b24b765541f159670cf">[詳解]</a><br /></td></tr>
+<tr class="separator:a8f31c46ec39b2b24b765541f159670cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 静的公開変数類</h2></td></tr>
 <tr class="memitem:a211c3ffb1760b2768a55d03451b544ca"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a">step_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a211c3ffb1760b2768a55d03451b544ca">STEP_MAX</a></td></tr>
 <tr class="memdesc:a211c3ffb1760b2768a55d03451b544ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">最大ステップ値  <a href="../../d9/da9/classMazeLib_1_1StepMap.html#a211c3ffb1760b2768a55d03451b544ca">[詳解]</a><br /></td></tr>
 <tr class="separator:a211c3ffb1760b2768a55d03451b544ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 限定公開メンバ関数</h2></td></tr>
-<tr class="memitem:aa2f24ebd8f9cc5044132e07008e5c0a0"><td class="memItemLeft" align="right" valign="top"><a id="aa2f24ebd8f9cc5044132e07008e5c0a0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#aa2f24ebd8f9cc5044132e07008e5c0a0">calcStraightStepTable</a> ()</td></tr>
-<tr class="memdesc:aa2f24ebd8f9cc5044132e07008e5c0a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">最短経路導出用の加速を考慮したステップリストを算出する関数 高速化のため，あらかじめ計算を終えておく． <br /></td></tr>
-<tr class="separator:aa2f24ebd8f9cc5044132e07008e5c0a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26a5dac32a26a341db912deca00d3c9c"><td class="memItemLeft" align="right" valign="top"><a id="a26a5dac32a26a341db912deca00d3c9c" name="a26a5dac32a26a341db912deca00d3c9c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>calcStraightCostTable</b> ()</td></tr>
+<tr class="memdesc:a26a5dac32a26a341db912deca00d3c9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">計算の高速化のために予め直進のコストテーブルを計算する関数 <br /></td></tr>
+<tr class="separator:a26a5dac32a26a341db912deca00d3c9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 限定公開変数類</h2></td></tr>
-<tr class="memitem:a2386ea2f61161350eb4ede3c3cfbd751"><td class="memItemLeft" align="right" valign="top"><a id="a2386ea2f61161350eb4ede3c3cfbd751"></a>
-std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a">step_t</a>, <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html#a7d2cf78cd70e0d51970e2d6fc3869df2">Position::SIZE</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a2386ea2f61161350eb4ede3c3cfbd751">step_map</a></td></tr>
-<tr class="memdesc:a2386ea2f61161350eb4ede3c3cfbd751"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路中のステップ数 <br /></td></tr>
-<tr class="separator:a2386ea2f61161350eb4ede3c3cfbd751"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ebe4703c0bbbaeba324dd3ffc59231b"><td class="memItemLeft" align="right" valign="top"><a id="a5ebe4703c0bbbaeba324dd3ffc59231b"></a>
-std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a">step_t</a>, <a class="el" href="../../dc/d56/namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">MAZE_SIZE</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a5ebe4703c0bbbaeba324dd3ffc59231b">step_table</a></td></tr>
-<tr class="memdesc:a5ebe4703c0bbbaeba324dd3ffc59231b"><td class="mdescLeft">&#160;</td><td class="mdescRight">台形加速を考慮した移動コストテーブル (壁沿い方向) <br /></td></tr>
-<tr class="separator:a5ebe4703c0bbbaeba324dd3ffc59231b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05caea082c7c81e8b2afdc4e6dd5b0e5"><td class="memItemLeft" align="right" valign="top"><a id="a05caea082c7c81e8b2afdc4e6dd5b0e5" name="a05caea082c7c81e8b2afdc4e6dd5b0e5"></a>
+std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a">step_t</a>, <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html#a7d2cf78cd70e0d51970e2d6fc3869df2">Position::SIZE</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>stepMap</b></td></tr>
+<tr class="memdesc:a05caea082c7c81e8b2afdc4e6dd5b0e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路中のステップ数 <br /></td></tr>
+<tr class="separator:a05caea082c7c81e8b2afdc4e6dd5b0e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17b20afe466f01e1d3595b9de244ed7a"><td class="memItemLeft" align="right" valign="top"><a id="a17b20afe466f01e1d3595b9de244ed7a" name="a17b20afe466f01e1d3595b9de244ed7a"></a>
+std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a">step_t</a>, <a class="el" href="../../dc/d56/namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">MAZE_SIZE</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>stepTable</b></td></tr>
+<tr class="memdesc:a17b20afe466f01e1d3595b9de244ed7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">台形加速を考慮した移動コストテーブル (壁沿い方向) <br /></td></tr>
+<tr class="separator:a17b20afe466f01e1d3595b9de244ed7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-static-attribs" name="pro-static-attribs"></a>
+静的限定公開変数類</h2></td></tr>
+<tr class="memitem:ad59a6774c6f4f2c5ab0601437c5c3fb0"><td class="memItemLeft" align="right" valign="top"><a id="ad59a6774c6f4f2c5ab0601437c5c3fb0" name="ad59a6774c6f4f2c5ab0601437c5c3fb0"></a>
+static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><b>stepTableSize</b> = <a class="el" href="../../dc/d56/namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">MAZE_SIZE</a></td></tr>
+<tr class="memdesc:ad59a6774c6f4f2c5ab0601437c5c3fb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">コストテーブルのサイズ <br /></td></tr>
+<tr class="separator:ad59a6774c6f4f2c5ab0601437c5c3fb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26c4f0b4b5600b519d11f5cac851984b"><td class="memItemLeft" align="right" valign="top"><a id="a26c4f0b4b5600b519d11f5cac851984b" name="a26c4f0b4b5600b519d11f5cac851984b"></a>
+static constexpr float&#160;</td><td class="memItemRight" valign="bottom"><b>scalingFactor</b> = 2</td></tr>
+<tr class="memdesc:a26c4f0b4b5600b519d11f5cac851984b"><td class="mdescLeft">&#160;</td><td class="mdescRight">コストが最大値を超えないようにスケーリングする係数 <br /></td></tr>
+<tr class="separator:a26c4f0b4b5600b519d11f5cac851984b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">詳解</h2>
-<div class="textblock"><p>区画ベースのステップマップを管理するクラス </p>
+<div class="textblock"><p >区画ベースのステップマップを管理するクラス </p>
 </div><h2 class="groupheader">構築子と解体子</h2>
-<a id="a04255283577fb7422d4b49e33cfde064"></a>
+<a id="a04255283577fb7422d4b49e33cfde064" name="a04255283577fb7422d4b49e33cfde064"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a04255283577fb7422d4b49e33cfde064">&#9670;&nbsp;</a></span>StepMap()</h2>
 
 <div class="memitem">
@@ -196,24 +209,18 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><div class="memdoc">
 
 <p>デフォルトコンストラクタ </p>
-<p>台形加速のコストテーブルを計算する処理を含む </p>
+<p >台形加速のコストテーブルを計算する処理を含む </p>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a04255283577fb7422d4b49e33cfde064_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a04255283577fb7422d4b49e33cfde064_cgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_a04255283577fb7422d4b49e33cfde064_cgraph" id="ad9/da9/classMazeLib_1_1StepMap_a04255283577fb7422d4b49e33cfde064_cgraph">
-<area shape="rect" title="デフォルトコンストラクタ" alt="" coords="5,42,212,69"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#aa2f24ebd8f9cc5044132e07008e5c0a0" title="最短経路導出用の加速を考慮したステップリストを算出する関数 高速化のため，あらかじめ計算を終えておく．" alt="" coords="260,5,487,47"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#abe105dfa5e71b6a5d98bd6185d48b63c" title="ステップマップを初期化する関数" alt="" coords="282,71,465,98"/>
-<area shape="rect" href="../../dc/d56/namespaceMazeLib.html#a23c4dc5304fedaea63eb69e3dfa3a8e7" title="台形加速を考慮したコストを生成する関数" alt="" coords="535,13,713,39"/>
-</map>
 </div>
 
 </div>
 </div>
 <h2 class="groupheader">関数詳解</h2>
-<a id="a5e4659c576d284dc3eaeb961a2f63bb0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e4659c576d284dc3eaeb961a2f63bb0">&#9670;&nbsp;</a></span>appendStraightDirections()</h2>
+<a id="a8f31c46ec39b2b24b765541f159670cf" name="a8f31c46ec39b2b24b765541f159670cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f31c46ec39b2b24b765541f159670cf">&#9670;&nbsp;</a></span>appendStraightDirections()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -231,19 +238,19 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;&#160;</td>
-          <td class="paramname"><em>shortest_dirs</em>, </td>
+          <td class="paramname"><em>shortestDirections</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>known_only</em>, </td>
+          <td class="paramname"><em>knownOnly</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>diag_enabled</em>&#160;</td>
+          <td class="paramname"><em>diagEnabled</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -261,32 +268,21 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 <p>ゴール区画内を行けるところまで直進させる方向列を追加する関数 </p>
 <dl class="params"><dt>引数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">maze</td><td>迷路の参照 </td></tr>
-    <tr><td class="paramname">shortest_dirs</td><td>追記元の方向列．これ自体に追記される． </td></tr>
-    <tr><td class="paramname">diag_enabled</td><td>斜めありなし </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">maze</td><td>使用する迷路 </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">shortestDirections</td><td>追記元の方向列。これ自体に追記される。 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">diagEnabled</td><td>斜めありなし </td></tr>
   </table>
   </dd>
 </dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a5e4659c576d284dc3eaeb961a2f63bb0_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a5e4659c576d284dc3eaeb961a2f63bb0_cgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_a5e4659c576d284dc3eaeb961a2f63bb0_cgraph" id="ad9/da9/classMazeLib_1_1StepMap_a5e4659c576d284dc3eaeb961a2f63bb0_cgraph">
-<area shape="rect" title="ゴール区画内を行けるところまで直進させる方向列を追加する関数" alt="" coords="5,74,203,115"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1" title="スタート区画を取得" alt="" coords="253,5,431,32"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208" title="壁が探索済みかを返す" alt="" coords="251,56,433,83"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0" title="壁の有無を返す" alt="" coords="259,107,425,133"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="255,157,429,184"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数．迷路外を参照すると壁ありと返す．" alt="" coords="481,77,680,104"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す． 迷路外の壁の場合未定義動作となる．" alt="" coords="728,37,876,78"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE&#45;1,MAZE_SIZE&#45;1)の間かつ，z が外周上にいない" alt="" coords="728,102,876,143"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a273bddbcc328c127be9453db54707ef6" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="509,150,653,191"/>
-</map>
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a8f31c46ec39b2b24b765541f159670cf_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a8f31c46ec39b2b24b765541f159670cf_cgraph" alt=""/></div>
 </div>
 
 </div>
 </div>
-<a id="adacb549c46e7464ddc9a69add9e16443"></a>
+<a id="adacb549c46e7464ddc9a69add9e16443" name="adacb549c46e7464ddc9a69add9e16443"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adacb549c46e7464ddc9a69add9e16443">&#9670;&nbsp;</a></span>calcNextDirections()</h2>
 
 <div class="memitem">
@@ -325,34 +321,84 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><div class="memdoc">
 
 <p>ステップマップから次に行くべき方向を計算する関数 </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">maze</td><td>使用する迷路 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">start</td><td>移動開始位置 </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">nextDirectionsKnown</td><td>既知区間移動方向列 </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">nextDirectionCandidates</td><td>既知区間移動後の移動方向の優先順位 </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>戻り値</dt><dd>既知区間の最終区画 </dd></dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_adacb549c46e7464ddc9a69add9e16443_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_adacb549c46e7464ddc9a69add9e16443_cgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_adacb549c46e7464ddc9a69add9e16443_cgraph" id="ad9/da9/classMazeLib_1_1StepMap_adacb549c46e7464ddc9a69add9e16443_cgraph">
-<area shape="rect" title="ステップマップから次に行くべき方向を計算する関数" alt="" coords="5,179,212,221"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#ac277a78faec8d3d924dabcaa7a7b69ed" title="引数区画の周囲の未知壁の確認優先順位を生成する関数" alt="" coords="260,74,461,115"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a82474af635f286d73d58c57a713bb330" title="ステップマップにより次に行くべき方向列を生成する" alt="" coords="261,230,460,271"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a637f3f49d407fb3cc1b66dab75c95dea" title="ステップの取得" alt="" coords="522,5,721,32"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0" title="壁の有無を返す" alt="" coords="538,107,705,133"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="794,208,967,235"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数．迷路外を参照すると壁ありと返す．" alt="" coords="781,116,980,143"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す． 迷路外の壁の場合未定義動作となる．" alt="" coords="1028,53,1176,94"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE&#45;1,MAZE_SIZE&#45;1)の間かつ，z が外周上にいない" alt="" coords="1028,118,1176,159"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a273bddbcc328c127be9453db54707ef6" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="1030,201,1174,242"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a79c7f753702503606434d941d5d57a51" title="迷路内の区画の一意な通し番号となるIDを取得する" alt="" coords="549,259,693,301"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71" title="フィールド内かどうかを判定する関数" alt="" coords="549,325,693,366"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208" title="壁が探索済みかを返す" alt="" coords="530,157,713,184"/>
-<area shape="rect" href="../../df/ddb/structMazeLib_1_1Pose.html#a2bd37cf8ac51b852973dfe9f31b9c35f" title="隣接姿勢の取得" alt="" coords="545,391,697,417"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831" title="引数区画に隣接する未知壁の数を返す" alt="" coords="509,441,733,468"/>
-</map>
 </div>
 
 </div>
 </div>
-<a id="a5622bf74eedec602d042d49958582c27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5622bf74eedec602d042d49958582c27">&#9670;&nbsp;</a></span>calcShortestDirections()</h2>
+<a id="a2a8c7e032f24e587b4736cfc6122cb03" name="a2a8c7e032f24e587b4736cfc6122cb03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a8c7e032f24e587b4736cfc6122cb03">&#9670;&nbsp;</a></span>calcShortestDirections() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> MazeLib::StepMap::calcShortestDirections </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;&#160;</td>
+          <td class="paramname"><em>maze</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>knownOnly</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>simple</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>スタートからゴールまでの最短経路を導出する関数 </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">maze</td><td>使用する迷路 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">knownOnly</td><td>未知壁は壁ありとみなし、既知壁のみを使用する </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">simple</td><td>台形加速を考慮しない、シンプルな足立法を使用する </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>戻り値</dt><dd>スタートからゴールへの最短経路の方向列。 経路がない場合は空配列となる。 </dd></dl>
+<div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a2a8c7e032f24e587b4736cfc6122cb03_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a2a8c7e032f24e587b4736cfc6122cb03_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a97a7b2d52b74a8fe1f2253fcc1398614" name="a97a7b2d52b74a8fe1f2253fcc1398614"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97a7b2d52b74a8fe1f2253fcc1398614">&#9670;&nbsp;</a></span>calcShortestDirections() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -366,7 +412,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>&#160;</td>
           <td class="paramname"><em>start</em>, </td>
         </tr>
         <tr>
@@ -379,7 +425,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>known_only</em>, </td>
+          <td class="paramname"><em>knownOnly</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -398,51 +444,29 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 <p>与えられた区画間の最短経路を導出する関数 </p>
 <dl class="params"><dt>引数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">maze</td><td>迷路の参照 </td></tr>
-    <tr><td class="paramname">start</td><td>始点区画 </td></tr>
-    <tr><td class="paramname">dest</td><td>目的地区画の集合(順不同) </td></tr>
-    <tr><td class="paramname">known_only</td><td>既知壁のみモードかどうか </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">maze</td><td>使用する迷路 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">start</td><td>始点区画 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dest</td><td>目的地区画の集合(順不同) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">knownOnly</td><td>未知壁は壁ありとみなし、既知壁のみを使用する </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">simple</td><td>台形加速を考慮しない、シンプルな足立法を使用する </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>戻り値</dt><dd>const Directions スタートからゴールへの最短経路の方向列． 経路がない場合は空配列となる． </dd></dl>
+<dl class="section return"><dt>戻り値</dt><dd>始点区画から目的地区画への最短経路の方向列。 経路がない場合は空配列となる。 </dd></dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a5622bf74eedec602d042d49958582c27_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a5622bf74eedec602d042d49958582c27_cgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_a5622bf74eedec602d042d49958582c27_cgraph" id="ad9/da9/classMazeLib_1_1StepMap_a5622bf74eedec602d042d49958582c27_cgraph">
-<area shape="rect" title="与えられた区画間の最短経路を導出する関数" alt="" coords="5,173,235,215"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a79c7f753702503606434d941d5d57a51" title="迷路内の区画の一意な通し番号となるIDを取得する" alt="" coords="569,5,713,47"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a82474af635f286d73d58c57a713bb330" title="ステップマップにより次に行くべき方向列を生成する" alt="" coords="283,173,481,215"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#acaf2520846ba0691bd42441dd609053c" title="ステップマップの更新" alt="" coords="285,366,479,393"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71" title="フィールド内かどうかを判定する関数" alt="" coords="569,173,713,215"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208" title="壁が探索済みかを返す" alt="" coords="550,341,733,367"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0" title="壁の有無を返す" alt="" coords="558,290,725,317"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="814,211,987,238"/>
-<area shape="rect" href="../../df/ddb/structMazeLib_1_1Pose.html#a2bd37cf8ac51b852973dfe9f31b9c35f" title="隣接姿勢の取得" alt="" coords="565,71,717,98"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831" title="引数区画に隣接する未知壁の数を返す" alt="" coords="529,122,753,149"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数．迷路外を参照すると壁ありと返す．" alt="" coords="801,323,1000,350"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す． 迷路外の壁の場合未定義動作となる．" alt="" coords="1048,279,1196,320"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE&#45;1,MAZE_SIZE&#45;1)の間かつ，z が外周上にいない" alt="" coords="1048,344,1196,385"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a273bddbcc328c127be9453db54707ef6" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="1050,204,1194,245"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a2acf8506c0b769c5ba44b44c2a98adc7" title="既知部分の迷路サイズを返す．計算量を減らすために使用．" alt="" coords="551,391,732,418"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#abe105dfa5e71b6a5d98bd6185d48b63c" title="ステップマップを初期化する関数" alt="" coords="550,442,733,469"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a14d715923bd4f411400ad714803967df" title="ステップの更新" alt="" coords="542,493,741,519"/>
-</map>
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a97a7b2d52b74a8fe1f2253fcc1398614_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a97a7b2d52b74a8fe1f2253fcc1398614_cgraph" alt=""/></div>
 </div>
 <div class="dynheader">
 被呼び出し関係図:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a5622bf74eedec602d042d49958582c27_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a5622bf74eedec602d042d49958582c27_icgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_a5622bf74eedec602d042d49958582c27_icgraph" id="ad9/da9/classMazeLib_1_1StepMap_a5622bf74eedec602d042d49958582c27_icgraph">
-<area shape="rect" title="与えられた区画間の最短経路を導出する関数" alt="" coords="283,5,512,47"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a9403d4e0deb77c81a2737b370148f775" title="スタートからゴールまでの最短経路を導出する関数" alt="" coords="5,5,235,47"/>
-</map>
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a97a7b2d52b74a8fe1f2253fcc1398614_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a97a7b2d52b74a8fe1f2253fcc1398614_icgraph" alt=""/></div>
 </div>
 
 </div>
 </div>
-<a id="ac277a78faec8d3d924dabcaa7a7b69ed"></a>
+<a id="ac277a78faec8d3d924dabcaa7a7b69ed" name="ac277a78faec8d3d924dabcaa7a7b69ed"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac277a78faec8d3d924dabcaa7a7b69ed">&#9670;&nbsp;</a></span>getNextDirectionCandidates()</h2>
 
 <div class="memitem">
@@ -469,35 +493,56 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><div class="memdoc">
 
 <p>引数区画の周囲の未知壁の確認優先順位を生成する関数 </p>
-<dl class="section return"><dt>戻り値</dt><dd>const Directions 行くべき方向の優先順位 </dd></dl>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">maze</td><td>使用する迷路 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">focus</td><td>注目する区画の位置姿勢 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>戻り値</dt><dd>行くべき方向の優先順位 </dd></dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_ac277a78faec8d3d924dabcaa7a7b69ed_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_ac277a78faec8d3d924dabcaa7a7b69ed_cgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_ac277a78faec8d3d924dabcaa7a7b69ed_cgraph" id="ad9/da9/classMazeLib_1_1StepMap_ac277a78faec8d3d924dabcaa7a7b69ed_cgraph">
-<area shape="rect" title="引数区画の周囲の未知壁の確認優先順位を生成する関数" alt="" coords="5,49,207,90"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a637f3f49d407fb3cc1b66dab75c95dea" title="ステップの取得" alt="" coords="255,5,453,32"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0" title="壁の有無を返す" alt="" coords="271,56,437,83"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="267,108,441,135"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数．迷路外を参照すると壁ありと返す．" alt="" coords="501,53,700,80"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す． 迷路外の壁の場合未定義動作となる．" alt="" coords="748,14,896,55"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE&#45;1,MAZE_SIZE&#45;1)の間かつ，z が外周上にいない" alt="" coords="748,79,896,121"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a273bddbcc328c127be9453db54707ef6" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="529,105,673,146"/>
-</map>
 </div>
 <div class="dynheader">
 被呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_ac277a78faec8d3d924dabcaa7a7b69ed_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_ac277a78faec8d3d924dabcaa7a7b69ed_icgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_ac277a78faec8d3d924dabcaa7a7b69ed_icgraph" id="ad9/da9/classMazeLib_1_1StepMap_ac277a78faec8d3d924dabcaa7a7b69ed_icgraph">
-<area shape="rect" title="引数区画の周囲の未知壁の確認優先順位を生成する関数" alt="" coords="260,5,461,47"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#adacb549c46e7464ddc9a69add9e16443" title="ステップマップから次に行くべき方向を計算する関数" alt="" coords="5,5,212,47"/>
-</map>
 </div>
 
 </div>
 </div>
-<a id="a637f3f49d407fb3cc1b66dab75c95dea"></a>
+<a id="aacec08625376c1864dffe926859e881e" name="aacec08625376c1864dffe926859e881e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacec08625376c1864dffe926859e881e">&#9670;&nbsp;</a></span>getScalingFactor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const auto MazeLib::StepMap::getScalingFactor </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>ステップのスケーリング係数を取得 </p>
+<p >ステップにこの数をかけるとミリ秒に変換できる </p>
+
+</div>
+</div>
+<a id="a637f3f49d407fb3cc1b66dab75c95dea" name="a637f3f49d407fb3cc1b66dab75c95dea"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a637f3f49d407fb3cc1b66dab75c95dea">&#9670;&nbsp;</a></span>getStep() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
@@ -532,21 +577,21 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><div class="memdoc">
 
 <p>ステップの取得 </p>
-<p>盤面外なら <code>STEP_MAX</code> を返す </p>
+<p >盤面外なら <code>STEP_MAX</code> を返す </p>
+<div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a637f3f49d407fb3cc1b66dab75c95dea_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a637f3f49d407fb3cc1b66dab75c95dea_cgraph" alt=""/></div>
+</div>
 <div class="dynheader">
 被呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a637f3f49d407fb3cc1b66dab75c95dea_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a637f3f49d407fb3cc1b66dab75c95dea_icgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_a637f3f49d407fb3cc1b66dab75c95dea_icgraph" id="ad9/da9/classMazeLib_1_1StepMap_a637f3f49d407fb3cc1b66dab75c95dea_icgraph">
-<area shape="rect" title="ステップの取得" alt="" coords="509,13,708,39"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#ac277a78faec8d3d924dabcaa7a7b69ed" title="引数区画の周囲の未知壁の確認優先順位を生成する関数" alt="" coords="260,5,461,47"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#adacb549c46e7464ddc9a69add9e16443" title="ステップマップから次に行くべき方向を計算する関数" alt="" coords="5,5,212,47"/>
-</map>
 </div>
 
 </div>
 </div>
-<a id="aae48b8fd35e7cf3274588d257ecc609f"></a>
+<a id="aae48b8fd35e7cf3274588d257ecc609f" name="aae48b8fd35e7cf3274588d257ecc609f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aae48b8fd35e7cf3274588d257ecc609f">&#9670;&nbsp;</a></span>getStep() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
@@ -571,22 +616,90 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><div class="memdoc">
 
 <p>ステップの取得 </p>
-<p>盤面外なら <code>STEP_MAX</code> を返す </p>
+<p >盤面外なら <code>STEP_MAX</code> を返す </p>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_aae48b8fd35e7cf3274588d257ecc609f_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_aae48b8fd35e7cf3274588d257ecc609f_cgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_aae48b8fd35e7cf3274588d257ecc609f_cgraph" id="ad9/da9/classMazeLib_1_1StepMap_aae48b8fd35e7cf3274588d257ecc609f_cgraph">
-<area shape="rect" title="ステップの取得" alt="" coords="5,46,204,73"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a79c7f753702503606434d941d5d57a51" title="迷路内の区画の一意な通し番号となるIDを取得する" alt="" coords="252,5,396,47"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71" title="フィールド内かどうかを判定する関数" alt="" coords="252,71,396,112"/>
-</map>
 </div>
 
 </div>
 </div>
-<a id="a8820317c6b0257db1789bbdc355fe7cb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8820317c6b0257db1789bbdc355fe7cb">&#9670;&nbsp;</a></span>print()</h2>
+<a id="af11d7b324e1cd98760f6a5fc3efa7a2a" name="af11d7b324e1cd98760f6a5fc3efa7a2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af11d7b324e1cd98760f6a5fc3efa7a2a">&#9670;&nbsp;</a></span>getStepDownDirections()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> MazeLib::StepMap::getStepDownDirections </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html">Maze</a> &amp;&#160;</td>
+          <td class="paramname"><em>maze</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html">Pose</a> &amp;&#160;</td>
+          <td class="paramname"><em>start</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html">Pose</a> &amp;&#160;</td>
+          <td class="paramname"><em>end</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>knownOnly</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>simple</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>breakUnknown</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ステップマップにより次に行くべき方向列を生成する </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">maze</td><td>使用する迷路 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">start</td><td>移動開始位置 </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">end</td><td>移動後の位置姿勢 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">breakUnknown</td><td>未知壁を含む区画に到達したら終了する(探索用) </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_af11d7b324e1cd98760f6a5fc3efa7a2a_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_af11d7b324e1cd98760f6a5fc3efa7a2a_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+被呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_af11d7b324e1cd98760f6a5fc3efa7a2a_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_af11d7b324e1cd98760f6a5fc3efa7a2a_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a1170bcf45c4a2e259f0fbe8628b18df8" name="a1170bcf45c4a2e259f0fbe8628b18df8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1170bcf45c4a2e259f0fbe8628b18df8">&#9670;&nbsp;</a></span>print()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -600,7 +713,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>&#160;</td>
           <td class="paramname"><em>p</em> = <code><a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>(-1,&#160;-1)</code>, </td>
         </tr>
         <tr>
@@ -626,24 +739,24 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 <p>ステップの表示 </p>
 <dl class="params"><dt>引数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">p</td><td>ハイライト区画 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p</td><td>ハイライト区画 </td></tr>
   </table>
   </dd>
 </dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a8820317c6b0257db1789bbdc355fe7cb_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a8820317c6b0257db1789bbdc355fe7cb_cgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_a8820317c6b0257db1789bbdc355fe7cb_cgraph" id="ad9/da9/classMazeLib_1_1StepMap_a8820317c6b0257db1789bbdc355fe7cb_cgraph">
-<area shape="rect" title="ステップの表示" alt="" coords="5,13,184,39"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="232,13,405,39"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a273bddbcc328c127be9453db54707ef6" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="453,5,597,47"/>
-</map>
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a1170bcf45c4a2e259f0fbe8628b18df8_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a1170bcf45c4a2e259f0fbe8628b18df8_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+被呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a1170bcf45c4a2e259f0fbe8628b18df8_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a1170bcf45c4a2e259f0fbe8628b18df8_icgraph" alt=""/></div>
 </div>
 
 </div>
 </div>
-<a id="abe105dfa5e71b6a5d98bd6185d48b63c"></a>
+<a id="abe105dfa5e71b6a5d98bd6185d48b63c" name="abe105dfa5e71b6a5d98bd6185d48b63c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abe105dfa5e71b6a5d98bd6185d48b63c">&#9670;&nbsp;</a></span>reset()</h2>
 
 <div class="memitem">
@@ -670,7 +783,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 <p>ステップマップを初期化する関数 </p>
 <dl class="params"><dt>引数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">step</td><td>この値で初期化する </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">step</td><td>この値で全マップを初期化する </td></tr>
   </table>
   </dd>
 </dl>
@@ -678,18 +791,11 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 被呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_abe105dfa5e71b6a5d98bd6185d48b63c_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_abe105dfa5e71b6a5d98bd6185d48b63c_icgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_abe105dfa5e71b6a5d98bd6185d48b63c_icgraph" id="ad9/da9/classMazeLib_1_1StepMap_abe105dfa5e71b6a5d98bd6185d48b63c_icgraph">
-<area shape="rect" title="ステップマップを初期化する関数" alt="" coords="815,31,997,57"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a04255283577fb7422d4b49e33cfde064" title="デフォルトコンストラクタ" alt="" coords="560,5,767,32"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#acaf2520846ba0691bd42441dd609053c" title="ステップマップの更新" alt="" coords="566,56,761,83"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a5622bf74eedec602d042d49958582c27" title="与えられた区画間の最短経路を導出する関数" alt="" coords="283,49,512,90"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a9403d4e0deb77c81a2737b370148f775" title="スタートからゴールまでの最短経路を導出する関数" alt="" coords="5,49,235,90"/>
-</map>
 </div>
 
 </div>
 </div>
-<a id="a14d715923bd4f411400ad714803967df"></a>
+<a id="a14d715923bd4f411400ad714803967df" name="a14d715923bd4f411400ad714803967df"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a14d715923bd4f411400ad714803967df">&#9670;&nbsp;</a></span>setStep() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
@@ -730,22 +836,21 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><div class="memdoc">
 
 <p>ステップの更新 </p>
-<p>盤面外なら何もしない </p>
+<p >盤面外なら何もしない </p>
+<div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a14d715923bd4f411400ad714803967df_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a14d715923bd4f411400ad714803967df_cgraph" alt=""/></div>
+</div>
 <div class="dynheader">
 被呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a14d715923bd4f411400ad714803967df_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a14d715923bd4f411400ad714803967df_icgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_a14d715923bd4f411400ad714803967df_icgraph" id="ad9/da9/classMazeLib_1_1StepMap_a14d715923bd4f411400ad714803967df_icgraph">
-<area shape="rect" title="ステップの更新" alt="" coords="803,13,1001,39"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#acaf2520846ba0691bd42441dd609053c" title="ステップマップの更新" alt="" coords="560,13,755,39"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a5622bf74eedec602d042d49958582c27" title="与えられた区画間の最短経路を導出する関数" alt="" coords="283,5,512,47"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a9403d4e0deb77c81a2737b370148f775" title="スタートからゴールまでの最短経路を導出する関数" alt="" coords="5,5,235,47"/>
-</map>
 </div>
 
 </div>
 </div>
-<a id="a3b0fff1fbe5cd71cbcb26619f4bf9d9b"></a>
+<a id="a3b0fff1fbe5cd71cbcb26619f4bf9d9b" name="a3b0fff1fbe5cd71cbcb26619f4bf9d9b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3b0fff1fbe5cd71cbcb26619f4bf9d9b">&#9670;&nbsp;</a></span>setStep() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
@@ -780,22 +885,17 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><div class="memdoc">
 
 <p>ステップの更新 </p>
-<p>盤面外なら何もしない </p>
+<p >盤面外なら何もしない </p>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_a3b0fff1fbe5cd71cbcb26619f4bf9d9b_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_a3b0fff1fbe5cd71cbcb26619f4bf9d9b_cgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_a3b0fff1fbe5cd71cbcb26619f4bf9d9b_cgraph" id="ad9/da9/classMazeLib_1_1StepMap_a3b0fff1fbe5cd71cbcb26619f4bf9d9b_cgraph">
-<area shape="rect" title="ステップの更新" alt="" coords="5,46,204,73"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a79c7f753702503606434d941d5d57a51" title="迷路内の区画の一意な通し番号となるIDを取得する" alt="" coords="252,5,396,47"/>
-<area shape="rect" href="../../d0/ddc/structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71" title="フィールド内かどうかを判定する関数" alt="" coords="252,71,396,112"/>
-</map>
 </div>
 
 </div>
 </div>
-<a id="acaf2520846ba0691bd42441dd609053c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acaf2520846ba0691bd42441dd609053c">&#9670;&nbsp;</a></span>update()</h2>
+<a id="aa693f3d5b63146dce4b2e60ed5aa9746" name="aa693f3d5b63146dce4b2e60ed5aa9746"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa693f3d5b63146dce4b2e60ed5aa9746">&#9670;&nbsp;</a></span>update()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -816,7 +916,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>known_only</em>, </td>
+          <td class="paramname"><em>knownOnly</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -835,43 +935,23 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 <p>ステップマップの更新 </p>
 <dl class="params"><dt>引数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">dest</td><td>ステップを0とする目的地の区画の集合(順不同) </td></tr>
-    <tr><td class="paramname">known_only</td><td>true:未知壁は通過不可能，false:未知壁は通過可能とする </td></tr>
-    <tr><td class="paramname">simple</td><td>台形加速を考慮せず，隣接区画のコストをすべて1にする </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">maze</td><td>更新に使用する迷路情報 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dest</td><td>ステップを0とする目的地の区画の集合(順不同) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">knownOnly</td><td>true:未知壁は通過不可能、false:未知壁は通過可能とする </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">simple</td><td>台形加速を考慮せず、隣接区画のコストをすべて1にする </td></tr>
   </table>
   </dd>
 </dl>
 <div class="dynheader">
-呼び出し関係図:</div>
-<div class="dyncontent">
-<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_acaf2520846ba0691bd42441dd609053c_cgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_acaf2520846ba0691bd42441dd609053c_cgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_acaf2520846ba0691bd42441dd609053c_cgraph" id="ad9/da9/classMazeLib_1_1StepMap_acaf2520846ba0691bd42441dd609053c_cgraph">
-<area shape="rect" title="ステップマップの更新" alt="" coords="5,107,200,133"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a2acf8506c0b769c5ba44b44c2a98adc7" title="既知部分の迷路サイズを返す．計算量を減らすために使用．" alt="" coords="257,5,438,32"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208" title="壁が探索済みかを返す" alt="" coords="256,56,439,83"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0" title="壁の有無を返す" alt="" coords="264,107,431,133"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#abe105dfa5e71b6a5d98bd6185d48b63c" title="ステップマップを初期化する関数" alt="" coords="256,157,439,184"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a14d715923bd4f411400ad714803967df" title="ステップの更新" alt="" coords="248,208,447,235"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数．迷路外を参照すると壁ありと返す．" alt="" coords="495,81,693,108"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す． 迷路外の壁の場合未定義動作となる．" alt="" coords="741,41,889,82"/>
-<area shape="rect" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE&#45;1,MAZE_SIZE&#45;1)の間かつ，z が外周上にいない" alt="" coords="741,106,889,147"/>
-</map>
-</div>
-<div class="dynheader">
 被呼び出し関係図:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_acaf2520846ba0691bd42441dd609053c_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_acaf2520846ba0691bd42441dd609053c_icgraph" alt=""/></div>
-<map name="ad9/da9/classMazeLib_1_1StepMap_acaf2520846ba0691bd42441dd609053c_icgraph" id="ad9/da9/classMazeLib_1_1StepMap_acaf2520846ba0691bd42441dd609053c_icgraph">
-<area shape="rect" title="ステップマップの更新" alt="" coords="560,13,755,39"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a5622bf74eedec602d042d49958582c27" title="与えられた区画間の最短経路を導出する関数" alt="" coords="283,5,512,47"/>
-<area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a9403d4e0deb77c81a2737b370148f775" title="スタートからゴールまでの最短経路を導出する関数" alt="" coords="5,5,235,47"/>
-</map>
+<div class="center"><img src="../../d9/da9/classMazeLib_1_1StepMap_aa693f3d5b63146dce4b2e60ed5aa9746_icgraph.png" border="0" usemap="#ad9/da9/classMazeLib_1_1StepMap_aa693f3d5b63146dce4b2e60ed5aa9746_icgraph" alt=""/></div>
 </div>
 
 </div>
 </div>
 <h2 class="groupheader">メンバ詳解</h2>
-<a id="a211c3ffb1760b2768a55d03451b544ca"></a>
+<a id="a211c3ffb1760b2768a55d03451b544ca" name="a211c3ffb1760b2768a55d03451b544ca"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a211c3ffb1760b2768a55d03451b544ca">&#9670;&nbsp;</a></span>STEP_MAX</h2>
 
 <div class="memitem">
@@ -904,7 +984,7 @@ std::array&lt; <a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html#a3a
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-構築:&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+構築:&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="../../doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3
 </small></address>
 </body>
 </html>
