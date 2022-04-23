@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['along4_0',['Along4',['../d3/d5c/classMazeLib_1_1Direction.html#a0bbcd134fc1ae010dccc909555fa0aa0',1,'MazeLib::Direction']]]
+  ['along4_228',['Along4',['../d3/d5c/classMazeLib_1_1Direction.html#a0bbcd134fc1ae010dccc909555fa0aa0',1,'MazeLib::Direction']]]
 ];
