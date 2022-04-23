@@ -73,7 +73,10 @@ class StepMap {
   const auto getScalingFactor() const { return scalingFactor; }
   /**
    * @brief ステップの表示
+   * @param[in] maze 表示する迷路
    * @param[in] p ハイライト区画
+   * @param[in] d ハイライト方向
+   * @param[inout] os output-stream
    */
   void print(const Maze& maze,
              const Position p = Position(-1, -1),
@@ -108,7 +111,7 @@ class StepMap {
    * @param[in] start 始点区画
    * @param[in] dest 目的地区画の集合(順不同)
    * @param[in] knownOnly 未知壁は壁ありとみなし、既知壁のみを使用する
-   * @param[in] simple 台形加速を考慮しない、シンプルな足立法を使用する
+   * @param[in] simple 台形加速を考慮せず、隣接区画のコストをすべて1にする
    * @return 始点区画から目的地区画への最短経路の方向列。
    *         経路がない場合は空配列となる。
    */
@@ -121,7 +124,8 @@ class StepMap {
    * @brief スタートからゴールまでの最短経路を導出する関数
    * @param[in] maze 使用する迷路
    * @param[in] knownOnly 未知壁は壁ありとみなし、既知壁のみを使用する
-   * @param[in] simple 台形加速を考慮しない、シンプルな足立法を使用する
+   * @param[in] simple 台形加速を考慮せず、隣接区画のコストをすべて1にする
+   * p
    * @return スタートからゴールへの最短経路の方向列。
    *         経路がない場合は空配列となる。
    */
@@ -148,6 +152,8 @@ class StepMap {
    * @param[in] maze 使用する迷路
    * @param[in] start 移動開始位置
    * @param[out] end 移動後の位置姿勢
+   * @param[in] knownOnly 未知壁は壁ありとみなし、既知壁のみを使用する
+   * @param[in] simple 台形加速を考慮せず、隣接区画のコストをすべて1にする
    * @param[in] breakUnknown 未知壁を含む区画に到達したら終了する(探索用)
    */
   Directions getStepDownDirections(const Maze& maze,
@@ -168,6 +174,7 @@ class StepMap {
    * @brief ゴール区画内を行けるところまで直進させる方向列を追加する関数
    * @param[in] maze 使用する迷路
    * @param[inout] shortestDirections 追記元の方向列。これ自体に追記される。
+   * @param[in] knownOnly 未知壁は壁ありとみなし、既知壁のみを使用する
    * @param[in] diagEnabled 斜めありなし
    */
   static void appendStraightDirections(const Maze& maze,

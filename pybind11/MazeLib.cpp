@@ -198,7 +198,7 @@ PYBIND11_MODULE(MazeLib, m) {
       .def("updateWall",
            py::overload_cast<const Position, const Direction, bool, bool>(
                &Maze::updateWall),
-           py::arg("p"), py::arg("d"), py::arg("b"), py::arg("pushLog") = true)
+           py::arg("p"), py::arg("d"), py::arg("b"), py::arg("pushRecords") = true)
       .def("resetLastWalls", &Maze::resetLastWalls)
       .def("wallCount", &Maze::wallCount)
       .def("unknownCount", &Maze::unknownCount)

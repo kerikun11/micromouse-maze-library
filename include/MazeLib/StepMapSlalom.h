@@ -250,7 +250,7 @@ class StepMapSlalom {
       return Index(x, y, z, nd + Direction::Back);
     }
   };
-  static_assert(sizeof(Index) == 2, "size error"); /**< @brief size check */
+  static_assert(sizeof(Index) == 2, "size error");
 
   /**
    * @brief Index の動的配列、集合

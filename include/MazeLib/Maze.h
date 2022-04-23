@@ -127,6 +127,7 @@ static constexpr int MAZE_SIZE_MAX = std::pow(2, MAZE_SIZE_BIT);
  * - 例: Direction(Direction::East + Direction::Left) == Direction::North
  * - 例: Direction(Direction::East - Direction::West) == Direction::Back
  * - 例: Direction(-Direction::Left) == Direction::Right
+ *
  * ```
  * AbsoluteDirection
  * +-----------+-------+-----------+
@@ -179,16 +180,16 @@ class Direction {
    * @details Direction 型ではなく int8_t 型なことに注意。
    * (Direction 型は 0-7 の整数)
    */
-  static constexpr int8_t Max = 8;
+  static constexpr const int8_t Max = 8;
 
  public:
   /**
-   * @brief デフォルトコンストラクタ。そのまま格納。
+   * @brief デフォルトコンストラクタ。絶対方向をそのまま格納。
    */
   Direction(const AbsoluteDirection d = East) : d(d) {}
   /**
    * @brief 整数を引数としたコンストラクタ。
-   * 相対方向などの計算結果を 0-7 の整数に直して格納する。
+   * @details 相対方向などの計算結果を 0-7 の整数に直して格納する。
    * @param d 相対方向などの演算結果の整数
    */
   Direction(const int8_t d) : d(d & 7) {}
@@ -196,25 +197,41 @@ class Direction {
    * @brief 整数へのキャスト。相対方向などの演算に使える。
    */
   operator int8_t() const { return d; }
-  /** @brief 壁沿い方向かどうかの判定 */
+  /**
+   * @brief 壁沿い方向かどうかの判定
+   */
   bool isAlong() const { return (d & 1) == 0; }
-  /** @brief 斜め方向かどうかの判定 */
+  /**
+   * @brief 斜め方向かどうかの判定
+   */
   bool isDiag() const { return (d & 1) == 1; }
-  /** @brief 表示用char型へのキャスト */
+  /**
+   * @brief 表示用char型へのキャスト
+   */
   char toChar() const { return ">'^`<,v.X"[d]; }
-  /** @brief stream 表示 */
+  /**
+   * @brief stream 表示
+   */
   friend std::ostream& operator<<(std::ostream& os, const Direction d) {
     return os << d.toChar();
   }
-  /** @brief for文用の斜めでない絶対4方向 */
+  /**
+   * @brief 斜めではない4方向の配列 (for文などで使用)
+   */
   static const std::array<Direction, 4> Along4;
-  /** @brief for文用の斜めの絶対4方向 */
+  /**
+   * @brief 斜めの4方向の配列 (for文などで使用)
+   */
   static const std::array<Direction, 4> Diag4;
 
  private:
-  int8_t d; /**< @brief 方向の実体, コンストラクタによって確実に 0-7 に収める */
+  /**
+   * @brief 方向情報の実体。
+   * @details コンストラクタによって確実に 0-7 の整数に収まる
+   */
+  int8_t d;
 };
-static_assert(sizeof(Direction) == 1, "size error"); /**< @brief size check */
+static_assert(sizeof(Direction) == 1, "size error");
 
 /**
  *  @brief Direction 構造体の動的配列、集合
@@ -230,6 +247,7 @@ std::ostream& operator<<(std::ostream& os, const Directions& obj);
  * @brief 迷路の区画の位置(座標)を定義。
  * @details 実体は 16bit の整数。
  * 左下の区画が (0,0) の (x,y) 平面。
+ *
  * ```
  * +--------+--------+
  * | (0, 1) | (1, 1) |
@@ -315,20 +333,20 @@ struct Position {
   /**
    * @brief 座標を回転変換する
    * @param d 回転角度, 4方位のみ
-   * @return const Position
+   * @return 変換後の位置
    */
   Position rotate(const Direction d) const;
   /**
    * @brief 座標を回転変換する
    * @param d 回転角度, 4方位のみ
    * @param center 回転中心座標
-   * @return const Position
+   * @return 変換後の位置
    */
   Position rotate(const Direction d, const Position center) const {
     return center + (*this - center).rotate(d);
   }
   /**
-   * @brief stream での表示。 (  x,  y) の形式
+   * @brief output-stream の表示関数。 (  x,  y) の形式
    */
   friend std::ostream& operator<<(std::ostream& os, const Position p);
   /**
@@ -340,7 +358,7 @@ struct Position {
     return str;
   }
 };
-static_assert(sizeof(Position) == 2, "size error"); /**< @brief size check */
+static_assert(sizeof(Position) == 2, "size error");
 
 /**
  * @brief Position 構造体の動的配列、集合
@@ -352,6 +370,7 @@ using Positions = std::vector<Position>;
  * @details アライメント制約により実体は 4Bytes。
  * 位置姿勢は、区画とそこに向かう方向で特定する。
  * 現在区画から出る方向ではないことに注意する。
+ *
  * ```
  * +---+---+---+ 例:
  * |   <       | <--- (0, 2, West)
@@ -373,7 +392,7 @@ struct Pose {
   /**
    * @brief 隣接姿勢の取得
    * @param nextDirection 隣接方向
-   * @return const Pose 隣接姿勢
+   * @return Pose 隣接姿勢
    */
   Pose next(const Direction nextDirection) const {
     return Pose(p.next(nextDirection), nextDirection);
@@ -391,7 +410,7 @@ struct Pose {
     return str;
   }
 };
-static_assert(sizeof(Pose) == 4, "size error"); /**< @brief size check */
+static_assert(sizeof(Pose) == 4, "size error");
 
 /**
  * @brief 区画ベースではなく、壁ベースの管理ID
@@ -404,6 +423,7 @@ static_assert(sizeof(Pose) == 4, "size error"); /**< @brief size check */
  * 最初から全部が通し番号のIDで保持してしまうと、
  * 迷路の範囲外の壁を表現できなくなってしまうため、
  * 必要に応じてIDを生成するようになっている。
+ *
  * ```
  *      [x, y]    : Cell Position
  *             z  : Wall Distinction in the Cell; 0:East, 1:North
@@ -461,7 +481,7 @@ struct WallIndex {
   /**
    * @brief IDを使って初期化するコンストラクタ
    * @param i 壁の通し番号ID。迷路内の壁であること。
-   *          迷路外の壁の場合未定義動作となる。
+   * @attention 迷路外の壁の場合未定義動作となる。
    */
   constexpr WallIndex(const uint16_t i)
       : x(i & (MAZE_SIZE_MAX - 1)),
@@ -479,7 +499,7 @@ struct WallIndex {
   }
   /**
    * @brief 迷路内の壁を一意な通し番号として表現したIDを返す。
-   *        迷路外の壁の場合未定義動作となる。
+   * @attention 迷路外の壁の場合未定義動作となる。
    * @return uint16_t ID
    */
   uint16_t getIndex() const {
@@ -498,8 +518,8 @@ struct WallIndex {
   friend std::ostream& operator<<(std::ostream& os, const WallIndex i);
   /**
    * @brief 壁がフィールド内か判定する関数
-   * x,y が (0,0)と(MAZE_SIZE-1,MAZE_SIZE-1)の間かつ、z が外周上にいない
-   *
+   * @details (x, y) が (0, 0) と (MAZE_SIZE-1, MAZE_SIZE-1) の間、かつ、
+   * z が外周上でない
    * @return true フィールド内
    * @return false フィールド外(外周上を含む)
    */
@@ -515,12 +535,12 @@ struct WallIndex {
   /**
    * @brief 引数方向の WallIndex を取得する関数
    * @param d 隣接方向
-   * @return const WallIndex 隣接壁
+   * @return WallIndex 隣接壁
    */
   WallIndex next(const Direction d) const;
   /**
    * @brief 現在壁に隣接する、柱ではない6方向を取得
-   * @return const std::array<Direction, 6>
+   * @return std::array<Direction, 6> 隣接方向の配列
    */
   std::array<Direction, 6> getNextDirection6() const {
     const auto d = getDirection();
@@ -541,7 +561,7 @@ struct WallIndex {
    * @param d 壁の方向 (4方位)
    */
   void uniquify(const Direction d) {
-    z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
+    z = (d >> 1) & 1; /*< {East,West} => 0, {North,South} => 1 */
     switch (d) {
       case Direction::West:
         x--;
@@ -552,7 +572,7 @@ struct WallIndex {
     }
   }
 };
-static_assert(sizeof(WallIndex) == 2, "size error"); /**< @brief size check */
+static_assert(sizeof(WallIndex) == 2, "size error");
 
 /**
  * @brief WallIndex の動的配列、集合
@@ -594,7 +614,7 @@ struct WallRecord {
   /** @brief 表示 */
   friend std::ostream& operator<<(std::ostream& os, const WallRecord& obj);
 };
-static_assert(sizeof(WallRecord) == 2, "size error"); /**< @brief size check */
+static_assert(sizeof(WallRecord) == 2, "size error");
 
 /**
  * @brief WallRecord 構造体の動的配列の定義
@@ -642,6 +662,7 @@ class Maze {
   }
   /**
    * @brief 壁を更新をする
+   * @param i 壁の位置
    * @param b 壁の有無 true:壁あり、false:壁なし
    */
   void setWall(const WallIndex i, const bool b) {
@@ -669,6 +690,7 @@ class Maze {
   }
   /**
    * @brief 壁の既知を更新する
+   * @param i 壁の位置
    * @param b 壁の未知既知 true:既知、false:未知
    */
   void setKnown(const WallIndex i, const bool b) {
@@ -698,13 +720,14 @@ class Maze {
    * @param p 区画の座標
    * @param d 壁の方向
    * @param b 壁の有無
+   * @param pushRecords 壁更新の記録に追加する
    * @return true: 正常に更新された
    * @return false: 既知の情報と不一致だった
    */
   bool updateWall(const Position p,
                   const Direction d,
                   const bool b,
-                  const bool pushLog = true);
+                  const bool pushRecords = true);
   /**
    * @brief 直前に更新した壁を見探索状態にリセットする
    * @param num 消去する直近の壁の数
@@ -733,6 +756,7 @@ class Maze {
    * @param start パスのスタート座標
    * @param dirs 移動方向の配列
    * @param os output-stream
+   * @param mazeSize 迷路の1辺の区画数（正方形のみ対応）
    */
   void print(const Directions& dirs,
              const Position start = Position(0, 0),
@@ -740,7 +764,9 @@ class Maze {
              const size_t mazeSize = MAZE_SIZE) const;
   /**
    * @brief 位置のハイライト付きの迷路の表示
-   * @param positions ハイライト位置s
+   * @param positions ハイライトする位置の集合
+   * @param os output-stream
+   * @param mazeSize 迷路の1辺の区画数（正方形のみ対応）
    */
   void print(const Positions& positions,
              std::ostream& os = std::cout,
@@ -748,6 +774,7 @@ class Maze {
   /**
    * @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
    * @details テキスト形式。S: スタート区画(単数)、G: ゴール区画(複数可)
+
    * ```
    * +---+---+
    * |     G |
@@ -755,6 +782,7 @@ class Maze {
    * | S | G |
    * +---+---+
    * ```
+   *
    * @param is *.maze 形式のファイルの input-stream
    */
   bool parse(std::istream& is);
@@ -777,6 +805,7 @@ class Maze {
    * @brief 配列から迷路を読み込むパーサ
    * @param data 各区画16進表記の文字列配列
    * 例：{"abaf", "1234", "abab", "aaff"}
+   * @param mazeSize 迷路の1辺の区画数（正方形のみ対応）
    */
   bool parse(const std::vector<std::string>& data, const int mazeSize);
   /**
