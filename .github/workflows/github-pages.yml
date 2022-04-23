@@ -18,9 +18,9 @@ jobs:
       - name: Install Packages
         run: sudo apt install -y gcc g++ make cmake graphviz
 
-      - name: Install Specific Verison of Doxygen
+      - name: Install Specific Version of Doxygen
         env:
-          DOXYGEN_VERSION: 1.9.3
+          DOXYGEN_VERSION: 1.9.1
         run: |
           sudo apt install -y curl make libclang-9-dev libclang-cpp9
           cd /tmp
