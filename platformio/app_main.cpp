@@ -9,8 +9,8 @@
 #include <esp_ota_ops.h>
 #include <esp_spiffs.h>
 #include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <soc/rtc.h>  //< for rtc_clk_cpu_freq_get_config
+#include <freertos/task.h>  //< for vTaskDelay
+#include <soc/rtc.h>        //< for rtc_clk_cpu_freq_get_config
 
 /* defined in examples/meas/main.cpp */
 int test_meas(const std::string& mazedata_dir, const std::string& save_dir);
@@ -46,12 +46,32 @@ void setup() {
   MAZE_LOGI << "CPU Freq: " << get_cpu_freq_in_mhz() << " MHz" << std::endl;
   MAZE_LOGI << "build timestamp: " << __DATE__ << " " << __TIME__ << std::endl;
   MAZE_LOGI << "version: " << get_app_version() << std::endl;
-
   mount_spiffs();
-  test_meas("/spiffs/", "/spiffs/");
-  MAZE_LOGI << "End" << std::endl;
+  xTaskCreatePinnedToCore(
+      [](void* arg) {
+        test_meas("/spiffs/", "/spiffs/");
+        vTaskDelete(NULL);
+      },
+      "meas", 4096, NULL, configMAX_PRIORITIES, NULL, APP_CPU_NUM);
+  xTaskCreatePinnedToCore(
+      [](void* arg) {
+        while (1) {
+          vTaskDelay(pdMS_TO_TICKS(10));
+          char c = getc(stdin);
+          switch (c) {
+            case 'r':
+              esp_restart();
+              break;
+            default:
+              break;
+          }
+        }
+      },
+      "meas", 4096, NULL, configMAX_PRIORITIES, NULL, PRO_CPU_NUM);
 }
-void loop() {}
+void loop() {
+  vTaskDelay(portMAX_DELAY);
+}
 
 /* called by esp-idf */
 #if 0

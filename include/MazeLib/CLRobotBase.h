@@ -13,6 +13,7 @@
 #include <chrono>
 #include <cstdio>  /*< for std::printf */
 #include <iomanip> /*< for std::setw */
+#include <memory>  /*< for std::make_unique */
 
 namespace MazeLib {
 
