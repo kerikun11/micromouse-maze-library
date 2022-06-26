@@ -19,7 +19,6 @@ target_compile_options(${MICROMOUSE_MAZE_LIBRARY} PUBLIC
   -fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}/= # make __FILE__ macro relative path
   -fdiagnostics-color=always # colorized output for gcc
   -mno-ms-bitfields # for use of '__attribute__((__packed__))' on MSYS environment
-  -fconcepts # for use of 'auto' in parameter declaration
   -Wall # This enables all the warnings about constructions that some users consider questionable, and that are easy to avoid (or modify to prevent the warning), even in conjunction with macros.
   -Wextra # This enables some extra warning flags that are not enabled by -Wall.
   -Wundef # Warn if an undefined identifier is evaluated in an #if directive. Such identifiers are replaced with zero.

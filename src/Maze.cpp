@@ -7,15 +7,24 @@
  */
 #include "MazeLib/Maze.h"
 
-#include <algorithm>  //< for std::find(), std::count_if()
-#include <iomanip>    //< for std::setw()
+#include <algorithm>  //< for std::find, std::count_if
+#include <iomanip>    //< for std::setw
 
 namespace MazeLib {
 
 /* Direction */
-const std::array<Direction, 4> Direction::Along4 = {East, North, West, South};
-const std::array<Direction, 4> Direction::Diag4 = {NorthEast, NorthWest,
-                                                   SouthWest, SouthEast};
+const std::array<Direction, 4> Direction::Along4 = {
+    East,
+    North,
+    West,
+    South,
+};
+const std::array<Direction, 4> Direction::Diag4 = {
+    NorthEast,
+    NorthWest,
+    SouthWest,
+    SouthEast,
+};
 std::ostream& operator<<(std::ostream& os, const Directions& obj) {
   for (const auto d : obj)
     os << d;
@@ -134,13 +143,13 @@ int8_t Maze::unknownCount(const Position p) const {
 bool Maze::updateWall(const Position p,
                       const Direction d,
                       const bool b,
-                      const bool pushLog) {
+                      const bool pushRecords) {
   /* 既知の壁と食い違いがあったら未知壁としてreturn */
   if (isKnown(p, d) && isWall(p, d) != b) {
     setWall(p, d, false);
     setKnown(p, d, false);
     /* ログに追加 */
-    if (pushLog)
+    if (pushRecords)
       wallRecords.push_back(WallRecord(p, d, b));
     return false;
   }
@@ -149,7 +158,7 @@ bool Maze::updateWall(const Position p,
     setWall(p, d, b);
     setKnown(p, d, true);
     /* ログに追加 */
-    if (pushLog)
+    if (pushRecords)
       wallRecords.push_back(WallRecord(p, d, b));
     /* 最大最小区画を更新 */
     min_x = std::min(p.x, min_x);

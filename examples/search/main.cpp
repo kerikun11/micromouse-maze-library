@@ -17,8 +17,8 @@
 #include <algorithm>  //< for std::find
 #include <thread>     //< for std::this_thread::sleep_for
 
-/**
- * @brief 名前空間の展開
+/*
+ * 名前空間の展開
  */
 using namespace MazeLib;
 
@@ -52,10 +52,12 @@ void MoveRobot(const Direction relativeDir) {
 void ShowAnimation(const StepMap& stepMap,
                    const Maze& maze,
                    const Position& pos,
-                   const Direction& dir) {
+                   const Direction& dir,
+                   const std::string& msg) {
   std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
   stepMap.print(maze, pos, dir);
-  std::cout << "Searching for goal" << std::endl;
+  std::cout << "\e[J"; /*< カーソル以下を消去 */
+  std::cout << msg << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
@@ -114,7 +116,8 @@ int SearchRun(Maze& maze, const Maze& mazeTarget) {
       currentPos = currentPos.next(nextDir);
       currentDir = nextDir;
       /* アニメーション表示 */
-      ShowAnimation(stepMap, maze, currentPos, currentDir);
+      ShowAnimation(stepMap, maze, currentPos, currentDir,
+                    "Searching for Goal");
     }
   }
   /* 2. 最短経路上の未知区画をつぶす探索走行 */
@@ -163,7 +166,8 @@ int SearchRun(Maze& maze, const Maze& mazeTarget) {
       currentPos = currentPos.next(nextDir);
       currentDir = nextDir;
       /* アニメーション表示 */
-      ShowAnimation(stepMap, maze, currentPos, currentDir);
+      ShowAnimation(stepMap, maze, currentPos, currentDir,
+                    "Searching for Shortest Path Candidates");
     }
   }
   /* 3. スタート区画へ戻る走行 */
@@ -188,7 +192,8 @@ int SearchRun(Maze& maze, const Maze& mazeTarget) {
       currentPos = currentPos.next(nextDir);
       currentDir = nextDir;
       /* アニメーション表示 */
-      ShowAnimation(stepMap, maze, currentPos, currentDir);
+      ShowAnimation(stepMap, maze, currentPos, currentDir,
+                    "Going Back to Start");
     }
   }
   /* 正常終了 */
@@ -218,7 +223,7 @@ int ShortestRun(const Maze& maze) {
     currentPos = currentPos.next(nextDir);
     currentDir = nextDir;
     /* アニメーション表示 */
-    ShowAnimation(stepMap, maze, currentPos, currentDir);
+    ShowAnimation(stepMap, maze, currentPos, currentDir, "Shortest Run");
   }
   /* 最短経路の表示 */
   maze.print(shortestDirs);
@@ -232,7 +237,7 @@ int ShortestRun(const Maze& maze) {
 int main(void) {
   /* 画面のクリア */
   std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-  std::cout << "\e[J";  /*< カーソル以下を消去 */
+  std::cout << "\e[J";    /*< カーソル以下を消去 */
 
   /* シミュレーションに用いる迷路の選択 */
   const std::string filepath = "../mazedata/data/16MM2018CX.maze";

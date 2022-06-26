@@ -9,7 +9,10 @@
 ```sh
 # build dev env
 ./docker/build.sh
+# run dev env
+./docker/run.sh
 # configure
+rm -rf build
 ./docker/run.sh cmake ..
 # build
 ./docker/run.sh make -j

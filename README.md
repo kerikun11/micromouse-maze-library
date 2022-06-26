@@ -27,8 +27,8 @@
 
 マイコンの C++ プロジェクトにこのリポジトリを追加して以下のように設定を行う。
 
-| 項目              | 値                      |
-| ----------------- | ----------------------- |
-| include directory | `./include`             |
-| source directory  | `./src`                 |
-| compile option    | `-std=c++14 -fconcepts` |
+| 項目              | 値           |
+| ----------------- | ------------ |
+| include directory | `./include`  |
+| source directory  | `./src`      |
+| compile option    | `-std=c++14` |
