@@ -15,7 +15,9 @@
 rm -rf build
 ./docker/run.sh cmake ..
 # build
-./docker/run.sh make
+./docker/run.sh make -j
+# run example
+./docker/run.sh make search
 ```
 
 --------------------------------------------------------------------------------

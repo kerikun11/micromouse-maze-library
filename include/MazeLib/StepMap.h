@@ -125,7 +125,6 @@ class StepMap {
    * @param[in] maze 使用する迷路
    * @param[in] knownOnly 未知壁は壁ありとみなし、既知壁のみを使用する
    * @param[in] simple 台形加速を考慮せず、隣接区画のコストをすべて1にする
-   * p
    * @return スタートからゴールへの最短経路の方向列。
    *         経路がない場合は空配列となる。
    */
