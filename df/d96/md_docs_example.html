@@ -71,7 +71,10 @@ $(function() {
 Docker による環境構築</h2>
 <div class="fragment"><div class="line"># build dev env</div>
 <div class="line">./docker/build.sh</div>
+<div class="line"># run dev env</div>
+<div class="line">./docker/run.sh</div>
 <div class="line"># configure</div>
+<div class="line">rm -rf build</div>
 <div class="line">./docker/run.sh cmake ..</div>
 <div class="line"># build</div>
 <div class="line">./docker/run.sh make -j</div>

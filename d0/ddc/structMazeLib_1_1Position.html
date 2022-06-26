@@ -154,12 +154,13 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 フレンド</h2></td></tr>
 <tr class="memitem:ac68e017112209824ac2f81c3d9d55378"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html#ac68e017112209824ac2f81c3d9d55378">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> p)</td></tr>
-<tr class="memdesc:ac68e017112209824ac2f81c3d9d55378"><td class="mdescLeft">&#160;</td><td class="mdescRight">stream での表示。 ( x, y) の形式  <a href="../../d0/ddc/structMazeLib_1_1Position.html#ac68e017112209824ac2f81c3d9d55378">[詳解]</a><br /></td></tr>
+<tr class="memdesc:ac68e017112209824ac2f81c3d9d55378"><td class="mdescLeft">&#160;</td><td class="mdescRight">output-stream の表示関数。 ( x, y) の形式  <a href="../../d0/ddc/structMazeLib_1_1Position.html#ac68e017112209824ac2f81c3d9d55378">[詳解]</a><br /></td></tr>
 <tr class="separator:ac68e017112209824ac2f81c3d9d55378"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">詳解</h2>
 <div class="textblock"><p>迷路の区画の位置(座標)を定義。 </p>
-<p>実体は 16bit の整数。 左下の区画が (0,0) の (x,y) 平面。 </p><div class="fragment"><div class="line">+--------+--------+</div>
+<p>実体は 16bit の整数。 左下の区画が (0,0) の (x,y) 平面。</p>
+<div class="fragment"><div class="line">+--------+--------+</div>
 <div class="line">| (0, 1) | (1, 1) |</div>
 <div class="line">+--------+--------+</div>
 <div class="line">| (0, 0) | (1, 0) |</div>
@@ -587,7 +588,7 @@ false フィールド外 </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>戻り値</dt><dd>const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> </dd></dl>
+<dl class="section return"><dt>戻り値</dt><dd>変換後の位置 </dd></dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
@@ -651,7 +652,7 @@ false フィールド外 </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>戻り値</dt><dd>const <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> </dd></dl>
+<dl class="section return"><dt>戻り値</dt><dd>変換後の位置 </dd></dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
@@ -727,7 +728,7 @@ false フィールド外 </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>stream での表示。 ( x, y) の形式 </p>
+<p>output-stream の表示関数。 ( x, y) の形式 </p>
 
 </div>
 </div>

@@ -76,7 +76,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>size check  
+<p>区画ベースではなく、壁ベースの管理ID  
  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#details">[詳解]</a></p>
 
 <p><code>#include &lt;<a class="el" href="../../d1/de8/Maze_8h_source.html">Maze.h</a>&gt;</code></p>
@@ -102,7 +102,7 @@ $(function() {
 <tr class="memdesc:a851efc64ad8d3a8c83d999d52990e1e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">等号否定  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a851efc64ad8d3a8c83d999d52990e1e4">[詳解]</a><br /></td></tr>
 <tr class="separator:a851efc64ad8d3a8c83d999d52990e1e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28d5ca6fe2ee32fe06a7a3d1437566ff"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff">getIndex</a> () const</td></tr>
-<tr class="memdesc:a28d5ca6fe2ee32fe06a7a3d1437566ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路内の壁を一意な通し番号として表現したIDを返す。 迷路外の壁の場合未定義動作となる。  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff">[詳解]</a><br /></td></tr>
+<tr class="memdesc:a28d5ca6fe2ee32fe06a7a3d1437566ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路内の壁を一意な通し番号として表現したIDを返す。  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff">[詳解]</a><br /></td></tr>
 <tr class="separator:a28d5ca6fe2ee32fe06a7a3d1437566ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56ade7d0b00e25b55a4dbf9a9c047674"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a56ade7d0b00e25b55a4dbf9a9c047674">getPosition</a> () const</td></tr>
 <tr class="memdesc:a56ade7d0b00e25b55a4dbf9a9c047674"><td class="mdescLeft">&#160;</td><td class="mdescRight">位置の取得  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a56ade7d0b00e25b55a4dbf9a9c047674">[詳解]</a><br /></td></tr>
@@ -111,10 +111,10 @@ $(function() {
 <tr class="memdesc:a17937fe7297c8dc715ff9d417435b1b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">方向の取得  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a17937fe7297c8dc715ff9d417435b1b3">[詳解]</a><br /></td></tr>
 <tr class="separator:a17937fe7297c8dc715ff9d417435b1b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab17656c4ce938f11b042e14a1f6e01ce"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce">isInsideOfField</a> () const</td></tr>
-<tr class="memdesc:ab17656c4ce938f11b042e14a1f6e01ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE-1,MAZE_SIZE-1)の間かつ、z が外周上にいない  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce">[詳解]</a><br /></td></tr>
+<tr class="memdesc:ab17656c4ce938f11b042e14a1f6e01ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">壁がフィールド内か判定する関数  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce">[詳解]</a><br /></td></tr>
 <tr class="separator:ab17656c4ce938f11b042e14a1f6e01ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4177234bba4e64cc4f6c59410b9a6908"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html">WallIndex</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a4177234bba4e64cc4f6c59410b9a6908">next</a> (const <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html">Direction</a> <a class="el" href="../../d1/de8/Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>) const</td></tr>
-<tr class="memdesc:a4177234bba4e64cc4f6c59410b9a6908"><td class="mdescLeft">&#160;</td><td class="mdescRight">引数方向の <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="size check">WallIndex</a> を取得する関数  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a4177234bba4e64cc4f6c59410b9a6908">[詳解]</a><br /></td></tr>
+<tr class="memdesc:a4177234bba4e64cc4f6c59410b9a6908"><td class="mdescLeft">&#160;</td><td class="mdescRight">引数方向の <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">WallIndex</a> を取得する関数  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a4177234bba4e64cc4f6c59410b9a6908">[詳解]</a><br /></td></tr>
 <tr class="separator:a4177234bba4e64cc4f6c59410b9a6908"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3dd5a061b1cf2c28cc412accc2bc93a"><td class="memItemLeft" align="right" valign="top">std::array&lt; <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html">Direction</a>, 6 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#aa3dd5a061b1cf2c28cc412accc2bc93a">getNextDirection6</a> () const</td></tr>
 <tr class="memdesc:aa3dd5a061b1cf2c28cc412accc2bc93a"><td class="mdescLeft">&#160;</td><td class="mdescRight">現在壁に隣接する、柱ではない6方向を取得  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#aa3dd5a061b1cf2c28cc412accc2bc93a">[詳解]</a><br /></td></tr>
@@ -154,9 +154,9 @@ $(function() {
 <tr class="separator:af8e323d73559c14dec738ae370607e44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">詳解</h2>
-<div class="textblock"><p>size check </p>
-<p>区画ベースではなく、壁ベースの管理ID</p>
-<p>uint16_t にキャストすることで全部の壁が通し番号になったIDを 取得できるという特徴がある。 迷路内部の壁の総数 <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a5fea3eb0fdea307f95640bde512c2481" title="壁を unique な通し番号として表現したときの総数。 配列の確保などで使用できる。">WallIndex::SIZE</a> 個の配列を確保しておけば、 取得したIDをインデックスとして使える。そのとき、 <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="size check">WallIndex</a> が 迷路の内部にあるかどうか確認すること。(配列の範囲外アクセス防止) <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE-1,MAZE_SIZE-1)の間かつ、z が外周上にいない">isInsideOfField()</a> 関数により迷路の内部に位置するか確認できる。 最初から全部が通し番号のIDで保持してしまうと、 迷路の範囲外の壁を表現できなくなってしまうため、 必要に応じてIDを生成するようになっている。 </p><div class="fragment"><div class="line">     [<a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a4ba371dd47e92b384572bc7f41629f6b">x</a>, <a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a2f1799666bb81b082c857a3ca874980a">y</a>]    : Cell Position</div>
+<div class="textblock"><p>区画ベースではなく、壁ベースの管理ID </p>
+<p>uint16_t にキャストすることで全部の壁が通し番号になったIDを 取得できるという特徴がある。 迷路内部の壁の総数 <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a5fea3eb0fdea307f95640bde512c2481" title="壁を unique な通し番号として表現したときの総数。 配列の確保などで使用できる。">WallIndex::SIZE</a> 個の配列を確保しておけば、 取得したIDをインデックスとして使える。そのとき、 <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">WallIndex</a> が 迷路の内部にあるかどうか確認すること。(配列の範囲外アクセス防止) <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数">isInsideOfField()</a> 関数により迷路の内部に位置するか確認できる。 最初から全部が通し番号のIDで保持してしまうと、 迷路の範囲外の壁を表現できなくなってしまうため、 必要に応じてIDを生成するようになっている。</p>
+<div class="fragment"><div class="line">     [<a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a4ba371dd47e92b384572bc7f41629f6b">x</a>, <a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a2f1799666bb81b082c857a3ca874980a">y</a>]    : Cell Position</div>
 <div class="line">            <a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#af553ee087777792346302c9768dd8634">z</a>  : Wall Distinction in the Cell; 0:East, 1:North</div>
 <div class="line">  =&gt; (<a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a4ba371dd47e92b384572bc7f41629f6b">x</a>, <a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a2f1799666bb81b082c857a3ca874980a">y</a>, <a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#af553ee087777792346302c9768dd8634">z</a>) : Wall Index</div>
 <div class="line">+-------------+-------------+-------------+</div>
@@ -172,9 +172,9 @@ $(function() {
 <div class="line">|           <a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#af553ee087777792346302c9768dd8634">z</a> = 0         <a class="code" href="../../d6/d8d/structMazeLib_1_1WallIndex.html#af553ee087777792346302c9768dd8634">z</a> = 0           |</div>
 <div class="line">|             |             |             |</div>
 <div class="line">+-------------+-------------+-------------+</div>
-<div class="ttc" id="astructMazeLib_1_1WallIndex_html_a2f1799666bb81b082c857a3ca874980a"><div class="ttname"><a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a2f1799666bb81b082c857a3ca874980a">MazeLib::WallIndex::y</a></div><div class="ttdeci">int8_t y</div><div class="ttdoc">区画座標のy成分</div><div class="ttdef"><b>Definition:</b> Maze.h:437</div></div>
-<div class="ttc" id="astructMazeLib_1_1WallIndex_html_a4ba371dd47e92b384572bc7f41629f6b"><div class="ttname"><a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a4ba371dd47e92b384572bc7f41629f6b">MazeLib::WallIndex::x</a></div><div class="ttdeci">int8_t x</div><div class="ttdoc">区画座標のx成分</div><div class="ttdef"><b>Definition:</b> Maze.h:436</div></div>
-<div class="ttc" id="astructMazeLib_1_1WallIndex_html_af553ee087777792346302c9768dd8634"><div class="ttname"><a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#af553ee087777792346302c9768dd8634">MazeLib::WallIndex::z</a></div><div class="ttdeci">uint8_t z</div><div class="ttdoc">区画内の壁の位置。0:East, 1:North</div><div class="ttdef"><b>Definition:</b> Maze.h:438</div></div>
+<div class="ttc" id="astructMazeLib_1_1WallIndex_html_a2f1799666bb81b082c857a3ca874980a"><div class="ttname"><a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a2f1799666bb81b082c857a3ca874980a">MazeLib::WallIndex::y</a></div><div class="ttdeci">int8_t y</div><div class="ttdoc">区画座標のy成分</div><div class="ttdef"><b>Definition:</b> Maze.h:457</div></div>
+<div class="ttc" id="astructMazeLib_1_1WallIndex_html_a4ba371dd47e92b384572bc7f41629f6b"><div class="ttname"><a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#a4ba371dd47e92b384572bc7f41629f6b">MazeLib::WallIndex::x</a></div><div class="ttdeci">int8_t x</div><div class="ttdoc">区画座標のx成分</div><div class="ttdef"><b>Definition:</b> Maze.h:456</div></div>
+<div class="ttc" id="astructMazeLib_1_1WallIndex_html_af553ee087777792346302c9768dd8634"><div class="ttname"><a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#af553ee087777792346302c9768dd8634">MazeLib::WallIndex::z</a></div><div class="ttdeci">uint8_t z</div><div class="ttdoc">区画内の壁の位置。0:East, 1:North</div><div class="ttdef"><b>Definition:</b> Maze.h:458</div></div>
 </div><!-- fragment --> </div><h2 class="groupheader">構築子と解体子</h2>
 <a id="a64bb5adda70c5c829138f9ed602d80f5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a64bb5adda70c5c829138f9ed602d80f5">&#9670;&nbsp;</a></span>WallIndex() <span class="overload">[1/4]</span></h2>
@@ -328,10 +328,11 @@ $(function() {
 <p>IDを使って初期化するコンストラクタ </p>
 <dl class="params"><dt>引数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">i</td><td>壁の通し番号ID。迷路内の壁であること。 迷路外の壁の場合未定義動作となる。 </td></tr>
+    <tr><td class="paramname">i</td><td>壁の通し番号ID。迷路内の壁であること。 </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section attention"><dt>注意</dt><dd>迷路外の壁の場合未定義動作となる。 </dd></dl>
 
 </div>
 </div>
@@ -395,14 +396,15 @@ $(function() {
 </table>
 </div><div class="memdoc">
 
-<p>迷路内の壁を一意な通し番号として表現したIDを返す。 迷路外の壁の場合未定義動作となる。 </p>
+<p>迷路内の壁を一意な通し番号として表現したIDを返す。 </p>
+<dl class="section attention"><dt>注意</dt><dd>迷路外の壁の場合未定義動作となる。 </dd></dl>
 <dl class="section return"><dt>戻り値</dt><dd>uint16_t ID </dd></dl>
 <div class="dynheader">
 被呼び出し関係図:</div>
 <div class="dyncontent">
 <div class="center"><img src="../../d6/d8d/structMazeLib_1_1WallIndex_a28d5ca6fe2ee32fe06a7a3d1437566ff_icgraph.png" border="0" usemap="#ad6/d8d/structMazeLib_1_1WallIndex_a28d5ca6fe2ee32fe06a7a3d1437566ff_icgraph" alt=""/></div>
 <map name="ad6/d8d/structMazeLib_1_1WallIndex_a28d5ca6fe2ee32fe06a7a3d1437566ff_icgraph" id="ad6/d8d/structMazeLib_1_1WallIndex_a28d5ca6fe2ee32fe06a7a3d1437566ff_icgraph">
-<area shape="rect" title="迷路内の壁を一意な通し番号として表現したIDを返す。 迷路外の壁の場合未定義動作となる。" alt="" coords="1515,363,1663,405"/>
+<area shape="rect" title="迷路内の壁を一意な通し番号として表現したIDを返す。" alt="" coords="1515,363,1663,405"/>
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数。迷路外を参照すると壁ありと返す。" alt="" coords="1264,279,1463,305"/>
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a9e513a20755fe6f62a1fd2aabd080ecd" title="壁の更新のベース関数。迷路外を参照すると無視される。" alt="" coords="1260,459,1467,485"/>
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208" title="壁が探索済みかを返す" alt="" coords="1025,224,1208,251"/>
@@ -414,7 +416,7 @@ $(function() {
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#abe3a8ddb09cef4adf591bbe4cc8f9b76" title="迷路の表示" alt="" coords="793,341,951,368"/>
 <area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#ad32a5acacd31cd9a73bfd577518cfee7" title=" " alt="" coords="771,5,973,32"/>
 <area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#aa693f3d5b63146dce4b2e60ed5aa9746" title="ステップマップの更新" alt="" coords="775,173,969,200"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a6a43815bde60f520ecd1f7471d3951ba" title="既知の壁情報と照らしあわせながら、壁を更新する関数" alt="" coords="772,509,972,536"/>
+<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f" title="既知の壁情報と照らしあわせながら、壁を更新する関数" alt="" coords="772,509,972,536"/>
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a83cf190b26fcda5ee853acf71f556c25" title=" " alt="" coords="524,123,692,149"/>
 <area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#adacb549c46e7464ddc9a69add9e16443" title="ステップマップから次に行くべき方向を計算する関数" alt="" coords="505,319,711,361"/>
 <area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614" title="与えられた区画間の最短経路を導出する関数" alt="" coords="493,214,723,255"/>
@@ -458,7 +460,7 @@ $(function() {
 </div><div class="memdoc">
 
 <p>現在壁に隣接する、柱ではない6方向を取得 </p>
-<dl class="section return"><dt>戻り値</dt><dd>const std::array&lt;Direction, 6&gt; </dd></dl>
+<dl class="section return"><dt>戻り値</dt><dd>std::array&lt;Direction, 6&gt; 隣接方向の配列 </dd></dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">
@@ -521,8 +523,8 @@ $(function() {
 </table>
 </div><div class="memdoc">
 
-<p>壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE-1,MAZE_SIZE-1)の間かつ、z が外周上にいない </p>
-<dl class="section return"><dt>戻り値</dt><dd>true フィールド内 </dd>
+<p>壁がフィールド内か判定する関数 </p>
+<p>(x, y) が (0, 0) と (MAZE_SIZE-1, MAZE_SIZE-1) の間、かつ、 z が外周上でない </p><dl class="section return"><dt>戻り値</dt><dd>true フィールド内 </dd>
 <dd>
 false フィールド外(外周上を含む) </dd></dl>
 <div class="dynheader">
@@ -530,7 +532,7 @@ false フィールド外(外周上を含む) </dd></dl>
 <div class="dyncontent">
 <div class="center"><img src="../../d6/d8d/structMazeLib_1_1WallIndex_ab17656c4ce938f11b042e14a1f6e01ce_icgraph.png" border="0" usemap="#ad6/d8d/structMazeLib_1_1WallIndex_ab17656c4ce938f11b042e14a1f6e01ce_icgraph" alt=""/></div>
 <map name="ad6/d8d/structMazeLib_1_1WallIndex_ab17656c4ce938f11b042e14a1f6e01ce_icgraph" id="ad6/d8d/structMazeLib_1_1WallIndex_ab17656c4ce938f11b042e14a1f6e01ce_icgraph">
-<area shape="rect" title="壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE&#45;1,MAZE_SIZE&#45;1)の間かつ、z が外周上にいない" alt="" coords="1515,363,1663,405"/>
+<area shape="rect" title="壁がフィールド内か判定する関数" alt="" coords="1515,363,1663,405"/>
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数。迷路外を参照すると壁ありと返す。" alt="" coords="1264,279,1463,305"/>
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a9e513a20755fe6f62a1fd2aabd080ecd" title="壁の更新のベース関数。迷路外を参照すると無視される。" alt="" coords="1260,459,1467,485"/>
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208" title="壁が探索済みかを返す" alt="" coords="1025,224,1208,251"/>
@@ -542,7 +544,7 @@ false フィールド外(外周上を含む) </dd></dl>
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#abe3a8ddb09cef4adf591bbe4cc8f9b76" title="迷路の表示" alt="" coords="793,341,951,368"/>
 <area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#ad32a5acacd31cd9a73bfd577518cfee7" title=" " alt="" coords="771,5,973,32"/>
 <area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#aa693f3d5b63146dce4b2e60ed5aa9746" title="ステップマップの更新" alt="" coords="775,173,969,200"/>
-<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a6a43815bde60f520ecd1f7471d3951ba" title="既知の壁情報と照らしあわせながら、壁を更新する関数" alt="" coords="772,509,972,536"/>
+<area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f" title="既知の壁情報と照らしあわせながら、壁を更新する関数" alt="" coords="772,509,972,536"/>
 <area shape="rect" href="../../d8/d25/classMazeLib_1_1Maze.html#a83cf190b26fcda5ee853acf71f556c25" title=" " alt="" coords="524,123,692,149"/>
 <area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#adacb549c46e7464ddc9a69add9e16443" title="ステップマップから次に行くべき方向を計算する関数" alt="" coords="505,319,711,361"/>
 <area shape="rect" href="../../d9/da9/classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614" title="与えられた区画間の最短経路を導出する関数" alt="" coords="493,214,723,255"/>
@@ -578,14 +580,14 @@ false フィールド外(外周上を含む) </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>引数方向の <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="size check">WallIndex</a> を取得する関数 </p>
+<p>引数方向の <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">WallIndex</a> を取得する関数 </p>
 <dl class="params"><dt>引数</dt><dd>
   <table class="params">
     <tr><td class="paramname">d</td><td>隣接方向 </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>戻り値</dt><dd>const <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="size check">WallIndex</a> 隣接壁 </dd></dl>
+<dl class="section return"><dt>戻り値</dt><dd><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">WallIndex</a> 隣接壁 </dd></dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">

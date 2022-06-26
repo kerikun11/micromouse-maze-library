@@ -72,7 +72,7 @@ $(function() {
 <p>マイクロマウスで迷路探索を行うためには、主に以下の処理が必要となる。</p>
 <ul>
 <li>迷路上にある機体の区画位置と進行方向を識別する処理 (<a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">MazeLib::Position</a>, <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">MazeLib::Direction</a>)</li>
-<li>迷路上の全壁の有無と既知未知を管理する処理 (<a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="size check">MazeLib::WallIndex</a>, <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html" title="迷路の壁情報を管理するクラス">MazeLib::Maze</a>)</li>
+<li>迷路上の全壁の有無と既知未知を管理する処理 (<a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">MazeLib::WallIndex</a>, <a class="el" href="../../d8/d25/classMazeLib_1_1Maze.html" title="迷路の壁情報を管理するクラス">MazeLib::Maze</a>)</li>
 <li>迷路上のある区画からある区画(の集合)への移動経路を導出する処理 (<a class="el" href="../../d9/da9/classMazeLib_1_1StepMap.html" title="区画ベースのステップマップを管理するクラス">MazeLib::StepMap</a>)</li>
 <li>スタート区画からゴール区画(の集合)への最短経路を導出する処理 (※)</li>
 </ul>

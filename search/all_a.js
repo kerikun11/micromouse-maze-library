@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['max_56',['Max',['../d3/d5c/classMazeLib_1_1Direction.html#a45d12960450cee7631c77462a977b211',1,'MazeLib::Direction']]],
+  ['max_56',['Max',['../d3/d5c/classMazeLib_1_1Direction.html#acacc0677c2bcb487c5f0404bf5a42f09',1,'MazeLib::Direction']]],
   ['max_5fx_57',['max_x',['../d8/d25/classMazeLib_1_1Maze.html#a2d3a9b9a6d128a977475ea6d99099d50',1,'MazeLib::Maze']]],
   ['max_5fy_58',['max_y',['../d8/d25/classMazeLib_1_1Maze.html#a4438acf57678e0d31f8418b6eda76689',1,'MazeLib::Maze']]],
   ['maze_59',['Maze',['../d8/d25/classMazeLib_1_1Maze.html#a8e313813114d6c26174fb04ca29007fe',1,'MazeLib::Maze::Maze()'],['../d8/d25/classMazeLib_1_1Maze.html',1,'MazeLib::Maze']]],

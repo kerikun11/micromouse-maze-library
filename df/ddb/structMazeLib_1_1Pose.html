@@ -120,7 +120,8 @@ MazeLib::Pose 連携図</div>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">詳解</h2>
 <div class="textblock"><p><a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> と <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a> をまとめた型。位置姿勢。 </p>
-<p>アライメント制約により実体は 4Bytes。 位置姿勢は、区画とそこに向かう方向で特定する。 現在区画から出る方向ではないことに注意する。 </p><div class="fragment"><div class="line">+---+---+---+ 例:</div>
+<p>アライメント制約により実体は 4Bytes。 位置姿勢は、区画とそこに向かう方向で特定する。 現在区画から出る方向ではないことに注意する。</p>
+<div class="fragment"><div class="line">+---+---+---+ 例:</div>
 <div class="line">|   &lt;       | &lt;--- (0, 2, West)</div>
 <div class="line">+   +---+ ^ + &lt;--- (2, 2, North)</div>
 <div class="line">|   &gt;       | &lt;--- (1, 1, East)</div>
@@ -234,7 +235,7 @@ MazeLib::Pose 連携図</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>戻り値</dt><dd>const <a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html" title="Position と Direction をまとめた型。位置姿勢。">Pose</a> 隣接姿勢 </dd></dl>
+<dl class="section return"><dt>戻り値</dt><dd><a class="el" href="../../df/ddb/structMazeLib_1_1Pose.html" title="Position と Direction をまとめた型。位置姿勢。">Pose</a> 隣接姿勢 </dd></dl>
 <div class="dynheader">
 呼び出し関係図:</div>
 <div class="dyncontent">

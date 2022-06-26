@@ -86,7 +86,7 @@ $(function() {
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> と <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a> をまとめた型。位置姿勢。  <a href="../../df/ddb/structMazeLib_1_1Pose.html#details">[詳解]</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html">WallIndex</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">size check  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#details">[詳解]</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">区画ベースではなく、壁ベースの管理ID  <a href="../../d6/d8d/structMazeLib_1_1WallIndex.html#details">[詳解]</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dd5/structMazeLib_1_1WallRecord.html">WallRecord</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">区画位置、方向、壁の有無を保持する構造体。  <a href="../../dc/dd5/structMazeLib_1_1WallRecord.html#details">[詳解]</a><br /></td></tr>
@@ -101,16 +101,16 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 型定義</h2></td></tr>
 <tr class="memitem:a523467695723fa4c8a7fa55a7e5d12e6"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> = std::vector&lt; <a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html">Direction</a> &gt;</td></tr>
-<tr class="memdesc:a523467695723fa4c8a7fa55a7e5d12e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">size check  <a href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">[詳解]</a><br /></td></tr>
+<tr class="memdesc:a523467695723fa4c8a7fa55a7e5d12e6"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a> 構造体の動的配列、集合  <a href="../../dc/d56/namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">[詳解]</a><br /></td></tr>
 <tr class="separator:a523467695723fa4c8a7fa55a7e5d12e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ecc0bb180fd1dee4ba69157e6d8b853"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">Positions</a> = std::vector&lt; <a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html">Position</a> &gt;</td></tr>
-<tr class="memdesc:a2ecc0bb180fd1dee4ba69157e6d8b853"><td class="mdescLeft">&#160;</td><td class="mdescRight">size check  <a href="../../dc/d56/namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">[詳解]</a><br /></td></tr>
+<tr class="memdesc:a2ecc0bb180fd1dee4ba69157e6d8b853"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> 構造体の動的配列、集合  <a href="../../dc/d56/namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">[詳解]</a><br /></td></tr>
 <tr class="separator:a2ecc0bb180fd1dee4ba69157e6d8b853"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd6dca43dde5d6adedc2b026b8980ffc"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d56/namespaceMazeLib.html#afd6dca43dde5d6adedc2b026b8980ffc">WallIndexes</a> = std::vector&lt; <a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html">WallIndex</a> &gt;</td></tr>
-<tr class="memdesc:afd6dca43dde5d6adedc2b026b8980ffc"><td class="mdescLeft">&#160;</td><td class="mdescRight">size check  <a href="../../dc/d56/namespaceMazeLib.html#afd6dca43dde5d6adedc2b026b8980ffc">[詳解]</a><br /></td></tr>
+<tr class="memdesc:afd6dca43dde5d6adedc2b026b8980ffc"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">WallIndex</a> の動的配列、集合  <a href="../../dc/d56/namespaceMazeLib.html#afd6dca43dde5d6adedc2b026b8980ffc">[詳解]</a><br /></td></tr>
 <tr class="separator:afd6dca43dde5d6adedc2b026b8980ffc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a781e89819e92f5f312289ffc2ed70576"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d56/namespaceMazeLib.html#a781e89819e92f5f312289ffc2ed70576">WallRecords</a> = std::vector&lt; <a class="el" href="../../dc/dd5/structMazeLib_1_1WallRecord.html">WallRecord</a> &gt;</td></tr>
-<tr class="memdesc:a781e89819e92f5f312289ffc2ed70576"><td class="mdescLeft">&#160;</td><td class="mdescRight">size check  <a href="../../dc/d56/namespaceMazeLib.html#a781e89819e92f5f312289ffc2ed70576">[詳解]</a><br /></td></tr>
+<tr class="memdesc:a781e89819e92f5f312289ffc2ed70576"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="../../dc/dd5/structMazeLib_1_1WallRecord.html" title="区画位置、方向、壁の有無を保持する構造体。">WallRecord</a> 構造体の動的配列の定義  <a href="../../dc/d56/namespaceMazeLib.html#a781e89819e92f5f312289ffc2ed70576">[詳解]</a><br /></td></tr>
 <tr class="separator:a781e89819e92f5f312289ffc2ed70576"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -160,7 +160,6 @@ $(function() {
       </table>
 </div><div class="memdoc">
 
-<p>size check </p>
 <p><a class="el" href="../../d3/d5c/classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a> 構造体の動的配列、集合 </p>
 
 </div>
@@ -177,7 +176,6 @@ $(function() {
       </table>
 </div><div class="memdoc">
 
-<p>size check </p>
 <p><a class="el" href="../../d0/ddc/structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> 構造体の動的配列、集合 </p>
 
 </div>
@@ -194,8 +192,7 @@ $(function() {
       </table>
 </div><div class="memdoc">
 
-<p>size check </p>
-<p><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="size check">WallIndex</a> の動的配列、集合 </p>
+<p><a class="el" href="../../d6/d8d/structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">WallIndex</a> の動的配列、集合 </p>
 
 </div>
 </div>
@@ -211,7 +208,6 @@ $(function() {
       </table>
 </div><div class="memdoc">
 
-<p>size check </p>
 <p><a class="el" href="../../dc/dd5/structMazeLib_1_1WallRecord.html" title="区画位置、方向、壁の有無を保持する構造体。">WallRecord</a> 構造体の動的配列の定義 </p>
 
 </div>

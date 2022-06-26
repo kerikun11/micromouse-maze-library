@@ -9,7 +9,7 @@
 <area shape="rect" id="node11" href="$d8/d25/classMazeLib_1_1Maze.html#abe3a8ddb09cef4adf591bbe4cc8f9b76" title="迷路の表示" alt="" coords="793,325,951,351"/>
 <area shape="rect" id="node12" href="$d9/da9/classMazeLib_1_1StepMap.html#ad32a5acacd31cd9a73bfd577518cfee7" title=" " alt="" coords="771,375,973,402"/>
 <area shape="rect" id="node13" href="$d9/da9/classMazeLib_1_1StepMap.html#aa693f3d5b63146dce4b2e60ed5aa9746" title="ステップマップの更新" alt="" coords="775,274,969,301"/>
-<area shape="rect" id="node14" href="$d8/d25/classMazeLib_1_1Maze.html#a6a43815bde60f520ecd1f7471d3951ba" title="既知の壁情報と照らしあわせながら、壁を更新する関数" alt="" coords="772,122,972,149"/>
+<area shape="rect" id="node14" href="$d8/d25/classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f" title="既知の壁情報と照らしあわせながら、壁を更新する関数" alt="" coords="772,122,972,149"/>
 <area shape="rect" id="node5" href="$d8/d25/classMazeLib_1_1Maze.html#a83cf190b26fcda5ee853acf71f556c25" title=" " alt="" coords="524,223,692,250"/>
 <area shape="rect" id="node7" href="$d9/da9/classMazeLib_1_1StepMap.html#adacb549c46e7464ddc9a69add9e16443" title="ステップマップから次に行くべき方向を計算する関数" alt="" coords="505,524,711,565"/>
 <area shape="rect" id="node8" href="$d9/da9/classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614" title="与えられた区画間の最短経路を導出する関数" alt="" coords="493,367,723,408"/>

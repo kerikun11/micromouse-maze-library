@@ -1,6 +1,6 @@
 <map id="MazeLib::Maze::isKnown" name="MazeLib::Maze::isKnown">
 <area shape="rect" id="node1" title="壁が探索済みかを返す" alt="" coords="5,46,188,73"/>
 <area shape="rect" id="node2" href="$d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数。迷路外を参照すると壁ありと返す。" alt="" coords="236,46,435,73"/>
-<area shape="rect" id="node3" href="$d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す。 迷路外の壁の場合未定義動作となる。" alt="" coords="483,5,631,47"/>
-<area shape="rect" id="node4" href="$d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE&#45;1,MAZE_SIZE&#45;1)の間かつ、z が外周上にいない" alt="" coords="483,71,631,112"/>
+<area shape="rect" id="node3" href="$d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す。" alt="" coords="483,5,631,47"/>
+<area shape="rect" id="node4" href="$d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数" alt="" coords="483,71,631,112"/>
 </map>

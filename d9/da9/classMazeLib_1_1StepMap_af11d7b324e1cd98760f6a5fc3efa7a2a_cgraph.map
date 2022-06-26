@@ -8,8 +8,8 @@
 <area shape="rect" id="node11" href="$df/ddb/structMazeLib_1_1Pose.html#ae858274f0f1f5e3be99cf41563ed0798" title="隣接姿勢の取得" alt="" coords="288,289,440,315"/>
 <area shape="rect" id="node13" href="$d8/d25/classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831" title="引数区画に隣接する未知壁の数を返す" alt="" coords="252,339,476,366"/>
 <area shape="rect" id="node5" href="$d8/d25/classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数。迷路外を参照すると壁ありと返す。" alt="" coords="524,154,723,181"/>
-<area shape="rect" id="node6" href="$d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す。 迷路外の壁の場合未定義動作となる。" alt="" coords="771,91,919,132"/>
-<area shape="rect" id="node7" href="$d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数 x,y が (0,0)と(MAZE_SIZE&#45;1,MAZE_SIZE&#45;1)の間かつ、z が外周上にいない" alt="" coords="771,156,919,197"/>
+<area shape="rect" id="node6" href="$d6/d8d/structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す。" alt="" coords="771,91,919,132"/>
+<area shape="rect" id="node7" href="$d6/d8d/structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数" alt="" coords="771,156,919,197"/>
 <area shape="rect" id="node10" href="$d0/ddc/structMazeLib_1_1Position.html#a273bddbcc328c127be9453db54707ef6" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="773,231,917,272"/>
 <area shape="rect" id="node12" href="$df/ddb/structMazeLib_1_1Pose.html#a1afb418adcd34f3d6a91fb6710e74731" title=" " alt="" coords="546,289,701,315"/>
 </map>
