@@ -56,6 +56,7 @@ void ShowAnimation(const StepMap& stepMap,
                    const std::string& msg) {
   std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
   stepMap.print(maze, pos, dir);
+  std::cout << "\e[J"; /*< カーソル以下を消去 */
   std::cout << msg << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
