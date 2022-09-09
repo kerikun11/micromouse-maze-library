@@ -18,7 +18,7 @@ const char* RobotBase::getSearchActionName(enum SearchAction action) {
     case ST_FULL:
       return "ST_FULL";
     case ST_HALF:
-      return "ST_HARF";
+      return "ST_HALF";
     case ST_HALF_STOP:
       return "ST_HALF_STOP";
     case TURN_L:

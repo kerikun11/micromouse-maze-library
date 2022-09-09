@@ -79,8 +79,8 @@ int main(int argc, char* argv[]) {
   std::printf(
       "Estimated Search Time: %2d:%02d, Step: %4d, Forward: %3d, "
       "Left: %3d, Right: %3d, Back: %3d\n",
-      robot.est_time_ms/ 1000 / 60 % 60, robot.est_time_ms/ 1000 % 60, robot.step,
-      robot.f, robot.l, robot.r, robot.b);
+      robot.est_time_ms / 1000 / 60 % 60, robot.est_time_ms / 1000 % 60,
+      robot.step, robot.f, robot.l, robot.r, robot.b);
   for (bool diagEnabled : {false, true}) {
     robot.calcShortestDirections(diagEnabled);
     robot.printPath();

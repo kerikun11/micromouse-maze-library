@@ -198,9 +198,18 @@ class CLRobotBase : public RobotBase {
     right = !mazeTarget.canGo(real.p, real.d + Direction::Right);
 #if 0
     /* 前1区画先の壁を読める場合 */
-    if (!front)
-      updateWall(currentPose.p.next(currentPose.d), currentPose.d,
+    if (mazeTarget.canGo(real.p, real.d))
+      updateWall(getCurrentPose().p.next(getCurrentPose().d),
+                 getCurrentPose().d,
                  !mazeTarget.canGo(real.p.next(real.d), real.d));
+#endif
+#if 0
+    /* 横1区画先の壁を読める場合 */
+    for (const auto d : {Direction::Left, Direction::Right})
+      if (mazeTarget.canGo(real.p, real.d + d))
+        updateWall(getCurrentPose().p.next(getCurrentPose().d + d),
+                   getCurrentPose().d + d,
+                   !mazeTarget.canGo(real.p.next(real.d + d), real.d + d));
 #endif
   }
   virtual void calcNextDirectionsPreCallback() override {

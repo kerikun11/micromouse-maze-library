@@ -67,7 +67,7 @@ void StepMap::print(const Maze& maze,
           os << (step == 0 ? C_YE : C_BL) << std::setw(3) << step << C_NO;
         }
       }
-      os << std::endl;
+      os << "\e[0K" << std::endl;  // clear from cursor position to end of line
     }
     /* Horizontal Wall Line */
     for (uint8_t x = 0; x < mazeSize; ++x) {
@@ -82,7 +82,7 @@ void StepMap::print(const Maze& maze,
       else
         os << (k ? (w ? "---" : "   ") : (C_RE " . " C_NO));
     }
-    os << '+' << std::endl;
+    os << '+' << "\e[0K" << std::endl;
   }
 }
 void StepMap::printFull(const Maze& maze,
