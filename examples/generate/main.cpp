@@ -15,9 +15,7 @@ void poll(Maze& maze) {
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
   const auto getRandomDirectionsAlong4 = [&]() {
-    Directions dirs;
-    for (const auto d : Direction::Along4)
-      dirs.push_back(d);
+    Directions dirs(Direction::Along4.begin(), Direction::Along4.end());
     std::shuffle(dirs.begin(), dirs.end(), engine);
     return dirs;
   };
@@ -79,16 +77,17 @@ void dig(Maze& maze) {
     /* print */
     // maze.print({p}), getc(stdin);
     /* walk */
-    Directions dirs;
-    for (const auto d : Direction::Along4)
-      dirs.push_back(d);
+    Directions dirs(Direction::Along4.begin(), Direction::Along4.end());
 #if 1
+    // 直進優先
     for (int i = 0; i < 2; ++i)
       dirs.push_back(Direction::Front);
     if (!stack.empty()) {
+      // 連続直進
       if (Direction(pose.d - stack.top().d) == Direction::Front)
-        for (int i = 0; i < 4; ++i)
+        for (int i = 0; i < 2; ++i)
           dirs.push_back(Direction::Front);
+      // 連続斜め直線
       if (Direction(pose.d - stack.top().d) == Direction::Left)
         for (int i = 0; i < 8; ++i)
           dirs.push_back(Direction::Right);

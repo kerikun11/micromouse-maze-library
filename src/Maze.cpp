@@ -310,9 +310,11 @@ void Maze::print(const Directions& dirs,
                  const size_t mazeSize) const {
   /* preparation */
   std::vector<Pose> path;
-  Position p = start;
-  for (const auto d : dirs)
-    path.push_back({p, d}), p = p.next(d);
+  {
+    Position p = start;
+    for (const auto d : dirs)
+      path.push_back({p, d}), p = p.next(d);
+  }
   const auto& maze = *this;
   /* start to draw maze */
   for (int8_t y = mazeSize; y >= 0; --y) {
@@ -417,12 +419,11 @@ bool Maze::backupWallRecordsToFile(const std::string& filepath,
   /* 前のデータが残っていたら削除 */
   std::ifstream ifs(filepath, std::ios::ate);
   const auto size = static_cast<size_t>(ifs.tellg());
+  ifs.close();
   if (clear || size / sizeof(WallRecord) > wallRecordsBackupCounter) {
-    ifs.close();
     std::remove(filepath.c_str());
     wallRecordsBackupCounter = 0;
   }
-  ifs.close();
   /* WallRecords を追記 */
   std::ofstream ofs(filepath, std::ios::binary | std::ios::app);
   if (ofs.fail()) {

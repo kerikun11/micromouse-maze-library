@@ -68,18 +68,20 @@ int test_position_identify() {
 
 #if 1
   /* Position Identification Run */
-  robot.display = 1;
-  const auto fake_offset = Pose(Position(0, 5), Direction::North);
-  robot.updateMaze(mazePi); /*< 探索直後の迷路に置き換える */
-  // robot.resetLastWalls(robot.getMaze().getWallRecords().size() / 2);
-  robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
-  bool res = robot.positionIdentifyRun(fake_offset);
-  if (!res) {
-    robot.printInfo();
-    std::cout << std::endl
-              << "Failed to Identify! offset:\t" << robot.fake_offset
-              << std::endl;
-    getc(stdin);
+  {
+    robot.display = 1;
+    const auto fake_offset = Pose(Position(0, 5), Direction::North);
+    robot.updateMaze(mazePi); /*< 探索直後の迷路に置き換える */
+    // robot.resetLastWalls(robot.getMaze().getWallRecords().size() / 2);
+    robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
+    bool res = robot.positionIdentifyRun(fake_offset);
+    if (!res) {
+      robot.printInfo();
+      std::cout << std::endl
+                << "Failed to Identify! offset:\t" << robot.fake_offset
+                << std::endl;
+      getc(stdin);
+    }
   }
 #endif
 
