@@ -44,8 +44,12 @@ class MazeSimulator : public MazeLib::RobotBase {
     for (int i = 0; i < MazeLib::MAZE_SIZE; ++i) {
       QFont font;
       font.setPointSize(font_size);
-      scene->addText(QString::number(i), font)->setPos((i + 0.25) * w, s * w);
-      scene->addText(QString::number(i), font)->setPos(-w, (s - i - 1) * w);
+      auto tx = scene->addText(QString::number(i), font);
+      tx->setPos((i + 0.25) * w, s * w);
+      tx->setDefaultTextColor(Qt::white);
+      auto ty = scene->addText(QString::number(i), font);
+      ty->setPos(-w, (s - i - 1) * w);
+      ty->setDefaultTextColor(Qt::white);
     }
     /* Print Cell Line */
     //        QPen pen;
