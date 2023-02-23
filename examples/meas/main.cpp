@@ -19,7 +19,7 @@ std::vector<std::string> getTargetMazeNames() {
   /* queue test files */
   std::vector<std::string> names;
 #if 0
-  names.push_back("32MM2021HX");
+  names.push_back("32MM2022HX");
   // names.push_back("32MM2015HX");  // max calc time is longest in 32x32
   // names.push_back("16MM2014CX");  // max calc time is longest in 16x16
   // names.push_back("32_no_wall");
@@ -29,7 +29,7 @@ std::vector<std::string> getTargetMazeNames() {
   // names.push_back("32_unknown");
   // names.push_back("32_fake");
 #else
-  for (int year = 2021; year >= 2008; --year)
+  for (int year = 2022; year >= 2008; --year)
     if (year != 2020)
       names.push_back("32MM" + std::to_string(year) + "HX");
 #if 1
