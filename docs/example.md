@@ -60,7 +60,7 @@ rm -rf build
 ### インストールコマンドの例
 
 ```sh
-# Ubuntu 20.04
+# Ubuntu 22.04
 apt install git make cmake gcc g++ \
     python3-matplotlib \
     python3-dev \
@@ -68,7 +68,7 @@ apt install git make cmake gcc g++ \
     python3-pybind11 \
     doxygen graphviz \
     libgtest-dev lcov \
-    qt5-default
+    qtbase5-dev
 # Arch Linux
 yay -S --needed git make cmake gcc \
     python-matplotlib \
