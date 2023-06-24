@@ -69,9 +69,7 @@ void setup() {
       },
       "meas", 4096, NULL, configMAX_PRIORITIES, NULL, PRO_CPU_NUM);
 }
-void loop() {
-  vTaskDelay(portMAX_DELAY);
-}
+void loop() { vTaskDelay(portMAX_DELAY); }
 
 /* called by esp-idf */
 #if 0

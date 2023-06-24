@@ -671,9 +671,7 @@ class Maze {
   void setWall(const Position p, const Direction d, const bool b) {
     return setWallBase(wall, WallIndex(p, d), b);
   }
-  void setWall(const int8_t x,
-               const int8_t y,
-               const Direction d,
+  void setWall(const int8_t x, const int8_t y, const Direction d,
                const bool b) {
     return setWallBase(wall, WallIndex(Position(x, y), d), b);
   }
@@ -699,9 +697,7 @@ class Maze {
   void setKnown(const Position p, const Direction d, const bool b) {
     return setWallBase(known, WallIndex(p, d), b);
   }
-  void setKnown(const int8_t x,
-                const int8_t y,
-                const Direction d,
+  void setKnown(const int8_t x, const int8_t y, const Direction d,
                 const bool b) {
     return setWallBase(known, WallIndex(Position(x, y), d), b);
   }
@@ -724,9 +720,7 @@ class Maze {
    * @return true: 正常に更新された
    * @return false: 既知の情報と不一致だった
    */
-  bool updateWall(const Position p,
-                  const Direction d,
-                  const bool b,
+  bool updateWall(const Position p, const Direction d, const bool b,
                   const bool pushRecords = true);
   /**
    * @brief 直前に更新した壁を見探索状態にリセットする
@@ -758,8 +752,7 @@ class Maze {
    * @param os output-stream
    * @param mazeSize 迷路の1辺の区画数（正方形のみ対応）
    */
-  void print(const Directions& dirs,
-             const Position start = Position(0, 0),
+  void print(const Directions& dirs, const Position start = Position(0, 0),
              std::ostream& os = std::cout,
              const size_t mazeSize = MAZE_SIZE) const;
   /**
@@ -768,8 +761,7 @@ class Maze {
    * @param os output-stream
    * @param mazeSize 迷路の1辺の区画数（正方形のみ対応）
    */
-  void print(const Positions& positions,
-             std::ostream& os = std::cout,
+  void print(const Positions& positions, std::ostream& os = std::cout,
              const size_t mazeSize = MAZE_SIZE) const;
   /**
    * @brief 特定の迷路の文字列(*.maze ファイル)から壁をパースする
@@ -867,8 +859,7 @@ class Maze {
   /**
    * @brief 壁の更新のベース関数。迷路外を参照すると無視される。
    */
-  void setWallBase(std::bitset<WallIndex::SIZE>& wall,
-                   const WallIndex i,
+  void setWallBase(std::bitset<WallIndex::SIZE>& wall, const WallIndex i,
                    const bool b) const {
     if (i.isInsideOfField())  //< 範囲外アクセスの防止
       wall[i.getIndex()] = b;

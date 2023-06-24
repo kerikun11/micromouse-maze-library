@@ -7,13 +7,13 @@
  */
 #pragma once
 
-#include "MazeLib/RobotBase.h"
-
 #include <algorithm> /*< for std::find */
 #include <chrono>
 #include <cstdio>  /*< for std::printf */
 #include <iomanip> /*< for std::setw */
 #include <memory>  /*< for std::make_unique */
+
+#include "MazeLib/RobotBase.h"
 
 namespace MazeLib {
 
@@ -100,8 +100,7 @@ class CLRobotBase : public RobotBase {
     queueNextDirections(getShortestDirections());
     /* real を最短後の位置に移動 */
     Position p = maze.getStart();
-    for (const auto d : getShortestDirections())
-      p = p.next(d);
+    for (const auto d : getShortestDirections()) p = p.next(d);
     real = Pose(p, getShortestDirections().back());
     /* スタート区画に帰る */
     if (!endFastRunBackingToStartRun()) {
@@ -137,8 +136,7 @@ class CLRobotBase : public RobotBase {
       for (int8_t y = 0; y < MAZE_SIZE; ++y) {
         for (const auto d : Direction::Along4) {
           const auto p = Position(x, y);
-          if (p == Position(0, 0))
-            continue; /*< スタート区画は除外 */
+          if (p == Position(0, 0)) continue; /*< スタート区画は除外 */
           if (stepMap.getStep(p) == StepMap::STEP_MAX)
             continue; /*< そもそも迷路的に行き得ない区画は除外 */
           if (mazeTarget.isWall(p, d + Direction::Back))
@@ -226,8 +224,7 @@ class CLRobotBase : public RobotBase {
 #endif
     calc_time_max = std::max(calc_time_max, tCalc);
     calcNextDirectionsData.push_back({getState(), getCurrentPose(), tCalc});
-    if (newState == oldState)
-      return;
+    if (newState == oldState) return;
     /* State Change has occurred */
     if (oldState == SearchAlgorithm::IDENTIFYING_POSITION) {
       const auto walls =
@@ -292,31 +289,27 @@ class CLRobotBase : public RobotBase {
         break;
       case RobotBase::TURN_L:
         real.d = real.d + Direction::Left;
-        if (!mazeTarget.canGo(real.p, real.d))
-          crashed();
+        if (!mazeTarget.canGo(real.p, real.d)) crashed();
         real.p = real.p.next(real.d);
         l++;
         step++;
         break;
       case RobotBase::TURN_R:
         real.d = real.d + Direction::Right;
-        if (!mazeTarget.canGo(real.p, real.d))
-          crashed();
+        if (!mazeTarget.canGo(real.p, real.d)) crashed();
         real.p = real.p.next(real.d);
         r++;
         step++;
         break;
       case RobotBase::ROTATE_180:
         real.d = real.d + Direction::Back;
-        if (!mazeTarget.canGo(real.p, real.d))
-          crashed();
+        if (!mazeTarget.canGo(real.p, real.d)) crashed();
         real.p = real.p.next(real.d);
         b++;
         step++;
         break;
       case RobotBase::ST_FULL:
-        if (!mazeTarget.canGo(real.p, real.d))
-          crashed();
+        if (!mazeTarget.canGo(real.p, real.d)) crashed();
         real.p = real.p.next(real.d);
         /* 未知区間加速 */
         if (getUnknownAccelFlag() && action_prev == action)
@@ -380,8 +373,7 @@ class CLRobotBase : public RobotBase {
     for (int i = 0; i < 2; ++i) {
       StepMap::step_t maxStep = 0;
       for (const auto step : stepMap[i]->getMapArray())
-        if (step != StepMap::STEP_MAX)
-          maxStep = std::max(maxStep, step);
+        if (step != StepMap::STEP_MAX) maxStep = std::max(maxStep, step);
       simple[i] = (maxStep < 999);
     }
     /* start to draw maze */

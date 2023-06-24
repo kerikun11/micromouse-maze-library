@@ -30,8 +30,7 @@ std::vector<std::string> getTargetMazeNames() {
   // names.push_back("32_fake");
 #else
   for (int year = 2022; year >= 2008; --year)
-    if (year != 2020)
-      names.push_back("32MM" + std::to_string(year) + "HX");
+    if (year != 2020) names.push_back("32MM" + std::to_string(year) + "HX");
 #if 1
   for (int year = 2018; year >= 2014; --year)
     names.push_back("21MM" + std::to_string(year) + "HX_Taiwan");
@@ -214,8 +213,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
         shortestDirections =
             map.calcShortestDirections(maze, knownOnly, simple);
         const auto t_e = robot.microseconds();
-        if (shortestDirections.empty())
-          MAZE_LOGE << "Failed!" << std::endl;
+        if (shortestDirections.empty()) MAZE_LOGE << "Failed!" << std::endl;
         sum += t_e - t_s;
       }
       std::cout << "StepMap " << (simple ? "simple" : "normal") << ":\t"
@@ -246,8 +244,7 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
         shortestDirections =
             map.calcShortestDirections(maze, knownOnly, simple);
         const auto t_e = robot.microseconds();
-        if (shortestDirections.empty())
-          MAZE_LOGE << "Failed!" << std::endl;
+        if (shortestDirections.empty()) MAZE_LOGE << "Failed!" << std::endl;
         sum += t_e - t_s;
       }
       std::cout << "StepMapWall " << (simple ? "s" : "n") << ":\t" << sum / n
@@ -328,6 +325,4 @@ int test_meas(const std::string& mazedata_dir = "../mazedata/data/",
   return 0;
 }
 
-int main(void) {
-  return test_meas();
-}
+int main(void) { return test_meas(); }

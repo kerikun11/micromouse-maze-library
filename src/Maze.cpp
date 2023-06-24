@@ -26,8 +26,7 @@ const std::array<Direction, 4> Direction::Diag4 = {
     SouthEast,
 };
 std::ostream& operator<<(std::ostream& os, const Directions& obj) {
-  for (const auto d : obj)
-    os << d;
+  for (const auto d : obj) os << d;
   return os;
 }
 
@@ -140,17 +139,14 @@ int8_t Maze::unknownCount(const Position p) const {
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        [&](const Direction d) { return !isKnown(p, d); });
 }
-bool Maze::updateWall(const Position p,
-                      const Direction d,
-                      const bool b,
+bool Maze::updateWall(const Position p, const Direction d, const bool b,
                       const bool pushRecords) {
   /* 既知の壁と食い違いがあったら未知壁としてreturn */
   if (isKnown(p, d) && isWall(p, d) != b) {
     setWall(p, d, false);
     setKnown(p, d, false);
     /* ログに追加 */
-    if (pushRecords)
-      wallRecords.push_back(WallRecord(p, d, b));
+    if (pushRecords) wallRecords.push_back(WallRecord(p, d, b));
     return false;
   }
   /* 未知壁なら壁情報を更新 */
@@ -158,8 +154,7 @@ bool Maze::updateWall(const Position p,
     setWall(p, d, b);
     setKnown(p, d, true);
     /* ログに追加 */
-    if (pushRecords)
-      wallRecords.push_back(WallRecord(p, d, b));
+    if (pushRecords) wallRecords.push_back(WallRecord(p, d, b));
     /* 最大最小区画を更新 */
     min_x = std::min(p.x, min_x);
     min_y = std::min(p.y, min_y);
@@ -170,8 +165,7 @@ bool Maze::updateWall(const Position p,
 }
 void Maze::resetLastWalls(const int num, const bool set_start_wall) {
   /* 直近の壁情報を削除 */
-  for (int i = 0; i < num && !wallRecords.empty(); ++i)
-    wallRecords.pop_back();
+  for (int i = 0; i < num && !wallRecords.empty(); ++i) wallRecords.pop_back();
   /* 削除後の壁情報を取得 */
   const auto new_wallRecords = wallRecords;
   /* スタート壁を考慮して迷路を再構築 */
@@ -189,8 +183,7 @@ bool Maze::parse(std::istream& is) {
   /* estimated (minimum) file size [byte] : F = (4*M + 1 + 1) * (2*M + 1) */
   /* using quadratic formula, we have: M = (sqrt(2*F) - 2) / 4 */
   const int mazeSize = (std::sqrt(2 * file_size) - 2) / 4;
-  if (mazeSize < 1)
-    return false; /*< file size error */
+  if (mazeSize < 1) return false; /*< file size error */
   /* reset existing maze */
   reset(), goals.clear();
   char c;  //< temporal variable to use next
@@ -217,8 +210,7 @@ bool Maze::parse(std::istream& is) {
     for (uint8_t x = 0; x < mazeSize; ++x) {
       is >> c;  //< skip until next '+' or 'o'
       std::string s;
-      for (int i = 0; i < 3; ++i)
-        s += (char)is.get();
+      for (int i = 0; i < 3; ++i) s += (char)is.get();
       if (s == "---")
         Maze::updateWall(Position(x, y), Direction::South, true, false);
       else if (s == "   ")
@@ -304,16 +296,13 @@ void Maze::print(std::ostream& os, const int mazeSize) const {
     os << '+' << std::endl;
   }
 }
-void Maze::print(const Directions& dirs,
-                 const Position start,
-                 std::ostream& os,
+void Maze::print(const Directions& dirs, const Position start, std::ostream& os,
                  const size_t mazeSize) const {
   /* preparation */
   std::vector<Pose> path;
   {
     Position p = start;
-    for (const auto d : dirs)
-      path.push_back({p, d}), p = p.next(d);
+    for (const auto d : dirs) path.push_back({p, d}), p = p.next(d);
   }
   const auto& maze = *this;
   /* start to draw maze */
@@ -333,8 +322,7 @@ void Maze::print(const Directions& dirs,
         else
           os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
         /* Breaking Condition */
-        if (x == mazeSize)
-          break;
+        if (x == mazeSize) break;
         /* Cell */
         const auto p = Position(x, y);
         if (p == start)
@@ -366,8 +354,7 @@ void Maze::print(const Directions& dirs,
     os << '+' << std::endl;
   }
 }
-void Maze::print(const Positions& positions,
-                 std::ostream& os,
+void Maze::print(const Positions& positions, std::ostream& os,
                  const size_t mazeSize) const {
   /* preparation */
   const auto exists = [&](const Position p) {
@@ -384,8 +371,7 @@ void Maze::print(const Positions& positions,
         const auto k = maze.isKnown(x, y, Direction::West);
         os << (k ? (w ? "|" : " ") : (C_RE "." C_NO));
         /* Breaking Condition */
-        if (x == mazeSize)
-          break;
+        if (x == mazeSize) break;
         /* Cell */
         const auto p = Position(x, y);
         if (p == start)
@@ -414,8 +400,7 @@ void Maze::print(const Positions& positions,
 bool Maze::backupWallRecordsToFile(const std::string& filepath,
                                    const bool clear) {
   /* 変更なし */
-  if (!clear && wallRecordsBackupCounter == wallRecords.size())
-    return true;
+  if (!clear && wallRecordsBackupCounter == wallRecords.size()) return true;
   /* 前のデータが残っていたら削除 */
   std::ifstream ifs(filepath, std::ios::ate);
   const auto size = static_cast<size_t>(ifs.tellg());

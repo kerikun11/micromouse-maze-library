@@ -19,8 +19,7 @@ class QMazeView : public QGraphicsView {
             const auto wi = MazeLib::WallIndex(x, y, z);
             const auto wl =
                 scene->addLine(getWallLine(wi), getWallPen(true, true));
-            if (wi.isInsideOfField())
-              wall_lines[wi.getIndex()] = wl;
+            if (wi.isInsideOfField()) wall_lines[wi.getIndex()] = wl;
           }
     for (int i = 0; i < MazeLib::MAZE_SIZE; ++i) {
       const int w = px_wall;
@@ -36,8 +35,7 @@ class QMazeView : public QGraphicsView {
           drawWall(maze, MazeLib::WallIndex(x, y, z));
   }
   void drawWall(const MazeLib::Maze& maze, const MazeLib::WallIndex& wi) {
-    if (!wi.isInsideOfField())
-      return;
+    if (!wi.isInsideOfField()) return;
     const auto is_wall = maze.isWall(wi);
     const auto is_known = maze.isKnown(wi);
     wall_lines[wi.getIndex()]->setPen(getWallPen(is_wall, is_known));

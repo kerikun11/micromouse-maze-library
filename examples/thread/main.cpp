@@ -1,6 +1,6 @@
-#include "MazeLib/CLRobotBase.h"
-
 #include <thread>
+
+#include "MazeLib/CLRobotBase.h"
 
 using namespace MazeLib;
 
@@ -85,8 +85,7 @@ int main(void) {
   /* parallel */
   for (const auto& name : names)
     threads.push_back(std::thread([&] { thread_maze(name); }));
-  for (std::thread& th : threads)
-    th.join();
+  for (std::thread& th : threads) th.join();
 #else
   /* serial */
   for (const auto& name : names) {

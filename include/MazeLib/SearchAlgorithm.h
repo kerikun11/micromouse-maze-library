@@ -86,14 +86,9 @@ class SearchAlgorithm {
    * @brief 壁の更新
    * @details 現在の探索状態を考慮して迷路情報を更新する
    */
-  bool updateWall(const State state,
-                  const Pose& pose,
-                  const bool left,
-                  const bool front,
-                  const bool right);
-  bool updateWall(const State state,
-                  const Position p,
-                  const Direction d,
+  bool updateWall(const State state, const Pose& pose, const bool left,
+                  const bool front, const bool right);
+  bool updateWall(const State state, const Position p, const Direction d,
                   const bool b);
   /**
    * @brief 直近の壁情報の削除
@@ -131,8 +126,7 @@ class SearchAlgorithm {
    * @retval false 失敗
    */
   bool calcShortestDirections(
-      Directions& shortestDirections,
-      const bool diagEnabled = true,
+      Directions& shortestDirections, const bool diagEnabled = true,
       const StepMapSlalom::EdgeCost& edgeCost = StepMapSlalom::EdgeCost());
   /**
    * @brief 自己位置同定の初期化
@@ -210,8 +204,7 @@ class SearchAlgorithm {
    * @param[inout] calcData 事前計算の結果
    * @return Pose 既知区間の最終姿勢
    */
-  const Pose calcNextDirectionsInAdvance(Maze& maze,
-                                         const Positions& dest,
+  const Pose calcNextDirectionsInAdvance(Maze& maze, const Positions& dest,
                                          CalcData& calcData);
 };
 

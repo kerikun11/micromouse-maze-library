@@ -7,9 +7,9 @@
  */
 #pragma once
 
-#include "MazeLib/Maze.h"
-
 #include <limits> /*< for std::numeric_limits */
+
+#include "MazeLib/Maze.h"
 
 namespace MazeLib {
 
@@ -89,11 +89,8 @@ class StepMapSlalom {
      * @param seg 1マスの長さ
      * @return StepMap::step_t コスト
      */
-    static cost_t calcStraightCost(const int i,
-                                   const float am,
-                                   const float vs,
-                                   const float vm,
-                                   const float seg) {
+    static cost_t calcStraightCost(const int i, const float am, const float vs,
+                                   const float vm, const float seg) {
       const auto d = seg * i; /*< i 区画分の走行距離 */
       /* グラフの面積から時間を求める */
       const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
@@ -262,14 +259,12 @@ class StepMapSlalom {
   /**
    * @brief ステップマップを表示する関数
    */
-  void print(const Maze& maze,
-             const Indexes& indexes,
+  void print(const Maze& maze, const Indexes& indexes,
              std::ostream& os = std::cout) const;
   /**
    * @brief 迷路上に Indexes を表示する関数
    */
-  void printPath(const Maze& maze,
-                 const Indexes& indexes,
+  void printPath(const Maze& maze, const Indexes& indexes,
                  std::ostream& os = std::cout) const;
   /**
    * @brief コストマップの更新
@@ -278,9 +273,7 @@ class StepMapSlalom {
    * @param dest 目的地の集合
    * @param knownOnly 既知壁のみを通過可能とする
    */
-  void update(const Maze& maze,
-              const EdgeCost& edgeCost,
-              const Indexes& dest,
+  void update(const Maze& maze, const EdgeCost& edgeCost, const Indexes& dest,
               const bool knownOnly);
   /**
    * @brief 最短経路を導出する
@@ -288,8 +281,7 @@ class StepMapSlalom {
    * @param edgeCost エッジコストオブジェクト
    * @param knownOnly 既知壁のみを通行可能とする
    */
-  Directions calcShortestDirections(const Maze& maze,
-                                    const EdgeCost& edgeCost,
+  Directions calcShortestDirections(const Maze& maze, const EdgeCost& edgeCost,
                                     const bool knownOnly);
   /**
    * @brief コストマップを辿って経路を生成する

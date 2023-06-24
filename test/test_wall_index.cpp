@@ -1,6 +1,6 @@
-#include "MazeLib/Maze.h"
-
 #include <gtest/gtest.h>
+
+#include "MazeLib/Maze.h"
 
 using namespace MazeLib;
 

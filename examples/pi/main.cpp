@@ -1,6 +1,6 @@
-#include "MazeLib/CLRobotBase.h"
-
 #include <thread>
+
+#include "MazeLib/CLRobotBase.h"
 
 using namespace MazeLib;
 
@@ -20,8 +20,7 @@ class CLRobot : public CLRobotBase {
       SearchAlgorithm::State oldState,
       SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirectionsPostCallback(oldState, newState);
-    if (newState == oldState)
-      return;
+    if (newState == oldState) return;
     /* state change has occurred */
     if (oldState == SearchAlgorithm::IDENTIFYING_POSITION) {
       display = 0;
@@ -53,8 +52,7 @@ int test_position_identify() {
   // const std::string filename = "32MM2021HX.maze";
   const std::string filename = "16MM2014CX.maze";  //< straight at start
   Maze mazeTarget;
-  if (!mazeTarget.parse((mazedata_dir + filename).c_str()))
-    return -1;
+  if (!mazeTarget.parse((mazedata_dir + filename).c_str())) return -1;
   const auto p_robot = std::make_unique<CLRobot>(mazeTarget);
   CLRobot& robot = *p_robot;
   robot.replaceGoals(mazeTarget.getGoals());
@@ -95,8 +93,7 @@ int test_position_identify() {
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
       for (const auto d : Direction::Along4) {
         const auto p = Position(x, y);
-        if (p == Position(0, 0))
-          continue; /*< スタートは除外 */
+        if (p == Position(0, 0)) continue; /*< スタートは除外 */
         if (stepMap.getStep(p) == StepMap::STEP_MAX)
           continue; /*< そもそも迷路的に行き得ない区画は除外 */
         if (mazeTarget.isWall(p, d + Direction::Back))
@@ -122,6 +119,4 @@ int test_position_identify() {
   return 0;
 }
 
-int main(void) {
-  return test_position_identify();
-}
+int main(void) { return test_position_identify(); }

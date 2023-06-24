@@ -1,6 +1,6 @@
-#include "MazeLib/CLRobotBase.h"
-
 #include <thread>
+
+#include "MazeLib/CLRobotBase.h"
 
 using namespace MazeLib;
 
@@ -18,8 +18,7 @@ class CLRobot : public CLRobotBase {
       SearchAlgorithm::State oldState,
       SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirectionsPostCallback(oldState, newState);
-    if (newState == oldState)
-      return;
+    if (newState == oldState) return;
     /* State Change has occurred */
   }
   virtual void crashed() override {
@@ -52,8 +51,7 @@ int main(int argc, char* argv[]) {
   const std::string filepath =
       argc > 1 ? std::string(argv[1]) : filepath_default;
   Maze mazeTarget;
-  if (!mazeTarget.parse(filepath))
-    return -1;
+  if (!mazeTarget.parse(filepath)) return -1;
   const auto p_robot = std::make_unique<CLRobot>(mazeTarget);
   CLRobot& robot = *p_robot;
   robot.replaceGoals(mazeTarget.getGoals());

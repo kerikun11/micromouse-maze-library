@@ -1,6 +1,6 @@
-#include "MazeLib/CLRobotBase.h"
-
 #include <gtest/gtest.h>
+
+#include "MazeLib/CLRobotBase.h"
 
 using namespace MazeLib;
 

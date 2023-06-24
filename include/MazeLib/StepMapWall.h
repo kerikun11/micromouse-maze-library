@@ -7,9 +7,9 @@
  */
 #pragma once
 
-#include "MazeLib/Maze.h"
-
 #include <limits> /*< for std::numeric_limits */
+
+#include "MazeLib/Maze.h"
 
 namespace MazeLib {
 
@@ -42,29 +42,24 @@ class StepMapWall {
    * @details 盤面外なら何もしない
    */
   void setStep(const WallIndex i, const step_t step) {
-    if (i.isInsideOfField())
-      stepMap[i.getIndex()] = step;
+    if (i.isInsideOfField()) stepMap[i.getIndex()] = step;
   }
   /**
    * @brief ステップマップの表示
    */
-  void print(const Maze& maze,
-             const WallIndexes& indexes,
+  void print(const Maze& maze, const WallIndexes& indexes,
              const bool showFullStep = false,
              std::ostream& os = std::cout) const;
-  void print(const Maze& maze,
-             const Directions& shortestDirections,
+  void print(const Maze& maze, const Directions& shortestDirections,
              const WallIndex& start = START_WALL_INDEX,
              const bool showFullStep = false,
              std::ostream& os = std::cout) const;
   /**
    * @brief 迷路上に WallIndex パスを表示
    */
-  void printPath(const Maze& maze,
-                 const WallIndexes& indexes,
+  void printPath(const Maze& maze, const WallIndexes& indexes,
                  std::ostream& os = std::cout) const;
-  void printPath(const Maze& maze,
-                 const Directions& shortestDirections,
+  void printPath(const Maze& maze, const Directions& shortestDirections,
                  const WallIndex& start = START_WALL_INDEX,
                  std::ostream& os = std::cout) const;
   /**
@@ -75,26 +70,19 @@ class StepMapWall {
    * @param knownOnly 既知壁のみで更新(未知壁は壁ありとみなす)
    * @param simple 台形加速を考慮しないシンプルな更新
    */
-  void update(const Maze& maze,
-              const WallIndexes& dest,
-              const bool knownOnly,
+  void update(const Maze& maze, const WallIndexes& dest, const bool knownOnly,
               const bool simple);
-  Directions calcShortestDirections(const Maze& maze,
-                                    const bool knownOnly,
+  Directions calcShortestDirections(const Maze& maze, const bool knownOnly,
                                     const bool simple) {
     return calcShortestDirections(maze, START_WALL_INDEX,
                                   convertDestinations(maze, maze.getGoals()),
                                   knownOnly, simple);
   }
-  Directions calcShortestDirections(const Maze& maze,
-                                    const WallIndex& start,
+  Directions calcShortestDirections(const Maze& maze, const WallIndex& start,
                                     const WallIndexes& dest,
-                                    const bool knownOnly,
-                                    const bool simple);
-  Directions getStepDownDirections(const Maze& maze,
-                                   const WallIndex& start,
-                                   WallIndex& end,
-                                   const bool knownOnly,
+                                    const bool knownOnly, const bool simple);
+  Directions getStepDownDirections(const Maze& maze, const WallIndex& start,
+                                   WallIndex& end, const bool knownOnly,
                                    const bool simple,
                                    const bool breakUnknown) const;
   static WallIndexes convertDestinations(const Maze& maze,
@@ -104,8 +92,7 @@ class StepMapWall {
   static Directions convertWallIndexDirectionsToPositionDirections(
       const Directions& src);
   static void appendStraightDirections(
-      const Maze& maze,
-      Directions& shortestDirections,
+      const Maze& maze, Directions& shortestDirections,
       const WallIndex& start = START_WALL_INDEX);
 
 #if MAZE_DEBUG_PROFILING

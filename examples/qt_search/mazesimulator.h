@@ -1,8 +1,6 @@
 #ifndef MAZESIMULATOR_H
 #define MAZESIMULATOR_H
 
-#include "ui_mainwindow.h"
-
 #include <MazeLib/Maze.h>
 #include <MazeLib/RobotBase.h>
 
@@ -11,8 +9,9 @@
 #include <QGraphicsScene>
 #include <QMainWindow>
 #include <QTimer>
-
 #include <sstream>
+
+#include "ui_mainwindow.h"
 
 using namespace MazeLib;
 
@@ -128,18 +127,15 @@ class MazeSimulator : public MazeLib::RobotBase {
                          cell2posY(p.y) - wall_unit_px / 2));
     scene->addPolygon(pol, QPen(Qt::yellow), QBrush(Qt::yellow));
   }
-  bool drawShortest(const Maze& maze,
-                    const bool diagEnabled,
+  bool drawShortest(const Maze& maze, const bool diagEnabled,
                     const StepMapSlalom::EdgeCost& edgeCost = {}) {
     Maze maze_tmp = maze;
     SearchAlgorithm sa(maze_tmp);
     Directions dirs;
-    if (!sa.calcShortestDirections(dirs, diagEnabled, edgeCost))
-      return false;
+    if (!sa.calcShortestDirections(dirs, diagEnabled, edgeCost)) return false;
     auto p = maze.getStart();
     for (size_t i = 0; i < dirs.size(); ++i) {
-      if (diagEnabled && i == dirs.size() - 1)
-        break;
+      if (diagEnabled && i == dirs.size() - 1) break;
       const auto d = dirs[i];
       const auto next_p = p.next(d);
       const auto next_d = diagEnabled ? dirs[i + 1] : d;
@@ -164,13 +160,11 @@ class MazeSimulator : public MazeLib::RobotBase {
     const bool diagEnabled = false;
     StepMap map;
     Directions dirs = map.calcShortestDirections(maze, knownOnly, simple);
-    if (dirs.empty())
-      return false;
+    if (dirs.empty()) return false;
     StepMap::appendStraightDirections(maze, dirs, knownOnly, diagEnabled);
     auto p = maze.getStart();
     for (size_t i = 0; i < dirs.size(); ++i) {
-      if (diagEnabled && i == dirs.size() - 1)
-        break;
+      if (diagEnabled && i == dirs.size() - 1) break;
       const auto d = dirs[i];
       const auto next_p = p.next(d);
       const auto next_d = diagEnabled ? dirs[i + 1] : d;
@@ -191,8 +185,7 @@ class MazeSimulator : public MazeLib::RobotBase {
     const bool diagEnabled = true;
     StepMapWall map;
     Directions dirs = map.calcShortestDirections(maze, knownOnly, simple);
-    if (dirs.empty())
-      return false;
+    if (dirs.empty()) return false;
     map.appendStraightDirections(maze, dirs);
     auto p = WallIndex(0, 0, 1);
     for (size_t i = 0; i < dirs.size(); ++i) {
@@ -239,8 +232,7 @@ class MazeSimulator : public MazeLib::RobotBase {
     }
   }
   void next(int n = 1) {
-    for (int i = 0; i < n; ++i)
-      loop->exit();
+    for (int i = 0; i < n; ++i) loop->exit();
   }
 
  protected:
@@ -262,8 +254,7 @@ class MazeSimulator : public MazeLib::RobotBase {
   virtual void calcNextDirectionsPostCallback(
       SearchAlgorithm::State oldState,
       SearchAlgorithm::State newState) override {
-    if (newState == oldState)
-      return;
+    if (newState == oldState) return;
     /* State Change has occurred */
   }
   virtual void discrepancyWithKnownWall() override {
@@ -280,8 +271,7 @@ class MazeSimulator : public MazeLib::RobotBase {
     draw();
     /* block */
     int code = loop->exec();
-    if (code < 0)
-      return;
+    if (code < 0) return;
     /* release */
   }
 
@@ -309,8 +299,7 @@ class MazeSimulator : public MazeLib::RobotBase {
     return QPoint(p1.x() + cell2posX(p.x) + wall_unit_px / 2,
                   p1.y() + cell2posY(p.y) - wall_unit_px / 2);
   }
-  QGraphicsItem* addWall(QGraphicsScene* scene,
-                         const MazeLib::Pose& pose,
+  QGraphicsItem* addWall(QGraphicsScene* scene, const MazeLib::Pose& pose,
                          const QPen& pen) {
     int x = pose.p.x;
     int y = pose.p.y;

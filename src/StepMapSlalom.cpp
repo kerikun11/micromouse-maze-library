@@ -97,14 +97,11 @@ Directions StepMapSlalom::calcShortestDirections(const Maze& maze,
   const auto dest = convertDestinations(maze.getGoals());
   update(maze, edgeCost, dest, knownOnly);
   Indexes path;
-  if (!genPathFromMap(path))
-    return {};
+  if (!genPathFromMap(path)) return {};
   return indexes2directions(path); /*< 区画ベースの方向列 */
 }
-void StepMapSlalom::update(const Maze& maze,
-                           const EdgeCost& edgeCost,
-                           const Indexes& dest,
-                           const bool knownOnly) {
+void StepMapSlalom::update(const Maze& maze, const EdgeCost& edgeCost,
+                           const Indexes& dest, const bool knownOnly) {
   /* 全ノードのコストを最大値に設定 */
   const auto cost = CostMax;
   costMap.fill(cost);
@@ -130,8 +127,7 @@ void StepMapSlalom::update(const Maze& maze,
 #endif
   /* knownOnly を考慮した壁の判定式を用意 */
   const auto canGo = [&](const WallIndex& i) {
-    if (maze.isWall(i) || (knownOnly && !maze.isKnown(i)))
-      return false;
+    if (maze.isWall(i) || (knownOnly && !maze.isKnown(i))) return false;
     return true;
   };
   /* 更新がなくなるまで更新 */
@@ -149,15 +145,13 @@ void StepMapSlalom::update(const Maze& maze,
     const auto focus_cost = costMap[focus.getIndex()];
     /* 枝刈り */
 #if STEP_MAP_USE_PRIORITY_QUEUE
-    if (focus_cost < focus_cost_q)
-      continue;
+    if (focus_cost < focus_cost_q) continue;
 #endif
     /* キューに追加する関数を用意 */
     const auto pushAndContinue = [&](const Index& next, const cost_t edgeCost) {
       const cost_t next_cost = focus_cost + edgeCost;
       const auto next_index = next.getIndex();
-      if (costMap[next_index] <= next_cost)
-        return false;
+      if (costMap[next_index] <= next_cost) return false;
       costMap[next_index] = next_cost;
       fromMap[next_index] = focus;
 #if STEP_MAP_USE_PRIORITY_QUEUE
@@ -170,14 +164,12 @@ void StepMapSlalom::update(const Maze& maze,
     const auto nd = focus.getNodeDirection();
     if (nd.isAlong()) { /* 区画の中央 */
       /* 直前の壁 */
-      if (!canGo(focus))
-        continue;
+      if (!canGo(focus)) continue;
       /* 直進で行けるところまで行く */
       int8_t n = 1;
       for (auto i = focus; canGo(i); ++n) {
         const auto next = i.next(nd);
-        if (!pushAndContinue(next, edgeCost.getEdgeCostAlong(n)))
-          break;
+        if (!pushAndContinue(next, edgeCost.getEdgeCostAlong(n))) break;
         i = next;
       }
       /* ターン */
@@ -218,10 +210,8 @@ void StepMapSlalom::update(const Maze& maze,
       int8_t n = 1;
       for (auto i = i_f;; ++n) {
         const auto next = i.next(nd);
-        if (!canGo(next))
-          break;
-        if (!pushAndContinue(i, edgeCost.getEdgeCostDiag(n)))
-          break;
+        if (!canGo(next)) break;
+        if (!pushAndContinue(i, edgeCost.getEdgeCostDiag(n))) break;
         i = next;
       }
       /* ターン */
@@ -249,22 +239,18 @@ bool StepMapSlalom::genPathFromMap(Indexes& path) const {
   while (1) {
     path.push_back(i.opposite());
     /* ゴールなら終了 */
-    if (costMap[i.getIndex()] == 0)
-      break;
+    if (costMap[i.getIndex()] == 0) break;
     /* 移動元を確認 */
     const auto i_from = fromMap[i.getIndex()];
-    if (!i_from.getWallIndex().isInsideOfField())
-      return false;
+    if (!i_from.getWallIndex().isInsideOfField()) return false;
     /* コストが減っていなかったらおかしい */
-    if (costMap[i.getIndex()] <= costMap[i_from.getIndex()])
-      return false;
+    if (costMap[i.getIndex()] <= costMap[i_from.getIndex()]) return false;
     i = fromMap[i.getIndex()];
   }
   /* ゴールにたどり着いた */
   return true;
 }
-void StepMapSlalom::print(const Maze& maze,
-                          const Indexes& indexes,
+void StepMapSlalom::print(const Maze& maze, const Indexes& indexes,
                           std::ostream& os) const {
   const auto exists = [&](const Index& i) {
     return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index& ii) {
@@ -331,8 +317,7 @@ void StepMapSlalom::print(const Maze& maze,
     }
   }
 }
-void StepMapSlalom::printPath(const Maze& maze,
-                              const Indexes& indexes,
+void StepMapSlalom::printPath(const Maze& maze, const Indexes& indexes,
                               std::ostream& os) const {
   const auto exists = [&](const Index& i) {
     return std::find_if(indexes.cbegin(), indexes.cend(), [&](const Index& ii) {
@@ -378,8 +363,7 @@ StepMapSlalom::Indexes StepMapSlalom::convertDestinations(
   Indexes dest;
   dest.reserve(src.size() * 4);
   for (const auto p : src)
-    for (const auto nd : Direction::Along4)
-      dest.push_back(Index(p, nd));
+    for (const auto nd : Direction::Along4) dest.push_back(Index(p, nd));
   return dest;
 }
 Directions StepMapSlalom::indexes2directions(const Indexes& path) {

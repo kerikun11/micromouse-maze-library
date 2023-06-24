@@ -16,18 +16,15 @@ namespace MazeLib {
 
 const WallIndex StepMapWall::START_WALL_INDEX = WallIndex(0, 0, 1);
 
-void StepMapWall::print(const Maze& maze,
-                        const WallIndexes& indexes,
-                        const bool showFullStep,
-                        std::ostream& os) const {
+void StepMapWall::print(const Maze& maze, const WallIndexes& indexes,
+                        const bool showFullStep, std::ostream& os) const {
   const int mazeSize = MAZE_SIZE;
   const auto find = [&](const WallIndex& i) {
     return std::find(indexes.cbegin(), indexes.cend(), i) != indexes.cend();
   };
   step_t maxStep = 0;
   for (const auto step : stepMap)
-    if (step != STEP_MAX)
-      maxStep = std::max(maxStep, step);
+    if (step != STEP_MAX) maxStep = std::max(maxStep, step);
   const bool simple = showFullStep || (maxStep < 999);
   const step_t scaler =
       stepTableDiag[stepTableSize - 1] - stepTableDiag[stepTableSize - 2];
@@ -74,10 +71,8 @@ void StepMapWall::print(const Maze& maze,
     }
   }
 }
-void StepMapWall::print(const Maze& maze,
-                        const Directions& shortestDirections,
-                        const WallIndex& start,
-                        const bool showFullStep,
+void StepMapWall::print(const Maze& maze, const Directions& shortestDirections,
+                        const WallIndex& start, const bool showFullStep,
                         std::ostream& os) const {
   auto i = start;
   WallIndexes shortestIndexes;
@@ -89,8 +84,7 @@ void StepMapWall::print(const Maze& maze,
   }
   print(maze, shortestIndexes, showFullStep, os);
 }
-void StepMapWall::printPath(const Maze& maze,
-                            const WallIndexes& indexes,
+void StepMapWall::printPath(const Maze& maze, const WallIndexes& indexes,
                             std::ostream& os) const {
   const auto exists = [&](const WallIndex& i) {
     return std::find(indexes.cbegin(), indexes.cend(), i) != indexes.cend();
@@ -127,8 +121,7 @@ void StepMapWall::printPath(const Maze& maze,
 }
 void StepMapWall::printPath(const Maze& maze,
                             const Directions& shortestDirections,
-                            const WallIndex& start,
-                            std::ostream& os) const {
+                            const WallIndex& start, std::ostream& os) const {
   auto i = start;
   WallIndexes shortestIndexes;
   shortestIndexes.reserve(shortestDirections.size() + 1);
@@ -139,10 +132,8 @@ void StepMapWall::printPath(const Maze& maze,
   }
   printPath(maze, shortestIndexes, os);
 }
-void StepMapWall::update(const Maze& maze,
-                         const WallIndexes& dest,
-                         const bool knownOnly,
-                         const bool simple) {
+void StepMapWall::update(const Maze& maze, const WallIndexes& dest,
+                         const bool knownOnly, const bool simple) {
   MAZE_DEBUG_PROFILING_START(0)
   /* 全区画のステップを最大値に設定 */
   const auto step = STEP_MAX;
@@ -183,8 +174,7 @@ void StepMapWall::update(const Maze& maze,
     const auto focus_step = stepMap[focus.getIndex()];
 #if STEP_MAP_USE_PRIORITY_QUEUE
     /* 枝刈り */
-    if (focus_step < focus_step_q)
-      continue;
+    if (focus_step < focus_step_q) continue;
 #endif
     /* 周辺を走査 */
     for (const auto d : focus.getNextDirection6()) {
@@ -194,14 +184,12 @@ void StepMapWall::update(const Maze& maze,
       for (int8_t i = 1;; ++i) {
         next = next.next(d); /*< 移動 */
         /* 壁あり or 既知壁のみで未知壁 ならば次へ */
-        if (maze.isWall(next) || (knownOnly && !maze.isKnown(next)))
-          break;
+        if (maze.isWall(next) || (knownOnly && !maze.isKnown(next))) break;
         /* 直線加速を考慮したステップを算出 */
         const step_t next_step = focus_step + (simple ? i : stepTable[i]);
         const auto next_index = next.getIndex();
-        if (stepMap[next_index] <= next_step)
-          break;                         /*< 更新の必要がない */
-        stepMap[next_index] = next_step; /*< 更新 */
+        if (stepMap[next_index] <= next_step) break; /*< 更新の必要がない */
+        stepMap[next_index] = next_step;             /*< 更新 */
         /* 再帰的に更新するためにキューにプッシュ */
 #if STEP_MAP_USE_PRIORITY_QUEUE
         q.push({next, next_step});
@@ -226,12 +214,9 @@ Directions StepMapWall::calcShortestDirections(const Maze& maze,
   /* ゴール判定 */
   return stepMap[end.getIndex()] == 0 ? shortestDirections : Directions{};
 }
-Directions StepMapWall::getStepDownDirections(const Maze& maze,
-                                              const WallIndex& start,
-                                              WallIndex& end,
-                                              const bool knownOnly,
-                                              const bool simple,
-                                              const bool breakUnknown) const {
+Directions StepMapWall::getStepDownDirections(
+    const Maze& maze, const WallIndex& start, WallIndex& end,
+    const bool knownOnly, const bool simple, const bool breakUnknown) const {
 #if 0
   /* 最短経路となるスタートからの方向列 */
   Directions shortestDirections;
@@ -296,8 +281,7 @@ Directions StepMapWall::getStepDownDirections(const Maze& maze,
   /* start から順にステップマップを下る */
   end = start;
   /* 確認 */
-  if (!start.isInsideOfField())
-    return {};
+  if (!start.isInsideOfField()) return {};
   while (1) {
     /* 周辺の走査; 未知壁の有無と、最小ステップの方向を求める */
     auto min_d = Direction::Max;
@@ -307,18 +291,15 @@ Directions StepMapWall::getStepDownDirections(const Maze& maze,
       auto next = end;     /*< 隣接 */
       next = next.next(d); /*< 移動 */
       /* 壁あり or 既知壁のみで未知壁 ならば次へ */
-      if (maze.isWall(next) || (knownOnly && !maze.isKnown(next)))
-        continue;
+      if (maze.isWall(next) || (knownOnly && !maze.isKnown(next))) continue;
       /* min_step よりステップが小さければ更新 (同じなら更新しない) */
       const auto next_step = stepMap[next.getIndex()];
-      if (min_step < next_step)
-        continue;
+      if (min_step < next_step) continue;
       min_step = next_step;
       min_d = d;
     }
     /* 現在地のステップより大きかったらなんかおかしい */
-    if (stepMap[end.getIndex()] <= min_step)
-      break;
+    if (stepMap[end.getIndex()] <= min_step) break;
     end = end.next(min_d);                //< 位置を更新
     shortestDirections.push_back(min_d);  //< 既知区間移動
   }
@@ -331,8 +312,7 @@ WallIndexes StepMapWall::convertDestinations(const Maze& maze,
   WallIndexes dest;
   for (const auto p : positions)
     for (const auto d : Direction::Along4)
-      if (!maze.isWall(p, d))
-        dest.push_back(WallIndex(p, d));
+      if (!maze.isWall(p, d)) dest.push_back(WallIndex(p, d));
   return dest;
 }
 Direction StepMapWall::convertWallIndexDirection(const WallIndex& i,
@@ -358,8 +338,7 @@ Direction StepMapWall::convertWallIndexDirection(const WallIndex& i,
 }
 Directions StepMapWall::convertWallIndexDirectionsToPositionDirections(
     const Directions& src) {
-  if (src.size() < 2)
-    return {};
+  if (src.size() < 2) return {};
   Directions dirs;
   dirs.reserve(src.size() + 1);
   auto i = START_WALL_INDEX;
@@ -374,14 +353,12 @@ void StepMapWall::appendStraightDirections(const Maze& maze,
                                            Directions& shortestDirections,
                                            const WallIndex& start) {
   auto i = start;
-  for (const auto d : shortestDirections)
-    i = i.next(d);
+  for (const auto d : shortestDirections) i = i.next(d);
   if (shortestDirections.size()) {
     const auto d = shortestDirections.back();
     while (1) {
       i = i.next(d);
-      if (maze.isWall(i))
-        break;
+      if (maze.isWall(i)) break;
       shortestDirections.push_back(d);
     }
   }
@@ -397,10 +374,8 @@ void StepMapWall::appendStraightDirections(const Maze& maze,
  * @param seg 1マスの長さ
  * @return StepMap::step_t コスト
  */
-static StepMapWall::step_t calcStraightCost(const int i,
-                                            const float am,
-                                            const float vs,
-                                            const float vm,
+static StepMapWall::step_t calcStraightCost(const int i, const float am,
+                                            const float vs, const float vm,
                                             const float seg) {
   const auto d = seg * i; /*< i 区画分の走行距離 */
   /* グラフの面積から時間を求める */

@@ -7,9 +7,9 @@
  */
 #pragma once
 
-#include "MazeLib/Maze.h"
-
 #include <limits> /*< for std::numeric_limits */
+
+#include "MazeLib/Maze.h"
 
 namespace MazeLib {
 
@@ -59,8 +59,7 @@ class StepMap {
    * @details 盤面外なら何もしない
    */
   void setStep(const Position p, const step_t step) {
-    if (p.isInsideOfField())
-      stepMap[p.getIndex()] = step;
+    if (p.isInsideOfField()) stepMap[p.getIndex()] = step;
   }
   /**
    * @brief ステップマップの生配列への参照を取得 (読み取り専用)
@@ -78,20 +77,16 @@ class StepMap {
    * @param[in] d ハイライト方向
    * @param[inout] os output-stream
    */
-  void print(const Maze& maze,
-             const Position p = Position(-1, -1),
+  void print(const Maze& maze, const Position p = Position(-1, -1),
              const Direction d = Direction::Max,
              std::ostream& os = std::cout) const;
-  void print(const Maze& maze,
-             const Directions& dirs,
+  void print(const Maze& maze, const Directions& dirs,
              const Position start = Position(0, 0),
              std::ostream& os = std::cout) const;
-  void printFull(const Maze& maze,
-                 const Position p = Position(-1, -1),
+  void printFull(const Maze& maze, const Position p = Position(-1, -1),
                  const Direction d = Direction::Max,
                  std::ostream& os = std::cout) const;
-  void printFull(const Maze& maze,
-                 const Directions& dirs,
+  void printFull(const Maze& maze, const Directions& dirs,
                  const Position start = Position(0, 0),
                  std::ostream& os = std::cout) const;
   /**
@@ -101,9 +96,7 @@ class StepMap {
    * @param[in] knownOnly true:未知壁は通過不可能、false:未知壁は通過可能とする
    * @param[in] simple 台形加速を考慮せず、隣接区画のコストをすべて1にする
    */
-  void update(const Maze& maze,
-              const Positions& dest,
-              const bool knownOnly,
+  void update(const Maze& maze, const Positions& dest, const bool knownOnly,
               const bool simple);
   /**
    * @brief 与えられた区画間の最短経路を導出する関数
@@ -115,10 +108,8 @@ class StepMap {
    * @return 始点区画から目的地区画への最短経路の方向列。
    *         経路がない場合は空配列となる。
    */
-  Directions calcShortestDirections(const Maze& maze,
-                                    const Position start,
-                                    const Positions& dest,
-                                    const bool knownOnly,
+  Directions calcShortestDirections(const Maze& maze, const Position start,
+                                    const Positions& dest, const bool knownOnly,
                                     const bool simple);
   /**
    * @brief スタートからゴールまでの最短経路を導出する関数
@@ -128,8 +119,7 @@ class StepMap {
    * @return スタートからゴールへの最短経路の方向列。
    *         経路がない場合は空配列となる。
    */
-  Directions calcShortestDirections(const Maze& maze,
-                                    const bool knownOnly,
+  Directions calcShortestDirections(const Maze& maze, const bool knownOnly,
                                     const bool simple) {
     return calcShortestDirections(maze, maze.getStart(), maze.getGoals(),
                                   knownOnly, simple);
@@ -142,8 +132,7 @@ class StepMap {
    * @param[out] nextDirectionCandidates 既知区間移動後の移動方向の優先順位
    * @return 既知区間の最終区画
    */
-  Pose calcNextDirections(const Maze& maze,
-                          const Pose& start,
+  Pose calcNextDirections(const Maze& maze, const Pose& start,
                           Directions& nextDirectionsKnown,
                           Directions& nextDirectionCandidates) const;
   /**
@@ -155,10 +144,8 @@ class StepMap {
    * @param[in] simple 台形加速を考慮せず、隣接区画のコストをすべて1にする
    * @param[in] breakUnknown 未知壁を含む区画に到達したら終了する(探索用)
    */
-  Directions getStepDownDirections(const Maze& maze,
-                                   const Pose& start,
-                                   Pose& end,
-                                   const bool knownOnly,
+  Directions getStepDownDirections(const Maze& maze, const Pose& start,
+                                   Pose& end, const bool knownOnly,
                                    const bool simple,
                                    const bool breakUnknown) const;
   /**

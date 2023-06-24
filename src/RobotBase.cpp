@@ -77,8 +77,7 @@ const char* RobotBase::getFastActionName(enum FastAction action) {
 }
 
 std::string RobotBase::convertDirectionsToSearchPath(const Directions& dirs) {
-  if (dirs.empty())
-    return "";
+  if (dirs.empty()) return "";
   std::string path;
   path.reserve(dirs.size());
   Direction prevDir = dirs[0];
@@ -112,8 +111,7 @@ std::string RobotBase::convertSearchPathToKnownPath(std::string src,
   /* 初手ターンを防ぐため、直線を探す */
   auto f = src.find_first_of(F_ST_HALF, 1); /*< 最初の直線を探す */
   auto b = src.find_last_of(F_ST_HALF);     /*< 最後の直線を探す */
-  if (f >= b)
-    return src; /*< 直線なし */
+  if (f >= b) return src;                   /*< 直線なし */
   /* 前後のターンを除いた、直線に挟まれた区間を抽出 */
   auto fb = src.substr(f, b - f + 1);
   fb = replaceStringSearchToFast(fb, diagEnabled); /*< 最短パターンに変換 */
@@ -135,8 +133,7 @@ void RobotBase::reset() {
 }
 bool RobotBase::searchRun() {
   /* 既に探索済みなら正常終了 */
-  if (!calcData.isForceGoingToGoal && isCompleted())
-    return true;
+  if (!calcData.isForceGoingToGoal && isCompleted()) return true;
   /* 探索中断をクリア */
   setBreakFlag(false);
   /* 自己位置同定をクリア */
@@ -165,8 +162,7 @@ bool RobotBase::endFastRunBackingToStartRun() {
   }
   /* 現在位置を最短後の位置に移す */
   Position p = maze.getStart();
-  for (const auto d : getShortestDirections())
-    p = p.next(d);
+  for (const auto d : getShortestDirections()) p = p.next(d);
   updateCurrentPose({p, getShortestDirections().back()});
   /* 最短後は区画の中央にいるので、区画の切り替わり位置に移動 */
   const auto next_d = getCurrentPose().d + Direction::Back;
@@ -186,8 +182,7 @@ void RobotBase::turnbackSave() {
   queueAction(ST_HALF_STOP);
   waitForEndAction();
   stopDequeue();
-  if (breakFlag)
-    return;
+  if (breakFlag) return;
   backupMazeToFlash();
   queueAction(ROTATE_180);
   queueAction(ST_HALF);
@@ -195,8 +190,7 @@ void RobotBase::turnbackSave() {
 }
 void RobotBase::queueNextDirections(const Directions& nextDirections) {
   for (const auto nextDirection : nextDirections) {
-    if (breakFlag)
-      return;
+    if (breakFlag) return;
     const auto relative_d = Direction(nextDirection - getCurrentPose().d);
     switch (relative_d) {
       case Direction::Front:
@@ -240,8 +234,7 @@ bool RobotBase::generalSearchRun() {
     /* 走行が終わるのを待つ */
     waitForEndAction();
     /* 探索終了を確認 */
-    if (status == SearchAlgorithm::Reached)
-      break;
+    if (status == SearchAlgorithm::Reached) break;
     /* 探索中断を確認 */
     if (breakFlag) {
       MAZE_LOGW << "the break flag was set" << std::endl;
@@ -251,8 +244,7 @@ bool RobotBase::generalSearchRun() {
     /* 壁を確認 */
     bool left, front, right;
     senseWalls(left, front, right);
-    if (!updateWall(left, front, right))
-      discrepancyWithKnownWall();
+    if (!updateWall(left, front, right)) discrepancyWithKnownWall();
     /* 壁のない方向へ1マス移動 */
     Direction nextDirection;
     if (!determineNextDirection(nextDirection)) {
@@ -278,11 +270,9 @@ bool RobotBase::generalSearchRun() {
   return true;
 }
 
-int RobotBase::replace(std::string& src,
-                       const std::string& from,
+int RobotBase::replace(std::string& src, const std::string& from,
                        const std::string& to) {
-  if (from.empty())
-    return 0;
+  if (from.empty()) return 0;
   auto pos = src.find(from);
   auto toLen = to.size();
   int i = 0;

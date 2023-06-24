@@ -110,8 +110,7 @@ class RobotBase : public Agent {
    * @param to 置換後文字列
    * @return int 置換した数
    */
-  static int replace(std::string& src,
-                     const std::string& from,
+  static int replace(std::string& src, const std::string& from,
                      const std::string& to);
   /**
    * @brief 探索パターンを最短パターンに変換する関数

@@ -1,12 +1,12 @@
-#include "MazeLib/CLRobotBase.h"
-#include "MazeLib/Maze.h"
-#include "MazeLib/StepMap.h"
-#include "MazeLib/StepMapSlalom.h"
-
 #include <algorithm>
 #include <queue>
 #include <random>
 #include <stack>
+
+#include "MazeLib/CLRobotBase.h"
+#include "MazeLib/Maze.h"
+#include "MazeLib/StepMap.h"
+#include "MazeLib/StepMapSlalom.h"
 
 using namespace MazeLib;
 
@@ -24,17 +24,14 @@ void poll(Maze& maze) {
   for (int x = 0; x < MAZE_SIZE; ++x)
     for (int y = 0; y < MAZE_SIZE; ++y) {
       auto p = Position(x, y);
-      if (p == maze.getStart())
-        continue;
+      if (p == maze.getStart()) continue;
       auto dirs = getRandomDirectionsAlong4();
       while (!dirs.empty()) {
         const auto d = dirs.back();
         dirs.pop_back();
         const auto i = WallIndex((d & 4) ? p.next(Direction::NorthEast) : p, d);
-        if (!i.isInsideOfField())
-          break;
-        if (maze.isWall(i))
-          continue;
+        if (!i.isInsideOfField()) break;
+        if (maze.isWall(i)) continue;
         maze.setWall(i, true);
         break;
       }
@@ -80,30 +77,24 @@ void dig(Maze& maze) {
     Directions dirs(Direction::Along4.begin(), Direction::Along4.end());
 #if 1
     // 直進優先
-    for (int i = 0; i < 2; ++i)
-      dirs.push_back(Direction::Front);
+    for (int i = 0; i < 2; ++i) dirs.push_back(Direction::Front);
     if (!stack.empty()) {
       // 連続直進
       if (Direction(pose.d - stack.top().d) == Direction::Front)
-        for (int i = 0; i < 2; ++i)
-          dirs.push_back(Direction::Front);
+        for (int i = 0; i < 2; ++i) dirs.push_back(Direction::Front);
       // 連続斜め直線
       if (Direction(pose.d - stack.top().d) == Direction::Left)
-        for (int i = 0; i < 8; ++i)
-          dirs.push_back(Direction::Right);
+        for (int i = 0; i < 8; ++i) dirs.push_back(Direction::Right);
       if (Direction(pose.d - stack.top().d) == Direction::Right)
-        for (int i = 0; i < 8; ++i)
-          dirs.push_back(Direction::Left);
+        for (int i = 0; i < 8; ++i) dirs.push_back(Direction::Left);
     }
 #endif
     std::shuffle(dirs.begin(), dirs.end(), engine);
     while (!dirs.empty()) {
       const auto d = dirs.back() + pose.d;
       dirs.pop_back();
-      if (!p.next(d).isInsideOfField())
-        continue;
-      if (mark[p.next(d).getIndex()])
-        continue;
+      if (!p.next(d).isInsideOfField()) continue;
+      if (mark[p.next(d).getIndex()]) continue;
       maze.setWall(pose.p, d, false);
       stack.push(pose);
       stack.push(pose.next(d));
@@ -132,8 +123,7 @@ void setGoalLongest(Maze& maze) {
     for (int y = 0; y < MAZE_SIZE; ++y) {
       const auto p = Position(x, y);
       const auto s = map.getStep(p);
-      if (s == StepMap::STEP_MAX || s <= maxStep)
-        continue;
+      if (s == StepMap::STEP_MAX || s <= maxStep) continue;
       maxStep = s;
       max_position = p;
     }

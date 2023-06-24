@@ -1,6 +1,6 @@
-#include "MazeLib/CLRobotBase.h"
-
 #include <thread>
+
+#include "MazeLib/CLRobotBase.h"
 
 using namespace MazeLib;
 
@@ -10,8 +10,7 @@ class CLRobot : public CLRobotBase {
   bool display = false;
 
   void wait() {
-    if (!display)
-      return;
+    if (!display) return;
     // getc(stdin);
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
@@ -21,8 +20,7 @@ class CLRobot : public CLRobotBase {
       SearchAlgorithm::State oldState,
       SearchAlgorithm::State newState) override {
     CLRobotBase::calcNextDirectionsPostCallback(oldState, newState);
-    if (newState == oldState)
-      return;
+    if (newState == oldState) return;
     /* State Change has occurred */
     if (oldState == SearchAlgorithm::SEARCHING_FOR_GOAL) {
     }
@@ -80,8 +78,7 @@ int main(void) {
   const std::string mazedata_dir = "../mazedata/data/";
   const std::string filename = "32MM2019HX.maze";
   Maze mazeTarget;
-  if (!mazeTarget.parse((mazedata_dir + filename).c_str()))
-    return -1;
+  if (!mazeTarget.parse((mazedata_dir + filename).c_str())) return -1;
   const auto p_robot = std::make_unique<CLRobot>(mazeTarget);
   CLRobot& robot = *p_robot;
   robot.replaceGoals(mazeTarget.getGoals());
