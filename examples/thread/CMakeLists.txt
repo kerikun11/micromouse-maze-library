@@ -14,15 +14,3 @@ add_custom_target(${CUSTOM_TARGET_NAME}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   USES_TERMINAL
 )
-## find python interpreter
-find_package(Python3)
-if(NOT Python3_FOUND)
-  message(WARNING "Python3 not found in your environment! skipping...")
-  RETURN()
-endif()
-## make a custom target to plot
-add_custom_target(${CUSTOM_TARGET_NAME}_plot
-  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/plot.py
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  USES_TERMINAL
-)

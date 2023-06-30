@@ -125,11 +125,6 @@ void StepMapSlalom::update(const Maze& maze, const EdgeCost& edgeCost,
 #else
     costMap[i.getIndex()] = 0, q.push(i);
 #endif
-  /* knownOnly を考慮した壁の判定式を用意 */
-  const auto canGo = [&](const WallIndex& i) {
-    if (maze.isWall(i) || (knownOnly && !maze.isKnown(i))) return false;
-    return true;
-  };
   /* 更新がなくなるまで更新 */
   while (!q.empty()) {
 #if MAZE_DEBUG_PROFILING
@@ -164,10 +159,10 @@ void StepMapSlalom::update(const Maze& maze, const EdgeCost& edgeCost,
     const auto nd = focus.getNodeDirection();
     if (nd.isAlong()) { /* 区画の中央 */
       /* 直前の壁 */
-      if (!canGo(focus)) continue;
+      if (!maze.canGo(focus, knownOnly)) continue;
       /* 直進で行けるところまで行く */
       int8_t n = 1;
-      for (auto i = focus; canGo(i); ++n) {
+      for (auto i = focus; maze.canGo(i, knownOnly); ++n) {
         const auto next = i.next(nd);
         if (!pushAndContinue(next, edgeCost.getEdgeCostAlong(n))) break;
         i = next;
@@ -180,18 +175,18 @@ void StepMapSlalom::update(const Maze& maze, const EdgeCost& edgeCost,
         const auto d180 = nd + nd_rel_45 * 4;
         /* 横壁 */
         const auto i45 = focus.next(d45);
-        if (canGo(i45)) {
+        if (maze.canGo(i45, knownOnly)) {
           /* 45 */
-          if (canGo(i45.next(i45.getNodeDirection())))
+          if (maze.canGo(i45.next(i45.getNodeDirection()), knownOnly))
             pushAndContinue(i45, edgeCost.getEdgeCostSlalom(F45));
           /* 90 */
           const auto v90 = focus.getPosition().next(nd).next(d90);
           pushAndContinue(Index(v90, d90), edgeCost.getEdgeCostSlalom(F90));
           /* 135 and 180 */
           const auto i135 = i45.next(d135);
-          if (canGo(i135)) {
+          if (maze.canGo(i135, knownOnly)) {
             /* 135 */
-            if (canGo(i135.next(i135.getNodeDirection())))
+            if (maze.canGo(i135.next(i135.getNodeDirection()), knownOnly))
               pushAndContinue(i135, edgeCost.getEdgeCostSlalom(F135));
             /* 180 */
             pushAndContinue(Index(v90.next(d180), d180),
@@ -202,7 +197,7 @@ void StepMapSlalom::update(const Maze& maze, const EdgeCost& edgeCost,
     } else { /* 壁の中央 */
       /* 直前の壁 */
       const auto i_f = focus.next(nd);
-      if (!canGo(i_f)) {
+      if (!maze.canGo(i_f, knownOnly)) {
         MAZE_LOGE << "Front Wall Exists: " << focus << std::endl;
         continue;
       }
@@ -210,7 +205,7 @@ void StepMapSlalom::update(const Maze& maze, const EdgeCost& edgeCost,
       int8_t n = 1;
       for (auto i = i_f;; ++n) {
         const auto next = i.next(nd);
-        if (!canGo(next)) break;
+        if (!maze.canGo(next, knownOnly)) break;
         if (!pushAndContinue(i, edgeCost.getEdgeCostDiag(n))) break;
         i = next;
       }
@@ -223,9 +218,9 @@ void StepMapSlalom::update(const Maze& maze, const EdgeCost& edgeCost,
       pushAndContinue(focus.next(d45), edgeCost.getEdgeCostSlalom(F45));
       /* V90, 135R */
       const auto i90 = i_f.next(d90);
-      if (canGo(i90)) {
+      if (maze.canGo(i90, knownOnly)) {
         /* V90 */
-        if (canGo(i90.next(i90.getNodeDirection())))
+        if (maze.canGo(i90.next(i90.getNodeDirection()), knownOnly))
           pushAndContinue(i90, edgeCost.getEdgeCostSlalom(FV90));
         /* 135 R */
         pushAndContinue(focus.next(d135), edgeCost.getEdgeCostSlalom(F135));

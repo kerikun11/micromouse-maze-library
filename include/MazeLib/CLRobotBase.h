@@ -11,7 +11,9 @@
 #include <chrono>
 #include <cstdio>  /*< for std::printf */
 #include <iomanip> /*< for std::setw */
+#include <limits>  /*< for std::numeric_limits */
 #include <memory>  /*< for std::make_unique */
+#include <vector>
 
 #include "MazeLib/RobotBase.h"
 
@@ -22,7 +24,7 @@ namespace MazeLib {
  */
 class CLRobotBase : public RobotBase {
  public:
-  CLRobotBase(Maze& mazeTarget) : mazeTarget(mazeTarget) {
+  explicit CLRobotBase(Maze& mazeTarget) : mazeTarget(mazeTarget) {
     replaceGoals(mazeTarget.getGoals());
   }
   void printInfo(const bool showMaze = true) {
@@ -403,15 +405,16 @@ class CLRobotBase : public RobotBase {
                   os << C_BL << " G " << C_NO;
                 else
                   os << "   ";
-              } else if (stepMap[i]->getStep(x, y) == StepMap::STEP_MAX)
+              } else if (stepMap[i]->getStep(x, y) == StepMap::STEP_MAX) {
                 os << C_CY << "999" << C_NO;
-              else if (stepMap[i]->getStep(x, y) == 0)
+              } else if (stepMap[i]->getStep(x, y) == 0) {
                 os << C_YE << std::setw(3) << stepMap[i]->getStep(x, y) << C_NO;
-              else if (simple[i])
+              } else if (simple[i]) {
                 os << C_CY << std::setw(3) << stepMap[i]->getStep(x, y) << C_NO;
-              else
+              } else {
                 os << C_CY << std::setw(3) << stepMap[i]->getStep(x, y) / 100
                    << C_NO;
+              }
             }
           }
           os << "   ";

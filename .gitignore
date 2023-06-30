@@ -9,4 +9,4 @@ build-*
 
 ## PlatformIO
 .pio
-/platformio-device-monitor-*.log
+logs/device-monitor-*.log

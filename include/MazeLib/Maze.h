@@ -13,6 +13,7 @@
 #include <cstdint>  /*< for uint8_t */
 #include <fstream>  /*< for std::ifstream */
 #include <iostream> /*< for std::cout */
+#include <string>
 #include <vector>
 
 /* debug profiling option */
@@ -710,6 +711,9 @@ class Maze {
   bool canGo(const Position p, const Direction d) const {
     return canGo(WallIndex(p, d));
   }
+  bool canGo(const WallIndex& i, bool knownOnly) const {
+    return !isWall(i) && (isKnown(i) || !knownOnly);
+  };
   /**
    * @brief 既知の壁情報と照らしあわせながら、壁を更新する関数
    * @details 既知の壁と非一致した場合、未知壁にして return する

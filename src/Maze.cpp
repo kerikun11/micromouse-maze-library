@@ -86,7 +86,7 @@ WallIndex WallIndex::next(const Direction d) const {
     case Direction::East:
       return WallIndex(x + 1, y, z);
     case Direction::NorthEast:
-      return WallIndex(x + (1 - z), y + z, 1 - z);
+      return WallIndex(x + 1 - z, y + z, 1 - z);
     case Direction::North:
       return WallIndex(x, y + 1, z);
     case Direction::NorthWest:
@@ -94,11 +94,11 @@ WallIndex WallIndex::next(const Direction d) const {
     case Direction::West:
       return WallIndex(x - 1, y, z);
     case Direction::SouthWest:
-      return WallIndex(x - z, y - (1 - z), 1 - z);
+      return WallIndex(x - z, y - 1 + z, 1 - z);
     case Direction::South:
       return WallIndex(x, y - 1, z);
     case Direction::SouthEast:
-      return WallIndex(x + (1 - z), y - (1 - z), 1 - z);
+      return WallIndex(x + 1 - z, y - 1 + z, 1 - z);
     default:
       MAZE_LOGE << d << std::endl;
       return WallIndex(x, y, z);

@@ -37,7 +37,7 @@ void thread_maze(const std::string& name) {
 int main(void) {
   /* prepare target maze names */
   std::vector<std::string> names;
-  for (int year = 2021; year >= 2021; --year)
+  for (int year = 2022; year >= 2021; --year)
     names.push_back("32MM" + std::to_string(year) + "HX");
   for (int year = 2019; year >= 2010; --year)
     names.push_back("32MM" + std::to_string(year) + "HX");

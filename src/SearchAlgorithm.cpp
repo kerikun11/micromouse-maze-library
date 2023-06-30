@@ -661,10 +661,9 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
   /* 初回の empty を除く */
   if (candidates.empty())
     for (int8_t x = min_x; x < max_x; ++x)
-      for (int8_t y = min_y; y < max_y; ++y) {
-        const auto p = Position(x, y);
-        if (idMaze.unknownCount(p)) candidates.push_back(p);
-      }
+      for (int8_t y = min_y; y < max_y; ++y)
+        if (const auto p = Position(x, y); idMaze.unknownCount(p))
+          candidates.push_back(p);
   /* スタート区画を避けたことで閉じ込められたか確認 */
   stepMap.update(idMaze, candidates, false, false);
   const auto current_step =

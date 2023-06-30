@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include <string>
+
 #include "MazeLib/Agent.h"
 
 namespace MazeLib {

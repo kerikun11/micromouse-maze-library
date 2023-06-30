@@ -11,7 +11,7 @@ option(BUILD_TEST "build unit test" ON)
 option(BUILD_EXAMPLES "build example projects" ON)
 
 ## global build options
-set(CMAKE_CXX_STANDARD 14) # enable option -std=c++14
+set(CMAKE_CXX_STANDARD 17) # enable option -std=c++17
 set(CMAKE_CXX_EXTENSIONS OFF) # without compiler extensions like gnu++14
 
 ## make a static library

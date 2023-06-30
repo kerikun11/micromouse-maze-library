@@ -8,6 +8,7 @@
 #pragma once
 
 #include <limits> /*< for std::numeric_limits */
+#include <vector>
 
 #include "MazeLib/Maze.h"
 
