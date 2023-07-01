@@ -27,8 +27,7 @@ void thread_maze(const std::string& name) {
   robot.printSearchResult();
 #if 0
   /* Fast Run */
-  for (const auto diagEnabled : {false, true})
-    robot.fastRun(diagEnabled);
+  for (const auto diagEnabled : {false, true}) robot.fastRun(diagEnabled);
   /* Position Identification Run */
   robot.positionIdentifyRunForAllOffset();
 #endif
@@ -76,7 +75,7 @@ int main(void) {
            "09MM2019C_Cheese",
            "08MM2016CF_pre",
        })
-    names.push_back(name);
+    names.push_back(name);  // cppcheck-suppress useStlAlgorithm
 #endif
 
   /* analyze for each maze */
@@ -84,6 +83,7 @@ int main(void) {
 #if 1
   /* parallel */
   for (const auto& name : names)
+    // cppcheck-suppress useStlAlgorithm
     threads.push_back(std::thread([&] { thread_maze(name); }));
   for (std::thread& th : threads) th.join();
 #else

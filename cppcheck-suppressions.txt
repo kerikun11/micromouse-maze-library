@@ -2,4 +2,3 @@ ctuOneDefinitionRuleViolation
 missingInclude
 noExplicitConstructor
 unusedFunction
-useStlAlgorithm

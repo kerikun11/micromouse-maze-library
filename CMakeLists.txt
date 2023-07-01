@@ -67,7 +67,7 @@ add_custom_target(cpplint
 
 ## cppcheck
 add_custom_target(cppcheck
-  COMMAND cppcheck --quiet --enable=all --suppressions-list=cppcheck-suppressions.txt -i build --platform=unix32 --std=c++17 .
+  COMMAND cppcheck --quiet --enable=all --inline-suppr --suppressions-list=cppcheck-suppressions.txt -i build --platform=unix32 --std=c++17 .
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   USES_TERMINAL
 )

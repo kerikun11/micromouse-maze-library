@@ -75,6 +75,7 @@ void dig(Maze& maze) {
     // maze.print({p}), getc(stdin);
     /* walk */
     Directions dirs;
+    // cppcheck-suppress useStlAlgorithm
     for (const auto d : Direction::Along4()) dirs.push_back(d);
 #if 1
     // 直進優先

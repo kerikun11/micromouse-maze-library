@@ -57,7 +57,9 @@ TEST(Maze, parse_from_istream) {
 
   Positions expected_goals;
   for (auto x : {3, 4, 5})
-    for (auto y : {3, 4, 5}) expected_goals.push_back(Position(x, y));
+    for (auto y : {3, 4, 5})
+      // cppcheck-suppress useStlAlgorithm
+      expected_goals.push_back(Position(x, y));
 
   EXPECT_EQ(expected_goals.size(), maze.getGoals().size());
   for (const auto g : maze.getGoals())
