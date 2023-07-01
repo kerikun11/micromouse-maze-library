@@ -118,12 +118,12 @@ void Maze::reset(const bool set_start_wall, const bool set_range_full) {
   wallRecords.clear();
 }
 int8_t Maze::wallCount(const Position p) const {
-  const auto&& dirs = Direction::Along4();
+  const auto dirs = Direction::Along4();
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        [&](const Direction d) { return isWall(p, d); });
 }
 int8_t Maze::unknownCount(const Position p) const {
-  const auto&& dirs = Direction::Along4();
+  const auto dirs = Direction::Along4();
   return std::count_if(dirs.cbegin(), dirs.cend(),
                        [&](const Direction d) { return !isKnown(p, d); });
 }
@@ -288,6 +288,7 @@ void Maze::print(const Directions& dirs, const Position start, std::ostream& os,
                  const int mazeSize) const {
   /* preparation */
   std::vector<Pose> path;
+  path.reserve(dirs.size());
   {
     Position p = start;
     for (const auto d : dirs) path.push_back({p, d}), p = p.next(d);

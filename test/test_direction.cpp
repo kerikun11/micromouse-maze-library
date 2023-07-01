@@ -40,5 +40,11 @@ TEST(Direction, Along4_Diag4) {
 
 TEST(Direction, toChar) {
   EXPECT_EQ(Direction(Direction::East).toChar(), '>');
-  EXPECT_EQ(Direction(Direction::East).toChar(), '>');
+  EXPECT_EQ(Direction(Direction::NorthEast).toChar(), '\'');
+  EXPECT_EQ(Direction(Direction::North).toChar(), '^');
+  EXPECT_EQ(Direction(Direction::NorthWest).toChar(), '`');
+  EXPECT_EQ(Direction(Direction::West).toChar(), '<');
+  EXPECT_EQ(Direction(Direction::SouthWest).toChar(), ',');
+  EXPECT_EQ(Direction(Direction::South).toChar(), 'v');
+  EXPECT_EQ(Direction(Direction::SouthEast).toChar(), '.');
 }

@@ -7,7 +7,7 @@
  */
 #include "MazeLib/SearchAlgorithm.h"
 
-#include <algorithm>  //< for std::find
+#include <algorithm>  //< for std::find std::sort
 
 namespace MazeLib {
 

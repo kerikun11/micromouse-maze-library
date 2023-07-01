@@ -15,7 +15,7 @@ void poll(Maze& maze) {
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
   const auto getRandomDirectionsAlong4 = [&]() {
-    Directions dirs(Direction::Along4().begin(), Direction::Along4().end());
+    auto dirs = Direction::Along4();
     std::shuffle(dirs.begin(), dirs.end(), engine);
     return dirs;
   };
@@ -101,7 +101,7 @@ void dig(Maze& maze) {
       stack.push(pose);
       stack.push(pose.next(d));
 #if 1
-      const auto&& along4 = Direction::Along4();
+      const auto along4 = Direction::Along4();
       const auto known =
           std::count_if(along4.cbegin(), along4.cend(), [&](const auto d) {
             const auto n = p.next(d);
