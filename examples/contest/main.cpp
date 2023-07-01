@@ -22,8 +22,6 @@ class CLRobot : public CLRobotBase {
     CLRobotBase::calcNextDirectionsPostCallback(oldState, newState);
     if (newState == oldState) return;
     /* State Change has occurred */
-    if (oldState == SearchAlgorithm::SEARCHING_FOR_GOAL) {
-    }
     if (oldState == SearchAlgorithm::IDENTIFYING_POSITION) {
       if (display) {
         wait();
@@ -71,8 +69,8 @@ class CLRobot : public CLRobotBase {
 };
 
 int main(void) {
-  std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-  std::cout << "\e[J";    /*< カーソル以下を消去 */
+  std::cout << "\e[0;0H";  //< カーソルを左上に移動
+  std::cout << "\e[J";     //< カーソル以下を消去
 
   /* Preparation */
   const std::string mazedata_dir = "../mazedata/data/";
@@ -162,8 +160,8 @@ int main(void) {
   // robot.printInfo();
   for (bool diagEnabled : {true, false}) {
     robot.calcShortestDirections(diagEnabled);
-    std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-    std::cout << "\e[J";    /*< カーソル以下を消去 */
+    std::cout << "\e[0;0H";  //< カーソルを左上に移動
+    std::cout << "\e[J";     //< カーソル以下を消去
     robot.printPath();
     std::cout << "Estimated Shortest Time "
               << (diagEnabled ? "(diag)" : "(no diag)") << ": "

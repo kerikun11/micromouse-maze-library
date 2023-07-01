@@ -7,7 +7,7 @@
  */
 #include "MazeLib/SearchAlgorithm.h"
 
-#include <algorithm> /*< for std::find */
+#include <algorithm>  //< for std::find
 
 namespace MazeLib {
 
@@ -37,7 +37,7 @@ void SearchAlgorithm::positionIdentifyingInit(Pose& currentPose) {
   /* オフセットを迷路の中央に設定 */
   idOffset = Position(MAZE_SIZE / 2, MAZE_SIZE / 2);
   currentPose = Pose(idOffset, Direction::East);
-  idMaze.reset(false); /*< reset without setting start cell */
+  idMaze.reset(false);  //< reset without setting start cell
   /* 自分の真下の壁を消す */
   idMaze.updateWall(currentPose.p, currentPose.d + Direction::Back, false);
 }
@@ -87,7 +87,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
         return result;
       case SearchAlgorithm::Reached:
         calcData.isPositionIdentification = false;
-        break; /*< go to next state */
+        break;  //< go to next state
       case SearchAlgorithm::Error:
         MAZE_LOGE << "failed" << std::endl;
         calcData.result.state = State::IMPOSSIBLE;
@@ -105,7 +105,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       case SearchAlgorithm::Processing:
         return result;
       case SearchAlgorithm::Reached:
-        break; /*< go to next state */
+        break;  //< go to next state
       case SearchAlgorithm::Error:
         MAZE_LOGE << "failed" << std::endl;
         calcData.result.state = State::IMPOSSIBLE;
@@ -123,7 +123,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       case SearchAlgorithm::Processing:
         return result;
       case SearchAlgorithm::Reached:
-        break; /*< go to next state */
+        break;  //< go to next state
       case SearchAlgorithm::Error:
         MAZE_LOGE << "failed" << std::endl;
         calcData.result.state = State::IMPOSSIBLE;
@@ -142,7 +142,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
         return result;
       case SearchAlgorithm::Reached:
         calcData.isForceGoingToGoal = false;
-        break; /*< go to next state */
+        break;  //< go to next state
       case SearchAlgorithm::Error:
         MAZE_LOGE << "failed" << std::endl;
         calcData.result.state = State::IMPOSSIBLE;
@@ -160,7 +160,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirections(
       return result;
     case SearchAlgorithm::Reached:
       calcData.isForceBackToStart = false;
-      break; /*< go to next state */
+      break;  //< go to next state
     case SearchAlgorithm::Error:
       MAZE_LOGE << "failed" << std::endl;
       calcData.result.state = State::IMPOSSIBLE;
@@ -202,7 +202,7 @@ bool SearchAlgorithm::determineNextDirection(const CalcData& calcData,
       nextDirectionCandidates.cbegin(), nextDirectionCandidates.cend(),
       [&](const Direction next_d) { return maze.canGo(pose.p, next_d); });
   MAZE_DEBUG_PROFILING_END(0);
-  if (it == nextDirectionCandidates.cend()) return false; /*< no answer */
+  if (it == nextDirectionCandidates.cend()) return false;  //< no answer
   nextDirection = *it;
   return true;
 }
@@ -213,7 +213,7 @@ bool SearchAlgorithm::calcShortestDirections(
   if (diagEnabled) {
     shortestDirections =
         stepMapSlalom.calcShortestDirections(maze, edgeCost, knownOnly);
-    if (shortestDirections.empty()) return false; /*< failed */
+    if (shortestDirections.empty()) return false;  //< failed
     shortestCost = stepMapSlalom.getShortestCost();
   } else {
     shortestDirections = stepMap.calcShortestDirections(maze, knownOnly, false);
@@ -255,7 +255,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions& candidates,
     Directions shortestDirections =
         stepMapSlalom.calcShortestDirections(maze, edgeCost, knownOnly);
     if (shortestDirections.empty())
-      return false; /*< failed */
+      return false;  //< failed
     StepMap::appendStraightDirections(maze, shortestDirections, knownOnly,
                                       diagEnabled);
     auto p = maze.getStart();
@@ -281,7 +281,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions& candidates,
     /* 最短経路の導出 */
     Directions shortestDirections =
         stepMap.calcShortestDirections(maze, knownOnly, false);
-    if (shortestDirections.empty()) return false; /*< 経路なし */
+    if (shortestDirections.empty()) return false;  //< 経路なし
     /* ゴール区画内を行けるところまで直進する */
     StepMap::appendStraightDirections(maze, shortestDirections, knownOnly,
                                       false);
@@ -326,7 +326,7 @@ bool SearchAlgorithm::findShortestCandidates(Positions& candidates,
     /* 最短経路の導出 */
     Directions shortestDirections =
         stepMapWall.calcShortestDirections(maze, knownOnly, false);
-    if (shortestDirections.empty()) return false; /*< 経路なし */
+    if (shortestDirections.empty()) return false;  //< 経路なし
     /* ゴール区画内の直進を追加 */
     StepMapWall::appendStraightDirections(maze, shortestDirections);
     /* 最短経路中の未知壁区画を訪問候補に追加 */
@@ -337,24 +337,24 @@ bool SearchAlgorithm::findShortestCandidates(Positions& candidates,
     }
   }
 #endif
-  return true; /*< 成功 */
+  return true;  //< 成功
 }
 int SearchAlgorithm::countIdentityCandidates(const WallRecords& idWallRecords,
                                              Pose& ans) const {
   MAZE_DEBUG_PROFILING_START(0)
-  const int min_diff = 6; /*< 許容食い違い壁数 */
+  const int min_diff = 6;  //< 許容食い違い壁数
   /* 既知迷路の大きさを取得 */
   const int8_t outside_margin = 2;  //< 既知のエリアの外側に行く可能性があるので
   const int8_t max_x = std::min(MAZE_SIZE, maze.getMaxX() + 1 + outside_margin);
   const int8_t max_y = std::min(MAZE_SIZE, maze.getMaxY() + 1 + outside_margin);
   /* パターンマッチング開始 */
-  int candidates_count = 0; /*< マッチ数 */
+  int candidates_count = 0;  //< マッチ数
   for (int8_t x = 0; x < max_x; ++x)
     for (int8_t y = 0; y < max_y; ++y) {
       const auto offset_p = Position(x, y);
-      for (const auto offset_d : Direction::Along4) {
+      for (const auto offset_d : Direction::Along4()) {
         /* 既知壁との食い違い数を数える */
-        int diffs = 0; /*< idWallRecords のうち、既知の食い違いの壁の数を格納 */
+        int diffs = 0;  //< idWallRecords のうち、既知の食い違いの壁の数を格納
         for (const auto wr : idWallRecords) {
           const auto maze_p =
               (wr.getPosition() - idOffset).rotate(offset_d) + offset_p;
@@ -392,12 +392,12 @@ const Directions SearchAlgorithm::findMatchDirectionCandidates(
     const Position currentPosition, const Pose& target,
     const int ignoreWalls) const {
   MAZE_DEBUG_PROFILING_START(0)
-  const int min_diff = ignoreWalls; /*< 許容食い違い壁数 */
+  const int min_diff = ignoreWalls;  //< 許容食い違い壁数
   /* パターンマッチング開始 */
   Directions result_dirs;  //< target と一致する方向の候補を格納する
-  for (const auto offset_d : Direction::Along4) {
+  for (const auto offset_d : Direction::Along4()) {
     /* 既知壁との食い違い数を数える */
-    int diffs = 0; /*< idWallRecords のうち、既知の食い違いの壁の数を格納 */
+    int diffs = 0;  //< idWallRecords のうち、既知の食い違いの壁の数を格納
     for (const auto wr : idMaze.getWallRecords()) {
       const auto maze_p =
           target.p + (wr.getPosition() - currentPosition).rotate(offset_d);
@@ -425,7 +425,7 @@ const Pose SearchAlgorithm::calcNextDirectionsInAdvance(
       calcData.result.nextDirectionCandidates);
   /* 仮壁を立てて事前に進む候補を決定する */
   Directions nextDirectionCandidatesAdvanced;
-  WallIndexes wall_backup; /*< 仮壁を立てるのでバックアップを作成 */
+  WallIndexes wall_backup;  //< 仮壁を立てるのでバックアップを作成
   while (1) {
     if (calcData.result.nextDirectionCandidates.empty()) break;
     const Direction d =
@@ -452,7 +452,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchForGoal(
   Positions candidates;
   for (const auto p : maze.getGoals())
     if (maze.unknownCount(p))
-      candidates.push_back(p); /*< ゴール区画の未知区画を洗い出す */
+      candidates.push_back(p);  //< ゴール区画の未知区画を洗い出す
   if (candidates.empty()) return Reached;
   calcNextDirectionsInAdvance(maze, candidates, calcData);
   return calcData.result.nextDirectionCandidates.empty() ? Error : Processing;
@@ -465,12 +465,12 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
   Directions& nextDirectionsKnown = calcData.result.nextDirectionsKnown;
   Directions& nextDirectionCandidates = calcData.result.nextDirectionCandidates;
   /* 最短経路上の未知区画を目的地とする */
-  Positions candidates; /*< 最短経路になりうる区画 */
+  Positions candidates;  //< 最短経路になりうる区画
   if (!findShortestCandidates(candidates, currentPose)) {
     MAZE_LOGE << "failed" << std::endl;
-    return Error; /*< 迷路の異常 */
+    return Error;  //< 迷路の異常
   }
-  if (candidates.empty()) return Reached; /*< 探索完了 */
+  if (candidates.empty()) return Reached;  //< 探索完了
   /* 既知区間移動方向列を生成 */
   stepMap.update(maze, candidates, false, false);
   const auto end = stepMap.calcNextDirections(
@@ -485,7 +485,7 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsSearchAdditionally(
   }
   /* 未知区間の移動優先順位を生成。仮壁を立てて事前候補を改良する */
   Directions nextDirectionCandidatesAdvanced;
-  WallIndexes wall_backup; /*< 仮壁を立てるのでバックアップを作成 */
+  WallIndexes wall_backup;  //< 仮壁を立てるのでバックアップを作成
   while (1) {
     if (nextDirectionCandidates.empty()) break;
     const Direction d = nextDirectionCandidates[0];  //< 一番行きたい方向
@@ -539,10 +539,10 @@ SearchAlgorithm::Result SearchAlgorithm::calcNextDirectionsBackingToStart(
   /* できれば停止なしで帰りたい */
   const auto d_back = Direction(currentPose.d + Direction::Back);
   const auto wall_backup = maze.isWall(currentPose.p, d_back);
-  maze.setWall(currentPose.p, d_back, true); /*< 後ろを一時的に塞ぐ */
+  maze.setWall(currentPose.p, d_back, true);  //< 後ろを一時的に塞ぐ
   const auto tmp_nextDirectionsKnown = stepMap.calcShortestDirections(
       maze, currentPose.p, {maze.getStart()}, true, false);
-  maze.setWall(currentPose.p, d_back, wall_backup); /*< 壁を戻す */
+  maze.setWall(currentPose.p, d_back, wall_backup);  //< 壁を戻す
   /* 経路がある、かつ、そこまで遠回りにならないとき */
   if (tmp_nextDirectionsKnown.size() &&
       tmp_nextDirectionsKnown.size() < nextDirectionsKnown.size() + 9)
@@ -624,9 +624,10 @@ SearchAlgorithm::calcNextDirectionsPositionIdentification(
     /* 移動不能にならないように、真下の壁を更新する */
     maze.updateWall(currentPose.p, currentPose.d + Direction::Back, false);
     /* 自己位置同定中に未知壁を見ていたら更新する */
-    const int ignore_first_walls = 12; /*< 復帰直後は壁の読み間違いがありそう */
+    const int ignore_first_walls = 12;  //< 復帰直後は壁の読み間違いがありそう
     const auto& wallRecords = idMaze.getWallRecords();
-    for (int i = ignore_first_walls; i < (int)wallRecords.size(); ++i) {
+    for (int i = ignore_first_walls; i < static_cast<int>(wallRecords.size());
+         ++i) {
       const auto wr = wallRecords[i];
       const auto maze_p = (wr.getPosition() - idOffset).rotate(ans.d) + ans.p;
       const auto maze_d = wr.d + ans.d;

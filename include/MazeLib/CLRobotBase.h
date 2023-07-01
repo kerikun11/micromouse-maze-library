@@ -7,12 +7,12 @@
  */
 #pragma once
 
-#include <algorithm> /*< for std::find */
+#include <algorithm>  //< for std::find
 #include <chrono>
-#include <cstdio>  /*< for std::printf */
-#include <iomanip> /*< for std::setw */
-#include <limits>  /*< for std::numeric_limits */
-#include <memory>  /*< for std::make_unique */
+#include <cstdio>   //< for std::printf
+#include <iomanip>  //< for std::setw
+#include <limits>   //< for std::numeric_limits
+#include <memory>   //< for std::make_unique
 #include <vector>
 
 #include "MazeLib/RobotBase.h"
@@ -33,7 +33,7 @@ class CLRobotBase : public RobotBase {
   }
   void printInfoDoubleMaze(const bool showMaze = true) {
     if (showMaze) {
-      std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+      std::cout << "\e[0;0H";  //< カーソルを左上に移動
       const auto& maze = getState() == SearchAlgorithm::IDENTIFYING_POSITION
                              ? getSearchAlgorithm().getIdMaze()
                              : getMaze();
@@ -47,9 +47,9 @@ class CLRobotBase : public RobotBase {
   void printSearchResult() const {
     std::printf(
         "SearchTime: %2d:%02d, Step: %4d, "
-        "F: %4d, L: %3d, R: %3d, B: %3d, Walls: %4d\n",
+        "F: %4d, L: %3d, R: %3d, B: %3d, Walls: %4zu\n",
         est_time_ms / 1000 / 60, est_time_ms / 1000 % 60, step, f, l, r, b,
-        int(maze.getWallRecords().size()));
+        maze.getWallRecords().size());
   }
   void printFastResult(const bool diagEnabled, const bool showMaze = false) {
     /* 最短走行時間の表示 */
@@ -131,22 +131,22 @@ class CLRobotBase : public RobotBase {
     /* Maze */
     const auto pMazeEndSearch = std::make_unique<Maze>();
     Maze& mazeEndSearch = *pMazeEndSearch;
-    mazeEndSearch = getMaze(); /*< 探索終了時の迷路を取得 */
+    mazeEndSearch = getMaze();  //< 探索終了時の迷路を取得
     /* 迷路的に行き得る区画を洗い出す */
     stepMap.update(mazeTarget, {mazeTarget.getStart()}, true, true);
     for (int8_t x = 0; x < MAZE_SIZE; ++x) {
       for (int8_t y = 0; y < MAZE_SIZE; ++y) {
-        for (const auto d : Direction::Along4) {
+        for (const auto d : Direction::Along4()) {
           const auto p = Position(x, y);
-          if (p == Position(0, 0)) continue; /*< スタート区画は除外 */
+          if (p == Position(0, 0)) continue;  //< スタート区画は除外
           if (stepMap.getStep(p) == StepMap::STEP_MAX)
-            continue; /*< そもそも迷路的に行き得ない区画は除外 */
+            continue;  //< そもそも迷路的に行き得ない区画は除外
           if (mazeTarget.isWall(p, d + Direction::Back))
-            continue; /*< 壁上からの場合は除外 */
+            continue;  //< 壁上からの場合は除外
           fake_offset = real = Pose(p, d);
-          updateMaze(mazeEndSearch); /*< 探索終了時の迷路に置き換える */
+          updateMaze(mazeEndSearch);  //< 探索終了時の迷路に置き換える
           // robot.resetLastWalls(mazePi.getWallRecords().size() / 5);
-          setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
+          setForceGoingToGoal();  //< ゴールへの訪問を指定
           const bool res = positionIdentifyRun(fake_offset);
           if (!res)
             MAZE_LOGE << "Failed to Identify! fake_offset: " << fake_offset
@@ -167,13 +167,13 @@ class CLRobotBase : public RobotBase {
   bool unknown_accel_prev = false;
 
  public:
-  int step = 0, f = 0, l = 0, r = 0, b = 0; /*< 探索の評価のためのカウンタ */
-  int est_time_ms = 0;                      /*< 見積もり探索時間 [ms] */
+  int step = 0, f = 0, l = 0, r = 0, b = 0;  //< 探索の評価のためのカウンタ
+  int est_time_ms = 0;                       //< 見積もり探索時間 [ms]
 
  public:
   Pose fake_offset;
-  size_t pi_walls_max = 0;
-  size_t pi_walls_min = MAZE_SIZE * MAZE_SIZE * 4;
+  int pi_walls_max = 0;
+  int pi_walls_min = MAZE_SIZE * MAZE_SIZE * 4;
   int pi_est_time_ms_max = 0;
   int pi_est_time_ms_min = std::numeric_limits<int>::max();
 
@@ -229,7 +229,7 @@ class CLRobotBase : public RobotBase {
     if (newState == oldState) return;
     /* State Change has occurred */
     if (oldState == SearchAlgorithm::IDENTIFYING_POSITION) {
-      const auto walls =
+      const int walls =
           getSearchAlgorithm().getIdMaze().getWallRecords().size();
       pi_walls_min = std::min(pi_walls_min, walls);
       pi_walls_max = std::max(pi_walls_max, walls);

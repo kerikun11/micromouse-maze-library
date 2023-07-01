@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include <limits> /*< for std::numeric_limits */
+#include <limits>  //< for std::numeric_limits
 #include <vector>
 
 #include "MazeLib/Maze.h"
@@ -39,19 +39,19 @@ class StepMapSlalom {
      */
     struct RunParameter {
       RunParameter() {}
-      static constexpr float factor = 2;      /*< CostMax の超過防止 */
-      float vs = 420.0f * factor;             /*< 基本速度 [mm/s] */
-      float am_a = 4200.0f * factor * factor; /*< 最大加速度 [mm/s/s] */
-      float am_d = 3600.0f * factor * factor; /*< 最大加速度(斜め) [mm/s/s] */
-      float vm_a = 1500.0f * factor;          /*< 飽和速度 [mm/s] */
-      float vm_d = 1200.0f * factor;          /*< 飽和速度(斜め) [mm/s] */
+      static constexpr float factor = 2;       //< CostMax の超過防止
+      float vs = 420.0f * factor;              //< 基本速度 [mm/s]
+      float am_a = 4200.0f * factor * factor;  //< 最大加速度 [mm/s/s]
+      float am_d = 3600.0f * factor * factor;  //< 最大加速度(斜め) [mm/s/s]
+      float vm_a = 1500.0f * factor;           //< 飽和速度 [mm/s]
+      float vm_d = 1200.0f * factor;           //< 飽和速度(斜め) [mm/s]
       std::array<cost_t, Slalom::FMAX> slalomCostTable = {{
-          cost_t(257 / factor), /*< F45  [ms] @ 412 [mm/s] */
-          cost_t(375 / factor), /*< F90  [ms] @ 422 [mm/s] */
-          cost_t(465 / factor), /*< F135 [ms] @ 354 [mm/s] */
-          cost_t(563 / factor), /*< F180 [ms] @ 412 [mm/s] */
-          cost_t(388 / factor), /*< FV90 [ms] @ 290 [mm/s] */
-          cost_t(287 / factor), /*< FS90 [ms] @ 266 [mm/s] */
+          cost_t(257 / factor),  //< F45  [ms] @ 412 [mm/s]
+          cost_t(375 / factor),  //< F90  [ms] @ 422 [mm/s]
+          cost_t(465 / factor),  //< F135 [ms] @ 354 [mm/s]
+          cost_t(563 / factor),  //< F180 [ms] @ 412 [mm/s]
+          cost_t(388 / factor),  //< FV90 [ms] @ 290 [mm/s]
+          cost_t(287 / factor),  //< FS90 [ms] @ 266 [mm/s]
       }};
     };
 
@@ -60,13 +60,13 @@ class StepMapSlalom {
       calcStraightCostTable();
     }
     cost_t getEdgeCostAlong(const int n) const {
-      return costTableAlong[n]; /*< [ms] */
+      return costTableAlong[n];  //< [ms]
     }
     cost_t getEdgeCostDiag(const int n) const {
-      return costTableDiag[n]; /*< [ms] */
+      return costTableDiag[n];  //< [ms]
     }
     cost_t getEdgeCostSlalom(const Slalom p) const {
-      return rp.slalomCostTable[p]; /*< [ms] */
+      return rp.slalomCostTable[p];  //< [ms]
     }
     const RunParameter& getRunParameter() const { return rp; }
     void setRunParameter(const RunParameter& rp) {
@@ -92,15 +92,14 @@ class StepMapSlalom {
      */
     static cost_t calcStraightCost(const int i, const float am, const float vs,
                                    const float vm, const float seg) {
-      const auto d = seg * i; /*< i 区画分の走行距離 */
+      const auto d = seg * i;  //< i 区画分の走行距離
       /* グラフの面積から時間を求める */
-      const auto d_thr = (vm * vm - vs * vs) / am; /*< 最大速度に達する距離 */
+      const auto d_thr = (vm * vm - vs * vs) / am;  //< 最大速度に達する距離
       if (d < d_thr)
-        return 2 * (std::sqrt(vs * vs + am * d) - vs) / am *
-               1000; /*< 三角加速 */
+        return 2 * (std::sqrt(vs * vs + am * d) - vs) / am * 1000;  //< 三角加速
       else
         return (am * d + (vm - vs) * (vm - vs)) / (am * vm) *
-               1000; /*< 台形加速 */
+               1000;  //< 台形加速
     }
     /**
      * @brief コストテーブルを生成する関数
@@ -125,14 +124,18 @@ class StepMapSlalom {
    private:
     union {
       struct {
-        int x : 6; /**< @brief x coordinate of the cell */
-        int y : 6; /**< @brief y coordinate of the cell */
+        /** @brief x coordinate of the cell */
+        int x : 6;
+        /** @brief y coordinate of the cell */
+        int y : 6;
         /** @brief position assignment in the cell, 0:East; 1:North */
         unsigned int z : 1;
-        unsigned int nd : 3; /**< @brief direction of the node */
+        /** @brief direction of the node */
+        unsigned int nd : 3;
       } __attribute__((__packed__));
       uint16_t data; /**< @brief for access to the entire data */
     };
+    static_assert(MAZE_SIZE < std::pow(2, 6), "MAZE_SIZE is too large!");
 
    public:
     /**
@@ -164,12 +167,12 @@ class StepMapSlalom {
     /** @brief 等号 */
     bool operator==(const Index i) const {
       // return x == i.x && y == i.y && z == i.z && nd == i.nd;
-      return data == i.data; /*< 高速化 */
+      return data == i.data;  //< 高速化
     }
     /** @brief 等号否定 */
     bool operator!=(const Index i) const {
       // return x != i.x || y != i.y || z != i.z || nd != i.nd;
-      return data != i.data; /*< 高速化 */
+      return data != i.data;  //< 高速化
     }
     /** @brief WallIndex へのキャスト */
     operator WallIndex() const {
@@ -185,14 +188,14 @@ class StepMapSlalom {
       return (((~nd) & 1) << (2 * MAZE_SIZE_BIT + 3)) |
              (z << (2 * MAZE_SIZE_BIT + 2)) |
              ((6 & nd) << (2 * MAZE_SIZE_BIT - 1)) | (x << MAZE_SIZE_BIT) |
-             y; /*< M * M * 12 */
+             y;  //< M * M * 12
     }
     /**
      * @brief 座標の冗長を一意にする。
      * @details d を East or North のどちらかにそろえる
      */
     void uniquify(const Direction d) {
-      z = (d >> 1) & 1; /*< East,West => 0, North,South => 1 */
+      z = (d >> 1) & 1;  //< East,West => 0, North,South => 1
       switch (d) {
         case Direction::West:
           x--;
@@ -207,7 +210,7 @@ class StepMapSlalom {
     /** @brief 壁の方向 */
     Direction getDirection() const {
       // return z == 0 ? Direction::East : Direction::North;
-      return z << 1; /*< 高速化 */
+      return z << 1;  //< 高速化
     }
     /** @brief 機体の方向 */
     Direction getNodeDirection() const { return nd; }
@@ -244,9 +247,7 @@ class StepMapSlalom {
      * @brief 反対向きのIndexを取得
      * @return const Index 反対向き Index
      */
-    const Index opposite() const {
-      return Index(x, y, z, nd + Direction::Back);
-    }
+    Index opposite() const { return Index(x, y, z, nd + Direction::Back); }
   };
   static_assert(sizeof(Index) == 2, "size error");
 
@@ -315,7 +316,7 @@ class StepMapSlalom {
   static Directions indexes2directions(const Indexes& path);
 
 #if MAZE_DEBUG_PROFILING
-  std::size_t queueSizeMax = 0;
+  int queueSizeMax = 0;
 #endif
 
  private:

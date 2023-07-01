@@ -62,16 +62,16 @@ int test_position_identify() {
   /* 探索終了時の迷路を保存 */
   const auto pMazePi = std::make_unique<Maze>();
   Maze& mazePi = *pMazePi;
-  mazePi = robot.getMaze(); /*< 探索終了時の迷路を取得 */
+  mazePi = robot.getMaze();  //< 探索終了時の迷路を取得
 
 #if 1
   /* Position Identification Run */
   {
     robot.display = 1;
     const auto fake_offset = Pose(Position(0, 5), Direction::North);
-    robot.updateMaze(mazePi); /*< 探索直後の迷路に置き換える */
+    robot.updateMaze(mazePi);  //< 探索直後の迷路に置き換える
     // robot.resetLastWalls(robot.getMaze().getWallRecords().size() / 2);
-    robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
+    robot.setForceGoingToGoal();  //< ゴールへの訪問を指定
     bool res = robot.positionIdentifyRun(fake_offset);
     if (!res) {
       robot.printInfo();
@@ -91,18 +91,18 @@ int test_position_identify() {
   stepMap.update(mazeTarget, {mazeTarget.getStart()}, true, true);
   for (int8_t x = 0; x < MAZE_SIZE; ++x)
     for (int8_t y = 0; y < MAZE_SIZE; ++y)
-      for (const auto d : Direction::Along4) {
+      for (const auto d : Direction::Along4()) {
         const auto p = Position(x, y);
-        if (p == Position(0, 0)) continue; /*< スタートは除外 */
+        if (p == Position(0, 0)) continue;  //< スタートは除外
         if (stepMap.getStep(p) == StepMap::STEP_MAX)
-          continue; /*< そもそも迷路的に行き得ない区画は除外 */
+          continue;  //< そもそも迷路的に行き得ない区画は除外
         if (mazeTarget.isWall(p, d + Direction::Back))
-          continue; /*< 壁上からは除外 */
+          continue;  //< 壁上からは除外
         /* set fake offset */
         const auto fake_offset = Pose(Position(x, y), d);
-        robot.updateMaze(mazePi); /*< 探索直後の迷路に置き換える */
+        robot.updateMaze(mazePi);  //< 探索直後の迷路に置き換える
         // robot.resetLastWalls(robot.getMaze().getWallRecords().size() / 2);
-        robot.setForceGoingToGoal(); /*< ゴールへの訪問を指定 */
+        robot.setForceGoingToGoal();  //< ゴールへの訪問を指定
         robot.display = 1;
         bool res = robot.positionIdentifyRun(fake_offset);
         if (!res) {

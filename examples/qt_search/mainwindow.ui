@@ -37,7 +37,7 @@
      <string>...</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="fileSeectEdit">
+   <widget class="QLineEdit" name="fileSelectEdit">
     <property name="geometry">
      <rect>
       <x>960</x>

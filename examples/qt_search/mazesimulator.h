@@ -1,5 +1,4 @@
-#ifndef MAZESIMULATOR_H
-#define MAZESIMULATOR_H
+#pragma once
 
 #include <MazeLib/Maze.h>
 #include <MazeLib/RobotBase.h>
@@ -9,6 +8,7 @@
 #include <QGraphicsScene>
 #include <QMainWindow>
 #include <QTimer>
+#include <algorithm>  //< std::min
 #include <sstream>
 
 #include "ui_mainwindow.h"
@@ -105,7 +105,8 @@ class MazeSimulator : public MazeLib::RobotBase {
         // font.setPointSize(5);
         font.setPointSize(font_size);
         scene
-            ->addText(QString::number(std::min((int)map.getStep(x, y), 999)),
+            ->addText(QString::number(
+                          std::min(static_cast<int>(map.getStep(x, y)), 999)),
                       font)
             ->setPos(cell2posX(x), cell2posY(y + 1));
         /* Draw Wall */
@@ -134,7 +135,7 @@ class MazeSimulator : public MazeLib::RobotBase {
     Directions dirs;
     if (!sa.calcShortestDirections(dirs, diagEnabled, edgeCost)) return false;
     auto p = maze.getStart();
-    for (size_t i = 0; i < dirs.size(); ++i) {
+    for (int i = 0; i < dirs.size(); ++i) {
       if (diagEnabled && i == dirs.size() - 1) break;
       const auto d = dirs[i];
       const auto next_p = p.next(d);
@@ -163,7 +164,7 @@ class MazeSimulator : public MazeLib::RobotBase {
     if (dirs.empty()) return false;
     StepMap::appendStraightDirections(maze, dirs, knownOnly, diagEnabled);
     auto p = maze.getStart();
-    for (size_t i = 0; i < dirs.size(); ++i) {
+    for (int i = 0; i < dirs.size(); ++i) {
       if (diagEnabled && i == dirs.size() - 1) break;
       const auto d = dirs[i];
       const auto next_p = p.next(d);
@@ -188,7 +189,7 @@ class MazeSimulator : public MazeLib::RobotBase {
     if (dirs.empty()) return false;
     map.appendStraightDirections(maze, dirs);
     auto p = WallIndex(0, 0, 1);
-    for (size_t i = 0; i < dirs.size(); ++i) {
+    for (int i = 0; i < dirs.size(); ++i) {
       const auto d = dirs[i];
       const auto next_p = p.next(d);
       QPoint offset(line_px, line_px);
@@ -333,5 +334,3 @@ class MazeSimulator : public MazeLib::RobotBase {
     return (s - y) * w;
   }
 };
-
-#endif  // MAZESIMULATOR_H

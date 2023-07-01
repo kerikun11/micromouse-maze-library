@@ -1,3 +1,10 @@
+/**
+ * @file test_direction.cpp
+ * @brief Unit Test for MazeLib::Direction
+ * @author Ryotaro Onuki <kerikun11+github@gmail.com>
+ * @date 2023-07-01
+ * @copyright Copyright 2023 Ryotaro Onuki <kerikun11+github@gmail.com>
+ */
 #include <gtest/gtest.h>
 
 #include "MazeLib/Maze.h"
@@ -19,13 +26,13 @@ TEST(Direction, isAlong_isDiag) {
 }
 
 TEST(Direction, Along4_Diag4) {
-  EXPECT_EQ(Direction::Along4.size(), 4);
-  for (const auto d : Direction::Along4) {
+  EXPECT_EQ(Direction::Along4().size(), 4);
+  for (const auto d : Direction::Along4()) {
     EXPECT_TRUE(d.isAlong());
     EXPECT_FALSE(d.isDiag());
   }
-  EXPECT_EQ(Direction::Diag4.size(), 4);
-  for (const auto d : Direction::Diag4) {
+  EXPECT_EQ(Direction::Diag4().size(), 4);
+  for (const auto d : Direction::Diag4()) {
     EXPECT_FALSE(d.isAlong());
     EXPECT_TRUE(d.isDiag());
   }

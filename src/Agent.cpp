@@ -12,11 +12,11 @@ namespace MazeLib {
 void Agent::printInfo(const bool showMaze) const {
   /* 迷路を表示 */
   if (showMaze) {
-    std::cout << "\e[0;0H"; /*< アニメーションのためにカーソルを左上に移動 */
+    std::cout << "\e[0;0H";  //< アニメーションのためにカーソルを左上に移動
     searchAlgorithm.printStepMap(getState(), getCurrentPose());
   }
   /* 詳細を表示 */
-  std::cout << "\e[J"; /*< カーソル以下を消去 */
+  std::cout << "\e[J";  //< カーソル以下を消去
   std::cout << "Pose: " << getCurrentPose() << ", "
             << "State: " << SearchAlgorithm::getStateString(getState()) << ", "
             << "Force Start: "

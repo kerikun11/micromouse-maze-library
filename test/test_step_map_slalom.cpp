@@ -1,3 +1,10 @@
+/**
+ * @file test_step_map_slalom.cpp
+ * @brief Unit Test for MazeLib::StepMapSlalom
+ * @author Ryotaro Onuki <kerikun11+github@gmail.com>
+ * @date 2023-07-01
+ * @copyright Copyright 2023 Ryotaro Onuki <kerikun11+github@gmail.com>
+ */
 #include <gtest/gtest.h>
 
 #include "MazeLib/StepMapSlalom.h"

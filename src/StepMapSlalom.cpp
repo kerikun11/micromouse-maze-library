@@ -8,8 +8,8 @@
 
 #include "MazeLib/StepMapSlalom.h"
 
-#include <algorithm> /*< for std::find_if */
-#include <iomanip>   /*< for std::setw */
+#include <algorithm>  //< for std::find_if
+#include <iomanip>    //< for std::setw
 #include <queue>
 
 namespace MazeLib {
@@ -82,10 +82,10 @@ StepMapSlalom::Index StepMapSlalom::Index::next(const Direction nd) const {
 }
 std::ostream& operator<<(std::ostream& os, const StepMapSlalom::Index& i) {
   if (i.getNodeDirection().isAlong())
-    return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
-              << (int)i.y << ", " << i.getNodeDirection().toChar() << ")";
-  return os << "( " << std::setw(2) << (int)i.x << ", " << std::setw(2)
-            << (int)i.y << ", " << i.getDirection().toChar() << ", "
+    return os << "( " << std::setw(2) << +i.x << ", " << std::setw(2) << +i.y
+              << ", " << i.getNodeDirection().toChar() << ")";
+  return os << "( " << std::setw(2) << +i.x << ", " << std::setw(2) << +i.y
+            << ", " << i.getDirection().toChar() << ", "
             << i.getNodeDirection().toChar() << ")";
 }
 
@@ -98,7 +98,7 @@ Directions StepMapSlalom::calcShortestDirections(const Maze& maze,
   update(maze, edgeCost, dest, knownOnly);
   Indexes path;
   if (!genPathFromMap(path)) return {};
-  return indexes2directions(path); /*< 区画ベースの方向列 */
+  return indexes2directions(path);  //< 区画ベースの方向列
 }
 void StepMapSlalom::update(const Maze& maze, const EdgeCost& edgeCost,
                            const Indexes& dest, const bool knownOnly) {
@@ -128,7 +128,7 @@ void StepMapSlalom::update(const Maze& maze, const EdgeCost& edgeCost,
   /* 更新がなくなるまで更新 */
   while (!q.empty()) {
 #if MAZE_DEBUG_PROFILING
-    queueSizeMax = std::max(queueSizeMax, q.size());
+    queueSizeMax = std::max(queueSizeMax, static_cast<int>(q.size()));
 #endif
 #if STEP_MAP_USE_PRIORITY_QUEUE
     const auto focus = q.top().v;
@@ -356,15 +356,16 @@ void StepMapSlalom::printPath(const Maze& maze, const Indexes& indexes,
 StepMapSlalom::Indexes StepMapSlalom::convertDestinations(
     const Positions& src) {
   Indexes dest;
-  dest.reserve(src.size() * 4);
+  dest.reserve(src.size() * Direction::Along4().size());
   for (const auto p : src)
-    for (const auto nd : Direction::Along4) dest.push_back(Index(p, nd));
+    for (const auto nd : Direction::Along4()) dest.push_back(Index(p, nd));
   return dest;
 }
 Directions StepMapSlalom::indexes2directions(const Indexes& path) {
+  const int length = path.size();
   Directions dirs;
-  dirs.reserve(path.size());
-  for (int i = 0; i < (int)path.size() - 1; ++i) {
+  dirs.reserve(length);
+  for (int i = 0; i < length - 1; ++i) {
     const auto nd = path[i].getNodeDirection();
     const auto rel_p = path[i + 1].getPosition() - path[i].getPosition();
     const auto rel_nd =

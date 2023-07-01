@@ -15,7 +15,7 @@ void poll(Maze& maze) {
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
   const auto getRandomDirectionsAlong4 = [&]() {
-    Directions dirs(Direction::Along4.begin(), Direction::Along4.end());
+    Directions dirs(Direction::Along4().begin(), Direction::Along4().end());
     std::shuffle(dirs.begin(), dirs.end(), engine);
     return dirs;
   };
@@ -48,7 +48,7 @@ void dig(Maze& maze) {
   };
   // const auto getRandomDirectionsAlong4 = [&]() {
   //   Directions dirs;
-  //   for (const auto d : Direction::getAlong4())
+  //   for (const auto d : Direction::Along)())
   //     dirs.push_back(d);
   //   std::shuffle(dirs.begin(), dirs.end(), engine);
   //   return dirs;
@@ -74,7 +74,8 @@ void dig(Maze& maze) {
     /* print */
     // maze.print({p}), getc(stdin);
     /* walk */
-    Directions dirs(Direction::Along4.begin(), Direction::Along4.end());
+    Directions dirs;
+    for (const auto d : Direction::Along4()) dirs.push_back(d);
 #if 1
     // 直進優先
     for (int i = 0; i < 2; ++i) dirs.push_back(Direction::Front);
@@ -99,9 +100,9 @@ void dig(Maze& maze) {
       stack.push(pose);
       stack.push(pose.next(d));
 #if 1
-      const auto known = std::count_if(
-          Direction::Along4.cbegin(), Direction::Along4.cend(),
-          [&](const auto d) {
+      const auto&& along4 = Direction::Along4();
+      const auto known =
+          std::count_if(along4.cbegin(), along4.cend(), [&](const auto d) {
             const auto n = p.next(d);
             const auto next = n.next(d);
             return next.isInsideOfField() && !mark[next.getIndex()];

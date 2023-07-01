@@ -94,7 +94,7 @@ class RobotBase : public Agent {
                                               __attribute__((unused))) {}
 
  protected:
-  bool breakFlag = false; /*< @brief 探索を中断させるフラグ */
+  bool breakFlag = false;  //< @brief 探索を中断させるフラグ
 
   /**
    * @brief 処理関数

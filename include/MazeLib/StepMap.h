@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include <limits> /*< for std::numeric_limits */
+#include <limits>  //< for std::numeric_limits
 
 #include "MazeLib/Maze.h"
 
@@ -169,7 +169,7 @@ class StepMap {
                                        const bool diagEnabled);
 
 #if MAZE_DEBUG_PROFILING
-  std::size_t queueSizeMax = 0;
+  int queueSizeMax = 0;
 #endif
 
  protected:

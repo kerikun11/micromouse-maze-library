@@ -13,6 +13,8 @@ option(BUILD_EXAMPLES "build example projects" ON)
 ## global build options
 set(CMAKE_CXX_STANDARD 17) # enable option -std=c++17
 set(CMAKE_CXX_EXTENSIONS OFF) # without compiler extensions like gnu++14
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ## make a static library
 set(MICROMOUSE_MAZE_LIBRARY "maze") # target name
@@ -55,3 +57,17 @@ endif()
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
+
+## cpplint
+add_custom_target(cpplint
+  COMMAND cpplint --quiet --recursive --exclude=build .
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  USES_TERMINAL
+)
+
+## cppcheck
+add_custom_target(cppcheck
+  COMMAND cppcheck --quiet --enable=all --suppress=missingInclude
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)

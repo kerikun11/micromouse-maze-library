@@ -78,10 +78,11 @@ const char* RobotBase::getFastActionName(enum FastAction action) {
 
 std::string RobotBase::convertDirectionsToSearchPath(const Directions& dirs) {
   if (dirs.empty()) return "";
+  const int length = dirs.size();
   std::string path;
-  path.reserve(dirs.size());
+  path.reserve(length);
   Direction prevDir = dirs[0];
-  for (int i = 1; i < (int)dirs.size(); ++i) {
+  for (int i = 1; i < length; ++i) {
     const auto nextDir = dirs[i];
     switch (Direction(nextDir - prevDir)) {
       case Direction::Front:
@@ -101,7 +102,7 @@ std::string RobotBase::convertDirectionsToSearchPath(const Directions& dirs) {
 std::string RobotBase::convertSearchPathToFastPath(std::string src,
                                                    const bool diagEnabled) {
   /* 前後に半分の直線を追加 */
-  src = (char)F_ST_HALF + src + (char)F_ST_HALF;
+  src = static_cast<char>(F_ST_HALF) + src + static_cast<char>(F_ST_HALF);
   return replaceStringSearchToFast(src, diagEnabled);
 }
 std::string RobotBase::convertSearchPathToKnownPath(std::string src,
@@ -109,12 +110,12 @@ std::string RobotBase::convertSearchPathToKnownPath(std::string src,
   /* 直線を半区画に統一 */
   replace(src, "S", "ss");
   /* 初手ターンを防ぐため、直線を探す */
-  auto f = src.find_first_of(F_ST_HALF, 1); /*< 最初の直線を探す */
-  auto b = src.find_last_of(F_ST_HALF);     /*< 最後の直線を探す */
-  if (f >= b) return src;                   /*< 直線なし */
+  auto f = src.find_first_of(F_ST_HALF, 1);  //< 最初の直線を探す
+  auto b = src.find_last_of(F_ST_HALF);      //< 最後の直線を探す
+  if (f >= b) return src;                    //< 直線なし
   /* 前後のターンを除いた、直線に挟まれた区間を抽出 */
   auto fb = src.substr(f, b - f + 1);
-  fb = replaceStringSearchToFast(fb, diagEnabled); /*< 最短パターンに変換 */
+  fb = replaceStringSearchToFast(fb, diagEnabled);  //< 最短パターンに変換
   /* 最初の直線前と最後の直線後を連結して完了 */
   return src.substr(0, f - 0) + fb + src.substr(b + 1, src.size() - b - 1);
 }
@@ -220,7 +221,7 @@ bool RobotBase::generalSearchRun() {
     /* 既知区間の走行中に最短経路を導出 */
     calcNextDirectionsPreCallback();
     const auto oldState = getState();
-    const auto status = calcNextDirections(); /*< 時間がかかる処理！ */
+    const auto status = calcNextDirections();  //< 時間がかかる処理！
     const auto newState = getState();
     calcNextDirectionsPostCallback(oldState, newState);
     /* 最短経路導出結果を確認 */
@@ -258,7 +259,7 @@ bool RobotBase::generalSearchRun() {
   queueAction(ST_HALF_STOP);
   queueAction(START_INIT);
   updateCurrentPose({Position(0, 0), Direction::North});
-  calcNextDirections(); /*< 最終状態に更新 */
+  calcNextDirections();  //< 最終状態に更新
   waitForEndAction();
   stopDequeue();
   /* 迷路情報の保存 */
@@ -285,36 +286,36 @@ int RobotBase::replace(std::string& src, const std::string& from,
 }
 std::string RobotBase::replaceStringSearchToFast(std::string src,
                                                  bool diagEnabled) {
-  replace(src, "S", "ss"); /*< expand */
-  replace(src, "L", "ll"); /*< expand */
-  replace(src, "R", "rr"); /*< expand */
+  replace(src, "S", "ss");  //< expand
+  replace(src, "L", "ll");  //< expand
+  replace(src, "R", "rr");  //< expand
   if (diagEnabled) {
     replace(src, "rllllr", "rlplr"); /**< FV90 */
     replace(src, "lrrrrl", "lrPrl"); /**< FV90 */
-    replace(src, "sllr", "zlr");     /*< F45 */
-    replace(src, "srrl", "crl");     /*< F45 */
-    replace(src, "rlls", "rlZ");     /*< F45 P */
-    replace(src, "lrrs", "lrC");     /*< F45 P */
-    replace(src, "sllllr", "alr");   /*< F135 */
-    replace(src, "srrrrl", "drl");   /*< F135 */
-    replace(src, "rlllls", "rlA");   /*< F135 P */
-    replace(src, "lrrrrs", "lrD");   /*< F135 P */
-    replace(src, "slllls", "u");     /*< F180 */
-    replace(src, "srrrrs", "U");     /*< F180 */
-    replace(src, "rllr", "rlwlr");   /*< ST_DIAG */
-    replace(src, "lrrl", "lrwrl");   /*< ST_DIAG */
-    replace(src, "slls", "q");       /*< F90 */
-    replace(src, "srrs", "Q");       /*< F90 */
-    replace(src, "rl", "");          /*< cleaning */
-    replace(src, "lr", "");          /*< cleaning */
-    replace(src, "ss", "S");         /*< ST_FULL */
+    replace(src, "sllr", "zlr");     //< F45
+    replace(src, "srrl", "crl");     //< F45
+    replace(src, "rlls", "rlZ");     //< F45 P
+    replace(src, "lrrs", "lrC");     //< F45 P
+    replace(src, "sllllr", "alr");   //< F135
+    replace(src, "srrrrl", "drl");   //< F135
+    replace(src, "rlllls", "rlA");   //< F135 P
+    replace(src, "lrrrrs", "lrD");   //< F135 P
+    replace(src, "slllls", "u");     //< F180
+    replace(src, "srrrrs", "U");     //< F180
+    replace(src, "rllr", "rlwlr");   //< ST_DIAG
+    replace(src, "lrrl", "lrwrl");   //< ST_DIAG
+    replace(src, "slls", "q");       //< F90
+    replace(src, "srrs", "Q");       //< F90
+    replace(src, "rl", "");          //< cleaning
+    replace(src, "lr", "");          //< cleaning
+    replace(src, "ss", "S");         //< ST_FULL
   } else {
-    replace(src, "slllls", "u"); /*< F180 */
-    replace(src, "srrrrs", "U"); /*< F180 */
-    replace(src, "slls", "q");   /*< F90 */
-    replace(src, "srrs", "Q");   /*< F90 */
-    replace(src, "ll", "L");     /**< FS90 */
-    replace(src, "rr", "R");     /**< FS90 */
+    replace(src, "slllls", "u");  //< F180
+    replace(src, "srrrrs", "U");  //< F180
+    replace(src, "slls", "q");    //< F90
+    replace(src, "srrs", "Q");    //< F90
+    replace(src, "ll", "L");      //< FS90
+    replace(src, "rr", "R");      //< FS90
   }
   return src;
 }

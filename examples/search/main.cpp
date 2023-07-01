@@ -6,16 +6,16 @@
  */
 
 /*
- * 迷路ライブラリの読み込み
- */
-#include "MazeLib/Maze.h"
-#include "MazeLib/StepMap.h"
-
-/*
  * 標準ライブラリの読み込み
  */
 #include <algorithm>  //< for std::find
 #include <thread>     //< for std::this_thread::sleep_for
+
+/*
+ * 迷路ライブラリの読み込み
+ */
+#include "MazeLib/Maze.h"
+#include "MazeLib/StepMap.h"
 
 /*
  * 名前空間の展開
@@ -52,9 +52,9 @@ void MoveRobot(const Direction relativeDir) {
 void ShowAnimation(const StepMap& stepMap, const Maze& maze,
                    const Position& pos, const Direction& dir,
                    const std::string& msg) {
-  std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+  std::cout << "\e[0;0H";  //< カーソルを左上に移動
   stepMap.print(maze, pos, dir);
-  std::cout << "\e[J"; /*< カーソル以下を消去 */
+  std::cout << "\e[J";  //< カーソル以下を消去
   std::cout << msg << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
@@ -229,8 +229,8 @@ int ShortestRun(const Maze& maze) {
  */
 int main(void) {
   /* 画面のクリア */
-  std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-  std::cout << "\e[J";    /*< カーソル以下を消去 */
+  std::cout << "\e[0;0H";  //< カーソルを左上に移動
+  std::cout << "\e[J";     //< カーソル以下を消去
 
   /* シミュレーションに用いる迷路の選択 */
   const std::string filepath = "../mazedata/data/16MM2018CX.maze";

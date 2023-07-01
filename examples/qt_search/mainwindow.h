@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <MazeLib/Maze.h>
 #include <MazeLib/StepMapSlalom.h>
@@ -25,7 +24,7 @@ class MainWindow : public QMainWindow {
         scene(new QGraphicsScene),
         mazeSimulator(ui, scene) {
     ui->setupUi(this);
-    ui->fileSeectEdit->setText("../mazedata/data/32MM2016HX.maze");
+    ui->fileSelectEdit->setText("../mazedata/data/32MM2016HX.maze");
     ui->statusBar->showMessage("Hello World!");
     ui->mazeView->setScene(scene);
   }
@@ -40,13 +39,13 @@ class MainWindow : public QMainWindow {
     /* get Relative Path */
     QDir pwd(".");
     QString s = pwd.relativeFilePath(fileinfo.filePath());
-    ui->fileSeectEdit->setText(s);
+    ui->fileSelectEdit->setText(s);
     /* draw */
     on_drawButton_clicked();
   }
 
   void on_drawButton_clicked() {
-    QString filepath = ui->fileSeectEdit->text();
+    QString filepath = ui->fileSelectEdit->text();
     /* Parse Maze File */
     MazeLib::Maze maze;
     if (!maze.parse(filepath.toStdString().c_str())) {
@@ -153,7 +152,7 @@ class MainWindow : public QMainWindow {
     }
   }
 
-  void on_fileSeectEdit_returnPressed() {
+  void on_fileSelectEdit_returnPressed() {
     on_drawButton_clicked();
     /* StepMap StepMapWall */
     on_stepmapSimpleButton_clicked();
@@ -195,7 +194,7 @@ class MainWindow : public QMainWindow {
   }
 
   void on_saveImageButton_clicked() {
-    auto filepath = QFileInfo(ui->fileSeectEdit->text());
+    auto filepath = QFileInfo(ui->fileSelectEdit->text());
     scene->clearSelection();  // Selections would also render to the file
     scene->setSceneRect(scene->itemsBoundingRect());  // Re-shrink the scene to
                                                       // it's bounding contents
@@ -304,5 +303,3 @@ class MainWindow : public QMainWindow {
     on_shortestNoDiagButton_clicked();
   }
 };
-
-#endif  // MAINWINDOW_H

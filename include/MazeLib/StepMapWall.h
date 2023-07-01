@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include <limits> /*< for std::numeric_limits */
+#include <limits>  //< for std::numeric_limits
 
 #include "MazeLib/Maze.h"
 
@@ -96,7 +96,7 @@ class StepMapWall {
       const WallIndex& start = START_WALL_INDEX);
 
 #if MAZE_DEBUG_PROFILING
-  std::size_t queueSizeMax = 0;
+  int queueSizeMax = 0;
 #endif
 
  private:
