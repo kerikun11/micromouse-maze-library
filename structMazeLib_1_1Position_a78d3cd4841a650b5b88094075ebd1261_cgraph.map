@@ -1,0 +1,4 @@
+<map id="MazeLib::Position::next" name="MazeLib::Position::next">
+<area shape="rect" id="node1" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="5,13,179,39"/>
+<area shape="rect" id="node2" href="$structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="227,5,371,47"/>
+</map>

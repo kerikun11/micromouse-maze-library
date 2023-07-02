@@ -1,0 +1,598 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MicroMouse Maze Library: MazeLib::Direction クラス</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">MicroMouse Maze Library
+   &#160;<span id="projectnumber">3703225</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 構築: Doxygen 1.9.1 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'検索','.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','検索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="namespaceMazeLib.html">MazeLib</a></li><li class="navelem"><a class="el" href="classMazeLib_1_1Direction.html">Direction</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">公開型</a> &#124;
+<a href="#pub-methods">公開メンバ関数</a> &#124;
+<a href="#pub-static-methods">静的公開メンバ関数</a> &#124;
+<a href="#pub-static-attribs">静的公開変数類</a> &#124;
+<a href="#friends">フレンド</a> &#124;
+<a href="classMazeLib_1_1Direction-members.html">全メンバ一覧</a>  </div>
+  <div class="headertitle">
+<div class="title">MazeLib::Direction クラス</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>迷路上の方向を表す。  
+ <a href="classMazeLib_1_1Direction.html#details">[詳解]</a></p>
+
+<p><code>#include &lt;<a class="el" href="Maze_8h_source.html">Maze.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+公開型</h2></td></tr>
+<tr class="memitem:a3eac649af2c57a5d9b58a530d22370ee"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370ee">AbsoluteDirection</a> : int8_t { <br />
+&#160;&#160;<a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">East</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4">NorthEast</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">North</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890">NorthWest</a>
+, <br />
+&#160;&#160;<a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7">West</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eeab8c82202106d287f826a9fe028e71be3">SouthWest</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a">South</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea133016eb925c28cd4d0337daf26f8e84">SouthEast</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:a3eac649af2c57a5d9b58a530d22370ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">絶対方向の列挙型。 0-7 の整数  <a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370ee">[詳解]</a><br /></td></tr>
+<tr class="separator:a3eac649af2c57a5d9b58a530d22370ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a762b348a57280c9c443d7c5d237edd60"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60">RelativeDirection</a> : int8_t { <br />
+&#160;&#160;<a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a8080bc3c245051ad644584a4bfc69034">Front</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a37957d01f6d2841bbac8d94bb954b465">Left45</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a72a37309043bab870fb2dc65564ed457">Left</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a93e602f7807b869f5acb95a1b812196d">Left135</a>
+, <br />
+&#160;&#160;<a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a0bcfbf4f8ebf9c5e5c68c984bc4f8b16">Back</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a3c4dcc97e1ebe1e847792417501f2109">Right135</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a53ecc375f42b4267a8bb141e2a447389">Right</a>
+, <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a3c25c52477258eb62db01c7c7d98309f">Right45</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:a762b348a57280c9c443d7c5d237edd60"><td class="mdescLeft">&#160;</td><td class="mdescRight">相対方向の列挙型。 0-7 の整数  <a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60">[詳解]</a><br /></td></tr>
+<tr class="separator:a762b348a57280c9c443d7c5d237edd60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+公開メンバ関数</h2></td></tr>
+<tr class="memitem:aaa32d9c23182e631dc4f649ad2de6b9e"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#aaa32d9c23182e631dc4f649ad2de6b9e">Direction</a> (const <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370ee">AbsoluteDirection</a> d=<a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">East</a>)</td></tr>
+<tr class="memdesc:aaa32d9c23182e631dc4f649ad2de6b9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">デフォルトコンストラクタ。絶対方向をそのまま格納。  <a href="classMazeLib_1_1Direction.html#aaa32d9c23182e631dc4f649ad2de6b9e">[詳解]</a><br /></td></tr>
+<tr class="separator:aaa32d9c23182e631dc4f649ad2de6b9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d89fe6c747d2aee8ce09883834bfea2"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#a8d89fe6c747d2aee8ce09883834bfea2">Direction</a> (const int8_t d)</td></tr>
+<tr class="memdesc:a8d89fe6c747d2aee8ce09883834bfea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">整数を引数としたコンストラクタ。  <a href="classMazeLib_1_1Direction.html#a8d89fe6c747d2aee8ce09883834bfea2">[詳解]</a><br /></td></tr>
+<tr class="separator:a8d89fe6c747d2aee8ce09883834bfea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaed893cce997f246379afc6c0d2de573"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#aaed893cce997f246379afc6c0d2de573">operator int8_t</a> () const</td></tr>
+<tr class="memdesc:aaed893cce997f246379afc6c0d2de573"><td class="mdescLeft">&#160;</td><td class="mdescRight">整数へのキャスト。相対方向などの演算に使える。  <a href="classMazeLib_1_1Direction.html#aaed893cce997f246379afc6c0d2de573">[詳解]</a><br /></td></tr>
+<tr class="separator:aaed893cce997f246379afc6c0d2de573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71ebf7d415031f843328f925a14fc774"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#a71ebf7d415031f843328f925a14fc774">isAlong</a> () const</td></tr>
+<tr class="memdesc:a71ebf7d415031f843328f925a14fc774"><td class="mdescLeft">&#160;</td><td class="mdescRight">壁沿い方向かどうかの判定  <a href="classMazeLib_1_1Direction.html#a71ebf7d415031f843328f925a14fc774">[詳解]</a><br /></td></tr>
+<tr class="separator:a71ebf7d415031f843328f925a14fc774"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4d2e7c798db8222193a63a5d6f05207"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#ab4d2e7c798db8222193a63a5d6f05207">isDiag</a> () const</td></tr>
+<tr class="memdesc:ab4d2e7c798db8222193a63a5d6f05207"><td class="mdescLeft">&#160;</td><td class="mdescRight">斜め方向かどうかの判定  <a href="classMazeLib_1_1Direction.html#ab4d2e7c798db8222193a63a5d6f05207">[詳解]</a><br /></td></tr>
+<tr class="separator:ab4d2e7c798db8222193a63a5d6f05207"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafdc7088bfc707aa2f4d215a18cfc437"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#aafdc7088bfc707aa2f4d215a18cfc437">toChar</a> () const</td></tr>
+<tr class="memdesc:aafdc7088bfc707aa2f4d215a18cfc437"><td class="mdescLeft">&#160;</td><td class="mdescRight">表示用char型へのキャスト  <a href="classMazeLib_1_1Direction.html#aafdc7088bfc707aa2f4d215a18cfc437">[詳解]</a><br /></td></tr>
+<tr class="separator:aafdc7088bfc707aa2f4d215a18cfc437"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+静的公開メンバ関数</h2></td></tr>
+<tr class="memitem:a16795275f8cd53156110f1e98efe95f3"><td class="memItemLeft" align="right" valign="top">static constexpr const std::array&lt; <a class="el" href="classMazeLib_1_1Direction.html">Direction</a>, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#a16795275f8cd53156110f1e98efe95f3">Along4</a> ()</td></tr>
+<tr class="memdesc:a16795275f8cd53156110f1e98efe95f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">斜めではない4方向の配列 (for文などで使用)  <a href="classMazeLib_1_1Direction.html#a16795275f8cd53156110f1e98efe95f3">[詳解]</a><br /></td></tr>
+<tr class="separator:a16795275f8cd53156110f1e98efe95f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d9004ffeff8437e502c88082d22b2fe"><td class="memItemLeft" align="right" valign="top">static constexpr const std::array&lt; <a class="el" href="classMazeLib_1_1Direction.html">Direction</a>, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#a2d9004ffeff8437e502c88082d22b2fe">Diag4</a> ()</td></tr>
+<tr class="memdesc:a2d9004ffeff8437e502c88082d22b2fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">斜めの4方向の配列 (for文などで使用)  <a href="classMazeLib_1_1Direction.html#a2d9004ffeff8437e502c88082d22b2fe">[詳解]</a><br /></td></tr>
+<tr class="separator:a2d9004ffeff8437e502c88082d22b2fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+静的公開変数類</h2></td></tr>
+<tr class="memitem:acacc0677c2bcb487c5f0404bf5a42f09"><td class="memItemLeft" align="right" valign="top">static constexpr const int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#acacc0677c2bcb487c5f0404bf5a42f09">Max</a> = 8</td></tr>
+<tr class="memdesc:acacc0677c2bcb487c5f0404bf5a42f09"><td class="mdescLeft">&#160;</td><td class="mdescRight">方向の総数。for文などで使える。  <a href="classMazeLib_1_1Direction.html#acacc0677c2bcb487c5f0404bf5a42f09">[詳解]</a><br /></td></tr>
+<tr class="separator:acacc0677c2bcb487c5f0404bf5a42f09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+フレンド</h2></td></tr>
+<tr class="memitem:aca4a8309bdbeb25e04ed475f3dd9be3a"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html#aca4a8309bdbeb25e04ed475f3dd9be3a">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a> d)</td></tr>
+<tr class="memdesc:aca4a8309bdbeb25e04ed475f3dd9be3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">stream 表示  <a href="classMazeLib_1_1Direction.html#aca4a8309bdbeb25e04ed475f3dd9be3a">[詳解]</a><br /></td></tr>
+<tr class="separator:aca4a8309bdbeb25e04ed475f3dd9be3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">詳解</h2>
+<div class="textblock"><p>迷路上の方向を表す。 </p>
+<p>実体は 8bit の整数。 絶対方向 or 相対方向の8方位を表現することができる。 コンストラクタにより8方位(0-7)に自動的に収められるので、 加法、減法により相対方向を計算することができる。</p><ul>
+<li>例: <a class="el" href="classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a>(<a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">Direction::East</a> + <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a72a37309043bab870fb2dc65564ed457">Direction::Left</a>) == <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">Direction::North</a></li>
+<li>例: <a class="el" href="classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a>(<a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">Direction::East</a> - <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7">Direction::West</a>) == <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a0bcfbf4f8ebf9c5e5c68c984bc4f8b16">Direction::Back</a></li>
+<li>例: <a class="el" href="classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a>(-<a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a72a37309043bab870fb2dc65564ed457">Direction::Left</a>) == <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a53ecc375f42b4267a8bb141e2a447389">Direction::Right</a></li>
+</ul>
+<div class="fragment"><div class="line"><a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370ee">AbsoluteDirection</a></div>
+<div class="line">+-----------+-------+-----------+</div>
+<div class="line">| <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890">NorthWest</a>   <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">North</a>   <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4">NorthEast</a> |</div>
+<div class="line">+           +       +           +</div>
+<div class="line">|      <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7">West</a>     X          <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">East</a> |</div>
+<div class="line">+           +       +           +</div>
+<div class="line">| <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890">NorthWest</a>   <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">North</a>   <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4">NorthEast</a> |</div>
+<div class="line">+-----------+-------+-----------+</div>
+<div class="line"><a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60">RelativeDirection</a></div>
+<div class="line">+-----------+-------+-----------+</div>
+<div class="line">|   <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a93e602f7807b869f5acb95a1b812196d">Left135</a>    <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a72a37309043bab870fb2dc65564ed457">Left</a>      <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a37957d01f6d2841bbac8d94bb954b465">Left45</a> |</div>
+<div class="line">+           +       +           +</div>
+<div class="line">|      <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a0bcfbf4f8ebf9c5e5c68c984bc4f8b16">Back</a>     X         <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a8080bc3c245051ad644584a4bfc69034">Front</a> |</div>
+<div class="line">+           +       +           +</div>
+<div class="line">|  <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a3c4dcc97e1ebe1e847792417501f2109">Right135</a>   <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a53ecc375f42b4267a8bb141e2a447389">Right</a>     <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a3c25c52477258eb62db01c7c7d98309f">Right45</a> |</div>
+<div class="line">+-----------+-------+-----------+</div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370ee"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370ee">MazeLib::Direction::AbsoluteDirection</a></div><div class="ttdeci">AbsoluteDirection</div><div class="ttdoc">絶対方向の列挙型。 0-7 の整数</div><div class="ttdef"><b>Definition:</b> Maze.h:150</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">MazeLib::Direction::North</a></div><div class="ttdeci">@ North</div><div class="ttdef"><b>Definition:</b> Maze.h:153</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890">MazeLib::Direction::NorthWest</a></div><div class="ttdeci">@ NorthWest</div><div class="ttdef"><b>Definition:</b> Maze.h:154</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4">MazeLib::Direction::NorthEast</a></div><div class="ttdeci">@ NorthEast</div><div class="ttdef"><b>Definition:</b> Maze.h:152</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">MazeLib::Direction::East</a></div><div class="ttdeci">@ East</div><div class="ttdef"><b>Definition:</b> Maze.h:151</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7">MazeLib::Direction::West</a></div><div class="ttdeci">@ West</div><div class="ttdef"><b>Definition:</b> Maze.h:155</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a762b348a57280c9c443d7c5d237edd60"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60">MazeLib::Direction::RelativeDirection</a></div><div class="ttdeci">RelativeDirection</div><div class="ttdoc">相対方向の列挙型。 0-7 の整数</div><div class="ttdef"><b>Definition:</b> Maze.h:163</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a762b348a57280c9c443d7c5d237edd60a0bcfbf4f8ebf9c5e5c68c984bc4f8b16"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a0bcfbf4f8ebf9c5e5c68c984bc4f8b16">MazeLib::Direction::Back</a></div><div class="ttdeci">@ Back</div><div class="ttdef"><b>Definition:</b> Maze.h:168</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a762b348a57280c9c443d7c5d237edd60a37957d01f6d2841bbac8d94bb954b465"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a37957d01f6d2841bbac8d94bb954b465">MazeLib::Direction::Left45</a></div><div class="ttdeci">@ Left45</div><div class="ttdef"><b>Definition:</b> Maze.h:165</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a762b348a57280c9c443d7c5d237edd60a3c25c52477258eb62db01c7c7d98309f"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a3c25c52477258eb62db01c7c7d98309f">MazeLib::Direction::Right45</a></div><div class="ttdeci">@ Right45</div><div class="ttdef"><b>Definition:</b> Maze.h:171</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a762b348a57280c9c443d7c5d237edd60a3c4dcc97e1ebe1e847792417501f2109"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a3c4dcc97e1ebe1e847792417501f2109">MazeLib::Direction::Right135</a></div><div class="ttdeci">@ Right135</div><div class="ttdef"><b>Definition:</b> Maze.h:169</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a762b348a57280c9c443d7c5d237edd60a53ecc375f42b4267a8bb141e2a447389"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a53ecc375f42b4267a8bb141e2a447389">MazeLib::Direction::Right</a></div><div class="ttdeci">@ Right</div><div class="ttdef"><b>Definition:</b> Maze.h:170</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a762b348a57280c9c443d7c5d237edd60a72a37309043bab870fb2dc65564ed457"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a72a37309043bab870fb2dc65564ed457">MazeLib::Direction::Left</a></div><div class="ttdeci">@ Left</div><div class="ttdef"><b>Definition:</b> Maze.h:166</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a762b348a57280c9c443d7c5d237edd60a8080bc3c245051ad644584a4bfc69034"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a8080bc3c245051ad644584a4bfc69034">MazeLib::Direction::Front</a></div><div class="ttdeci">@ Front</div><div class="ttdef"><b>Definition:</b> Maze.h:164</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a762b348a57280c9c443d7c5d237edd60a93e602f7807b869f5acb95a1b812196d"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a93e602f7807b869f5acb95a1b812196d">MazeLib::Direction::Left135</a></div><div class="ttdeci">@ Left135</div><div class="ttdef"><b>Definition:</b> Maze.h:167</div></div>
+</div><!-- fragment --> </div><h2 class="groupheader">列挙型メンバ詳解</h2>
+<a id="a3eac649af2c57a5d9b58a530d22370ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3eac649af2c57a5d9b58a530d22370ee">&#9670;&nbsp;</a></span>AbsoluteDirection</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370ee">MazeLib::Direction::AbsoluteDirection</a> : int8_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>絶対方向の列挙型。 0-7 の整数 </p>
+<table class="fieldtable">
+<tr><th colspan="2">列挙値</th></tr><tr><td class="fieldname"><a id="a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82"></a>East&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4"></a>NorthEast&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4"></a>North&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890"></a>NorthWest&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7"></a>West&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a3eac649af2c57a5d9b58a530d22370eeab8c82202106d287f826a9fe028e71be3"></a>SouthWest&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a"></a>South&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a3eac649af2c57a5d9b58a530d22370eea133016eb925c28cd4d0337daf26f8e84"></a>SouthEast&#160;</td><td class="fielddoc"></td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                         : int8_t {</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">East</a>,</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4">NorthEast</a>,</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">North</a>,</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890">NorthWest</a>,</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7">West</a>,</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eeab8c82202106d287f826a9fe028e71be3">SouthWest</a>,</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a">South</a>,</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea133016eb925c28cd4d0337daf26f8e84">SouthEast</a>,</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  };</div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea133016eb925c28cd4d0337daf26f8e84"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea133016eb925c28cd4d0337daf26f8e84">MazeLib::Direction::SouthEast</a></div><div class="ttdeci">@ SouthEast</div><div class="ttdef"><b>Definition:</b> Maze.h:158</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a">MazeLib::Direction::South</a></div><div class="ttdeci">@ South</div><div class="ttdef"><b>Definition:</b> Maze.h:157</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eeab8c82202106d287f826a9fe028e71be3"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eeab8c82202106d287f826a9fe028e71be3">MazeLib::Direction::SouthWest</a></div><div class="ttdeci">@ SouthWest</div><div class="ttdef"><b>Definition:</b> Maze.h:156</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a762b348a57280c9c443d7c5d237edd60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a762b348a57280c9c443d7c5d237edd60">&#9670;&nbsp;</a></span>RelativeDirection</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60">MazeLib::Direction::RelativeDirection</a> : int8_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>相対方向の列挙型。 0-7 の整数 </p>
+<table class="fieldtable">
+<tr><th colspan="2">列挙値</th></tr><tr><td class="fieldname"><a id="a762b348a57280c9c443d7c5d237edd60a8080bc3c245051ad644584a4bfc69034"></a>Front&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a762b348a57280c9c443d7c5d237edd60a37957d01f6d2841bbac8d94bb954b465"></a>Left45&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a762b348a57280c9c443d7c5d237edd60a72a37309043bab870fb2dc65564ed457"></a>Left&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a762b348a57280c9c443d7c5d237edd60a93e602f7807b869f5acb95a1b812196d"></a>Left135&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a762b348a57280c9c443d7c5d237edd60a0bcfbf4f8ebf9c5e5c68c984bc4f8b16"></a>Back&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a762b348a57280c9c443d7c5d237edd60a3c4dcc97e1ebe1e847792417501f2109"></a>Right135&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a762b348a57280c9c443d7c5d237edd60a53ecc375f42b4267a8bb141e2a447389"></a>Right&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a762b348a57280c9c443d7c5d237edd60a3c25c52477258eb62db01c7c7d98309f"></a>Right45&#160;</td><td class="fielddoc"></td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;                         : int8_t {</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a8080bc3c245051ad644584a4bfc69034">Front</a>,</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a37957d01f6d2841bbac8d94bb954b465">Left45</a>,</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a72a37309043bab870fb2dc65564ed457">Left</a>,</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a93e602f7807b869f5acb95a1b812196d">Left135</a>,</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a0bcfbf4f8ebf9c5e5c68c984bc4f8b16">Back</a>,</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a3c4dcc97e1ebe1e847792417501f2109">Right135</a>,</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a53ecc375f42b4267a8bb141e2a447389">Right</a>,</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <a class="code" href="classMazeLib_1_1Direction.html#a762b348a57280c9c443d7c5d237edd60a3c25c52477258eb62db01c7c7d98309f">Right45</a>,</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  };</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">構築子と解体子</h2>
+<a id="aaa32d9c23182e631dc4f649ad2de6b9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa32d9c23182e631dc4f649ad2de6b9e">&#9670;&nbsp;</a></span>Direction() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr MazeLib::Direction::Direction </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370ee">AbsoluteDirection</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">East</a></code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>デフォルトコンストラクタ。絶対方向をそのまま格納。 </p>
+<div class="fragment"><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;: d(d) {}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a8d89fe6c747d2aee8ce09883834bfea2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d89fe6c747d2aee8ce09883834bfea2">&#9670;&nbsp;</a></span>Direction() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr MazeLib::Direction::Direction </td>
+          <td>(</td>
+          <td class="paramtype">const int8_t&#160;</td>
+          <td class="paramname"><em>d</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>整数を引数としたコンストラクタ。 </p>
+<p>相対方向などの計算結果を 0-7 の整数に直して格納する。 </p><dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">d</td><td>相対方向などの演算結果の整数 </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;: d(d &amp; 7) {}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">関数詳解</h2>
+<a id="a16795275f8cd53156110f1e98efe95f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a16795275f8cd53156110f1e98efe95f3">&#9670;&nbsp;</a></span>Along4()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static constexpr const std::array&lt;<a class="el" href="classMazeLib_1_1Direction.html">Direction</a>, 4&gt; MazeLib::Direction::Along4 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>斜めではない4方向の配列 (for文などで使用) </p>
+<div class="fragment"><div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;                                                         {</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordflow">return</span> {</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">Direction::East</a>,</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">Direction::North</a>,</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7">Direction::West</a>,</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a">Direction::South</a>,</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    };</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a2d9004ffeff8437e502c88082d22b2fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d9004ffeff8437e502c88082d22b2fe">&#9670;&nbsp;</a></span>Diag4()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static constexpr const std::array&lt;<a class="el" href="classMazeLib_1_1Direction.html">Direction</a>, 4&gt; MazeLib::Direction::Diag4 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>斜めの4方向の配列 (for文などで使用) </p>
+<div class="fragment"><div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;                                                        {</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordflow">return</span> {</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4">Direction::NorthEast</a>,</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890">Direction::NorthWest</a>,</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eeab8c82202106d287f826a9fe028e71be3">Direction::SouthWest</a>,</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea133016eb925c28cd4d0337daf26f8e84">Direction::SouthEast</a>,</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    };</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a71ebf7d415031f843328f925a14fc774"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71ebf7d415031f843328f925a14fc774">&#9670;&nbsp;</a></span>isAlong()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MazeLib::Direction::isAlong </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>壁沿い方向かどうかの判定 </p>
+<div class="fragment"><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;{ <span class="keywordflow">return</span> !(d &amp; 1); }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ab4d2e7c798db8222193a63a5d6f05207"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4d2e7c798db8222193a63a5d6f05207">&#9670;&nbsp;</a></span>isDiag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MazeLib::Direction::isDiag </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>斜め方向かどうかの判定 </p>
+<div class="fragment"><div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;{ <span class="keywordflow">return</span> (d &amp; 1); }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aaed893cce997f246379afc6c0d2de573"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaed893cce997f246379afc6c0d2de573">&#9670;&nbsp;</a></span>operator int8_t()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr MazeLib::Direction::operator int8_t </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>整数へのキャスト。相対方向などの演算に使える。 </p>
+<div class="fragment"><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;{ <span class="keywordflow">return</span> d; }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aafdc7088bfc707aa2f4d215a18cfc437"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafdc7088bfc707aa2f4d215a18cfc437">&#9670;&nbsp;</a></span>toChar()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">char MazeLib::Direction::toChar </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>表示用char型へのキャスト </p>
+<div class="fragment"><div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;&gt;&#39;^`&lt;,v.X&quot;</span>[d]; }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">フレンドと関連関数の詳解</h2>
+<a id="aca4a8309bdbeb25e04ed475f3dd9be3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca4a8309bdbeb25e04ed475f3dd9be3a">&#9670;&nbsp;</a></span>operator&lt;&lt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a>&#160;</td>
+          <td class="paramname"><em>d</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>stream 表示 </p>
+<div class="fragment"><div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;                                                                   {</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keywordflow">return</span> os &lt;&lt; d.toChar();</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">メンバ詳解</h2>
+<a id="acacc0677c2bcb487c5f0404bf5a42f09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acacc0677c2bcb487c5f0404bf5a42f09">&#9670;&nbsp;</a></span>Max</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr const int8_t MazeLib::Direction::Max = 8</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>方向の総数。for文などで使える。 </p>
+<p><a class="el" href="classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a> 型ではなく int8_t 型なことに注意。 (<a class="el" href="classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a> 型は 0-7 の整数) </p>
+
+</div>
+</div>
+<hr/>このクラス詳解は次のファイルから抽出されました:<ul>
+<li>include/MazeLib/<a class="el" href="Maze_8h_source.html">Maze.h</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+構築:&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

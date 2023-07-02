@@ -1,5 +1,0 @@
-<map id="MazeLib::Pose" name="MazeLib::Pose">
-<area shape="rect" id="node1" title="Position と Direction をまとめた型。位置姿勢。" alt="" coords="101,95,215,121"/>
-<area shape="rect" id="node2" href="$d3/d5c/classMazeLib_1_1Direction.html" title="迷路上の方向を表す。" alt="" coords="5,5,148,32"/>
-<area shape="rect" id="node3" href="$d0/ddc/structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。" alt="" coords="173,5,309,32"/>
-</map>

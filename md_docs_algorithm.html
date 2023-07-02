@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MicroMouse Maze Library: アルゴリズムの概要</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">MicroMouse Maze Library
+   &#160;<span id="projectnumber">3703225</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 構築: Doxygen 1.9.1 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'検索','.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','検索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+</div><!-- top -->
+<div class="PageDoc"><div class="header">
+  <div class="headertitle">
+<div class="title">アルゴリズムの概要 </div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p>以下で説明するアルゴリズムを用いることで、どんな迷路に対しても少なくともひとつの経路を見つけ出すことができる。 ただし、目的地が封鎖されていて経路が存在しない場合はその事実を検出して終了する。</p>
+<hr  />
+<h2><a class="anchor" id="autotoc_md2"></a>
+迷路探索に必要な処理</h2>
+<p>マイクロマウスで迷路探索を行うためには、主に以下の処理が必要となる。</p>
+<ul>
+<li>迷路上にある機体の区画位置と進行方向を識別する処理 (<a class="el" href="structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">MazeLib::Position</a>, <a class="el" href="classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">MazeLib::Direction</a>)</li>
+<li>迷路上の全壁の有無と既知未知を管理する処理 (<a class="el" href="structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">MazeLib::WallIndex</a>, <a class="el" href="classMazeLib_1_1Maze.html" title="迷路の壁情報を管理するクラス">MazeLib::Maze</a>)</li>
+<li>迷路上のある区画からある区画(の集合)への移動経路を導出する処理 (<a class="el" href="classMazeLib_1_1StepMap.html" title="区画ベースのステップマップを管理するクラス">MazeLib::StepMap</a>)</li>
+<li>スタート区画からゴール区画(の集合)への最短経路を導出する処理 (※)</li>
+</ul>
+<p>※初期段階では最短経路導出処理は移動経路導出処理で代用できる。</p>
+<hr  />
+<h2><a class="anchor" id="autotoc_md4"></a>
+探索走行アルゴリズム</h2>
+<p>未知の迷路を探索し、スタートからゴールまでの最短経路を発見するアルゴリズム。</p>
+<ol type="1">
+<li>ゴール区画までの往路探索走行<ol type="a">
+<li>自己位置からゴール区画までの移動経路を、未知壁は壁なしとして導出する。<ol type="i">
+<li>経路が存在しない場合は異常終了とする。</li>
+</ol>
+</li>
+<li>上記の経路を未知壁を含む区画に当たるまで進む。</li>
+<li>センサによって壁を確認し、迷路情報を更新する。</li>
+<li>現在位置がゴールでなければ1へ戻る。</li>
+</ol>
+</li>
+<li>最短経路を見つける追加探索走行<ol type="a">
+<li>スタート区画からゴール区画までの最短経路を、未知壁は壁なしとして導出する。<ol type="i">
+<li>経路が存在しない場合は異常終了とする。</li>
+</ol>
+</li>
+<li>最短経路上の未知壁を含む区画を目的地とする。目的地が空なら終了する。</li>
+<li>自己位置から目的地までの移動経路を、未知壁は壁なしとして導出する。</li>
+<li>上記の経路を未知壁を含む区画に当たるまで進む。</li>
+<li>センサによって壁を確認し、迷路情報を更新する。</li>
+<li>1へ戻る。</li>
+</ol>
+</li>
+<li>スタートに戻る走行<ol type="a">
+<li>自己位置からスタート区画までの経路を、未知壁は壁ありとして導出する。</li>
+<li>上記の経路を進んでスタート区画に到達する。</li>
+</ol>
+</li>
+</ol>
+<h2><a class="anchor" id="autotoc_md5"></a>
+移動経路導出アルゴリズム</h2>
+<p>探索中に用いる、「ある始点区画」から「ある目的区画集合」への「移動経路」導出処理。</p>
+<ol type="1">
+<li>準備<ol type="a">
+<li>迷路上の全区画のステップマップを用意する。</li>
+</ol>
+</li>
+<li>展開<ol type="a">
+<li>目的区画に含まれる区画のステップを0とする。</li>
+<li>そこから壁がない方向の区画へ進むたびにステップを1ずつ増やし、ステップマップを更新する。</li>
+<li>ステップの変更がなくなるまでステップマップを再帰的に更新する。</li>
+</ol>
+</li>
+<li>経路導出<ol type="a">
+<li>始点区画からステップが小さくなる方向へ順次進んでいくとやがて目的区画のひとつにたどりつき、それが移動経路となる。</li>
+<li>目的区画にたどり着くことなく、ステップが小さくなる方向が存在しなくなった場合、その迷路に解はないので終了する。</li>
+</ol>
+</li>
+</ol>
+<h2><a class="anchor" id="autotoc_md6"></a>
+最短経路導出アルゴリズム</h2>
+<p>探索中や最短走行前に用いる、「スタート区画」から「ゴール区画の集合」への「最短経路」の導出処理。</p>
+<p>一番簡単な実装としては、 移動経路導出アルゴリズムの始点をスタート区画に、 目的区画をゴールにすればよい。 しかしながら、それだけだとターンの多い経路になりがちなので、 直線部分の加速や各ターンのコストを考慮した最短経路が導出できるとよい。</p>
+<p>ここでは台形加速を考慮した直線コストのステップマップを紹介する。(斜め走行および各ターンのコストは考慮していない)</p>
+<ol type="1">
+<li>準備<ol type="a">
+<li>迷路上の全区画のステップマップを用意する。</li>
+<li>台形加速で n マスの移動するときにかかる時間を列挙したコストテーブルを用意する。</li>
+<li>コストテーブルの全要素から1マス直線のコストを引き、さらに1マスのスラロームターンにかかる時間を足す。</li>
+</ol>
+</li>
+<li>展開<ol type="a">
+<li>目的区画に含まれる区画のステップを0とする。</li>
+<li>そこから壁がない方向の区画へ、直線で行けるところまでコストテーブルの値を用いてステップを更新する。</li>
+<li>ステップの変更がなくなるまでステップマップを再帰的に更新する。</li>
+</ol>
+</li>
+<li>経路導出<ol type="a">
+<li>始点区画からステップが小さくなる方向へ順次進んでいくとやがて目的区画のひとつにたどりつき、それが移動経路となる。</li>
+<li>目的区画にたどり着くことなく、ステップが小さくなる方向が存在しなくなった場合、その迷路に解はないので終了する。 </li>
+</ol>
+</li>
+</ol>
+</div></div><!-- contents -->
+</div><!-- PageDoc -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+構築:&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

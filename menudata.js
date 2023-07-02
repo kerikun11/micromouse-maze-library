@@ -76,7 +76,6 @@ var menudata={children:[
 {text:"u",url:"functions_func.html#index_u"},
 {text:"w",url:"functions_func.html#index_w"}]},
 {text:"変数",url:"functions_vars.html",children:[
-{text:"a",url:"functions_vars.html#index_a"},
 {text:"b",url:"functions_vars.html#index_b"},
 {text:"d",url:"functions_vars.html#index_d"},
 {text:"g",url:"functions_vars.html#index_g"},
@@ -96,5 +95,6 @@ var menudata={children:[
 {text:"ファイル一覧",url:"files.html"},
 {text:"ファイルメンバ",url:"globals.html",children:[
 {text:"全て",url:"globals.html"},
+{text:"関数",url:"globals_func.html"},
 {text:"変数",url:"globals_vars.html"},
 {text:"マクロ定義",url:"globals_defs.html"}]}]}]}

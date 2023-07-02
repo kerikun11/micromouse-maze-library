@@ -1,4 +1,0 @@
-<map id="MazeLib::WallIndex::getDirection" name="MazeLib::WallIndex::getDirection">
-<area shape="rect" id="node1" title="方向の取得" alt="" coords="203,5,351,47"/>
-<area shape="rect" id="node2" href="$d6/d8d/structMazeLib_1_1WallIndex.html#aa3dd5a061b1cf2c28cc412accc2bc93a" title="現在壁に隣接する、柱ではない6方向を取得" alt="" coords="5,5,155,47"/>
-</map>

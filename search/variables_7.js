@@ -1,10 +1,6 @@
 var searchData=
 [
-  ['scalingfactor_244',['scalingFactor',['../d9/da9/classMazeLib_1_1StepMap.html#a26c4f0b4b5600b519d11f5cac851984b',1,'MazeLib::StepMap']]],
-  ['size_245',['SIZE',['../d0/ddc/structMazeLib_1_1Position.html#a7d2cf78cd70e0d51970e2d6fc3869df2',1,'MazeLib::Position::SIZE()'],['../d6/d8d/structMazeLib_1_1WallIndex.html#a5fea3eb0fdea307f95640bde512c2481',1,'MazeLib::WallIndex::SIZE()']]],
-  ['start_246',['start',['../d8/d25/classMazeLib_1_1Maze.html#a4a55a074596447c389588321a5772b32',1,'MazeLib::Maze']]],
-  ['step_5fmax_247',['STEP_MAX',['../d9/da9/classMazeLib_1_1StepMap.html#a211c3ffb1760b2768a55d03451b544ca',1,'MazeLib::StepMap']]],
-  ['stepmap_248',['stepMap',['../d9/da9/classMazeLib_1_1StepMap.html#a05caea082c7c81e8b2afdc4e6dd5b0e5',1,'MazeLib::StepMap']]],
-  ['steptable_249',['stepTable',['../d9/da9/classMazeLib_1_1StepMap.html#a17b20afe466f01e1d3595b9de244ed7a',1,'MazeLib::StepMap']]],
-  ['steptablesize_250',['stepTableSize',['../d9/da9/classMazeLib_1_1StepMap.html#ad59a6774c6f4f2c5ab0601437c5c3fb0',1,'MazeLib::StepMap']]]
+  ['wall_261',['wall',['../classMazeLib_1_1Maze.html#addb5a7c584752e8cbea1abf8f8cb7ba5',1,'MazeLib::Maze']]],
+  ['wallrecords_262',['wallRecords',['../classMazeLib_1_1Maze.html#aaa3d1c775181ed96621993087d82ca83',1,'MazeLib::Maze']]],
+  ['wallrecordsbackupcounter_263',['wallRecordsBackupCounter',['../classMazeLib_1_1Maze.html#ac03a57c82684f19cacada8d5bdf2e815',1,'MazeLib::Maze']]]
 ];

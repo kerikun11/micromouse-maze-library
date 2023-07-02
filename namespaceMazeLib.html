@@ -1,0 +1,534 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MicroMouse Maze Library: MazeLib 名前空間</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">MicroMouse Maze Library
+   &#160;<span id="projectnumber">3703225</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 構築: Doxygen 1.9.1 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'検索','.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','検索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">クラス</a> &#124;
+<a href="#typedef-members">型定義</a> &#124;
+<a href="#func-members">関数</a> &#124;
+<a href="#var-members">変数</a>  </div>
+  <div class="headertitle">
+<div class="title">MazeLib 名前空間</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>迷路探索ライブラリはすべてこの名前空間に格納されている。  
+<a href="namespaceMazeLib.html#details">[詳解]</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+クラス</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Direction.html">Direction</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路上の方向を表す。  <a href="classMazeLib_1_1Direction.html#details">[詳解]</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html">Position</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路の区画の位置(座標)を定義。  <a href="structMazeLib_1_1Position.html#details">[詳解]</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Pose.html">Pose</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> と <a class="el" href="classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a> をまとめた型。位置姿勢。  <a href="structMazeLib_1_1Pose.html#details">[詳解]</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1WallIndex.html">WallIndex</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">区画ベースではなく、壁ベースの管理ID  <a href="structMazeLib_1_1WallIndex.html#details">[詳解]</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1WallRecord.html">WallRecord</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">区画位置、方向、壁の有無を保持する構造体。  <a href="structMazeLib_1_1WallRecord.html#details">[詳解]</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1Maze.html">Maze</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路の壁情報を管理するクラス  <a href="classMazeLib_1_1Maze.html#details">[詳解]</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMazeLib_1_1StepMap.html">StepMap</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">区画ベースのステップマップを管理するクラス  <a href="classMazeLib_1_1StepMap.html#details">[詳解]</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+型定義</h2></td></tr>
+<tr class="memitem:a523467695723fa4c8a7fa55a7e5d12e6"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> = std::vector&lt; <a class="el" href="classMazeLib_1_1Direction.html">Direction</a> &gt;</td></tr>
+<tr class="memdesc:a523467695723fa4c8a7fa55a7e5d12e6"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a> 構造体の動的配列、集合  <a href="namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">[詳解]</a><br /></td></tr>
+<tr class="separator:a523467695723fa4c8a7fa55a7e5d12e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ecc0bb180fd1dee4ba69157e6d8b853"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">Positions</a> = std::vector&lt; <a class="el" href="structMazeLib_1_1Position.html">Position</a> &gt;</td></tr>
+<tr class="memdesc:a2ecc0bb180fd1dee4ba69157e6d8b853"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> 構造体の動的配列、集合  <a href="namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">[詳解]</a><br /></td></tr>
+<tr class="separator:a2ecc0bb180fd1dee4ba69157e6d8b853"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd6dca43dde5d6adedc2b026b8980ffc"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#afd6dca43dde5d6adedc2b026b8980ffc">WallIndexes</a> = std::vector&lt; <a class="el" href="structMazeLib_1_1WallIndex.html">WallIndex</a> &gt;</td></tr>
+<tr class="memdesc:afd6dca43dde5d6adedc2b026b8980ffc"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">WallIndex</a> の動的配列、集合  <a href="namespaceMazeLib.html#afd6dca43dde5d6adedc2b026b8980ffc">[詳解]</a><br /></td></tr>
+<tr class="separator:afd6dca43dde5d6adedc2b026b8980ffc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a781e89819e92f5f312289ffc2ed70576"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#a781e89819e92f5f312289ffc2ed70576">WallRecords</a> = std::vector&lt; <a class="el" href="structMazeLib_1_1WallRecord.html">WallRecord</a> &gt;</td></tr>
+<tr class="memdesc:a781e89819e92f5f312289ffc2ed70576"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structMazeLib_1_1WallRecord.html" title="区画位置、方向、壁の有無を保持する構造体。">WallRecord</a> 構造体の動的配列の定義  <a href="namespaceMazeLib.html#a781e89819e92f5f312289ffc2ed70576">[詳解]</a><br /></td></tr>
+<tr class="separator:a781e89819e92f5f312289ffc2ed70576"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+関数</h2></td></tr>
+<tr class="memitem:a490cc7bb1579d973acbf2f1a3dc609f2"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#a490cc7bb1579d973acbf2f1a3dc609f2">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;obj)</td></tr>
+<tr class="memdesc:a490cc7bb1579d973acbf2f1a3dc609f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Directions の stream 表示  <a href="namespaceMazeLib.html#a490cc7bb1579d973acbf2f1a3dc609f2">[詳解]</a><br /></td></tr>
+<tr class="separator:a490cc7bb1579d973acbf2f1a3dc609f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0b1daaf84315f8706f1e03b9e61605d"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#af0b1daaf84315f8706f1e03b9e61605d">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structMazeLib_1_1Position.html">Position</a> p)</td></tr>
+<tr class="separator:af0b1daaf84315f8706f1e03b9e61605d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dd12ba25c0388649e20f4660a986636"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#a6dd12ba25c0388649e20f4660a986636">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structMazeLib_1_1Pose.html">Pose</a> &amp;pose)</td></tr>
+<tr class="separator:a6dd12ba25c0388649e20f4660a986636"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea4ce3c5ffab80deb4cbe2a3def3afed"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#aea4ce3c5ffab80deb4cbe2a3def3afed">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structMazeLib_1_1WallIndex.html">WallIndex</a> i)</td></tr>
+<tr class="separator:aea4ce3c5ffab80deb4cbe2a3def3afed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3334dd563c6a0519fe295ec84e2c8f52"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#a3334dd563c6a0519fe295ec84e2c8f52">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structMazeLib_1_1WallRecord.html">WallRecord</a> &amp;obj)</td></tr>
+<tr class="separator:a3334dd563c6a0519fe295ec84e2c8f52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62088d5b34f7acecdff98bc2be839eb3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a">StepMap::step_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#a62088d5b34f7acecdff98bc2be839eb3">calcStraightCost</a> (const int i, const float am, const float vs, const float vm, const float seg)</td></tr>
+<tr class="memdesc:a62088d5b34f7acecdff98bc2be839eb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">台形加速を考慮したコストを生成する関数  <a href="namespaceMazeLib.html#a62088d5b34f7acecdff98bc2be839eb3">[詳解]</a><br /></td></tr>
+<tr class="separator:a62088d5b34f7acecdff98bc2be839eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+変数</h2></td></tr>
+<tr class="memitem:aae4766ca69a8d58c1c60e4600ec47efa"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">MAZE_SIZE</a> = 16</td></tr>
+<tr class="memdesc:aae4766ca69a8d58c1c60e4600ec47efa"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路の1辺の区画数の定数。  <a href="namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">[詳解]</a><br /></td></tr>
+<tr class="separator:aae4766ca69a8d58c1c60e4600ec47efa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88e6e653888925d5477ac5d2a7cd14b5"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#a88e6e653888925d5477ac5d2a7cd14b5">MAZE_SIZE_BIT</a> = std::ceil(std::log2(<a class="el" href="namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">MAZE_SIZE</a>))</td></tr>
+<tr class="memdesc:a88e6e653888925d5477ac5d2a7cd14b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路の1辺の区画数の bit 数。bit shift などに用いる。  <a href="namespaceMazeLib.html#a88e6e653888925d5477ac5d2a7cd14b5">[詳解]</a><br /></td></tr>
+<tr class="separator:a88e6e653888925d5477ac5d2a7cd14b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ea3567169dc6afe5013bc4b3b0515b8"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8">MAZE_SIZE_MAX</a> = std::pow(2, <a class="el" href="namespaceMazeLib.html#a88e6e653888925d5477ac5d2a7cd14b5">MAZE_SIZE_BIT</a>)</td></tr>
+<tr class="memdesc:a2ea3567169dc6afe5013bc4b3b0515b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路の1辺の区画数の最大値。2のbit数乗の値。  <a href="namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8">[詳解]</a><br /></td></tr>
+<tr class="separator:a2ea3567169dc6afe5013bc4b3b0515b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">詳解</h2>
+<div class="textblock"><p>迷路探索ライブラリはすべてこの名前空間に格納されている。 </p>
+</div><h2 class="groupheader">型定義詳解</h2>
+<a id="a523467695723fa4c8a7fa55a7e5d12e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a523467695723fa4c8a7fa55a7e5d12e6">&#9670;&nbsp;</a></span>Directions</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">MazeLib::Directions</a> = typedef std::vector&lt;<a class="el" href="classMazeLib_1_1Direction.html">Direction</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="classMazeLib_1_1Direction.html" title="迷路上の方向を表す。">Direction</a> 構造体の動的配列、集合 </p>
+
+</div>
+</div>
+<a id="a2ecc0bb180fd1dee4ba69157e6d8b853"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ecc0bb180fd1dee4ba69157e6d8b853">&#9670;&nbsp;</a></span>Positions</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">MazeLib::Positions</a> = typedef std::vector&lt;<a class="el" href="structMazeLib_1_1Position.html">Position</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> 構造体の動的配列、集合 </p>
+
+</div>
+</div>
+<a id="afd6dca43dde5d6adedc2b026b8980ffc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd6dca43dde5d6adedc2b026b8980ffc">&#9670;&nbsp;</a></span>WallIndexes</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceMazeLib.html#afd6dca43dde5d6adedc2b026b8980ffc">MazeLib::WallIndexes</a> = typedef std::vector&lt;<a class="el" href="structMazeLib_1_1WallIndex.html">WallIndex</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="structMazeLib_1_1WallIndex.html" title="区画ベースではなく、壁ベースの管理ID">WallIndex</a> の動的配列、集合 </p>
+
+</div>
+</div>
+<a id="a781e89819e92f5f312289ffc2ed70576"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a781e89819e92f5f312289ffc2ed70576">&#9670;&nbsp;</a></span>WallRecords</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceMazeLib.html#a781e89819e92f5f312289ffc2ed70576">MazeLib::WallRecords</a> = typedef std::vector&lt;<a class="el" href="structMazeLib_1_1WallRecord.html">WallRecord</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="structMazeLib_1_1WallRecord.html" title="区画位置、方向、壁の有無を保持する構造体。">WallRecord</a> 構造体の動的配列の定義 </p>
+
+</div>
+</div>
+<h2 class="groupheader">関数詳解</h2>
+<a id="a62088d5b34f7acecdff98bc2be839eb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62088d5b34f7acecdff98bc2be839eb3">&#9670;&nbsp;</a></span>calcStraightCost()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a">StepMap::step_t</a> MazeLib::calcStraightCost </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>i</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>am</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>vs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>vm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>seg</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>台形加速を考慮したコストを生成する関数 </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>マスの数 </td></tr>
+    <tr><td class="paramname">am</td><td>最大加速度 </td></tr>
+    <tr><td class="paramname">vs</td><td>始点速度 </td></tr>
+    <tr><td class="paramname">vm</td><td>飽和速度 </td></tr>
+    <tr><td class="paramname">seg</td><td>1マスの長さ </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>戻り値</dt><dd><a class="el" href="classMazeLib_1_1StepMap.html#a3a3603aafce4cd7a543a90580bdfdd0a" title="ステップの型">StepMap::step_t</a> コスト </dd></dl>
+<div class="fragment"><div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;                                                         {</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a> = seg * i;  <span class="comment">//&lt; i 区画分の走行距離</span></div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <span class="comment">/* グラフの面積から時間を求める */</span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> d_thr = (vm * vm - vs * vs) / am;  <span class="comment">//&lt; 最大速度に達する距離</span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a> &lt; d_thr)</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    <span class="keywordflow">return</span> 2 * (std::sqrt(vs * vs + am * <a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>) - vs) / am * 1000;  <span class="comment">//&lt; 三角加速</span></div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;    <span class="keywordflow">return</span> (am * <a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a> + (vm - vs) * (vm - vs)) / (am * vm) * 1000;  <span class="comment">//&lt; 台形加速</span></div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;}</div>
+<div class="ttc" id="aMaze_8h_html_a2e373ebbe85a38d70fb6b861312ee6d2"><div class="ttname"><a href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a></div><div class="ttdeci">unsigned int d</div><div class="ttdoc">壁の方向</div><div class="ttdef"><b>Definition:</b> Maze.h:609</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a490cc7bb1579d973acbf2f1a3dc609f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a490cc7bb1579d973acbf2f1a3dc609f2">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; MazeLib::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespaceMazeLib.html#a523467695723fa4c8a7fa55a7e5d12e6">Directions</a> &amp;&#160;</td>
+          <td class="paramname"><em>obj</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Directions の stream 表示 </p>
+<p>&gt;^&lt;v の形式 </p>
+<div class="fragment"><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                                                              {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a> : obj) os &lt;&lt; <a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keywordflow">return</span> os;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a6dd12ba25c0388649e20f4660a986636"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dd12ba25c0388649e20f4660a986636">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; MazeLib::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1Pose.html">Pose</a> &amp;&#160;</td>
+          <td class="paramname"><em>pose</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                                                         {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keywordflow">return</span> os &lt;&lt; <span class="stringliteral">&quot;( &quot;</span> &lt;&lt; std::setw(2) &lt;&lt; +pose.p.x &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; std::setw(2)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            &lt;&lt; +pose.p.y &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; pose.d.toChar() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="af0b1daaf84315f8706f1e03b9e61605d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0b1daaf84315f8706f1e03b9e61605d">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; MazeLib::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td>
+          <td class="paramname"><em>p</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="fragment"><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                                         {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">return</span> os &lt;&lt; <span class="stringliteral">&quot;( &quot;</span> &lt;&lt; std::setw(2) &lt;&lt; +p.x &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; std::setw(2) &lt;&lt; +p.y</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aea4ce3c5ffab80deb4cbe2a3def3afed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea4ce3c5ffab80deb4cbe2a3def3afed">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; MazeLib::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1WallIndex.html">WallIndex</a>&#160;</td>
+          <td class="paramname"><em>i</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="fragment"><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                                                          {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="keywordflow">return</span> os &lt;&lt; <span class="stringliteral">&quot;( &quot;</span> &lt;&lt; std::setw(2) &lt;&lt; +i.x &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; std::setw(2) &lt;&lt; +i.y</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; i.getDirection().toChar() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a3334dd563c6a0519fe295ec84e2c8f52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3334dd563c6a0519fe295ec84e2c8f52">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; MazeLib::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1WallRecord.html">WallRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>obj</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="fragment"><div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                                                              {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="keywordflow">return</span> os &lt;&lt; <span class="stringliteral">&quot;( &quot;</span> &lt;&lt; std::setw(2) &lt;&lt; +obj.x &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; std::setw(2) &lt;&lt; +obj.y</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; obj.getDirection().toChar() &lt;&lt; <span class="stringliteral">&quot;, &quot;</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            &lt;&lt; (obj.b ? <span class="stringliteral">&quot;true&quot;</span> : <span class="stringliteral">&quot;false&quot;</span>) &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">変数詳解</h2>
+<a id="aae4766ca69a8d58c1c60e4600ec47efa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae4766ca69a8d58c1c60e4600ec47efa">&#9670;&nbsp;</a></span>MAZE_SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int MazeLib::MAZE_SIZE = 16</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>迷路の1辺の区画数の定数。 </p>
+
+</div>
+</div>
+<a id="a88e6e653888925d5477ac5d2a7cd14b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88e6e653888925d5477ac5d2a7cd14b5">&#9670;&nbsp;</a></span>MAZE_SIZE_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int MazeLib::MAZE_SIZE_BIT = std::ceil(std::log2(<a class="el" href="namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">MAZE_SIZE</a>))</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>迷路の1辺の区画数の bit 数。bit shift などに用いる。 </p>
+
+</div>
+</div>
+<a id="a2ea3567169dc6afe5013bc4b3b0515b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ea3567169dc6afe5013bc4b3b0515b8">&#9670;&nbsp;</a></span>MAZE_SIZE_MAX</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int MazeLib::MAZE_SIZE_MAX = std::pow(2, <a class="el" href="namespaceMazeLib.html#a88e6e653888925d5477ac5d2a7cd14b5">MAZE_SIZE_BIT</a>)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>迷路の1辺の区画数の最大値。2のbit数乗の値。 </p>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+構築:&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

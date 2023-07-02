@@ -1,0 +1,649 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MicroMouse Maze Library: examples/search/main.cpp ファイル</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">MicroMouse Maze Library
+   &#160;<span id="projectnumber">3703225</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 構築: Doxygen 1.9.1 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'検索','.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','検索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_d28a4824dc47e487b107a5db32ef43c4.html">examples</a></li><li class="navelem"><a class="el" href="dir_db56fe314c714396850317f19f4c5a17.html">search</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">関数</a>  </div>
+  <div class="headertitle">
+<div class="title">main.cpp ファイル</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>迷路探索アルゴリズムの使用例  
+<a href="#details">[詳解]</a></p>
+<div class="textblock"><code>#include &lt;algorithm&gt;</code><br />
+<code>#include &lt;thread&gt;</code><br />
+<code>#include &quot;<a class="el" href="Maze_8h_source.html">MazeLib/Maze.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="StepMap_8h_source.html">MazeLib/StepMap.h</a>&quot;</code><br />
+</div><div class="textblock"><div class="dynheader">
+main.cpp の依存先関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="main_8cpp__incl.png" border="0" usemap="#aexamples_2search_2main_8cpp" alt=""/></div>
+<map name="aexamples_2search_2main_8cpp" id="aexamples_2search_2main_8cpp">
+<area shape="rect" title="迷路探索アルゴリズムの使用例" alt="" coords="203,5,400,32"/>
+<area shape="rect" title=" " alt="" coords="125,80,211,107"/>
+<area shape="rect" title=" " alt="" coords="235,80,299,107"/>
+<area shape="rect" href="Maze_8h.html" title="マイクロマウスの迷路を扱うクラスを定義" alt="" coords="273,155,399,181"/>
+<area shape="rect" href="StepMap_8h.html" title="マイクロマウスの迷路の区画ベースのステップマップを扱うクラスを定義" alt="" coords="373,80,523,107"/>
+<area shape="rect" title=" " alt="" coords="5,229,61,256"/>
+<area shape="rect" title=" " alt="" coords="85,229,144,256"/>
+<area shape="rect" title=" " alt="" coords="169,229,231,256"/>
+<area shape="rect" title=" " alt="" coords="256,229,323,256"/>
+<area shape="rect" title=" " alt="" coords="347,229,421,256"/>
+<area shape="rect" title=" " alt="" coords="445,229,525,256"/>
+<area shape="rect" title=" " alt="" coords="549,229,608,256"/>
+<area shape="rect" title=" " alt="" coords="633,229,695,256"/>
+<area shape="rect" title=" " alt="" coords="424,155,483,181"/>
+</map>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+関数</h2></td></tr>
+<tr class="memitem:a20d2b751a83439c035d9d4611bf25a08"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08">MoveRobot</a> (const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a> relativeDir)</td></tr>
+<tr class="memdesc:a20d2b751a83439c035d9d4611bf25a08"><td class="mdescLeft">&#160;</td><td class="mdescRight">ロボットを動かす模擬関数  <a href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08">[詳解]</a><br /></td></tr>
+<tr class="separator:a20d2b751a83439c035d9d4611bf25a08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade78a4f1e50a26e869652609d2692e24"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24">ShowAnimation</a> (const <a class="el" href="classMazeLib_1_1StepMap.html">StepMap</a> &amp;stepMap, const <a class="el" href="classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="structMazeLib_1_1Position.html">Position</a> &amp;pos, const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a> &amp;dir, const std::string &amp;msg)</td></tr>
+<tr class="memdesc:ade78a4f1e50a26e869652609d2692e24"><td class="mdescLeft">&#160;</td><td class="mdescRight">アニメーション状に迷路を表示する関数  <a href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24">[詳解]</a><br /></td></tr>
+<tr class="separator:ade78a4f1e50a26e869652609d2692e24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5faa421b8b6d7342b0efed2bb4d5da5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#ac5faa421b8b6d7342b0efed2bb4d5da5">SearchRun</a> (<a class="el" href="classMazeLib_1_1Maze.html">Maze</a> &amp;maze, const <a class="el" href="classMazeLib_1_1Maze.html">Maze</a> &amp;mazeTarget)</td></tr>
+<tr class="memdesc:ac5faa421b8b6d7342b0efed2bb4d5da5"><td class="mdescLeft">&#160;</td><td class="mdescRight">探索走行のアルゴリズム  <a href="main_8cpp.html#ac5faa421b8b6d7342b0efed2bb4d5da5">[詳解]</a><br /></td></tr>
+<tr class="separator:ac5faa421b8b6d7342b0efed2bb4d5da5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23fe4ff74df8c46e004cfa4b874b548b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a23fe4ff74df8c46e004cfa4b874b548b">ShortestRun</a> (const <a class="el" href="classMazeLib_1_1Maze.html">Maze</a> &amp;maze)</td></tr>
+<tr class="memdesc:a23fe4ff74df8c46e004cfa4b874b548b"><td class="mdescLeft">&#160;</td><td class="mdescRight">最短走行のアルゴリズム  <a href="main_8cpp.html#a23fe4ff74df8c46e004cfa4b874b548b">[詳解]</a><br /></td></tr>
+<tr class="separator:a23fe4ff74df8c46e004cfa4b874b548b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">main 関数  <a href="main_8cpp.html#a840291bc02cba5474a4cb46a9b9566fe">[詳解]</a><br /></td></tr>
+<tr class="separator:a840291bc02cba5474a4cb46a9b9566fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">詳解</h2>
+<div class="textblock"><p>迷路探索アルゴリズムの使用例 </p>
+<dl class="section author"><dt>著者</dt><dd>Ryotaro Onuki <a href="#" onclick="location.href='mai'+'lto:'+'ker'+'ik'+'un1'+'1+'+'git'+'hu'+'b@g'+'ma'+'il.'+'co'+'m'; return false;">kerik<span style="display: none;">.nosp@m.</span>un11<span style="display: none;">.nosp@m.</span>+gith<span style="display: none;">.nosp@m.</span>ub@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a> </dd></dl>
+<dl class="section date"><dt>日付</dt><dd>2019-08-29 </dd></dl>
+</div><h2 class="groupheader">関数詳解</h2>
+<a id="a840291bc02cba5474a4cb46a9b9566fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&nbsp;</a></span>main()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int main </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>main 関数 </p>
+<div class="fragment"><div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;               {</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="comment">/* 画面のクリア */</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;\e[0;0H&quot;</span>;  <span class="comment">//&lt; カーソルを左上に移動</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;\e[J&quot;</span>;     <span class="comment">//&lt; カーソル以下を消去</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="comment">/* シミュレーションに用いる迷路の選択 */</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="keyword">const</span> std::string filepath = <span class="stringliteral">&quot;../mazedata/data/16MM2018CX.maze&quot;</span>;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="comment">/* 正解の迷路を用意 */</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <a class="code" href="classMazeLib_1_1Maze.html">Maze</a> mazeTarget;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="comment">/* ファイルから迷路情報を取得 */</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  <span class="keywordflow">if</span> (!mazeTarget.<a class="code" href="classMazeLib_1_1Maze.html#aeaf471afcf3c3562c815707aa1b04952">parse</a>(filepath.c_str())) {</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to Parse Maze: &quot;</span> &lt;&lt; filepath &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  }</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  <span class="comment">/* 正解の迷路の表示 */</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  mazeTarget.<a class="code" href="classMazeLib_1_1Maze.html#abe3a8ddb09cef4adf591bbe4cc8f9b76">print</a>();</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="comment">/* 探索用の迷路を用意 */</span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <a class="code" href="classMazeLib_1_1Maze.html">Maze</a> maze;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="comment">/* ゴール位置を設定 */</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  maze.<a class="code" href="classMazeLib_1_1Maze.html#a38daccb9a112d85f746384d42ad7e798">setGoals</a>(mazeTarget.<a class="code" href="classMazeLib_1_1Maze.html#a43f2570cb23b6843896993c4076d75d4">getGoals</a>());</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="comment">/* 探索走行テスト */</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <a class="code" href="main_8cpp.html#ac5faa421b8b6d7342b0efed2bb4d5da5">SearchRun</a>(maze, mazeTarget);</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="comment">/* 最短走行テスト */</span></div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <a class="code" href="main_8cpp.html#a23fe4ff74df8c46e004cfa4b874b548b">ShortestRun</a>(maze);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="comment">/* 終了 */</span></div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;}</div>
+<div class="ttc" id="aclassMazeLib_1_1Maze_html"><div class="ttname"><a href="classMazeLib_1_1Maze.html">MazeLib::Maze</a></div><div class="ttdoc">迷路の壁情報を管理するクラス</div><div class="ttdef"><b>Definition:</b> Maze.h:646</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Maze_html_a38daccb9a112d85f746384d42ad7e798"><div class="ttname"><a href="classMazeLib_1_1Maze.html#a38daccb9a112d85f746384d42ad7e798">MazeLib::Maze::setGoals</a></div><div class="ttdeci">void setGoals(const Positions &amp;goals)</div><div class="ttdoc">ゴール区画の集合を更新</div><div class="ttdef"><b>Definition:</b> Maze.h:822</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Maze_html_a43f2570cb23b6843896993c4076d75d4"><div class="ttname"><a href="classMazeLib_1_1Maze.html#a43f2570cb23b6843896993c4076d75d4">MazeLib::Maze::getGoals</a></div><div class="ttdeci">const Positions &amp; getGoals() const</div><div class="ttdoc">ゴール区画の集合を取得</div><div class="ttdef"><b>Definition:</b> Maze.h:830</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Maze_html_abe3a8ddb09cef4adf591bbe4cc8f9b76"><div class="ttname"><a href="classMazeLib_1_1Maze.html#abe3a8ddb09cef4adf591bbe4cc8f9b76">MazeLib::Maze::print</a></div><div class="ttdeci">void print(std::ostream &amp;os=std::cout, const int mazeSize=MAZE_SIZE) const</div><div class="ttdoc">迷路の表示</div><div class="ttdef"><b>Definition:</b> Maze.cpp:261</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Maze_html_aeaf471afcf3c3562c815707aa1b04952"><div class="ttname"><a href="classMazeLib_1_1Maze.html#aeaf471afcf3c3562c815707aa1b04952">MazeLib::Maze::parse</a></div><div class="ttdeci">bool parse(std::istream &amp;is)</div><div class="ttdoc">特定の迷路の文字列(*.maze ファイル)から壁をパースする</div><div class="ttdef"><b>Definition:</b> Maze.cpp:165</div></div>
+<div class="ttc" id="amain_8cpp_html_a23fe4ff74df8c46e004cfa4b874b548b"><div class="ttname"><a href="main_8cpp.html#a23fe4ff74df8c46e004cfa4b874b548b">ShortestRun</a></div><div class="ttdeci">int ShortestRun(const Maze &amp;maze)</div><div class="ttdoc">最短走行のアルゴリズム</div><div class="ttdef"><b>Definition:</b> main.cpp:199</div></div>
+<div class="ttc" id="amain_8cpp_html_ac5faa421b8b6d7342b0efed2bb4d5da5"><div class="ttname"><a href="main_8cpp.html#ac5faa421b8b6d7342b0efed2bb4d5da5">SearchRun</a></div><div class="ttdeci">int SearchRun(Maze &amp;maze, const Maze &amp;mazeTarget)</div><div class="ttdoc">探索走行のアルゴリズム</div><div class="ttdef"><b>Definition:</b> main.cpp:65</div></div>
+</div><!-- fragment --><div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="main_8cpp_a840291bc02cba5474a4cb46a9b9566fe_cgraph.png" border="0" usemap="#amain_8cpp_a840291bc02cba5474a4cb46a9b9566fe_cgraph" alt=""/></div>
+<map name="amain_8cpp_a840291bc02cba5474a4cb46a9b9566fe_cgraph" id="amain_8cpp_a840291bc02cba5474a4cb46a9b9566fe_cgraph">
+<area shape="rect" title="main 関数" alt="" coords="5,183,60,209"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a43f2570cb23b6843896993c4076d75d4" title="ゴール区画の集合を取得" alt="" coords="362,132,547,159"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#aeaf471afcf3c3562c815707aa1b04952" title="特定の迷路の文字列(*.maze ファイル)から壁をパースする" alt="" coords="119,31,281,57"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#abe3a8ddb09cef4adf591bbe4cc8f9b76" title="迷路の表示" alt="" coords="639,157,796,184"/>
+<area shape="rect" href="main_8cpp.html#ac5faa421b8b6d7342b0efed2bb4d5da5" title="探索走行のアルゴリズム" alt="" coords="155,411,245,437"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a38daccb9a112d85f746384d42ad7e798" title="ゴール区画の集合を更新" alt="" coords="108,284,292,311"/>
+<area shape="rect" href="main_8cpp.html#a23fe4ff74df8c46e004cfa4b874b548b" title="最短走行のアルゴリズム" alt="" coords="149,233,251,260"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#ae550859cb46898c9cf4a74c254488e46" title="迷路の初期化。壁を削除し、スタート区画を既知に" alt="" coords="375,31,535,57"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f" title="既知の壁情報と照らしあわせながら、壁を更新する関数" alt="" coords="617,81,817,108"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208" title="壁が探索済みかを返す" alt="" coords="886,183,1069,209"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0" title="壁の有無を返す" alt="" coords="894,132,1061,159"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#abf856e087422284ca0008d616dc3aa58" title="壁の既知を更新する" alt="" coords="882,31,1073,57"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#ac4e0bed3b12d8ecc0ae3f987cc999019" title="壁を更新をする" alt="" coords="890,81,1065,108"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数。迷路外を参照すると壁ありと返す。" alt="" coords="1141,136,1340,163"/>
+<area shape="rect" href="structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す。" alt="" coords="1392,133,1540,174"/>
+<area shape="rect" href="structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数" alt="" coords="1392,67,1540,109"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a9e513a20755fe6f62a1fd2aabd080ecd" title="壁の更新のベース関数。迷路外を参照すると無視される。" alt="" coords="1137,79,1344,105"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614" title="与えられた区画間の最短経路を導出する関数" alt="" coords="340,538,569,579"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="1154,335,1327,361"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831" title="引数区画に隣接する未知壁の数を返す" alt="" coords="865,620,1089,647"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1" title="スタート区画を取得" alt="" coords="365,335,544,361"/>
+<area shape="rect" href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08" title="ロボットを動かす模擬関数" alt="" coords="407,284,503,311"/>
+<area shape="rect" href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24" title="アニメーション状に迷路を表示する関数" alt="" coords="393,487,517,513"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a79c7f753702503606434d941d5d57a51" title="迷路内の区画の一意な通し番号となるIDを取得する" alt="" coords="905,554,1049,595"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#af11d7b324e1cd98760f6a5fc3efa7a2a" title="ステップマップにより次に行くべき方向列を生成する" alt="" coords="618,495,817,537"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#aa693f3d5b63146dce4b2e60ed5aa9746" title="ステップマップの更新" alt="" coords="620,747,815,773"/>
+<area shape="rect" href="classMazeLib_1_1Direction.html#a16795275f8cd53156110f1e98efe95f3" title="斜めではない4方向の配列 (for文などで使用)" alt="" coords="1169,613,1312,654"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71" title="フィールド内かどうかを判定する関数" alt="" coords="905,386,1049,427"/>
+<area shape="rect" href="structMazeLib_1_1Pose.html#ae858274f0f1f5e3be99cf41563ed0798" title="隣接姿勢の取得" alt="" coords="901,452,1053,479"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="1394,327,1538,369"/>
+<area shape="rect" href="structMazeLib_1_1Pose.html#a1afb418adcd34f3d6a91fb6710e74731" title=" " alt="" coords="1163,452,1318,479"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#acdb6d2483e4e1cb07bd449da299b999f" title=" " alt="" coords="885,721,1070,748"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#afcf9fe5e5c5eafd9393f4c4e827fd7b5" title=" " alt="" coords="885,772,1069,799"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a2acf8506c0b769c5ba44b44c2a98adc7" title="既知部分の迷路サイズを返す。計算量を減らすために使用。" alt="" coords="887,823,1068,849"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#acc89ab569077fee27b755eee07102b32" title=" " alt="" coords="887,873,1067,900"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#abe105dfa5e71b6a5d98bd6185d48b63c" title="ステップマップを初期化する関数" alt="" coords="886,924,1069,951"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a14d715923bd4f411400ad714803967df" title="ステップの更新" alt="" coords="878,975,1077,1001"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a1170bcf45c4a2e259f0fbe8628b18df8" title="ステップの表示" alt="" coords="628,444,807,471"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a20d2b751a83439c035d9d4611bf25a08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20d2b751a83439c035d9d4611bf25a08">&#9670;&nbsp;</a></span>MoveRobot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MoveRobot </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a>&#160;</td>
+          <td class="paramname"><em>relativeDir</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ロボットを動かす模擬関数 </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">relativeDir</td><td>移動方向(自己位置に対する相対方向) </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                                            {</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordflow">switch</span> (relativeDir) {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">case</span> Direction::Front:</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="keywordflow">return</span> <span class="comment">/* &lt;直進の処理&gt; */</span>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">case</span> Direction::Left:</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      <span class="keywordflow">return</span> <span class="comment">/* &lt;左ターンの処理&gt; */</span>;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">case</span> Direction::Right:</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <span class="keywordflow">return</span> <span class="comment">/* &lt;右ターンの処理&gt; */</span>;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">case</span> Direction::Back:</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <span class="keywordflow">return</span> <span class="comment">/* &lt;引き返しの処理&gt; */</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <a class="code" href="Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441">MAZE_LOGE</a> &lt;&lt; <span class="stringliteral">&quot;invalid direction: &quot;</span> &lt;&lt; relativeDir &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
+<div class="ttc" id="aMaze_8h_html_a2b3300dfb66ed9d40f9109731b18a441"><div class="ttname"><a href="Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441">MAZE_LOGE</a></div><div class="ttdeci">#define MAZE_LOGE</div><div class="ttdef"><b>Definition:</b> Maze.h:78</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ac5faa421b8b6d7342b0efed2bb4d5da5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5faa421b8b6d7342b0efed2bb4d5da5">&#9670;&nbsp;</a></span>SearchRun()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SearchRun </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classMazeLib_1_1Maze.html">Maze</a> &amp;&#160;</td>
+          <td class="paramname"><em>maze</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Maze.html">Maze</a> &amp;&#160;</td>
+          <td class="paramname"><em>mazeTarget</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>探索走行のアルゴリズム </p>
+<div class="fragment"><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                                                  {</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="comment">/* 探索テスト */</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <a class="code" href="classMazeLib_1_1StepMap.html">StepMap</a> stepMap;  <span class="comment">//&lt; 経路導出に使用するステップマップ</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="comment">/* 現在方向は、現在区画に向かう方向を表す。</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">   * 現在区画から出る方向ではないことに注意する。</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">   * +---+---+---+ 例</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">   * |   &lt;       | &lt;--- (0, 2, West)</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">   * +   +---+ ^ + &lt;--- (2, 2, North)</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">   * |   &gt;       | &lt;--- (1, 1, East)</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">   * +   +---+ v + &lt;--- (2, 0, South)</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">   * | S |       | &lt;--- (0, 0)</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">   * +---+---+---+</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">   */</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <a class="code" href="structMazeLib_1_1Position.html">Position</a> currentPos = <a class="code" href="structMazeLib_1_1Position.html">Position</a>(0, 0);     <span class="comment">//&lt; 現在の区画位置</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <a class="code" href="classMazeLib_1_1Direction.html">Direction</a> currentDir = Direction::North;  <span class="comment">//&lt; 現在向いている方向</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="comment">/* 1. ゴールへ向かう探索走行 */</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keywordflow">while</span> (1) {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="comment">/* 壁を確認。ここでは mazeTarget を参照しているが、実際には壁を見る */</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> wall_front =</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        mazeTarget.<a class="code" href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0">isWall</a>(currentPos, currentDir + Direction::Front);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> wall_left =</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        mazeTarget.<a class="code" href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0">isWall</a>(currentPos, currentDir + Direction::Left);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> wall_right =</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        mazeTarget.<a class="code" href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0">isWall</a>(currentPos, currentDir + Direction::Right);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="comment">/* 迷路の壁を更新 */</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    maze.<a class="code" href="classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f">updateWall</a>(currentPos, currentDir + Direction::Front, wall_front);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    maze.<a class="code" href="classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f">updateWall</a>(currentPos, currentDir + Direction::Left, wall_left);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    maze.<a class="code" href="classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f">updateWall</a>(currentPos, currentDir + Direction::Right, wall_right);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="comment">/* 現在地のゴール判定 */</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span>&amp; goals = maze.<a class="code" href="classMazeLib_1_1Maze.html#a43f2570cb23b6843896993c4076d75d4">getGoals</a>();</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordflow">if</span> (std::find(goals.cbegin(), goals.cend(), currentPos) != goals.cend())</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="comment">/* 現在地からゴールへの移動経路を、未知壁はないものとして導出 */</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> moveDirs = stepMap.<a class="code" href="classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614">calcShortestDirections</a>(</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        maze, currentPos, maze.<a class="code" href="classMazeLib_1_1Maze.html#a43f2570cb23b6843896993c4076d75d4">getGoals</a>(), <span class="keyword">false</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="comment">/* エラー処理 */</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordflow">if</span> (moveDirs.empty()) {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <a class="code" href="Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441">MAZE_LOGE</a> &lt;&lt; <span class="stringliteral">&quot;Failed to Find a path to goal!&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="comment">/* 未知壁のある区画に当たるまで進む */</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> nextDir : moveDirs) {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      <span class="comment">/* 未知壁があったら終了 */</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      <span class="keywordflow">if</span> (maze.<a class="code" href="classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831">unknownCount</a>(currentPos)) <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <span class="comment">/* ロボットを動かす */</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> relativeDir = <a class="code" href="classMazeLib_1_1Direction.html">Direction</a>(nextDir - currentDir);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      <a class="code" href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08">MoveRobot</a>(relativeDir);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <span class="comment">/* 現在地を進める */</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      currentPos = currentPos.<a class="code" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261">next</a>(nextDir);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      currentDir = nextDir;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      <span class="comment">/* アニメーション表示 */</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      <a class="code" href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24">ShowAnimation</a>(stepMap, maze, currentPos, currentDir,</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;                    <span class="stringliteral">&quot;Searching for Goal&quot;</span>);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    }</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="comment">/* 2. 最短経路上の未知区画をつぶす探索走行 */</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <span class="keywordflow">while</span> (1) {</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">/* 壁を確認。ここでは mazeTarget を参照しているが、実際には壁を見る */</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> wall_front =</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        mazeTarget.<a class="code" href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0">isWall</a>(currentPos, currentDir + Direction::Front);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> wall_left =</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        mazeTarget.<a class="code" href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0">isWall</a>(currentPos, currentDir + Direction::Left);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> wall_right =</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        mazeTarget.<a class="code" href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0">isWall</a>(currentPos, currentDir + Direction::Right);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="comment">/* 迷路の壁を更新 */</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    maze.<a class="code" href="classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f">updateWall</a>(currentPos, currentDir + Direction::Front, wall_front);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    maze.<a class="code" href="classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f">updateWall</a>(currentPos, currentDir + Direction::Left, wall_left);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    maze.<a class="code" href="classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f">updateWall</a>(currentPos, currentDir + Direction::Right, wall_right);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">/* 最短経路上の未知区画を洗い出し */</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> shortestDirs = stepMap.<a class="code" href="classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614">calcShortestDirections</a>(</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        maze, maze.<a class="code" href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1">getStart</a>(), maze.<a class="code" href="classMazeLib_1_1Maze.html#a43f2570cb23b6843896993c4076d75d4">getGoals</a>(), <span class="keyword">false</span>, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <a class="code" href="namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">Positions</a> shortestCandidates;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keyword">auto</span> pos = maze.<a class="code" href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1">getStart</a>();</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> nextDir : shortestDirs) {</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      pos = pos.<a class="code" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261">next</a>(nextDir);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      <span class="keywordflow">if</span> (maze.<a class="code" href="classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831">unknownCount</a>(pos)) shortestCandidates.push_back(pos);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    }</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="comment">/* 最短経路上に未知区画がなければ次へ */</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordflow">if</span> (shortestCandidates.empty()) <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="comment">/* 現在地から最短候補への移動経路を未知壁はないものとして導出 */</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> moveDirs = stepMap.<a class="code" href="classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614">calcShortestDirections</a>(</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        maze, currentPos, shortestCandidates, <span class="keyword">false</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">/* エラー処理 */</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">if</span> (moveDirs.empty()) {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      <a class="code" href="Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441">MAZE_LOGE</a> &lt;&lt; <span class="stringliteral">&quot;Failed to Find a path to goal!&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    }</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="comment">/* 未知壁のある区画に当たるまで進む */</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> nextDir : moveDirs) {</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      <span class="comment">/* 未知壁があったら終了 */</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <span class="keywordflow">if</span> (maze.<a class="code" href="classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831">unknownCount</a>(currentPos)) <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <span class="comment">/* ロボットを動かす */</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> relativeDir = <a class="code" href="classMazeLib_1_1Direction.html">Direction</a>(nextDir - currentDir);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      <a class="code" href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08">MoveRobot</a>(relativeDir);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      <span class="comment">/* 現在地を進める */</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      currentPos = currentPos.<a class="code" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261">next</a>(nextDir);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      currentDir = nextDir;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <span class="comment">/* アニメーション表示 */</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <a class="code" href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24">ShowAnimation</a>(stepMap, maze, currentPos, currentDir,</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;                    <span class="stringliteral">&quot;Searching for Shortest Path Candidates&quot;</span>);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    }</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  }</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <span class="comment">/* 3. スタート区画へ戻る走行 */</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keywordflow">while</span> (1) {</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="comment">/* 現在地のスタート区画判定 */</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">if</span> (currentPos == maze.<a class="code" href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1">getStart</a>()) <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">/* 現在地からスタートへの最短経路を既知壁のみの経路で導出 */</span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> moveDirs = stepMap.<a class="code" href="classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614">calcShortestDirections</a>(</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        maze, currentPos, {maze.<a class="code" href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1">getStart</a>()}, <span class="keyword">true</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="comment">/* エラー処理 */</span></div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordflow">if</span> (moveDirs.empty()) {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <a class="code" href="Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441">MAZE_LOGE</a> &lt;&lt; <span class="stringliteral">&quot;Failed to Find a path to goal!&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="comment">/* 経路上を進む */</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> nextDir : moveDirs) {</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <span class="comment">/* ロボットを動かす */</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> relativeDir = <a class="code" href="classMazeLib_1_1Direction.html">Direction</a>(nextDir - currentDir);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <a class="code" href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08">MoveRobot</a>(relativeDir);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;      <span class="comment">/* 現在地を進める */</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      currentPos = currentPos.<a class="code" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261">next</a>(nextDir);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      currentDir = nextDir;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      <span class="comment">/* アニメーション表示 */</span></div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      <a class="code" href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24">ShowAnimation</a>(stepMap, maze, currentPos, currentDir,</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;                    <span class="stringliteral">&quot;Going Back to Start&quot;</span>);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    }</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  }</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  <span class="comment">/* 正常終了 */</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;}</div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html"><div class="ttname"><a href="classMazeLib_1_1Direction.html">MazeLib::Direction</a></div><div class="ttdoc">迷路上の方向を表す。</div><div class="ttdef"><b>Definition:</b> Maze.h:145</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Maze_html_a37e66416f2fbd2afc3a5e367bf96f4d1"><div class="ttname"><a href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1">MazeLib::Maze::getStart</a></div><div class="ttdeci">const Position &amp; getStart() const</div><div class="ttdoc">スタート区画を取得</div><div class="ttdef"><b>Definition:</b> Maze.h:834</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Maze_html_a91145dfc930b8ecbe162037617c3624f"><div class="ttname"><a href="classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f">MazeLib::Maze::updateWall</a></div><div class="ttdeci">bool updateWall(const Position p, const Direction d, const bool b, const bool pushRecords=true)</div><div class="ttdoc">既知の壁情報と照らしあわせながら、壁を更新する関数</div><div class="ttdef"><b>Definition:</b> Maze.cpp:130</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Maze_html_aa727fb0dba3e28ea5325ac4fdb87c831"><div class="ttname"><a href="classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831">MazeLib::Maze::unknownCount</a></div><div class="ttdeci">int8_t unknownCount(const Position p) const</div><div class="ttdoc">引数区画に隣接する未知壁の数を返す</div><div class="ttdef"><b>Definition:</b> Maze.cpp:125</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Maze_html_aefe7c86cad9db92885a6f6eda52b04d0"><div class="ttname"><a href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0">MazeLib::Maze::isWall</a></div><div class="ttdeci">bool isWall(const WallIndex i) const</div><div class="ttdoc">壁の有無を返す</div><div class="ttdef"><b>Definition:</b> Maze.h:669</div></div>
+<div class="ttc" id="aclassMazeLib_1_1StepMap_html"><div class="ttname"><a href="classMazeLib_1_1StepMap.html">MazeLib::StepMap</a></div><div class="ttdoc">区画ベースのステップマップを管理するクラス</div><div class="ttdef"><b>Definition:</b> StepMap.h:19</div></div>
+<div class="ttc" id="aclassMazeLib_1_1StepMap_html_a97a7b2d52b74a8fe1f2253fcc1398614"><div class="ttname"><a href="classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614">MazeLib::StepMap::calcShortestDirections</a></div><div class="ttdeci">Directions calcShortestDirections(const Maze &amp;maze, const Position start, const Positions &amp;dest, const bool knownOnly, const bool simple)</div><div class="ttdoc">与えられた区画間の最短経路を導出する関数</div><div class="ttdef"><b>Definition:</b> StepMap.cpp:221</div></div>
+<div class="ttc" id="amain_8cpp_html_a20d2b751a83439c035d9d4611bf25a08"><div class="ttname"><a href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08">MoveRobot</a></div><div class="ttdeci">void MoveRobot(const Direction relativeDir)</div><div class="ttdoc">ロボットを動かす模擬関数</div><div class="ttdef"><b>Definition:</b> main.cpp:29</div></div>
+<div class="ttc" id="amain_8cpp_html_ade78a4f1e50a26e869652609d2692e24"><div class="ttname"><a href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24">ShowAnimation</a></div><div class="ttdeci">void ShowAnimation(const StepMap &amp;stepMap, const Maze &amp;maze, const Position &amp;pos, const Direction &amp;dir, const std::string &amp;msg)</div><div class="ttdoc">アニメーション状に迷路を表示する関数</div><div class="ttdef"><b>Definition:</b> main.cpp:52</div></div>
+<div class="ttc" id="anamespaceMazeLib_html_a2ecc0bb180fd1dee4ba69157e6d8b853"><div class="ttname"><a href="namespaceMazeLib.html#a2ecc0bb180fd1dee4ba69157e6d8b853">MazeLib::Positions</a></div><div class="ttdeci">std::vector&lt; Position &gt; Positions</div><div class="ttdoc">Position 構造体の動的配列、集合</div><div class="ttdef"><b>Definition:</b> Maze.h:375</div></div>
+<div class="ttc" id="astructMazeLib_1_1Position_html"><div class="ttname"><a href="structMazeLib_1_1Position.html">MazeLib::Position</a></div><div class="ttdoc">迷路の区画の位置(座標)を定義。</div><div class="ttdef"><b>Definition:</b> Maze.h:268</div></div>
+<div class="ttc" id="astructMazeLib_1_1Position_html_a78d3cd4841a650b5b88094075ebd1261"><div class="ttname"><a href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261">MazeLib::Position::next</a></div><div class="ttdeci">Position next(const Direction d) const</div><div class="ttdoc">自分の引数方向に隣接した区画の Position を返す</div><div class="ttdef"><b>Definition:</b> Maze.cpp:22</div></div>
+</div><!-- fragment --><div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="main_8cpp_ac5faa421b8b6d7342b0efed2bb4d5da5_cgraph.png" border="0" usemap="#amain_8cpp_ac5faa421b8b6d7342b0efed2bb4d5da5_cgraph" alt=""/></div>
+<map name="amain_8cpp_ac5faa421b8b6d7342b0efed2bb4d5da5_cgraph" id="amain_8cpp_ac5faa421b8b6d7342b0efed2bb4d5da5_cgraph">
+<area shape="rect" title="探索走行のアルゴリズム" alt="" coords="5,848,96,875"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614" title="与えられた区画間の最短経路を導出する関数" alt="" coords="144,471,373,513"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0" title="壁の有無を返す" alt="" coords="698,848,865,875"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="958,489,1131,516"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831" title="引数区画に隣接する未知壁の数を返す" alt="" coords="669,5,893,32"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a43f2570cb23b6843896993c4076d75d4" title="ゴール区画の集合を取得" alt="" coords="166,949,351,976"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1" title="スタート区画を取得" alt="" coords="169,1000,348,1027"/>
+<area shape="rect" href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08" title="ロボットを動かす模擬関数" alt="" coords="211,1051,307,1077"/>
+<area shape="rect" href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24" title="アニメーション状に迷路を表示する関数" alt="" coords="197,747,321,773"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a91145dfc930b8ecbe162037617c3624f" title="既知の壁情報と照らしあわせながら、壁を更新する関数" alt="" coords="421,899,621,925"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a79c7f753702503606434d941d5d57a51" title="迷路内の区画の一意な通し番号となるIDを取得する" alt="" coords="709,275,853,317"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#af11d7b324e1cd98760f6a5fc3efa7a2a" title="ステップマップにより次に行くべき方向列を生成する" alt="" coords="422,217,621,258"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#aa693f3d5b63146dce4b2e60ed5aa9746" title="ステップマップの更新" alt="" coords="424,519,619,545"/>
+<area shape="rect" href="classMazeLib_1_1Direction.html#a16795275f8cd53156110f1e98efe95f3" title="斜めではない4方向の配列 (for文などで使用)" alt="" coords="973,166,1116,207"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71" title="フィールド内かどうかを判定する関数" alt="" coords="709,107,853,149"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208" title="壁が探索済みかを返す" alt="" coords="690,493,873,520"/>
+<area shape="rect" href="structMazeLib_1_1Pose.html#ae858274f0f1f5e3be99cf41563ed0798" title="隣接姿勢の取得" alt="" coords="705,56,857,83"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数。迷路外を参照すると壁ありと返す。" alt="" coords="945,847,1144,873"/>
+<area shape="rect" href="structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す。" alt="" coords="1196,835,1344,877"/>
+<area shape="rect" href="structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数" alt="" coords="1196,901,1344,942"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="1198,482,1342,523"/>
+<area shape="rect" href="structMazeLib_1_1Pose.html#a1afb418adcd34f3d6a91fb6710e74731" title=" " alt="" coords="967,56,1122,83"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#acdb6d2483e4e1cb07bd449da299b999f" title=" " alt="" coords="689,544,874,571"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#afcf9fe5e5c5eafd9393f4c4e827fd7b5" title=" " alt="" coords="689,595,873,621"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a2acf8506c0b769c5ba44b44c2a98adc7" title="既知部分の迷路サイズを返す。計算量を減らすために使用。" alt="" coords="691,645,872,672"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#acc89ab569077fee27b755eee07102b32" title=" " alt="" coords="691,696,871,723"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#abe105dfa5e71b6a5d98bd6185d48b63c" title="ステップマップを初期化する関数" alt="" coords="690,392,873,419"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a14d715923bd4f411400ad714803967df" title="ステップの更新" alt="" coords="682,443,881,469"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a1170bcf45c4a2e259f0fbe8628b18df8" title="ステップの表示" alt="" coords="432,747,611,773"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#abf856e087422284ca0008d616dc3aa58" title="壁の既知を更新する" alt="" coords="686,899,877,925"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#ac4e0bed3b12d8ecc0ae3f987cc999019" title="壁を更新をする" alt="" coords="694,949,869,976"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a9e513a20755fe6f62a1fd2aabd080ecd" title="壁の更新のベース関数。迷路外を参照すると無視される。" alt="" coords="941,901,1148,928"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a23fe4ff74df8c46e004cfa4b874b548b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23fe4ff74df8c46e004cfa4b874b548b">&#9670;&nbsp;</a></span>ShortestRun()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ShortestRun </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Maze.html">Maze</a> &amp;&#160;</td>
+          <td class="paramname"><em>maze</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>最短走行のアルゴリズム </p>
+<div class="fragment"><div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;                                  {</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <span class="comment">/* スタートからゴールまでの最短経路導出 */</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <a class="code" href="classMazeLib_1_1StepMap.html">StepMap</a> stepMap;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> shortestDirs = stepMap.<a class="code" href="classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614">calcShortestDirections</a>(</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      maze, maze.<a class="code" href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1">getStart</a>(), maze.<a class="code" href="classMazeLib_1_1Maze.html#a43f2570cb23b6843896993c4076d75d4">getGoals</a>(), <span class="keyword">true</span>, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <span class="keywordflow">if</span> (shortestDirs.empty()) {</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <a class="code" href="Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441">MAZE_LOGE</a> &lt;&lt; <span class="stringliteral">&quot;Failed to Find a path to goal!&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  }</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  <span class="comment">/* 最短走行 */</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <a class="code" href="structMazeLib_1_1Position.html">Position</a> currentPos = maze.<a class="code" href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1">getStart</a>();</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <a class="code" href="classMazeLib_1_1Direction.html">Direction</a> currentDir = Direction::North;</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> nextDir : shortestDirs) {</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="comment">/* ロボットを動かす */</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> relativeDir = <a class="code" href="classMazeLib_1_1Direction.html">Direction</a>(nextDir - currentDir);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <a class="code" href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08">MoveRobot</a>(relativeDir);</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">/* 現在地を進める */</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    currentPos = currentPos.<a class="code" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261">next</a>(nextDir);</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    currentDir = nextDir;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="comment">/* アニメーション表示 */</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <a class="code" href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24">ShowAnimation</a>(stepMap, maze, currentPos, currentDir, <span class="stringliteral">&quot;Shortest Run&quot;</span>);</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  }</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="comment">/* 最短経路の表示 */</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  maze.<a class="code" href="classMazeLib_1_1Maze.html#abe3a8ddb09cef4adf591bbe4cc8f9b76">print</a>(shortestDirs);</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="comment">/* 終了 */</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;}</div>
+</div><!-- fragment --><div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="main_8cpp_a23fe4ff74df8c46e004cfa4b874b548b_cgraph.png" border="0" usemap="#amain_8cpp_a23fe4ff74df8c46e004cfa4b874b548b_cgraph" alt=""/></div>
+<map name="amain_8cpp_a23fe4ff74df8c46e004cfa4b874b548b_cgraph" id="amain_8cpp_a23fe4ff74df8c46e004cfa4b874b548b_cgraph">
+<area shape="rect" title="最短走行のアルゴリズム" alt="" coords="5,847,107,874"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a97a7b2d52b74a8fe1f2253fcc1398614" title="与えられた区画間の最短経路を導出する関数" alt="" coords="155,383,384,424"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="963,627,1137,654"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a43f2570cb23b6843896993c4076d75d4" title="ゴール区画の集合を取得" alt="" coords="177,898,362,925"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a37e66416f2fbd2afc3a5e367bf96f4d1" title="スタート区画を取得" alt="" coords="180,949,359,975"/>
+<area shape="rect" href="main_8cpp.html#a20d2b751a83439c035d9d4611bf25a08" title="ロボットを動かす模擬関数" alt="" coords="221,999,317,1026"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#abe3a8ddb09cef4adf591bbe4cc8f9b76" title="迷路の表示" alt="" coords="453,391,610,418"/>
+<area shape="rect" href="main_8cpp.html#ade78a4f1e50a26e869652609d2692e24" title="アニメーション状に迷路を表示する関数" alt="" coords="207,847,331,874"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a79c7f753702503606434d941d5d57a51" title="迷路内の区画の一意な通し番号となるIDを取得する" alt="" coords="719,5,863,47"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#af11d7b324e1cd98760f6a5fc3efa7a2a" title="ステップマップにより次に行くべき方向列を生成する" alt="" coords="432,232,631,273"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#aa693f3d5b63146dce4b2e60ed5aa9746" title="ステップマップの更新" alt="" coords="434,518,629,545"/>
+<area shape="rect" href="classMazeLib_1_1Direction.html#a16795275f8cd53156110f1e98efe95f3" title="斜めではない4方向の配列 (for文などで使用)" alt="" coords="979,177,1121,219"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71" title="フィールド内かどうかを判定する関数" alt="" coords="719,123,863,164"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a239d960e2d48de73ffcdd48b046cc208" title="壁が探索済みかを返す" alt="" coords="699,341,882,367"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#aefe7c86cad9db92885a6f6eda52b04d0" title="壁の有無を返す" alt="" coords="707,391,874,418"/>
+<area shape="rect" href="structMazeLib_1_1Pose.html#ae858274f0f1f5e3be99cf41563ed0798" title="隣接姿勢の取得" alt="" coords="715,239,867,266"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#aa727fb0dba3e28ea5325ac4fdb87c831" title="引数区画に隣接する未知壁の数を返す" alt="" coords="679,189,903,215"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a221de846e39eb32863a2b24ab9543560" title="壁の確認のベース関数。迷路外を参照すると壁ありと返す。" alt="" coords="951,366,1149,393"/>
+<area shape="rect" href="structMazeLib_1_1WallIndex.html#a28d5ca6fe2ee32fe06a7a3d1437566ff" title="迷路内の壁を一意な通し番号として表現したIDを返す。" alt="" coords="1197,325,1345,367"/>
+<area shape="rect" href="structMazeLib_1_1WallIndex.html#ab17656c4ce938f11b042e14a1f6e01ce" title="壁がフィールド内か判定する関数" alt="" coords="1197,391,1345,432"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="1199,620,1343,661"/>
+<area shape="rect" href="structMazeLib_1_1Pose.html#a1afb418adcd34f3d6a91fb6710e74731" title=" " alt="" coords="973,243,1127,270"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#acdb6d2483e4e1cb07bd449da299b999f" title=" " alt="" coords="698,493,883,519"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#afcf9fe5e5c5eafd9393f4c4e827fd7b5" title=" " alt="" coords="699,543,883,570"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#a2acf8506c0b769c5ba44b44c2a98adc7" title="既知部分の迷路サイズを返す。計算量を減らすために使用。" alt="" coords="700,594,881,621"/>
+<area shape="rect" href="classMazeLib_1_1Maze.html#acc89ab569077fee27b755eee07102b32" title=" " alt="" coords="701,645,881,671"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#abe105dfa5e71b6a5d98bd6185d48b63c" title="ステップマップを初期化する関数" alt="" coords="699,695,882,722"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a14d715923bd4f411400ad714803967df" title="ステップの更新" alt="" coords="691,746,890,773"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a1170bcf45c4a2e259f0fbe8628b18df8" title="ステップの表示" alt="" coords="442,847,621,874"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="ade78a4f1e50a26e869652609d2692e24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade78a4f1e50a26e869652609d2692e24">&#9670;&nbsp;</a></span>ShowAnimation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ShowAnimation </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1StepMap.html">StepMap</a> &amp;&#160;</td>
+          <td class="paramname"><em>stepMap</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Maze.html">Maze</a> &amp;&#160;</td>
+          <td class="paramname"><em>maze</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1Position.html">Position</a> &amp;&#160;</td>
+          <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a> &amp;&#160;</td>
+          <td class="paramname"><em>dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>msg</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>アニメーション状に迷路を表示する関数 </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stepMap</td><td>表示するステップマップ </td></tr>
+    <tr><td class="paramname">maze</td><td>表示する迷路 </td></tr>
+    <tr><td class="paramname">pos</td><td>迷路上の位置 </td></tr>
+    <tr><td class="paramname">dir</td><td>進行方向 </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                                         {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;\e[0;0H&quot;</span>;  <span class="comment">//&lt; カーソルを左上に移動</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  stepMap.<a class="code" href="classMazeLib_1_1StepMap.html#a1170bcf45c4a2e259f0fbe8628b18df8">print</a>(maze, pos, dir);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;\e[J&quot;</span>;  <span class="comment">//&lt; カーソル以下を消去</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  std::cout &lt;&lt; msg &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  std::this_thread::sleep_for(std::chrono::milliseconds(10));</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
+<div class="ttc" id="aclassMazeLib_1_1StepMap_html_a1170bcf45c4a2e259f0fbe8628b18df8"><div class="ttname"><a href="classMazeLib_1_1StepMap.html#a1170bcf45c4a2e259f0fbe8628b18df8">MazeLib::StepMap::print</a></div><div class="ttdeci">void print(const Maze &amp;maze, const Position p=Position(-1, -1), const Direction d=Direction::Max, std::ostream &amp;os=std::cout) const</div><div class="ttdoc">ステップの表示</div><div class="ttdef"><b>Definition:</b> StepMap.cpp:21</div></div>
+</div><!-- fragment --><div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="main_8cpp_ade78a4f1e50a26e869652609d2692e24_cgraph.png" border="0" usemap="#amain_8cpp_ade78a4f1e50a26e869652609d2692e24_cgraph" alt=""/></div>
+<map name="amain_8cpp_ade78a4f1e50a26e869652609d2692e24_cgraph" id="amain_8cpp_ade78a4f1e50a26e869652609d2692e24_cgraph">
+<area shape="rect" title="アニメーション状に迷路を表示する関数" alt="" coords="5,13,129,39"/>
+<area shape="rect" href="classMazeLib_1_1StepMap.html#a1170bcf45c4a2e259f0fbe8628b18df8" title="ステップの表示" alt="" coords="177,13,356,39"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="404,13,577,39"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="625,5,769,47"/>
+</map>
+</div>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+構築:&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

@@ -1,4 +1,0 @@
-<map id="MazeLib::Maze::getGoals" name="MazeLib::Maze::getGoals">
-<area shape="rect" id="node1" title="ゴール区画の集合を取得" alt="" coords="283,13,468,39"/>
-<area shape="rect" id="node2" href="$d9/da9/classMazeLib_1_1StepMap.html#a2a8c7e032f24e587b4736cfc6122cb03" title="スタートからゴールまでの最短経路を導出する関数" alt="" coords="5,5,235,47"/>
-</map>

@@ -1,0 +1,4 @@
+<map id="MazeLib::Maze::wallCount" name="MazeLib::Maze::wallCount">
+<area shape="rect" id="node1" title="引数区画の壁の数を返す" alt="" coords="5,13,197,39"/>
+<area shape="rect" id="node2" href="$classMazeLib_1_1Direction.html#a16795275f8cd53156110f1e98efe95f3" title="斜めではない4方向の配列 (for文などで使用)" alt="" coords="245,5,388,47"/>
+</map>

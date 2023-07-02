@@ -1,0 +1,850 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MicroMouse Maze Library: MazeLib::Position 構造体</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">MicroMouse Maze Library
+   &#160;<span id="projectnumber">3703225</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 構築: Doxygen 1.9.1 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'検索','.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','検索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="namespaceMazeLib.html">MazeLib</a></li><li class="navelem"><a class="el" href="structMazeLib_1_1Position.html">Position</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">公開メンバ関数</a> &#124;
+<a href="#pub-static-methods">静的公開メンバ関数</a> &#124;
+<a href="#pub-attribs">公開変数類</a> &#124;
+<a href="#pub-static-attribs">静的公開変数類</a> &#124;
+<a href="#friends">フレンド</a> &#124;
+<a href="structMazeLib_1_1Position-members.html">全メンバ一覧</a>  </div>
+  <div class="headertitle">
+<div class="title">MazeLib::Position 構造体</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>迷路の区画の位置(座標)を定義。  
+ <a href="structMazeLib_1_1Position.html#details">[詳解]</a></p>
+
+<p><code>#include &lt;<a class="el" href="Maze_8h_source.html">Maze.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+公開メンバ関数</h2></td></tr>
+<tr class="memitem:a7d5a934e5841cb10560e3673e38d0cde"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a> ()</td></tr>
+<tr class="memdesc:a7d5a934e5841cb10560e3673e38d0cde"><td class="mdescLeft">&#160;</td><td class="mdescRight">ゼロ初期化のデフォルトコンストラクタ  <a href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">[詳解]</a><br /></td></tr>
+<tr class="separator:a7d5a934e5841cb10560e3673e38d0cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a099ca39da154fdd987439ca5c410f6db"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a099ca39da154fdd987439ca5c410f6db">Position</a> (const int8_t <a class="el" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>, const int8_t <a class="el" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>)</td></tr>
+<tr class="memdesc:a099ca39da154fdd987439ca5c410f6db"><td class="mdescLeft">&#160;</td><td class="mdescRight">コンストラクタ  <a href="structMazeLib_1_1Position.html#a099ca39da154fdd987439ca5c410f6db">[詳解]</a><br /></td></tr>
+<tr class="separator:a099ca39da154fdd987439ca5c410f6db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79c7f753702503606434d941d5d57a51"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a79c7f753702503606434d941d5d57a51">getIndex</a> () const</td></tr>
+<tr class="memdesc:a79c7f753702503606434d941d5d57a51"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路内の区画の一意な通し番号となるIDを取得する  <a href="structMazeLib_1_1Position.html#a79c7f753702503606434d941d5d57a51">[詳解]</a><br /></td></tr>
+<tr class="separator:a79c7f753702503606434d941d5d57a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a4ed4ec285221afdc192e7bfef1f79a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a1a4ed4ec285221afdc192e7bfef1f79a">operator+</a> (const <a class="el" href="structMazeLib_1_1Position.html">Position</a> p) const</td></tr>
+<tr class="memdesc:a1a4ed4ec285221afdc192e7bfef1f79a"><td class="mdescLeft">&#160;</td><td class="mdescRight">加法  <a href="structMazeLib_1_1Position.html#a1a4ed4ec285221afdc192e7bfef1f79a">[詳解]</a><br /></td></tr>
+<tr class="separator:a1a4ed4ec285221afdc192e7bfef1f79a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad7a776c2b3dc40a31ec595d0049f1d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#aad7a776c2b3dc40a31ec595d0049f1d5">operator-</a> (const <a class="el" href="structMazeLib_1_1Position.html">Position</a> p) const</td></tr>
+<tr class="memdesc:aad7a776c2b3dc40a31ec595d0049f1d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">減法  <a href="structMazeLib_1_1Position.html#aad7a776c2b3dc40a31ec595d0049f1d5">[詳解]</a><br /></td></tr>
+<tr class="separator:aad7a776c2b3dc40a31ec595d0049f1d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5eb033a49e64f1327a1ca4268e051a8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#ad5eb033a49e64f1327a1ca4268e051a8">operator==</a> (const <a class="el" href="structMazeLib_1_1Position.html">Position</a> p) const</td></tr>
+<tr class="memdesc:ad5eb033a49e64f1327a1ca4268e051a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">等号  <a href="structMazeLib_1_1Position.html#ad5eb033a49e64f1327a1ca4268e051a8">[詳解]</a><br /></td></tr>
+<tr class="separator:ad5eb033a49e64f1327a1ca4268e051a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45b2cb12aa10a5aec5dd396302a5d458"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a45b2cb12aa10a5aec5dd396302a5d458">operator!=</a> (const <a class="el" href="structMazeLib_1_1Position.html">Position</a> p) const</td></tr>
+<tr class="memdesc:a45b2cb12aa10a5aec5dd396302a5d458"><td class="mdescLeft">&#160;</td><td class="mdescRight">等号否定  <a href="structMazeLib_1_1Position.html#a45b2cb12aa10a5aec5dd396302a5d458">[詳解]</a><br /></td></tr>
+<tr class="separator:a45b2cb12aa10a5aec5dd396302a5d458"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78d3cd4841a650b5b88094075ebd1261"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261">next</a> (const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a> <a class="el" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>) const</td></tr>
+<tr class="memdesc:a78d3cd4841a650b5b88094075ebd1261"><td class="mdescLeft">&#160;</td><td class="mdescRight">自分の引数方向に隣接した区画の <a class="el" href="structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> を返す  <a href="structMazeLib_1_1Position.html#a78d3cd4841a650b5b88094075ebd1261">[詳解]</a><br /></td></tr>
+<tr class="separator:a78d3cd4841a650b5b88094075ebd1261"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cdcf2aff33d82472233488385ff9d71"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71">isInsideOfField</a> () const</td></tr>
+<tr class="memdesc:a4cdcf2aff33d82472233488385ff9d71"><td class="mdescLeft">&#160;</td><td class="mdescRight">フィールド内かどうかを判定する関数  <a href="structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71">[詳解]</a><br /></td></tr>
+<tr class="separator:a4cdcf2aff33d82472233488385ff9d71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4aac1630ca560a2139a781b90202dbb0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a4aac1630ca560a2139a781b90202dbb0">rotate</a> (const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a> <a class="el" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>) const</td></tr>
+<tr class="memdesc:a4aac1630ca560a2139a781b90202dbb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">座標を回転変換する  <a href="structMazeLib_1_1Position.html#a4aac1630ca560a2139a781b90202dbb0">[詳解]</a><br /></td></tr>
+<tr class="separator:a4aac1630ca560a2139a781b90202dbb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9660ebc8676cf177c8a96bb129abf3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#ae9660ebc8676cf177c8a96bb129abf3c">rotate</a> (const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a> <a class="el" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>, const <a class="el" href="structMazeLib_1_1Position.html">Position</a> center) const</td></tr>
+<tr class="memdesc:ae9660ebc8676cf177c8a96bb129abf3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">座標を回転変換する  <a href="structMazeLib_1_1Position.html#ae9660ebc8676cf177c8a96bb129abf3c">[詳解]</a><br /></td></tr>
+<tr class="separator:ae9660ebc8676cf177c8a96bb129abf3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a708d3f09f3e82e145420d6123ebb2fdf"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a708d3f09f3e82e145420d6123ebb2fdf">toString</a> () const</td></tr>
+<tr class="memdesc:a708d3f09f3e82e145420d6123ebb2fdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">表示用文字列に変換する  <a href="structMazeLib_1_1Position.html#a708d3f09f3e82e145420d6123ebb2fdf">[詳解]</a><br /></td></tr>
+<tr class="separator:a708d3f09f3e82e145420d6123ebb2fdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+静的公開メンバ関数</h2></td></tr>
+<tr class="memitem:ab5bcb17560306132751f46298f13a519"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#ab5bcb17560306132751f46298f13a519">getPositionFromIndex</a> (const uint16_t index)</td></tr>
+<tr class="memdesc:ab5bcb17560306132751f46298f13a519"><td class="mdescLeft">&#160;</td><td class="mdescRight">IDからPositionを作成する関数  <a href="structMazeLib_1_1Position.html#ab5bcb17560306132751f46298f13a519">[詳解]</a><br /></td></tr>
+<tr class="separator:ab5bcb17560306132751f46298f13a519"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+公開変数類</h2></td></tr>
+<tr class="memitem:af9ae11703d2d8f331c9c41d93d59ea94"><td class="memItemLeft" >union {</td></tr>
+<tr class="memitem:abe8295726204aeddde3e347e67aa115b"><td class="memItemLeft" >&#160;&#160;&#160;struct {</td></tr>
+<tr class="memitem:a7f3a347608d9ec6b7b2426200ab752d9"><td class="memItemLeft" >&#160;&#160;&#160;&#160;&#160;&#160;int8_t&#160;&#160;&#160;<a class="el" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a></td></tr>
+<tr class="memdesc:a7f3a347608d9ec6b7b2426200ab752d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路区画のx座標成分  <a href="structMazeLib_1_1Position_1_1_0d0_1_1_0d2.html#a7f3a347608d9ec6b7b2426200ab752d9">[詳解]</a><br /></td></tr>
+<tr class="separator:a7f3a347608d9ec6b7b2426200ab752d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a909bf181caef82ed6ce19517111ef5a0"><td class="memItemLeft" >&#160;&#160;&#160;&#160;&#160;&#160;int8_t&#160;&#160;&#160;<a class="el" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a></td></tr>
+<tr class="memdesc:a909bf181caef82ed6ce19517111ef5a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">迷路区画のy座標成分  <a href="structMazeLib_1_1Position_1_1_0d0_1_1_0d2.html#a909bf181caef82ed6ce19517111ef5a0">[詳解]</a><br /></td></tr>
+<tr class="separator:a909bf181caef82ed6ce19517111ef5a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe8295726204aeddde3e347e67aa115b"><td class="memItemLeft" valign="top">&#160;&#160;&#160;}&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:abe8295726204aeddde3e347e67aa115b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a56d39e67eeef5b4998e2f2550d15b4"><td class="memItemLeft" >&#160;&#160;&#160;uint16_t&#160;&#160;&#160;<a class="el" href="structMazeLib_1_1Position.html#ab59b686826eb240a5720bb20bff76eb1">data</a></td></tr>
+<tr class="memdesc:a6a56d39e67eeef5b4998e2f2550d15b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">データ全体へのアクセス用  <a href="unionMazeLib_1_1Position_1_1_0d0.html#a6a56d39e67eeef5b4998e2f2550d15b4">[詳解]</a><br /></td></tr>
+<tr class="separator:a6a56d39e67eeef5b4998e2f2550d15b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9ae11703d2d8f331c9c41d93d59ea94"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:af9ae11703d2d8f331c9c41d93d59ea94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+静的公開変数類</h2></td></tr>
+<tr class="memitem:a7d2cf78cd70e0d51970e2d6fc3869df2"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#a7d2cf78cd70e0d51970e2d6fc3869df2">SIZE</a> = <a class="el" href="namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8">MAZE_SIZE_MAX</a> * <a class="el" href="namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8">MAZE_SIZE_MAX</a></td></tr>
+<tr class="memdesc:a7d2cf78cd70e0d51970e2d6fc3869df2"><td class="mdescLeft">&#160;</td><td class="mdescRight">フィールドの区画数。配列確保などで使える。  <a href="structMazeLib_1_1Position.html#a7d2cf78cd70e0d51970e2d6fc3869df2">[詳解]</a><br /></td></tr>
+<tr class="separator:a7d2cf78cd70e0d51970e2d6fc3869df2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+フレンド</h2></td></tr>
+<tr class="memitem:ac68e017112209824ac2f81c3d9d55378"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMazeLib_1_1Position.html#ac68e017112209824ac2f81c3d9d55378">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structMazeLib_1_1Position.html">Position</a> p)</td></tr>
+<tr class="memdesc:ac68e017112209824ac2f81c3d9d55378"><td class="mdescLeft">&#160;</td><td class="mdescRight">output-stream の表示関数。 ( x, y) の形式  <a href="structMazeLib_1_1Position.html#ac68e017112209824ac2f81c3d9d55378">[詳解]</a><br /></td></tr>
+<tr class="separator:ac68e017112209824ac2f81c3d9d55378"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">詳解</h2>
+<div class="textblock"><p>迷路の区画の位置(座標)を定義。 </p>
+<p>実体は 16bit の整数。 左下の区画が (0,0) の (x,y) 平面。</p>
+<div class="fragment"><div class="line">+--------+--------+</div>
+<div class="line">| (0, 1) | (1, 1) |</div>
+<div class="line">+--------+--------+</div>
+<div class="line">| (0, 0) | (1, 0) |</div>
+<div class="line">+--------+--------+</div>
+</div><!-- fragment --> </div><h2 class="groupheader">構築子と解体子</h2>
+<a id="a7d5a934e5841cb10560e3673e38d0cde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d5a934e5841cb10560e3673e38d0cde">&#9670;&nbsp;</a></span>Position() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr MazeLib::Position::Position </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>ゼロ初期化のデフォルトコンストラクタ </p>
+<div class="fragment"><div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;: <a class="code" href="structMazeLib_1_1Position.html#ab59b686826eb240a5720bb20bff76eb1">data</a>(0) {}</div>
+<div class="ttc" id="astructMazeLib_1_1Position_html_ab59b686826eb240a5720bb20bff76eb1"><div class="ttname"><a href="structMazeLib_1_1Position.html#ab59b686826eb240a5720bb20bff76eb1">MazeLib::Position::data</a></div><div class="ttdeci">uint16_t data</div><div class="ttdoc">データ全体へのアクセス用</div><div class="ttdef"><b>Definition:</b> Maze.h:279</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a099ca39da154fdd987439ca5c410f6db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a099ca39da154fdd987439ca5c410f6db">&#9670;&nbsp;</a></span>Position() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr MazeLib::Position::Position </td>
+          <td>(</td>
+          <td class="paramtype">const int8_t&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int8_t&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>コンストラクタ </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x,y</td><td>初期化パラメータ </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;: <a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>), <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>(<a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>) {}</div>
+<div class="ttc" id="astructMazeLib_1_1Position_html_a601f3f2a255e34608b71303e1f1c266d"><div class="ttname"><a href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">MazeLib::Position::x</a></div><div class="ttdeci">int8_t x</div><div class="ttdoc">迷路区画のx座標成分</div><div class="ttdef"><b>Definition:</b> Maze.h:276</div></div>
+<div class="ttc" id="astructMazeLib_1_1Position_html_abbeef7b29b98ee225dfbb0e1319736ec"><div class="ttname"><a href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">MazeLib::Position::y</a></div><div class="ttdeci">int8_t y</div><div class="ttdoc">迷路区画のy座標成分</div><div class="ttdef"><b>Definition:</b> Maze.h:277</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">関数詳解</h2>
+<a id="a79c7f753702503606434d941d5d57a51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79c7f753702503606434d941d5d57a51">&#9670;&nbsp;</a></span>getIndex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t MazeLib::Position::getIndex </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>迷路内の区画の一意な通し番号となるIDを取得する </p>
+<p>迷路外の区画の場合未定義動作となる。 <a class="el" href="structMazeLib_1_1Position.html#a4cdcf2aff33d82472233488385ff9d71" title="フィールド内かどうかを判定する関数">Position::isInsideOfField()</a> を使って迷路区画内であることを確認すること。 </p><dl class="section return"><dt>戻り値</dt><dd>uint16_t 通し番号ID </dd></dl>
+<div class="fragment"><div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;{ <span class="keywordflow">return</span> (<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a> &lt;&lt; <a class="code" href="namespaceMazeLib.html#a88e6e653888925d5477ac5d2a7cd14b5">MAZE_SIZE_BIT</a>) | <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>; }</div>
+<div class="ttc" id="anamespaceMazeLib_html_a88e6e653888925d5477ac5d2a7cd14b5"><div class="ttname"><a href="namespaceMazeLib.html#a88e6e653888925d5477ac5d2a7cd14b5">MazeLib::MAZE_SIZE_BIT</a></div><div class="ttdeci">static constexpr int MAZE_SIZE_BIT</div><div class="ttdoc">迷路の1辺の区画数の bit 数。bit shift などに用いる。</div><div class="ttdef"><b>Definition:</b> Maze.h:110</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ab5bcb17560306132751f46298f13a519"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5bcb17560306132751f46298f13a519">&#9670;&nbsp;</a></span>getPositionFromIndex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structMazeLib_1_1Position.html">Position</a> MazeLib::Position::getPositionFromIndex </td>
+          <td>(</td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>IDからPositionを作成する関数 </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>通し番号 ID </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;                                                             {</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="keywordflow">return</span> {int8_t(index &gt;&gt; <a class="code" href="namespaceMazeLib.html#a88e6e653888925d5477ac5d2a7cd14b5">MAZE_SIZE_BIT</a>),</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;            int8_t(index &amp; (<a class="code" href="namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8">MAZE_SIZE_MAX</a> - 1))};</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  }</div>
+<div class="ttc" id="anamespaceMazeLib_html_a2ea3567169dc6afe5013bc4b3b0515b8"><div class="ttname"><a href="namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8">MazeLib::MAZE_SIZE_MAX</a></div><div class="ttdeci">static constexpr int MAZE_SIZE_MAX</div><div class="ttdoc">迷路の1辺の区画数の最大値。2のbit数乗の値。</div><div class="ttdef"><b>Definition:</b> Maze.h:114</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a4cdcf2aff33d82472233488385ff9d71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4cdcf2aff33d82472233488385ff9d71">&#9670;&nbsp;</a></span>isInsideOfField()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MazeLib::Position::isInsideOfField </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>フィールド内かどうかを判定する関数 </p>
+<dl class="section return"><dt>戻り値</dt><dd>true フィールド内 </dd>
+<dd>
+false フィールド外 </dd></dl>
+<div class="fragment"><div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;                               {</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <span class="comment">// return x &gt;= 0 &amp;&amp; x &lt; MAZE_SIZE &amp;&amp; y &gt;= 0 &amp;&amp; y &lt; MAZE_SIZE;</span></div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <span class="comment">/* 高速化 */</span></div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    <span class="keywordflow">return</span> (<span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>) &lt; <a class="code" href="namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">MAZE_SIZE</a>) &amp;&amp;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;           (<span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>(<a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>) &lt; <a class="code" href="namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">MAZE_SIZE</a>);</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  }</div>
+<div class="ttc" id="anamespaceMazeLib_html_aae4766ca69a8d58c1c60e4600ec47efa"><div class="ttname"><a href="namespaceMazeLib.html#aae4766ca69a8d58c1c60e4600ec47efa">MazeLib::MAZE_SIZE</a></div><div class="ttdeci">static constexpr int MAZE_SIZE</div><div class="ttdoc">迷路の1辺の区画数の定数。</div><div class="ttdef"><b>Definition:</b> Maze.h:106</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a78d3cd4841a650b5b88094075ebd1261"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78d3cd4841a650b5b88094075ebd1261">&#9670;&nbsp;</a></span>next()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structMazeLib_1_1Position.html">Position</a> MazeLib::Position::next </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a>&#160;</td>
+          <td class="paramname"><em>d</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>自分の引数方向に隣接した区画の <a class="el" href="structMazeLib_1_1Position.html" title="迷路の区画の位置(座標)を定義。">Position</a> を返す </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">d</td><td>隣接方向 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>戻り値</dt><dd>隣接区画の座標 </dd></dl>
+<div class="fragment"><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;                                               {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordflow">switch</span> (<a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>) {</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">Direction::East</a>:</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a> + 1, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4">Direction::NorthEast</a>:</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a> + 1, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a> + 1);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">Direction::North</a>:</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a> + 1);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890">Direction::NorthWest</a>:</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a> - 1, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a> + 1);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7">Direction::West</a>:</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a> - 1, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eeab8c82202106d287f826a9fe028e71be3">Direction::SouthWest</a>:</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a> - 1, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a> - 1);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a">Direction::South</a>:</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a> - 1);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea133016eb925c28cd4d0337daf26f8e84">Direction::SouthEast</a>:</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a> + 1, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a> - 1);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <a class="code" href="Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441">MAZE_LOGE</a> &lt;&lt; <a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;}</div>
+<div class="ttc" id="aMaze_8h_html_a2b3300dfb66ed9d40f9109731b18a441"><div class="ttname"><a href="Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441">MAZE_LOGE</a></div><div class="ttdeci">#define MAZE_LOGE</div><div class="ttdef"><b>Definition:</b> Maze.h:78</div></div>
+<div class="ttc" id="aMaze_8h_html_a2e373ebbe85a38d70fb6b861312ee6d2"><div class="ttname"><a href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a></div><div class="ttdeci">unsigned int d</div><div class="ttdoc">壁の方向</div><div class="ttdef"><b>Definition:</b> Maze.h:609</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea133016eb925c28cd4d0337daf26f8e84"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea133016eb925c28cd4d0337daf26f8e84">MazeLib::Direction::SouthEast</a></div><div class="ttdeci">@ SouthEast</div><div class="ttdef"><b>Definition:</b> Maze.h:158</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">MazeLib::Direction::North</a></div><div class="ttdeci">@ North</div><div class="ttdef"><b>Definition:</b> Maze.h:153</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a">MazeLib::Direction::South</a></div><div class="ttdeci">@ South</div><div class="ttdef"><b>Definition:</b> Maze.h:157</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea565f036956e3a9a1372c2e3b326e3890">MazeLib::Direction::NorthWest</a></div><div class="ttdeci">@ NorthWest</div><div class="ttdef"><b>Definition:</b> Maze.h:154</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea5df18bea967deb066d5db3b06900e0d4">MazeLib::Direction::NorthEast</a></div><div class="ttdeci">@ NorthEast</div><div class="ttdef"><b>Definition:</b> Maze.h:152</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">MazeLib::Direction::East</a></div><div class="ttdeci">@ East</div><div class="ttdef"><b>Definition:</b> Maze.h:151</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7">MazeLib::Direction::West</a></div><div class="ttdeci">@ West</div><div class="ttdef"><b>Definition:</b> Maze.h:155</div></div>
+<div class="ttc" id="aclassMazeLib_1_1Direction_html_a3eac649af2c57a5d9b58a530d22370eeab8c82202106d287f826a9fe028e71be3"><div class="ttname"><a href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eeab8c82202106d287f826a9fe028e71be3">MazeLib::Direction::SouthWest</a></div><div class="ttdeci">@ SouthWest</div><div class="ttdef"><b>Definition:</b> Maze.h:156</div></div>
+<div class="ttc" id="astructMazeLib_1_1Position_html_a7d5a934e5841cb10560e3673e38d0cde"><div class="ttname"><a href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">MazeLib::Position::Position</a></div><div class="ttdeci">constexpr Position()</div><div class="ttdoc">ゼロ初期化のデフォルトコンストラクタ</div><div class="ttdef"><b>Definition:</b> Maze.h:286</div></div>
+</div><!-- fragment --><div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="structMazeLib_1_1Position_a78d3cd4841a650b5b88094075ebd1261_cgraph.png" border="0" usemap="#astructMazeLib_1_1Position_a78d3cd4841a650b5b88094075ebd1261_cgraph" alt=""/></div>
+<map name="astructMazeLib_1_1Position_a78d3cd4841a650b5b88094075ebd1261_cgraph" id="astructMazeLib_1_1Position_a78d3cd4841a650b5b88094075ebd1261_cgraph">
+<area shape="rect" title="自分の引数方向に隣接した区画の Position を返す" alt="" coords="5,13,179,39"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="227,5,371,47"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a45b2cb12aa10a5aec5dd396302a5d458"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45b2cb12aa10a5aec5dd396302a5d458">&#9670;&nbsp;</a></span>operator!=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MazeLib::Position::operator!= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>等号否定 </p>
+<div class="fragment"><div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;                                          {</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <span class="comment">// return x != p.x || y != p.y;</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#ab59b686826eb240a5720bb20bff76eb1">data</a> != p.data;  <span class="comment">//&lt; 高速化</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a1a4ed4ec285221afdc192e7bfef1f79a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a4ed4ec285221afdc192e7bfef1f79a">&#9670;&nbsp;</a></span>operator+()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structMazeLib_1_1Position.html">Position</a> MazeLib::Position::operator+ </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>加法 </p>
+<div class="fragment"><div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;                                             {</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a> + p.x, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a> + p.y);</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  }</div>
+</div><!-- fragment --><div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="structMazeLib_1_1Position_a1a4ed4ec285221afdc192e7bfef1f79a_cgraph.png" border="0" usemap="#astructMazeLib_1_1Position_a1a4ed4ec285221afdc192e7bfef1f79a_cgraph" alt=""/></div>
+<map name="astructMazeLib_1_1Position_a1a4ed4ec285221afdc192e7bfef1f79a_cgraph" id="astructMazeLib_1_1Position_a1a4ed4ec285221afdc192e7bfef1f79a_cgraph">
+<area shape="rect" title="加法" alt="" coords="5,5,149,47"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="197,5,341,47"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="aad7a776c2b3dc40a31ec595d0049f1d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad7a776c2b3dc40a31ec595d0049f1d5">&#9670;&nbsp;</a></span>operator-()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structMazeLib_1_1Position.html">Position</a> MazeLib::Position::operator- </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>減法 </p>
+<div class="fragment"><div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;                                             {</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a> - p.x, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a> - p.y);</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;  }</div>
+</div><!-- fragment --><div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="structMazeLib_1_1Position_aad7a776c2b3dc40a31ec595d0049f1d5_cgraph.png" border="0" usemap="#astructMazeLib_1_1Position_aad7a776c2b3dc40a31ec595d0049f1d5_cgraph" alt=""/></div>
+<map name="astructMazeLib_1_1Position_aad7a776c2b3dc40a31ec595d0049f1d5_cgraph" id="astructMazeLib_1_1Position_aad7a776c2b3dc40a31ec595d0049f1d5_cgraph">
+<area shape="rect" title="減法" alt="" coords="5,5,149,47"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="197,5,341,47"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="ad5eb033a49e64f1327a1ca4268e051a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5eb033a49e64f1327a1ca4268e051a8">&#9670;&nbsp;</a></span>operator==()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MazeLib::Position::operator== </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>等号 </p>
+<div class="fragment"><div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;                                          {</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <span class="comment">// return x == p.x &amp;&amp; y == p.y;</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#ab59b686826eb240a5720bb20bff76eb1">data</a> == p.data;  <span class="comment">//&lt; 高速化</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a4aac1630ca560a2139a781b90202dbb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4aac1630ca560a2139a781b90202dbb0">&#9670;&nbsp;</a></span>rotate() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structMazeLib_1_1Position.html">Position</a> MazeLib::Position::rotate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a>&#160;</td>
+          <td class="paramname"><em>d</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>座標を回転変換する </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">d</td><td>回転角度, 4方位のみ </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>戻り値</dt><dd>変換後の位置 </dd></dl>
+<div class="fragment"><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                                                 {</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">switch</span> (<a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>) {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea7e9e05839a8246d49a6fbff8a02e9b82">Direction::East</a>:</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea314d00172c80dd481eeaa3eb437e2fb4">Direction::North</a>:</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(-<a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>, <a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea82fb65617bb6def7535e2cedffc233b7">Direction::West</a>:</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(-<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>, -<a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classMazeLib_1_1Direction.html#a3eac649af2c57a5d9b58a530d22370eea35be9d6b51f91ef0edae21118a0aef5a">Direction::South</a>:</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde">Position</a>(<a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>, -<a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <a class="code" href="Maze_8h.html#a2b3300dfb66ed9d40f9109731b18a441">MAZE_LOGE</a> &lt;&lt; <a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
+</div><!-- fragment --><div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="structMazeLib_1_1Position_a4aac1630ca560a2139a781b90202dbb0_cgraph.png" border="0" usemap="#astructMazeLib_1_1Position_a4aac1630ca560a2139a781b90202dbb0_cgraph" alt=""/></div>
+<map name="astructMazeLib_1_1Position_a4aac1630ca560a2139a781b90202dbb0_cgraph" id="astructMazeLib_1_1Position_a4aac1630ca560a2139a781b90202dbb0_cgraph">
+<area shape="rect" title="座標を回転変換する" alt="" coords="5,5,149,47"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="197,5,341,47"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="ae9660ebc8676cf177c8a96bb129abf3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9660ebc8676cf177c8a96bb129abf3c">&#9670;&nbsp;</a></span>rotate() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structMazeLib_1_1Position.html">Position</a> MazeLib::Position::rotate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classMazeLib_1_1Direction.html">Direction</a>&#160;</td>
+          <td class="paramname"><em>d</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td>
+          <td class="paramname"><em>center</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>座標を回転変換する </p>
+<dl class="params"><dt>引数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">d</td><td>回転角度, 4方位のみ </td></tr>
+    <tr><td class="paramname">center</td><td>回転中心座標 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>戻り値</dt><dd>変換後の位置 </dd></dl>
+<div class="fragment"><div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;                                                                  {</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="keywordflow">return</span> center + (*<span class="keyword">this</span> - center).<a class="code" href="structMazeLib_1_1Position.html#a4aac1630ca560a2139a781b90202dbb0">rotate</a>(<a class="code" href="Maze_8h.html#a2e373ebbe85a38d70fb6b861312ee6d2">d</a>);</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  }</div>
+<div class="ttc" id="astructMazeLib_1_1Position_html_a4aac1630ca560a2139a781b90202dbb0"><div class="ttname"><a href="structMazeLib_1_1Position.html#a4aac1630ca560a2139a781b90202dbb0">MazeLib::Position::rotate</a></div><div class="ttdeci">Position rotate(const Direction d) const</div><div class="ttdoc">座標を回転変換する</div><div class="ttdef"><b>Definition:</b> Maze.cpp:45</div></div>
+</div><!-- fragment --><div class="dynheader">
+呼び出し関係図:</div>
+<div class="dyncontent">
+<div class="center"><img src="structMazeLib_1_1Position_ae9660ebc8676cf177c8a96bb129abf3c_cgraph.png" border="0" usemap="#astructMazeLib_1_1Position_ae9660ebc8676cf177c8a96bb129abf3c_cgraph" alt=""/></div>
+<map name="astructMazeLib_1_1Position_ae9660ebc8676cf177c8a96bb129abf3c_cgraph" id="astructMazeLib_1_1Position_ae9660ebc8676cf177c8a96bb129abf3c_cgraph">
+<area shape="rect" title="座標を回転変換する" alt="" coords="5,5,149,47"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a4aac1630ca560a2139a781b90202dbb0" title="座標を回転変換する" alt="" coords="197,5,341,47"/>
+<area shape="rect" href="structMazeLib_1_1Position.html#a7d5a934e5841cb10560e3673e38d0cde" title="ゼロ初期化のデフォルトコンストラクタ" alt="" coords="389,5,533,47"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a708d3f09f3e82e145420d6123ebb2fdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a708d3f09f3e82e145420d6123ebb2fdf">&#9670;&nbsp;</a></span>toString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* MazeLib::Position::toString </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>表示用文字列に変換する </p>
+<div class="fragment"><div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;                               {</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">char</span> str[32];</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    snprintf(str, <span class="keyword">sizeof</span>(str), <span class="stringliteral">&quot;(%02d, %02d)&quot;</span>, <a class="code" href="structMazeLib_1_1Position.html#a601f3f2a255e34608b71303e1f1c266d">x</a>, <a class="code" href="structMazeLib_1_1Position.html#abbeef7b29b98ee225dfbb0e1319736ec">y</a>);</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="keywordflow">return</span> str;</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">フレンドと関連関数の詳解</h2>
+<a id="ac68e017112209824ac2f81c3d9d55378"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac68e017112209824ac2f81c3d9d55378">&#9670;&nbsp;</a></span>operator&lt;&lt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structMazeLib_1_1Position.html">Position</a>&#160;</td>
+          <td class="paramname"><em>p</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>output-stream の表示関数。 ( x, y) の形式 </p>
+<div class="fragment"><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                                         {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">return</span> os &lt;&lt; <span class="stringliteral">&quot;( &quot;</span> &lt;&lt; std::setw(2) &lt;&lt; +p.x &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; std::setw(2) &lt;&lt; +p.y</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">メンバ詳解</h2>
+<a id="af9ae11703d2d8f331c9c41d93d59ea94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9ae11703d2d8f331c9c41d93d59ea94">&#9670;&nbsp;</a></span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">union { ... } </td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab59b686826eb240a5720bb20bff76eb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab59b686826eb240a5720bb20bff76eb1">&#9670;&nbsp;</a></span>data</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t MazeLib::Position::data</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>データ全体へのアクセス用 </p>
+
+</div>
+</div>
+<a id="a7d2cf78cd70e0d51970e2d6fc3869df2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d2cf78cd70e0d51970e2d6fc3869df2">&#9670;&nbsp;</a></span>SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int MazeLib::Position::SIZE = <a class="el" href="namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8">MAZE_SIZE_MAX</a> * <a class="el" href="namespaceMazeLib.html#a2ea3567169dc6afe5013bc4b3b0515b8">MAZE_SIZE_MAX</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>フィールドの区画数。配列確保などで使える。 </p>
+
+</div>
+</div>
+<a id="a601f3f2a255e34608b71303e1f1c266d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a601f3f2a255e34608b71303e1f1c266d">&#9670;&nbsp;</a></span>x</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int8_t MazeLib::Position::x</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>迷路区画のx座標成分 </p>
+
+</div>
+</div>
+<a id="abbeef7b29b98ee225dfbb0e1319736ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbeef7b29b98ee225dfbb0e1319736ec">&#9670;&nbsp;</a></span>y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int8_t MazeLib::Position::y</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>迷路区画のy座標成分 </p>
+
+</div>
+</div>
+<hr/>この構造体詳解は次のファイルから抽出されました:<ul>
+<li>include/MazeLib/<a class="el" href="Maze_8h_source.html">Maze.h</a></li>
+<li>src/<a class="el" href="Maze_8cpp.html">Maze.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+構築:&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>
