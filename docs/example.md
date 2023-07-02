@@ -6,6 +6,8 @@
 
 ### Docker による環境構築
 
+Docker がインストールされた Linux 上で下記コマンドを実行する。
+
 ```sh
 # build dev env
 ./docker/build.sh
@@ -16,7 +18,7 @@ rm -rf build
 ./docker/run.sh cmake ..
 # build
 ./docker/run.sh make -j
-# run
+# run example
 ./docker/run.sh make search
 ```
 
@@ -60,7 +62,7 @@ rm -rf build
 ### インストールコマンドの例
 
 ```sh
-# Ubuntu 20.04
+# Ubuntu 22.04
 apt install git make cmake gcc g++ \
     python3-matplotlib \
     python3-dev \
@@ -68,7 +70,7 @@ apt install git make cmake gcc g++ \
     python3-pybind11 \
     doxygen graphviz \
     libgtest-dev lcov \
-    qt5-default
+    qtbase5-dev
 # Arch Linux
 yay -S --needed git make cmake gcc \
     python-matplotlib \
@@ -117,7 +119,7 @@ make
 
 ### 探索走行
 
-サンプルコード [examples/search/main.cpp](/examples/search/main.cpp) を実行するコマンドの例
+サンプルコード `examples/search/main.cpp` を実行するコマンドの例
 
 ```sh
 ## 実行 (examples/search/main.cpp を実行)

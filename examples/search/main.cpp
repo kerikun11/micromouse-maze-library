@@ -6,16 +6,16 @@
  */
 
 /*
- * 迷路ライブラリの読み込み
- */
-#include "MazeLib/Maze.h"
-#include "MazeLib/StepMap.h"
-
-/*
  * 標準ライブラリの読み込み
  */
 #include <algorithm>  //< for std::find
 #include <thread>     //< for std::this_thread::sleep_for
+
+/*
+ * 迷路ライブラリの読み込み
+ */
+#include "MazeLib/Maze.h"
+#include "MazeLib/StepMap.h"
 
 /*
  * 名前空間の展開
@@ -49,14 +49,12 @@ void MoveRobot(const Direction relativeDir) {
  * @param pos 迷路上の位置
  * @param dir 進行方向
  */
-void ShowAnimation(const StepMap& stepMap,
-                   const Maze& maze,
-                   const Position& pos,
-                   const Direction& dir,
+void ShowAnimation(const StepMap& stepMap, const Maze& maze,
+                   const Position& pos, const Direction& dir,
                    const std::string& msg) {
-  std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
+  std::cout << "\e[0;0H";  //< カーソルを左上に移動
   stepMap.print(maze, pos, dir);
-  std::cout << "\e[J"; /*< カーソル以下を消去 */
+  std::cout << "\e[J";  //< カーソル以下を消去
   std::cout << msg << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
@@ -107,8 +105,7 @@ int SearchRun(Maze& maze, const Maze& mazeTarget) {
     /* 未知壁のある区画に当たるまで進む */
     for (const auto nextDir : moveDirs) {
       /* 未知壁があったら終了 */
-      if (maze.unknownCount(currentPos))
-        break;
+      if (maze.unknownCount(currentPos)) break;
       /* ロボットを動かす */
       const auto relativeDir = Direction(nextDir - currentDir);
       MoveRobot(relativeDir);
@@ -140,12 +137,10 @@ int SearchRun(Maze& maze, const Maze& mazeTarget) {
     auto pos = maze.getStart();
     for (const auto nextDir : shortestDirs) {
       pos = pos.next(nextDir);
-      if (maze.unknownCount(pos))
-        shortestCandidates.push_back(pos);
+      if (maze.unknownCount(pos)) shortestCandidates.push_back(pos);
     }
     /* 最短経路上に未知区画がなければ次へ */
-    if (shortestCandidates.empty())
-      break;
+    if (shortestCandidates.empty()) break;
     /* 現在地から最短候補への移動経路を未知壁はないものとして導出 */
     const auto moveDirs = stepMap.calcShortestDirections(
         maze, currentPos, shortestCandidates, false, true);
@@ -157,8 +152,7 @@ int SearchRun(Maze& maze, const Maze& mazeTarget) {
     /* 未知壁のある区画に当たるまで進む */
     for (const auto nextDir : moveDirs) {
       /* 未知壁があったら終了 */
-      if (maze.unknownCount(currentPos))
-        break;
+      if (maze.unknownCount(currentPos)) break;
       /* ロボットを動かす */
       const auto relativeDir = Direction(nextDir - currentDir);
       MoveRobot(relativeDir);
@@ -173,8 +167,7 @@ int SearchRun(Maze& maze, const Maze& mazeTarget) {
   /* 3. スタート区画へ戻る走行 */
   while (1) {
     /* 現在地のスタート区画判定 */
-    if (currentPos == maze.getStart())
-      break;
+    if (currentPos == maze.getStart()) break;
     /* 現在地からスタートへの最短経路を既知壁のみの経路で導出 */
     const auto moveDirs = stepMap.calcShortestDirections(
         maze, currentPos, {maze.getStart()}, true, true);
@@ -236,8 +229,8 @@ int ShortestRun(const Maze& maze) {
  */
 int main(void) {
   /* 画面のクリア */
-  std::cout << "\e[0;0H"; /*< カーソルを左上に移動 */
-  std::cout << "\e[J";    /*< カーソル以下を消去 */
+  std::cout << "\e[0;0H";  //< カーソルを左上に移動
+  std::cout << "\e[J";     //< カーソル以下を消去
 
   /* シミュレーションに用いる迷路の選択 */
   const std::string filepath = "../mazedata/data/16MM2018CX.maze";

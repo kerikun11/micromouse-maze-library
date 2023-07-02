@@ -14,7 +14,7 @@
     "license": "MIT",
     "build": {
         "flags": [
-            "-std=c++14",
+            "-std=c++17",
             "-O2"
         ]
     }
