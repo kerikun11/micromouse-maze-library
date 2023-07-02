@@ -6,6 +6,8 @@
 
 ### Docker による環境構築
 
+Docker がインストールされた Linux 上で下記コマンドを実行する。
+
 ```sh
 # build dev env
 ./docker/build.sh
@@ -117,7 +119,7 @@ make
 
 ### 探索走行
 
-サンプルコード [examples/search/main.cpp](/examples/search/main.cpp) を実行するコマンドの例
+サンプルコード `examples/search/main.cpp` を実行するコマンドの例
 
 ```sh
 ## 実行 (examples/search/main.cpp を実行)

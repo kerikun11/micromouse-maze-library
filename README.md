@@ -31,4 +31,4 @@
 | ----------------- | ------------ |
 | include directory | `./include`  |
 | source directory  | `./src`      |
-| compile option    | `-std=c++14` |
+| compile option    | `-std=c++17` |
