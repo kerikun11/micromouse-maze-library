@@ -16,34 +16,6 @@
 #include <string>
 #include <vector>
 
-/* debug profiling option */
-#define MAZE_DEBUG_PROFILING 0
-#if MAZE_DEBUG_PROFILING
-#warning "this is debug mode!"
-#include <chrono>
-static int microseconds() {
-  return std::chrono::duration_cast<std::chrono::microseconds>(
-             std::chrono::steady_clock::now().time_since_epoch())
-      .count();
-}
-static int microseconds() __attribute__((unused));
-#define MAZE_DEBUG_PROFILING_START(id) const auto t0_##id = microseconds();
-#define MAZE_DEBUG_PROFILING_END(id)                                 \
-  {                                                                  \
-    const auto t1_##id = microseconds();                             \
-    const auto dur = t1_##id - t0_##id;                              \
-    static auto dur_max = 0;                                         \
-    if (dur > dur_max) {                                             \
-      dur_max = dur;                                                 \
-      MAZE_LOGD << __func__ << "(" << #id << ")\t" << dur << " [us]" \
-                << std::endl;                                        \
-    }                                                                \
-  }
-#else
-#define MAZE_DEBUG_PROFILING_START(id)
-#define MAZE_DEBUG_PROFILING_END(id)
-#endif
-
 /*
  * 迷路のカラー表示切替
  */
@@ -93,6 +65,34 @@ static int microseconds() __attribute__((unused));
 #define MAZE_LOGD MAZE_LOG_STREAM_BASE(std::cout, "D", C_BL)
 #else
 #define MAZE_LOGD std::ostream(0)
+#endif
+
+/* debug profiling option */
+#define MAZE_DEBUG_PROFILING 0
+#if MAZE_DEBUG_PROFILING
+#warning "this is debug mode!"
+#include <chrono>
+static int microseconds() {
+  return std::chrono::duration_cast<std::chrono::microseconds>(
+             std::chrono::steady_clock::now().time_since_epoch())
+      .count();
+}
+static int microseconds() __attribute__((unused));
+#define MAZE_DEBUG_PROFILING_START(id) const auto t0_##id = microseconds();
+#define MAZE_DEBUG_PROFILING_END(id)                                 \
+  {                                                                  \
+    const auto t1_##id = microseconds();                             \
+    const auto dur = t1_##id - t0_##id;                              \
+    static auto dur_max = 0;                                         \
+    if (dur > dur_max) {                                             \
+      dur_max = dur;                                                 \
+      MAZE_LOGD << __func__ << "(" << #id << ")\t" << dur << " [us]" \
+                << std::endl;                                        \
+    }                                                                \
+  }
+#else
+#define MAZE_DEBUG_PROFILING_START(id)
+#define MAZE_DEBUG_PROFILING_END(id)
 #endif
 
 /**
