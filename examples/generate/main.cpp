@@ -25,10 +25,8 @@ void poll(Maze& maze) {
     for (int y = 0; y < MAZE_SIZE; ++y) {
       auto p = Position(x, y);
       if (p == maze.getStart()) continue;
-      auto dirs = getRandomDirectionsAlong4();
-      while (!dirs.empty()) {
-        const auto d = dirs.back();
-        dirs.pop_back();
+      const auto dirs = getRandomDirectionsAlong4();
+      for (const auto d : dirs) {
         const auto i = WallIndex((d & 4) ? p.next(Direction::NorthEast) : p, d);
         if (!i.isInsideOfField()) break;
         if (maze.isWall(i)) continue;
@@ -151,7 +149,7 @@ int main(void) {
 
   /* print */
   maze.print();
-  std::ofstream of("gen.maze");
+  std::ofstream of("generated.maze");
   maze.print(of);
 
   /* StepMapSlalom */
